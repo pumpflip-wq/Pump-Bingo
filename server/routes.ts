@@ -51,7 +51,25 @@ export async function registerRoutes(
     if (!round) return res.status(404).json({ message: "Round not found" });
     
     const count = await storage.getRoundParticipantsCount(roundId);
-    res.json({ round, participantsCount: count });
+    
+    // Fetch participants with usernames
+    const roundParticipants = await db.select({
+      id: users.id,
+      username: users.username,
+      joinedAt: participants.joinedAt
+    })
+    .from(participants)
+    .innerJoin(users, eq(participants.userId, users.id))
+    .where(eq(participants.roundId, roundId));
+
+    res.json({ 
+      round, 
+      participantsCount: count,
+      participants: roundParticipants.map(p => ({
+        ...p,
+        joinedAt: p.joinedAt?.toISOString() || new Array().toString()
+      }))
+    });
   });
 
   app.post(api.rounds.join.path, async (req, res) => {

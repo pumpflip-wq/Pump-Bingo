@@ -50,6 +50,11 @@ export const api = {
         200: z.object({
           round: z.custom<typeof rounds.$inferSelect>(),
           participantsCount: z.number(),
+          participants: z.array(z.object({
+            id: z.number(),
+            username: z.string(),
+            joinedAt: z.string()
+          }))
         }),
         404: errorSchemas.notFound,
       },
