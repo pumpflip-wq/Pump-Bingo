@@ -35,8 +35,16 @@ export default function Home() {
     }
   }, [connected, walletAddress, login]);
 
-  const user = queryClient.getQueryData<User>(["/api/auth/me"]);
+  const { data: user } = useQuery<User>({ 
+    queryKey: ["/api/auth/me"],
+    staleTime: Infinity 
+  });
+  
   const { data: participant } = useParticipant(latestRound?.id || 0, user?.id);
+  
+  // Also check roundData for current user's participation if hook is lagging
+  const isParticipant = !!participant || (roundData?.participants?.some((p: any) => p.username === walletAddress));
+  
   const [showWinner, setShowWinner] = useState(false);
 
   useEffect(() => {
@@ -202,10 +210,10 @@ export default function Home() {
                   <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
                 </div>
 
-                {participant ? (
+                {isParticipant ? (
                   <div className="relative space-y-10">
                     <BingoCard 
-                      card={participant.card as number[][]} 
+                      card={participant?.card as number[][] || roundData.participants.find((p: any) => p.username === walletAddress)?.card as number[][]} 
                       drawnNumbers={roundData.round.drawnNumbers || []} 
                       className="w-full max-w-[540px] mx-auto"
                     />
@@ -214,10 +222,10 @@ export default function Home() {
                       <BingoClaimButton 
                         roundId={roundData.round.id} 
                         userId={user?.id || 0} 
-                        card={participant.card as number[][]}
+                        card={participant?.card as number[][] || roundData.participants.find((p: any) => p.username === walletAddress)?.card as number[][]}
                         drawnNumbers={roundData.round.drawnNumbers || []}
                         status={roundData.round.status}
-                        isBingoed={participant.hasBingo || false}
+                        isBingoed={participant?.hasBingo || false}
                       />
                     </div>
                   </div>
@@ -300,7 +308,7 @@ function HistoryItem({ id, winner, prize }: { id: number, winner: string, prize:
   );
 }
 
-function CountdownTimer({ targetDate, status, participantCount }: { targetDate: string | null, status: string, participantCount: number }) {
+function CountdownTimer({ targetDate, status, participantCount }: { targetDate: string | null | undefined, status: string, participantCount: number }) {
   const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
