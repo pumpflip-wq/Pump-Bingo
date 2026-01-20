@@ -236,10 +236,6 @@ export default function Home() {
                 <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2">
                   <History className="w-4 h-4 text-primary" /> Protocol Archive
                 </h3>
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                  <span className="w-1 h-1 rounded-full bg-emerald-500" />
-                  <span className="text-[8px] font-bold text-emerald-500 uppercase">Mainnet-Beta Sync</span>
-                </div>
               </div>
               
               <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
@@ -286,14 +282,14 @@ function HistoryItem({ id, winner, prize }: { id: number, winner: string, prize:
       className="block p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:border-primary/50 hover:bg-white/10 group"
     >
       <div className="flex justify-between items-start mb-2">
-        <span className="font-mono text-[10px] text-white/60 tracking-tighter">ROUND #{id}</span>
+        <span className="font-mono text-[10px] text-white tracking-tighter">ROUND #{id}</span>
         <span className="text-primary font-black font-display italic text-sm">+{prize.toLocaleString()} PUMP</span>
       </div>
       <div className="flex justify-between items-center">
         <span className="text-xs font-black text-white italic">@{winner}</span>
         <div className="flex items-center gap-1">
           <ShieldCheck className="w-3 h-3 text-primary/40 group-hover:text-primary transition-colors" />
-          <span className="text-[10px] text-white/60 uppercase font-black group-hover:text-white transition-colors">VERIFIED</span>
+          <span className="text-[10px] text-white uppercase font-black group-hover:text-white transition-colors">VERIFIED</span>
         </div>
       </div>
     </a>
