@@ -49,8 +49,8 @@ export class GameManager {
     const seed = crypto.randomBytes(32).toString('hex');
     const hash = crypto.createHash('sha256').update(seed).digest('hex');
     
-    // Start 30 seconds from now
-    const startTime = new Date(Date.now() + 30 * 1000); 
+    // Start 45 seconds from now to allow for lobby time
+    const startTime = new Date(Date.now() + 45 * 1000); 
 
     await storage.createRound({
       status: ROUND_STATUS.OPEN,
@@ -94,20 +94,22 @@ export class GameManager {
             return;
         }
 
-        // Draw every 3 seconds
-        const lastDrawTime = round.updatedAt?.getTime() || 0; // Assuming we add updatedAt or use createdAt as proxy
-        // Since we update the round on every draw, the 'updatedAt' (or our update call) can be used.
-        // Let's just draw if a certain time passed. 
-        // For simplicity in MVP tick, let's use a simpler check or just draw.
-        
-        const available = Array.from({length: 75}, (_, i) => i + 1)
-            .filter(n => !round.drawnNumbers!.includes(n));
-        
-        if (available.length > 0) {
-            const nextNum = available[Math.floor(Math.random() * available.length)];
-            const newNumbers = [...round.drawnNumbers, nextNum];
-            await storage.updateRound(round.id, { drawnNumbers: newNumbers });
-            console.log(`Round ${round.id} drew number ${nextNum}`);
+        // Draw numbers based on fixed interval
+        const now = new Date().getTime();
+        const startTime = new Date(round.startTime!).getTime() + 5000; // startTime + STARTING delay
+        const elapsed = now - startTime;
+        const expectedNumbers = Math.min(75, Math.floor(elapsed / 3000)); // One number every 3 seconds
+
+        if (round.drawnNumbers.length < expectedNumbers) {
+            const available = Array.from({length: 75}, (_, i) => i + 1)
+                .filter(n => !round.drawnNumbers!.includes(n));
+            
+            if (available.length > 0) {
+                const nextNum = available[Math.floor(Math.random() * available.length)];
+                const newNumbers = [...round.drawnNumbers, nextNum];
+                await storage.updateRound(round.id, { drawnNumbers: newNumbers });
+                console.log(`Round ${round.id} drew number ${nextNum}`);
+            }
         }
     }
   }

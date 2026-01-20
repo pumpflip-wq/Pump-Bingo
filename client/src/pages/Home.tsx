@@ -11,17 +11,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
 export default function Home() {
-  const { data: rounds, isLoading: roundsLoading } = useRounds();
   const { user } = useAuth();
   const [, setLocation] = useLocation();
 
-  if (!user) {
-    if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+  useEffect(() => {
+    if (!user && typeof window !== 'undefined' && window.location.pathname !== '/login') {
        window.location.href = '/login';
-       return null;
     }
-  }
+  }, [user]);
 
+  const { data: rounds, isLoading: roundsLoading } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
   const { data: roundData, isLoading: roundLoading } = useRound(latestRound?.id);
   const { data: participant } = useParticipant(latestRound?.id, user?.id);
@@ -37,6 +36,8 @@ export default function Home() {
   }, [roundData?.round.winnerId]);
 
   const isLoading = roundsLoading || (latestRound && roundLoading);
+
+  if (!user) return null;
 
   return (
     <Layout>
