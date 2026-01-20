@@ -10,7 +10,7 @@ export function useRounds() {
       if (!res.ok) throw new Error("Failed to fetch rounds");
       return api.rounds.list.responses[200].parse(await res.json());
     },
-    refetchInterval: 5000, // Poll list occasionally
+    refetchInterval: 2000, // Poll list occasionally
   });
 }
 

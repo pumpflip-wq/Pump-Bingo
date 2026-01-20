@@ -73,19 +73,25 @@ export class GameManager {
       
       // Only allow the countdown to progress if we have at least 2 players
       if (participantCount >= 2) {
+        if (!round.startTime || (new Date(round.startTime).getTime() - now.getTime()) > 60000) {
+            // If we just reached 2 players, set the countdown to start from 60s
+            await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60 * 1000) });
+            return;
+        }
+
         if (round.startTime && now >= round.startTime) {
           await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
           console.log(`Round ${round.id} starting...`);
         }
       } else {
-        // Not enough players: strictly fix the start time to exactly 60s in the future
-        // We set it to a very distant future or just keep resetting it to now + 60s
-        // But to avoid the "jumping" in the UI, we'll just set it to a fixed state
-        const sixtySecondsFromNow = new Date(now.getTime() + 60 * 1000);
+        // Not enough players: strictly freeze the start time at exactly 60s in the future
+        const sixtySecondsFromNow = new Date(now.getTime() + 60000);
         
+        // We only update if it's not already roughly 60s (to avoid constant DB writes)
         const currentStartTime = round.startTime ? new Date(round.startTime) : null;
-        // If we don't have a start time, or it's less than 59s away, reset it to 60s
-        if (!currentStartTime || (currentStartTime.getTime() - now.getTime()) < 59000) {
+        const diff = currentStartTime ? Math.abs(currentStartTime.getTime() - sixtySecondsFromNow.getTime()) : Infinity;
+        
+        if (diff > 2000) { // Update if off by more than 2 seconds
            await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
         }
       }
@@ -120,10 +126,10 @@ export class GameManager {
             return;
         }
 
-        // Draw one number every 3 seconds
+        // Draw one number every 2 seconds for faster gameplay
         const startTime = new Date(round.startTime!).getTime() + 5000;
         const elapsed = now.getTime() - startTime;
-        const expectedNumbersCount = Math.min(75, Math.floor(elapsed / 3000));
+        const expectedNumbersCount = Math.min(75, Math.floor(elapsed / 2000));
 
         if (round.drawnNumbers.length < expectedNumbersCount) {
             const available = Array.from({length: 75}, (_, i) => i + 1)

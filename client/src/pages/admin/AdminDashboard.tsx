@@ -1,11 +1,39 @@
-import { useQuery } from "@tanstack/react-query";
-import { type Round, type Participant, type User } from "@shared/schema";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { type Round, type Participant, type User, ROUND_STATUS } from "@shared/schema";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Loader2, ShieldCheck, Settings, Users } from "lucide-react";
+import { Loader2, ShieldCheck, Settings, Users, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminDashboard() {
-  const { data: rounds, isLoading: roundsLoading } = useQuery<Round[]>({ queryKey: ["/api/rounds"] });
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { data: rounds, isLoading: roundsLoading } = useQuery<Round[]>({ 
+    queryKey: ["/api/rounds"],
+    refetchInterval: 2000
+  });
+
+  const forceStartMutation = useMutation({
+    mutationFn: async (roundId: number) => {
+      await apiRequest("POST", `/api/rounds/${roundId}/force-start`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
+      toast({
+        title: "Success",
+        description: "Round force started",
+      });
+    },
+    onError: (err: Error) => {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
+    }
+  });
   
   if (roundsLoading) {
     return (
@@ -15,6 +43,8 @@ export default function AdminDashboard() {
     );
   }
 
+  const activeRoundsCount = rounds?.filter(r => r.status !== ROUND_STATUS.FINISHED).length || 0;
+
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
@@ -23,10 +53,10 @@ export default function AdminDashboard() {
         </h1>
         <div className="flex gap-4">
           <div className="bg-card p-4 rounded-xl border border-white/10 flex items-center gap-3">
-            <Users className="text-primary w-5 h-5" />
+            <Settings className="text-primary w-5 h-5" />
             <div>
-              <p className="text-[10px] uppercase font-black text-white/40">Total Nodes</p>
-              <p className="text-xl font-black text-white italic">2,481</p>
+              <p className="text-[10px] uppercase font-black text-white/40">Active Rounds</p>
+              <p className="text-xl font-black text-white italic">{activeRoundsCount}</p>
             </div>
           </div>
         </div>
@@ -57,6 +87,7 @@ export default function AdminDashboard() {
                 <TableHead className="text-white/40 font-black uppercase text-[10px]">ID</TableHead>
                 <TableHead className="text-white/40 font-black uppercase text-[10px]">Status</TableHead>
                 <TableHead className="text-white/40 font-black uppercase text-[10px]">Prize Pool</TableHead>
+                <TableHead className="text-white/40 font-black uppercase text-[10px]">Actions</TableHead>
                 <TableHead className="text-white/40 font-black uppercase text-[10px]">Created At</TableHead>
               </TableRow>
             </TableHeader>
@@ -70,6 +101,19 @@ export default function AdminDashboard() {
                     </span>
                   </TableCell>
                   <TableCell className="font-black text-white italic">{round.prizePool} PUMP</TableCell>
+                  <TableCell>
+                    {round.status === ROUND_STATUS.OPEN && (
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="gap-2 font-black italic uppercase text-[10px]"
+                        onClick={() => forceStartMutation.mutate(round.id)}
+                        disabled={forceStartMutation.isPending}
+                      >
+                        <Play className="w-3 h-3 fill-current" /> Force Start
+                      </Button>
+                    )}
+                  </TableCell>
                   <TableCell className="text-white/40 text-xs">
                     {new Date(round.createdAt!).toLocaleString()}
                   </TableCell>

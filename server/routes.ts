@@ -176,5 +176,24 @@ export async function registerRoutes(
       res.json(participant);
   });
 
+  app.post(api.rounds.get.path + "/force-start", async (req, res) => {
+    const roundId = Number(req.params.id);
+    if (isNaN(roundId)) return res.status(400).json({ message: "Invalid round ID" });
+
+    const round = await storage.getRound(roundId);
+    if (!round) return res.status(404).json({ message: "Round not found" });
+
+    if (round.status !== ROUND_STATUS.OPEN) {
+      return res.status(400).json({ message: "Round is not in OPEN state" });
+    }
+
+    await storage.updateRound(roundId, { 
+      status: ROUND_STATUS.STARTING,
+      startTime: new Date()
+    });
+
+    res.json({ message: "Round force started" });
+  });
+
   return httpServer;
 }
