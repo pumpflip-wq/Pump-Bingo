@@ -2,18 +2,34 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Round, type Participant, type User, ROUND_STATUS } from "@shared/schema";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Loader2, ShieldCheck, Settings, Users, Play } from "lucide-react";
+import { Loader2, ShieldCheck, Settings, Users, Play, Search, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import crypto from "crypto";
 
 export default function AdminDashboard() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [verifySeed, setVerifySeed] = useState("");
+  const [verifyHash, setVerifyHash] = useState("");
+  const [verificationResult, setVerificationResult] = useState<{valid: boolean, hash: string} | null>(null);
+
   const { data: rounds, isLoading: roundsLoading } = useQuery<Round[]>({ 
     queryKey: ["/api/rounds"],
     refetchInterval: 2000
   });
+
+  const handleVerify = () => {
+    if (!verifySeed) return;
+    const computedHash = crypto.createHash('sha256').update(verifySeed).digest('hex');
+    setVerificationResult({
+      valid: computedHash === verifyHash,
+      hash: computedHash
+    });
+  };
 
   const forceStartMutation = useMutation({
     mutationFn: async (roundId: number) => {
@@ -62,7 +78,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-card/80 border-white/10">
           <CardHeader>
             <CardTitle className="text-sm font-black uppercase text-white/60">System Status</CardTitle>
@@ -72,6 +88,45 @@ export default function AdminDashboard() {
               <ShieldCheck className="w-5 h-5" />
               <span className="font-black italic uppercase">Firewall Active</span>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/80 border-white/10">
+          <CardHeader>
+            <CardTitle className="text-sm font-black uppercase text-white/60">Fairness Verifier</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 gap-2">
+              <Input 
+                placeholder="Server Seed" 
+                value={verifySeed} 
+                onChange={(e) => setVerifySeed(e.target.value)}
+                className="bg-black/20 border-white/10"
+              />
+              <Input 
+                placeholder="Public Hash" 
+                value={verifyHash} 
+                onChange={(e) => setVerifyHash(e.target.value)}
+                className="bg-black/20 border-white/10"
+              />
+              <Button onClick={handleVerify} className="w-full gap-2 font-black italic uppercase">
+                <Search className="w-4 h-4" /> Verify Protocol
+              </Button>
+            </div>
+            {verificationResult && (
+              <div className={cn(
+                "p-4 rounded-xl border flex items-center gap-3",
+                verificationResult.valid ? "bg-primary/10 border-primary/20 text-primary" : "bg-red-500/10 border-red-500/20 text-red-500"
+              )}>
+                {verificationResult.valid ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+                <div>
+                  <p className="text-xs font-black uppercase tracking-widest">
+                    {verificationResult.valid ? "Verification Passed" : "Verification Failed"}
+                  </p>
+                  <p className="text-[10px] font-mono break-all opacity-60">{verificationResult.hash}</p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
