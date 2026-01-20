@@ -23,6 +23,8 @@ export const rounds = pgTable("rounds", {
   publicHash: text("public_hash").notNull(), // SHA256(seed) shown before game
   drawnNumbers: integer("drawn_numbers").array().default([]), // List of numbers drawn so far
   createdAt: timestamp("created_at").defaultNow(),
+  splMint: text("spl_mint"), // Added for future SPL token integration
+  feePercentage: integer("fee_percentage").default(10), // House fee
 });
 
 export const participants = pgTable("participants", {
@@ -32,6 +34,7 @@ export const participants = pgTable("participants", {
   card: jsonb("card").notNull(), // 5x5 grid of numbers
   hasBingo: boolean("has_bingo").default(false),
   joinedAt: timestamp("joined_at").defaultNow(),
+  txSignature: text("tx_signature"), // Solana transaction signature for verification
 });
 
 export const transactions = pgTable("transactions", {
