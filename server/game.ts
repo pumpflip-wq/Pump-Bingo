@@ -128,6 +128,12 @@ export class GameManager {
     else if (round.status === ROUND_STATUS.IN_GAME) {
         if (!round.drawnNumbers) round.drawnNumbers = [];
         
+        // Check if winner was already declared (e.g. via claim route)
+        if (round.winnerId) {
+            await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
+            return;
+        }
+
         if (round.drawnNumbers.length >= 75) {
             // End game if all numbers drawn
             await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
