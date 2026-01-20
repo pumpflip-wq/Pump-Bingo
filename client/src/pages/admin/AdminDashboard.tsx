@@ -2,17 +2,22 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Round, type Participant, type User, ROUND_STATUS } from "@shared/schema";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Loader2, ShieldCheck, Settings, Users, Play, Search, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, ShieldCheck, Settings, Users, Play, Search, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
 import crypto from "crypto";
+
+const ADMIN_WALLET = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns";
 
 export default function AdminDashboard() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [verifySeed, setVerifySeed] = useState("");
   const [verifyHash, setVerifyHash] = useState("");
   const [verificationResult, setVerificationResult] = useState<{valid: boolean, hash: string} | null>(null);
@@ -21,6 +26,19 @@ export default function AdminDashboard() {
     queryKey: ["/api/rounds"],
     refetchInterval: 2000
   });
+
+  if (!user || user.username !== ADMIN_WALLET) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
+        <AlertTriangle className="w-16 h-16 text-destructive mb-4" />
+        <h1 className="text-2xl font-black uppercase italic tracking-tighter mb-2">ACCESS RESTRICTED</h1>
+        <p className="text-muted-foreground max-w-md">
+          This terminal is restricted to authorized administrator protocols only.
+          Your current signature does not match the required clearance level.
+        </p>
+      </div>
+    );
+  }
 
   const handleVerify = () => {
     if (!verifySeed) return;

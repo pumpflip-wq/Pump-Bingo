@@ -7,8 +7,11 @@ import { BingoCard } from "@/components/BingoCard";
 import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
 import { CyberButton } from "@/components/ui/CyberButton";
-import { Loader2, AlertCircle, Share2, History } from "lucide-react";
-import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { Loader2, AlertCircle, History, ShieldCheck, CheckCircle2, XCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import crypto from "crypto";
 
 export default function GameRoom() {
   const [, params] = useRoute("/game/:id");
@@ -17,21 +20,34 @@ export default function GameRoom() {
   const [, setLocation] = useLocation();
 
   const { data: roundData, isLoading: roundLoading } = useRound(roundId);
-  // Safely handle user potentially being null (though Layout/Auth guard handles it usually)
   const { data: participant, isLoading: partLoading } = useParticipant(roundId, user?.id);
   
   const { mutate: claimBingo, isPending: claiming } = useClaimBingo();
   const [showWinner, setShowWinner] = useState(false);
+  const [showVerifier, setShowVerifier] = useState(false);
+  const [verifySeed, setVerifySeed] = useState("");
+  const [verificationResult, setVerificationResult] = useState<{valid: boolean, hash: string} | null>(null);
 
-  // Check for winner
   useEffect(() => {
     if (roundData?.round.winnerId) {
       setShowWinner(true);
     }
   }, [roundData?.round.winnerId]);
 
+  const handleVerify = () => {
+    if (!verifySeed || !roundData) return;
+    try {
+      const computedHash = crypto.createHash('sha256').update(verifySeed).digest('hex');
+      setVerificationResult({
+        valid: computedHash === roundData.round.publicHash,
+        hash: computedHash
+      });
+    } catch (e) {
+      console.error("Verification error:", e);
+    }
+  };
+
   if (!user) {
-      // Very basic auth guard
       if (typeof window !== 'undefined') window.location.href = '/login';
       return null;
   }
@@ -61,9 +77,6 @@ export default function GameRoom() {
 
   const { round, participantsCount } = roundData;
   const drawnNumbers = round.drawnNumbers || [];
-  
-  // Basic validation to see if BINGO is possible (simplified for frontend visual)
-  // Real validation happens on backend
   const canClaim = participant && !participant.hasBingo && round.status === 'IN_GAME'; 
 
   return (
@@ -86,15 +99,78 @@ export default function GameRoom() {
               </div>
               <div className="h-[1px] bg-white/10" />
               <div>
-                 <p className="text-xs text-muted-foreground mb-1">PROOF OF FAIRNESS</p>
-                 <div className="bg-black p-2 rounded text-[10px] text-muted-foreground font-mono break-all border border-white/5 truncate">
+                 <p className="text-xs text-muted-foreground mb-1 font-display flex items-center justify-between">
+                   PROOF OF FAIRNESS
+                   {round.status === 'FINISHED' && (
+                     <button 
+                       onClick={() => setShowVerifier(!showVerifier)}
+                       className="text-[10px] text-primary hover:underline font-black"
+                     >
+                       VERIFY NOW
+                     </button>
+                   )}
+                 </p>
+                 <div className="bg-black p-2 rounded text-[10px] text-muted-foreground font-mono break-all border border-white/5 truncate mb-2">
                    {round.publicHash}
                  </div>
+                 {round.status === 'FINISHED' && (
+                   <div className="space-y-2">
+                     <p className="text-[9px] text-emerald-500 uppercase font-black">ROUND SEED REVEALED:</p>
+                     <div className="bg-emerald-500/10 p-2 rounded text-[10px] text-emerald-500 font-mono break-all border border-emerald-500/20">
+                       {round.serverSeed}
+                     </div>
+                   </div>
+                 )}
               </div>
             </div>
           </div>
 
-          <div className="bg-card border border-white/10 rounded-2xl p-6 h-[300px] flex flex-col">
+          <AnimatePresence>
+            {showVerifier && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="bg-card border border-primary/30 rounded-2xl p-6 space-y-4 overflow-hidden"
+              >
+                <h3 className="text-sm text-primary uppercase font-display flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4" /> Authenticity Verifier
+                </h3>
+                <p className="text-[10px] text-muted-foreground">Enter the revealed server seed to verify the public hash.</p>
+                <Input 
+                  placeholder="Revealed Seed" 
+                  value={verifySeed}
+                  onChange={(e) => setVerifySeed(e.target.value)}
+                  className="bg-black/40 border-white/10 text-xs font-mono"
+                />
+                <CyberButton 
+                  size="sm" 
+                  variant="outline" 
+                  className="w-full text-[10px]"
+                  onClick={handleVerify}
+                >
+                  VERIFY HASH
+                </CyberButton>
+
+                {verificationResult && (
+                  <div className={cn(
+                    "p-3 rounded-lg border flex items-center gap-2",
+                    verificationResult.valid ? "bg-primary/10 border-primary/20 text-primary" : "bg-red-500/10 border-red-500/20 text-red-500"
+                  )}>
+                    {verificationResult.valid ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <XCircle className="w-4 h-4 shrink-0" />}
+                    <div className="overflow-hidden">
+                      <p className="text-[9px] font-black uppercase tracking-widest">
+                        {verificationResult.valid ? "PASSED" : "FAILED"}
+                      </p>
+                      <p className="text-[8px] font-mono truncate opacity-60">{verificationResult.hash}</p>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="bg-card border border-white/10 rounded-2xl p-6 h-[250px] flex flex-col">
             <h3 className="text-sm text-muted-foreground uppercase mb-4 font-display flex items-center gap-2">
               <History className="w-4 h-4" /> Draw History
             </h3>
