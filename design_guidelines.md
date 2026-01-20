@@ -1,91 +1,87 @@
-# Solana Bingo Game - Design Guidelines
+# PUMP BINGO - Design Guidelines
 
 ## Design Approach
-**Reference-Based: Pump.fun Aesthetic** - High-energy meme platform meets crypto gaming. Inspired by Pump.fun's playful chaos, bold typography, and "number go up" energy. Think memecoin launch excitement with structured gameplay. Professional enough for real money, fun enough for degens.
+**Cyberpunk Trading Terminal Aesthetic** - Inspired by premium financial terminals (Bloomberg, TradingView) fused with underground crypto gaming energy. Think Binance futures interface meets cyberpunk arcade. Information-dense displays with surgical precision, neon accents piercing deep blacks, and real-time data streams. Professional enough for high-stakes wagering, edgy enough for degens.
 
 ## Color Palette
-- **Primary Action:** Neon Green `#22c55e` (buttons, winning states, highlights)
-- **Accent:** Pump Pink `#ec4899` (prizes, multipliers, special states)
-- **Background:** Deep Black `#09090b` (base layer)
-- **Surfaces:** `#1a1a1f` (cards, panels)
-- **Borders/Dividers:** `#27272a` with green/pink glow accents
+- **Primary Action:** Neon Green `#22c55e` (buy buttons, winning states, active trades)
+- **Accent:** Electric Purple `#ec4899` (prizes, multipliers, special highlights)
+- **Background Base:** `#09090b` (deep black foundation)
+- **Surfaces:** `#0f0f14` and `#1a1a1f` (layered panels)
+- **Borders:** `#27272a` with subtle green/purple glow accents
+- **Text Primary:** `#fafafa`, Secondary: `#a1a1aa`, Muted: `#52525b`
 
 ## Typography
 **Font Stack:**
-- Primary: 'Space Grotesk' (700-800 for headings, 600 for buttons/labels)
-- Secondary: 'DM Sans' (500-600 for body, instructions, UI text)
-- Numbers: 'JetBrains Mono' (700 for bingo numbers, wallet balances, prize amounts)
+- Headers: 'Rajdhani' (700-800 weight, uppercase tracking-wide for impact)
+- Data/Numbers: 'JetBrains Mono' (600-700 for all numeric displays, addresses, timers)
+- Body: System fonts (-apple-system, sans-serif) for optimal legibility
 
 **Hierarchy:**
-- Game Logo/Headers: text-6xl md:text-7xl, font-extrabold, uppercase
-- Called Numbers: text-5xl md:text-6xl, monospace, font-bold
-- Bingo Card Numbers: text-3xl md:text-4xl, monospace, bold
-- Prize Amounts: text-4xl md:text-5xl, monospace, gradient text effect
-- Body Text: text-base md:text-lg, leading-relaxed
-- Micro Data: text-sm, font-medium
+- Main Logo/Title: text-7xl md:text-8xl font-extrabold uppercase tracking-wider
+- Section Headers: text-3xl md:text-4xl font-bold uppercase tracking-wide
+- Bingo Numbers (Called): text-6xl md:text-7xl monospace font-bold
+- Card Grid Numbers: text-4xl monospace font-semibold
+- Prize Amounts: text-5xl md:text-6xl monospace with gradient treatment
+- Stats/Data: text-lg md:text-xl monospace font-medium
+- Labels: text-sm font-semibold uppercase tracking-widest
 
 ## Layout System
-**Spacing:** Tailwind units of 4, 6, 8, 12, 16, 24
-- Mobile-first: p-4, gap-6 on small screens
-- Desktop: p-8, gap-12 for sections
-- Card spacing: space-y-6
-- Grid gaps: gap-4 md:gap-6
+**12-Column Grid with Breakpoints:**
+- Mobile: Single column, full-width stacked sections (p-4, gap-6)
+- Tablet: 8-column grid (p-6, gap-8)
+- Desktop: Full 12-column (p-8, gap-12), three-zone layout (3-col sidebar | 6-col main | 3-col sidebar)
 
-**Grid Structure:**
-- Mobile: Single column, stacked components
-- Desktop: 3-column (sidebar-main-sidebar) with bingo card centered, 70% width main area
+**Spacing Units:** Tailwind 4, 6, 8, 12, 16, 24
+- Section padding: py-12 md:py-16
+- Card internal: p-6 md:p-8
+- Component gaps: gap-4 md:gap-6
+- Grid spacing: gap-3 for bingo card cells
 
 ## Component Library
 
-**Header:**
-Sticky top bar with backdrop-blur-xl, dark background. Includes: SOL balance (large monospace text with green), wallet button (neon green with black text, rounded-full), meme-style logo text ("BINGO DEGEN" or similar), hamburger menu mobile.
+**Header Navigation:**
+Fixed top, backdrop-blur-xl with dark gradient (black to transparent). Left: "PUMP BINGO" logo (Rajdhani, oversized, green gradient). Center: Round timer (circular progress, green stroke), current round #, players online (monospace). Right: SOL balance (large monospace, green), wallet button (green bg, black text, rounded-lg, sharp borders).
 
-**Bingo Card:**
-Centered, prominent card with sharp rounded corners (rounded-2xl). Background gradient from dark surface to slightly lighter. 5x5 grid with thick borders between cells. Each cell: large monospace number, centered. Called numbers: bright green background with scale animation. FREE space: pink gradient with icon. Winning pattern: animated green glow outline pulsing.
+**Main Bingo Card:**
+Centered panel, 5x5 grid occupying 60% viewport width desktop. Container: rounded-xl with double border (inner green glow, outer dark). Each cell: square aspect-ratio, monospace number centered, sharp internal borders (#27272a). Called numbers: green background with instant highlight transition. FREE space: purple gradient with icon. Winning cells: animated green outline pulse (2s).
 
 **Number Call Display:**
-Large horizontal banner showing latest called number (giant text, green glow, brief flash animation). Below: scrolling horizontal chips of previously called numbers (pill-shaped, green borders, dark bg).
+Horizontal banner above card. Latest number: gigantic text (text-8xl), green text-shadow glow, brief scale-in. History strip below: horizontally scrolling pills (rounded-full, border-2 green, dark bg, monospace numbers).
 
-**Prize Pool Section:**
-Eye-catching panel with gradient border (green to pink). Giant SOL amount with animated counter, sparkle effects on change. Prize tiers in grid cards: 2-column mobile, 3-column desktop. Each tier shows pattern type, SOL amount (pink text), and odds (small gray text).
+**Prize Pool Panel:**
+Prominent card with gradient border (green-to-purple). Top: Total pool (huge monospace SOL amount, animated counter with sparkle effect on increment). Below: 3-column grid of prize tiers (2-col mobile). Each tier card: pattern type icon, SOL amount (purple gradient text), win condition, odds (small muted text).
 
-**Buy Card Button:**
-Massive, impossible-to-miss CTA. Full-width mobile, prominent desktop. Neon green background, black text, bold font, rounded-full, thick border, shadow-2xl with green glow. Text: "BUY CARD - 0.1 SOL" or similar.
+**Transaction Feed (Sidebar):**
+Vertical scrolling panel. Each entry: compact card with timestamp, event type badge (pill-shaped, color-coded), truncated wallet, action description. Recent wins highlighted with purple border glow.
 
-**Game Status Bar:**
-Top banner (below header) with round timer (circular progress ring, green), current round number, players active count. On mobile: compact horizontal layout.
+**Buy Card CTA:**
+Full-width bottom bar mobile, prominent centered button desktop. Neon green background, black text, Rajdhani font, rounded-lg, thick border with shadow-2xl green glow. Text: "BUY CARD - 0.1 SOL" plus card count available.
 
-**Transaction Feed:**
-Side panel (desktop) or bottom drawer (mobile). Shows recent activity: "🔥 Player won 5 SOL!", "Called: B-12", transaction confirmations. Each item: compact card with timestamp, pill-shaped badges for transaction type.
-
-**Leaderboard:**
-Cards showing top 5 players. Each card: rank badge (gradient circle, pink/green), truncated wallet address (monospace), wins count (green number), total SOL won (large pink number). Stack mobile, 2-column tablet, single column in sidebar desktop.
+**Stats Dashboard (Second Sidebar):**
+Stacked information cards: Leaderboard (top 5, rank badges with gradient, monospace addresses, win counts), Your Stats (games played, win rate, total won), Recent Activity. Each card: glassmorphic background, refined borders.
 
 **Footer:**
-Compact section with Solana logo, "Powered by Solana" text, smart contract address (click to copy, monospace), links to rules/FAQ, social icons (X, Discord, Telegram). Simple horizontal layout mobile, spread out desktop.
+Compact terminal-style bar. Left: Solana logo + "POWERED BY SOLANA". Center: Contract address (monospace, click-to-copy with green flash). Right: Social icons (Discord, X, Telegram) with subtle hover glow.
 
 ## Images
 
-**Hero Background (Welcome/Lobby Screen):**
-Abstract neon grid cityscape with pink and green light streaks. Think Pump.fun's playful geometric patterns meets Tron-style digital landscape. Full viewport height with dark gradient overlay (bottom to top, black to transparent) ensuring text readability. Position main CTAs ("ENTER GAME", "CONNECT WALLET") over this background with backdrop-blur-lg backgrounds.
+**Hero Background:**
+Full-viewport cyberpunk cityscape with neon grid overlay. Abstract purple and green light trails cutting through dark geometric architecture. Tron-meets-Blade Runner aesthetic with heavy film grain texture. Dark gradient overlay (90% black at bottom fading to 60% at top) ensures text readability. Position "ENTER GAME" and "CONNECT WALLET" buttons centered with backdrop-blur-lg cards behind them (no hover states on these backdrop buttons).
 
-**Pattern Overlays:**
-Subtle dot matrix or grid pattern at 3% opacity across dark surfaces for texture depth without distraction.
+**Texture Overlays:**
+Scanline effect at 2% opacity across all dark surfaces. Subtle dot matrix pattern in corners and edges for depth.
 
 ## Visual Treatment
-- Glass morphism on all panels: backdrop-blur-lg, semi-transparent backgrounds
-- Borders: 2px green or pink on interactive elements
-- Glows: box-shadow with green (active/winning) or pink (prizes) at 40% opacity, large blur radius
-- Gradients: Green-to-pink on special elements (prize amounts, winning states)
-- Pill shapes: rounded-full for chips, badges, small buttons
-- Card shapes: rounded-2xl for major panels
+- **Glassmorphism:** All panels use backdrop-blur-lg with rgba backgrounds (0.05-0.1 alpha)
+- **Borders:** 1-2px sharp borders, green or purple on interactive elements
+- **Glows:** box-shadow with 20px blur, green/purple at 30% opacity on hover/active states
+- **Gradients:** Green-to-purple on prize amounts, winning states, special badges
+- **Shapes:** rounded-lg for major containers, rounded-full for pills/badges, sharp corners for grid cells
 
-## Animations
-**Purposeful Only:**
-- Number call: Quick bounce-in (0.2s spring)
-- Prize counter: Smooth increment with brief green flash
-- Win state: Pulsing green glow (2s loop)
-- Card purchase: Success checkmark scale-in
-- Loading: Rotating Solana logo or green dot pulse
-
-Avoid excessive particle effects or screen transitions that slow gameplay.
+## Animations (Minimal)
+- Number call: Quick scale-in (0.15s cubic-bezier)
+- Prize increment: Smooth count-up with brief green flash
+- Win pattern: Pulsing green glow (2s loop)
+- Button interactions: Standard scale and glow (handled by Button component)
+- Loading states: Rotating Solana icon or green pulse dot

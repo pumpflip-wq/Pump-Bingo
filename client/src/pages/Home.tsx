@@ -99,30 +99,37 @@ export default function Home() {
           <Zap className="w-12 h-12 text-black fill-current" />
         </motion.div>
         
-        <div className="space-y-4">
+        <div className="space-y-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 p-2 pl-4 pr-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-[0.2em]"
+            className="inline-flex items-center gap-3 p-1 pl-4 pr-1 rounded-full bg-black/40 border border-primary/30 text-primary text-xs font-bold uppercase tracking-[0.2em] backdrop-blur-md shadow-[0_0_20px_rgba(34,197,94,0.1)]"
           >
-            <span className="opacity-60">CA:</span>
-            <span className="font-mono text-sm">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
+            <span className="opacity-60 font-mono text-[10px]">CONTRACT:</span>
+            <span className="font-mono text-sm tracking-tighter">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
             <button 
               onClick={copyCA}
-              className="ml-2 p-2 rounded-full bg-primary/20 hover:bg-primary/30 transition-colors"
+              className="ml-2 p-2 rounded-full bg-primary text-black hover:scale-105 transition-all active:scale-95 shadow-[0_0_15px_rgba(34,197,94,0.4)]"
             >
-              <Copy className="w-4 h-4" />
+              <Copy className="w-3.5 h-3.5" />
             </button>
           </motion.div>
           
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-7xl md:text-9xl font-black font-display tracking-tighter text-white italic leading-none"
-          >
-            PUMP <span className="text-primary drop-shadow-[0_0_30px_rgba(34,197,94,0.3)]">BINGO</span>
-          </motion.h1>
-          <p className="text-primary/70 font-black uppercase tracking-[0.5em] text-sm md:text-base italic">The fairest game on Solana</p>
+          <div className="relative inline-block">
+            <motion.h1 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-8xl md:text-[10rem] font-black font-display tracking-tighter text-white italic leading-[0.8] mb-2 drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
+            >
+              PUMP <span className="text-primary drop-shadow-[0_0_40px_rgba(34,197,94,0.4)]">BINGO</span>
+            </motion.h1>
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 blur-sm"
+            />
+          </div>
+          <p className="text-primary/80 font-black uppercase tracking-[0.8em] text-xs md:text-sm italic pl-[0.8em]">PROVABLY FAIR SOLANA GAMING</p>
         </div>
       </section>
 
@@ -135,9 +142,9 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           <aside className="lg:col-span-3 space-y-8">
-            <div className="bg-card/80 border border-white/10 rounded-2xl p-6 shadow-xl">
+            <div className="glass-card neon-border rounded-2xl p-6 shadow-xl">
               <div className="flex items-center justify-between mb-8">
-                <h3 className="text-lg text-white uppercase font-black tracking-widest">Live Stats</h3>
+                <h3 className="text-lg text-white uppercase font-black tracking-widest font-display">Live Stats</h3>
                 <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                   <span className="text-[10px] font-bold text-primary uppercase">Active</span>
@@ -146,30 +153,30 @@ export default function Home() {
               
               <div className="space-y-6">
                 <div className="space-y-1">
-                  <p className="text-sm text-white font-bold tracking-widest">Prize Pool</p>
+                  <p className="text-sm text-white/60 font-bold tracking-widest uppercase">Prize Pool</p>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-black text-primary font-display tracking-tighter">
+                    <span className="text-5xl font-black text-primary font-display tracking-tighter drop-shadow-[0_0_20px_rgba(34,197,94,0.3)]">
                       {roundData.round.prizePool.toLocaleString()}
                     </span>
-                    <span className="text-sm font-black text-primary italic uppercase">PUMP</span>
+                    <span className="text-sm font-black text-primary italic uppercase tracking-widest">PUMP</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/5">
                   <div className="space-y-1">
-                    <p className="text-[10px] text-white font-bold tracking-widest">Nodes</p>
-                    <p className="text-xl font-black text-white font-display">{roundData.participantsCount}</p>
+                    <p className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Nodes</p>
+                    <p className="text-2xl font-black text-white font-display tracking-tight">{roundData.participantsCount}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] text-white font-bold tracking-widest">Entry</p>
-                    <p className="text-xl font-black text-white font-display">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
+                    <p className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Entry</p>
+                    <p className="text-2xl font-black text-white font-display tracking-tight">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-card/80 border border-white/10 rounded-2xl p-6 flex flex-col h-[320px]">
-              <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2">
+            <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[320px]">
+              <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
                 <Users className="w-4 h-4 text-primary" /> Active Players
               </h3>
               
@@ -179,17 +186,17 @@ export default function Home() {
                     <motion.div 
                       key={p.id}
                       layout
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-colors hover:border-primary/50"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
                           {p.username[0].toUpperCase()}
                         </div>
-                        <span className="text-sm font-bold text-white italic">@{formatAddress(p.username)}</span>
+                        <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
                       </div>
-                      <ShieldCheck className="w-4 h-4 text-primary/40" />
+                      <ShieldCheck className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
                     </motion.div>
                   ))}
                 </AnimatePresence>
@@ -234,26 +241,28 @@ export default function Home() {
 
           <main className="lg:col-span-6 space-y-8">
             {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
-              <div className="bg-card/80 border-2 border-white/5 rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-[600px] relative overflow-hidden">
+              <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-[600px] relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="space-y-10 relative z-10 w-full max-w-md">
                   <div className="space-y-4">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest">
                       {roundData.round.status === 'OPEN' ? `Accepting Entries - Round #${roundData.round.id}` : `Game Starting - Round #${roundData.round.id}`}
                     </div>
-                    <h2 className="text-5xl md:text-7xl font-black font-display text-white tracking-tighter italic">
-                      BINGO <span className="text-primary">LOBBY</span>
+                    <h2 className="text-5xl md:text-8xl font-black font-display text-white tracking-tighter italic">
+                      BINGO <span className="text-primary drop-shadow-[0_0_20px_rgba(34,197,94,0.3)]">LOBBY</span>
                     </h2>
                   </div>
 
-                  <div className="p-10 bg-black/40 rounded-[2rem] border border-white/10 backdrop-blur-xl">
-                    <p className="text-white text-xs uppercase font-black tracking-[0.2em] mb-6">Game Starting In</p>
+                  <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
+                    <p className="text-white/60 text-xs uppercase font-black tracking-[0.2em] mb-6 font-mono">Game Starting In</p>
                     <CountdownTimer 
                       targetDate={roundData.round.startTime?.toString() || null} 
                       status={roundData.round.status}
                       participantCount={roundData.participantsCount}
                     />
                     {roundData.participantsCount < 2 && (
-                      <p className="text-primary text-sm uppercase font-black mt-6 animate-pulse tracking-widest">
+                      <p className="text-primary text-sm uppercase font-black mt-6 animate-pulse tracking-widest font-display">
                         Waiting for at least 2 players to start timer...
                       </p>
                     )}
@@ -315,9 +324,9 @@ export default function Home() {
           </main>
 
           <aside className="lg:col-span-3">
-            <div className="bg-card/80 border border-white/10 rounded-2xl p-6 flex flex-col h-[600px] shadow-xl">
+            <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[600px] shadow-xl">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2">
+                <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
                   <History className="w-4 h-4 text-primary" /> Game History
                 </h3>
               </div>
@@ -347,7 +356,38 @@ export default function Home() {
               </div>
               
               <div className="mt-8 pt-6 border-t border-white/10">
-                <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest">PROVABLY FAIR SYSTEM ACTIVE</p>
+                <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
+              </div>
+            </div>
+          </aside>
+
+          <aside className="lg:col-span-3">
+            <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[280px]">
+              <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
+                <History className="w-4 h-4 text-primary" /> My Stats
+              </h3>
+              
+              <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                {userTransactions?.length ? (
+                  userTransactions.map((tx: any) => (
+                    <div key={tx.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] uppercase font-black text-white/40 font-mono">{tx.type}</span>
+                        <span className="text-xs text-white/60 font-mono">{new Date(tx.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <span className={cn(
+                        "font-black italic font-display",
+                        tx.amount > 0 ? "text-primary" : "text-red-500"
+                      )}>
+                        {tx.amount > 0 ? '+' : ''}{tx.amount}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
+                    <p className="text-[10px] uppercase font-black tracking-widest text-white">No activity</p>
+                  </div>
+                )}
               </div>
             </div>
           </aside>
