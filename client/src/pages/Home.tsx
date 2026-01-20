@@ -12,103 +12,60 @@ export default function Home() {
   const [, setLocation] = useLocation();
 
   if (!user) {
-    // If not logged in, redirect (or handled by Layout/Auth check)
-    // Ideally we might show a landing page here, but for now redirect
     if (window.location.pathname !== '/login') {
        window.location.href = '/login';
        return null;
     }
   }
 
+  const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
+
   return (
     <Layout>
-      <div className="space-y-12">
-        {/* Hero Section */}
-        <section className="relative py-12 md:py-20 overflow-hidden rounded-3xl bg-card border border-white/5">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2832&auto=format&fit=crop')] bg-cover bg-center opacity-20 pointer-events-none mix-blend-screen"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent pointer-events-none"></div>
-          
-          <div className="container relative z-10 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="max-w-2xl">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="inline-block px-3 py-1 mb-4 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider"
-              >
-                Live on Solana
-              </motion.div>
-              <motion.h1 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="text-5xl md:text-7xl font-black font-display tracking-tighter text-white mb-4"
-              >
-                PUMP <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">BINGO</span>
-              </motion.h1>
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-xl text-muted-foreground mb-8 max-w-lg"
-              >
-                Fair, fast, and fun. Join real-time bingo rounds, compete for massive PUMP pools, and win instant payouts.
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <CyberButton size="lg" onClick={() => document.getElementById('lobby')?.scrollIntoView({ behavior: 'smooth' })}>
-                  Start Playing
-                </CyberButton>
-              </motion.div>
-            </div>
-            
-            {/* Stat Cards - Floating */}
-            <motion.div 
-               initial={{ opacity: 0, x: 50 }}
-               animate={{ opacity: 1, x: 0 }}
-               transition={{ delay: 0.4 }}
-               className="hidden md:grid grid-cols-2 gap-4"
-            >
-               <div className="bg-black/50 backdrop-blur border border-white/10 p-6 rounded-2xl">
-                 <p className="text-muted-foreground text-xs uppercase mb-1">Total Paid Out</p>
-                 <p className="text-3xl font-bold font-display text-primary">1.2M+</p>
-               </div>
-               <div className="bg-black/50 backdrop-blur border border-white/10 p-6 rounded-2xl">
-                 <p className="text-muted-foreground text-xs uppercase mb-1">Live Players</p>
-                 <p className="text-3xl font-bold font-display text-secondary">428</p>
-               </div>
-            </motion.div>
-          </div>
+      <div className="space-y-8 max-w-4xl mx-auto">
+        {/* Header Section */}
+        <section className="text-center pt-8">
+          <motion.h1 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-6xl md:text-8xl font-black font-display tracking-tighter text-white mb-2 italic"
+          >
+            PUMP <span className="text-primary">BINGO</span>
+          </motion.h1>
+          <p className="text-muted-foreground font-mono text-sm tracking-widest uppercase opacity-70">
+            Fair • Fast • Fun • Solana
+          </p>
         </section>
 
-        {/* Game Lobby */}
-        <section id="lobby" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-white flex items-center gap-2">
-              <PlayCircle className="text-primary" /> Active Lobby
-            </h2>
-            <div className="flex gap-2">
-               {/* Filters could go here */}
-            </div>
-          </div>
-
+        {/* Global Game Card */}
+        <section id="lobby" className="relative">
           {isLoading ? (
             <div className="flex justify-center py-20">
               <Loader2 className="w-12 h-12 text-primary animate-spin" />
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {rounds?.map((round) => (
-                <RoundCard key={round.id} round={round} />
-              ))}
+          ) : latestRound ? (
+            <div className="space-y-6">
+              <GlobalRoundCard round={latestRound} />
               
-              {(!rounds || rounds.length === 0) && (
-                <div className="col-span-full py-20 text-center border-2 border-dashed border-white/10 rounded-2xl">
-                  <p className="text-muted-foreground">No active rounds. Check back soon!</p>
+              {/* Fairness Banner */}
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <Trophy className="text-primary w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Proof of Fairness</p>
+                    <p className="text-[10px] font-mono text-white/40 break-all max-w-md">{latestRound.publicHash}</p>
+                  </div>
                 </div>
-              )}
+                <div className="text-right">
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase">Round #{latestRound.id.toString().padStart(6, '0')}</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="py-20 text-center border-2 border-dashed border-white/10 rounded-3xl">
+              <p className="text-muted-foreground">Waiting for the next round to be generated...</p>
             </div>
           )}
         </section>
@@ -117,71 +74,81 @@ export default function Home() {
   );
 }
 
-function RoundCard({ round }: { round: any }) {
+function GlobalRoundCard({ round }: { round: any }) {
   const { mutate: joinRound, isPending } = useJoinRound();
+  const { user } = useAuth();
   const [, setLocation] = useLocation();
 
   const handleJoin = () => {
+    if (!user) {
+      setLocation('/login');
+      return;
+    }
     joinRound(
-      { roundId: round.id, userId: 1 }, // Note: User ID would come from auth context in real app
+      { roundId: round.id, userId: user.id },
       {
         onSuccess: () => setLocation(`/game/${round.id}`),
-        onError: (err) => alert(err.message) // Replace with toast
+        onError: (err: any) => alert(err.message)
       }
     );
   };
 
   const isLive = round.status === 'IN_GAME' || round.status === 'STARTING';
+  const isFinished = round.status === 'FINISHED';
   
   return (
     <motion.div 
-      whileHover={{ y: -5 }}
-      className="group bg-card border border-white/10 rounded-2xl overflow-hidden hover:border-primary/50 transition-colors flex flex-col"
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="bg-card border-2 border-white/10 rounded-[2rem] overflow-hidden p-8 md:p-12 shadow-[0_0_80px_rgba(57,255,20,0.05)]"
     >
-      <div className="p-6 flex-1">
-        <div className="flex justify-between items-start mb-4">
-           <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${isLive ? 'bg-primary/20 text-primary animate-pulse' : 'bg-white/10 text-muted-foreground'}`}>
-             {isLive ? 'Live Now' : 'Upcoming'}
+      <div className="flex flex-col items-center text-center space-y-8">
+        <div className="flex items-center gap-4">
+           <div className={`px-4 py-1 rounded-full text-sm font-black uppercase tracking-tighter ${isLive ? 'bg-primary text-black' : 'bg-white/10 text-muted-foreground'}`}>
+             {round.status}
            </div>
-           <div className="flex items-center text-muted-foreground text-xs font-mono">
-             #{round.id.toString().padStart(4, '0')}
+           {isLive && <div className="w-2 h-2 rounded-full bg-primary animate-ping" />}
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-muted-foreground font-mono uppercase tracking-widest text-sm">Prize Pool</p>
+          <h2 className="text-7xl md:text-9xl font-black font-display text-white tracking-tighter">
+            {round.prizePool.toLocaleString()}
+          </h2>
+          <p className="text-2xl font-black text-primary font-display">PUMP TOKENS</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-8 w-full max-w-md">
+           <div className="space-y-1">
+             <p className="text-xs text-muted-foreground uppercase font-bold">Buy-in</p>
+             <p className="text-2xl font-display font-bold">{round.price} PUMP</p>
+           </div>
+           <div className="space-y-1">
+             <p className="text-xs text-muted-foreground uppercase font-bold">Status</p>
+             <p className="text-2xl font-display font-bold text-secondary">
+               {round.status === 'OPEN' ? 'WAITING' : round.status}
+             </p>
            </div>
         </div>
-        
-        <div className="space-y-4">
-          <div>
-            <p className="text-sm text-muted-foreground uppercase tracking-wide mb-1">Prize Pool</p>
-            <p className="text-3xl font-black font-display text-white group-hover:text-primary transition-colors">
-              {round.prizePool.toLocaleString()} <span className="text-lg">PUMP</span>
+
+        <div className="w-full max-w-lg pt-4">
+          <CyberButton 
+            variant={isLive ? "secondary" : "primary"} 
+            className="w-full h-24 text-3xl font-black italic tracking-tighter"
+            onClick={() => isLive ? setLocation(`/game/${round.id}`) : handleJoin()}
+            disabled={isPending || isFinished}
+          >
+            {isPending ? <Loader2 className="animate-spin" /> : 
+             isLive ? 'ENTER GAME' : 
+             isFinished ? 'ROUND ENDED' :
+             `JOIN NEXT ROUND`}
+          </CyberButton>
+          {round.status === 'OPEN' && (
+            <p className="mt-4 text-muted-foreground text-sm font-mono animate-pulse">
+              STARTING AUTOMATICALLY SOON
             </p>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-             <div className="bg-black/30 rounded-lg p-3">
-               <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                 <Users className="w-3 h-3" /> Players
-               </div>
-               <p className="font-bold">12/100</p>
-             </div>
-             <div className="bg-black/30 rounded-lg p-3">
-               <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                 <Clock className="w-3 h-3" /> Entry
-               </div>
-               <p className="font-bold text-primary">{round.price} PUMP</p>
-             </div>
-          </div>
+          )}
         </div>
-      </div>
-      
-      <div className="p-4 bg-white/5 border-t border-white/5">
-        <CyberButton 
-          variant={isLive ? "secondary" : "primary"} 
-          className="w-full"
-          onClick={() => isLive ? setLocation(`/game/${round.id}`) : handleJoin()}
-          disabled={isPending}
-        >
-          {isLive ? 'Spectate / Play' : `Join for ${round.price} PUMP`}
-        </CyberButton>
       </div>
     </motion.div>
   );

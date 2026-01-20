@@ -59,11 +59,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getOpenRounds(): Promise<Round[]> {
-    // Return OPEN, STARTING, or IN_GAME rounds
-    // In a real app we might paginate
+    // Return only the most recent round, regardless of status
     return await db.select().from(rounds)
-      .where(sql`${rounds.status} IN ('OPEN', 'STARTING', 'IN_GAME')`)
-      .orderBy(rounds.startTime);
+      .orderBy(sql`${rounds.id} DESC`)
+      .limit(1);
   }
 
   async createRound(round: Partial<Round>): Promise<Round> {
