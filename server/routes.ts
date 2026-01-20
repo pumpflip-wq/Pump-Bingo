@@ -21,12 +21,11 @@ export async function registerRoutes(
   app.post(api.auth.login.path, async (req, res) => {
     try {
       const { username } = api.auth.login.input.parse(req.body);
+      // username is the wallet address
       let user = await storage.getUserByUsername(username);
       
       if (!user) {
         user = await storage.createUser({ username });
-        // Give welcome bonus for MVP
-        // await storage.updateUserBalance(user.id, 10000); 
       }
       
       res.status(200).json(user);

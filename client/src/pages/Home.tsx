@@ -10,19 +10,44 @@ import { Clock, Users, Trophy, PlayCircle, Loader2, History, AlertCircle, Shield
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
-export default function Home() {
-  const { user } = useAuth();
-  const [, setLocation] = useLocation();
+import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { type User } from "@shared/schema";
 
+export default function Home() {
+  const { publicKey, connected } = useWallet();
+  const walletAddress = publicKey?.toBase58();
+
+  // Auto-login/sync with backend when wallet connects
   useEffect(() => {
-    if (!user && typeof window !== 'undefined' && window.location.pathname !== '/login') {
-       window.location.href = '/login';
+    if (connected && walletAddress) {
+      // We'll update the useAuth or similar to handle wallet login
+      // For now, let's assume the backend handles it via the address
     }
-  }, [user]);
+  }, [connected, walletAddress]);
 
   const { data: rounds, isLoading: roundsLoading } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
   const { data: roundData, isLoading: roundLoading } = useRound(latestRound?.id);
+
+  // Sync wallet with backend
+  const { mutate: login } = useMutation({
+    mutationFn: (address: string) => apiRequest("POST", "/api/auth/login", { username: address }).then(res => res.json()),
+    onSuccess: (data) => {
+      // Store user info in query cache or local storage if needed
+      queryClient.setQueryData(["/api/auth/me"], data);
+    }
+  });
+
+  useEffect(() => {
+    if (connected && walletAddress) {
+      login(walletAddress);
+    }
+  }, [connected, walletAddress, login]);
+
+  const user = queryClient.getQueryData<User>(["/api/auth/me"]);
   const { data: participant } = useParticipant(latestRound?.id, user?.id);
   const { mutate: claimBingo, isPending: claiming } = useClaimBingo();
   const [showWinner, setShowWinner] = useState(false);
@@ -37,7 +62,19 @@ export default function Home() {
 
   const isLoading = roundsLoading || (latestRound && roundLoading);
 
-  if (!user) return null;
+  if (!connected) {
+    return (
+      <Layout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6">
+          <div className="space-y-2">
+            <h2 className="text-4xl font-black tracking-tighter">READY TO PUMP?</h2>
+            <p className="text-muted-foreground text-lg">Connect your Solana wallet to start playing</p>
+          </div>
+          <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-14 !px-8 !text-lg !rounded-xl" />
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

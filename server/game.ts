@@ -49,8 +49,8 @@ export class GameManager {
     const seed = crypto.randomBytes(32).toString('hex');
     const hash = crypto.createHash('sha256').update(seed).digest('hex');
     
-    // Start 45 seconds from now to allow for lobby time
-    const startTime = new Date(Date.now() + 45 * 1000); 
+    // Start 60 seconds from now to allow for lobby time
+    const startTime = new Date(Date.now() + 60 * 1000); 
 
     await storage.createRound({
       status: ROUND_STATUS.OPEN,
@@ -69,9 +69,20 @@ export class GameManager {
 
     // 1. OPEN -> STARTING
     if (round.status === ROUND_STATUS.OPEN) {
-      if (round.startTime && now >= round.startTime) {
-        await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
-        console.log(`Round ${round.id} starting...`);
+      const participantCount = await storage.getRoundParticipantsCount(round.id);
+      
+      // Only start countdown if we have at least 2 players
+      if (participantCount >= 2) {
+        if (round.startTime && now >= round.startTime) {
+          await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
+          console.log(`Round ${round.id} starting...`);
+        }
+      } else {
+        // Reset start time if not enough players to keep it 60s in future
+        // but only if it's about to expire or already expired
+        if (round.startTime && now.getTime() > round.startTime.getTime() - 10000) {
+           await storage.updateRound(round.id, { startTime: new Date(Date.now() + 60 * 1000) });
+        }
       }
     }
 
