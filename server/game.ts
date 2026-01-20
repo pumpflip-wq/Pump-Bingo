@@ -49,7 +49,7 @@ export class GameManager {
     const seed = crypto.randomBytes(32).toString('hex');
     const hash = crypto.createHash('sha256').update(seed).digest('hex');
     
-    // Start 60 seconds from now to allow for lobby time
+    // Default wait time is 60 seconds
     const startTime = new Date(Date.now() + 60 * 1000); 
 
     await storage.createRound({
@@ -71,29 +71,33 @@ export class GameManager {
     if (round.status === ROUND_STATUS.OPEN) {
       const participantCount = await storage.getRoundParticipantsCount(round.id);
       
-      // Only start countdown if we have at least 2 players
+      // Only allow the countdown to progress if we have at least 2 players
       if (participantCount >= 2) {
         if (round.startTime && now >= round.startTime) {
           await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
           console.log(`Round ${round.id} starting...`);
         }
       } else {
-        // Reset start time if not enough players to keep it 60s in future
-        // but only if it's about to expire or already expired
-        if (round.startTime && now.getTime() > round.startTime.getTime() - 10000) {
-           await storage.updateRound(round.id, { startTime: new Date(Date.now() + 60 * 1000) });
+        // Not enough players: reset/pause the start time to 60s in the future
+        // This effectively "freezes" the timer until 2+ players are present
+        const currentStartTime = round.startTime ? new Date(round.startTime) : null;
+        const sixtySecondsFromNow = new Date(Date.now() + 60 * 1000);
+
+        if (!currentStartTime || currentStartTime.getTime() < sixtySecondsFromNow.getTime() - 2000) {
+           await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
+           console.log(`Round ${round.id} waiting for more players (current: ${participantCount})`);
         }
       }
     }
 
     // 2. STARTING -> IN_GAME
     else if (round.status === ROUND_STATUS.STARTING) {
-        // Give it 5 seconds of "Starting" state for hype
+        // 5 second "Starting" hype phase
         const elapsed = now.getTime() - (round.startTime?.getTime() || 0);
         const participantCount = await storage.getRoundParticipantsCount(round.id);
 
         if (participantCount < 2) {
-            // Revert to OPEN if players left during STARTING
+            // Revert if players leave during the hype phase
             await storage.updateRound(round.id, { 
                 status: ROUND_STATUS.OPEN,
                 startTime: new Date(Date.now() + 60 * 1000) 
@@ -101,6 +105,7 @@ export class GameManager {
             console.log(`Round ${round.id} reverted to OPEN - not enough players`);
         } else if (elapsed > 5000) {
             await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME });
+            console.log(`Round ${round.id} is now IN_GAME`);
         }
     }
 
@@ -109,18 +114,17 @@ export class GameManager {
         if (!round.drawnNumbers) round.drawnNumbers = [];
         
         if (round.drawnNumbers.length >= 75) {
-            // No one won? Force finish.
+            // End game if all numbers drawn
             await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
             return;
         }
 
-        // Draw numbers based on fixed interval
-        const now = new Date().getTime();
-        const startTime = new Date(round.startTime!).getTime() + 5000; // startTime + STARTING delay
-        const elapsed = now - startTime;
-        const expectedNumbers = Math.min(75, Math.floor(elapsed / 3000)); // One number every 3 seconds
+        // Draw one number every 3 seconds
+        const startTime = new Date(round.startTime!).getTime() + 5000;
+        const elapsed = now.getTime() - startTime;
+        const expectedNumbersCount = Math.min(75, Math.floor(elapsed / 3000));
 
-        if (round.drawnNumbers.length < expectedNumbers) {
+        if (round.drawnNumbers.length < expectedNumbersCount) {
             const available = Array.from({length: 75}, (_, i) => i + 1)
                 .filter(n => !round.drawnNumbers!.includes(n));
             
@@ -135,45 +139,38 @@ export class GameManager {
   }
 
   // Bingo Card Generation (5x5)
-  // Columns: B(1-15), I(16-30), N(31-45), G(46-60), O(61-75)
   generateCard(): number[][] {
     const card: number[][] = [];
     const ranges = [
       { min: 1, max: 15 },
       { min: 16, max: 30 },
-      { min: 31, max: 45 }, // Middle is free in std bingo, but "Pump Bingo" might differ. Let's do standard with Free space = 0.
+      { min: 31, max: 45 },
       { min: 46, max: 60 },
       { min: 61, max: 75 }
     ];
-
-    for (let r = 0; r < 5; r++) {
-       const row: number[] = [];
-       // Wait, standard bingo is Columns are ranges.
-       // So we generate 5 columns, then transpose for rows.
-    }
     
     const cols: number[][] = [];
     for (let c = 0; c < 5; c++) {
         const col: number[] = [];
         const { min, max } = ranges[c];
         const candidates = Array.from({length: max - min + 1}, (_, i) => i + min);
-        // Shuffle
+        
+        // Shuffle candidates
         for (let i = candidates.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
         }
-        // Take 5
+        
         for(let r=0; r<5; r++) {
             col.push(candidates[r]);
         }
         cols.push(col);
     }
 
-    // Free space
-    cols[2][2] = 0; // 0 = Free
+    // Standard Free space
+    cols[2][2] = 0; 
 
-    // Transpose to rows for easier rendering if needed, or keep as cols.
-    // Let's store as rows (5x5 grid)
+    // Transpose columns to rows
     for(let r=0; r<5; r++) {
         const row: number[] = [];
         for(let c=0; c<5; c++) {
@@ -186,21 +183,23 @@ export class GameManager {
   }
 
   validateBingo(card: number[][], drawn: number[]): boolean {
-    // Check rows
+    const isMarked = (n: number) => n === 0 || drawn.includes(n);
+
+    // Rows
     for (let r = 0; r < 5; r++) {
-        if (card[r].every(n => n === 0 || drawn.includes(n))) return true;
+        if (card[r].every(isMarked)) return true;
     }
-    // Check cols
+    // Cols
     for (let c = 0; c < 5; c++) {
         const col = [card[0][c], card[1][c], card[2][c], card[3][c], card[4][c]];
-        if (col.every(n => n === 0 || drawn.includes(n))) return true;
+        if (col.every(isMarked)) return true;
     }
     // Diagonals
     const d1 = [card[0][0], card[1][1], card[2][2], card[3][3], card[4][4]];
-    if (d1.every(n => n === 0 || drawn.includes(n))) return true;
+    if (d1.every(isMarked)) return true;
 
     const d2 = [card[0][4], card[1][3], card[2][2], card[3][1], card[4][0]];
-    if (d2.every(n => n === 0 || drawn.includes(n))) return true;
+    if (d2.every(isMarked)) return true;
 
     return false;
   }
