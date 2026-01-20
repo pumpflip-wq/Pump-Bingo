@@ -57,11 +57,14 @@ export default function Home() {
   
   useEffect(() => {
     if (roundData?.round.winnerId) {
-      setShowWinner(true);
+      // Only show popup for participants (Winners/Losers)
+      if (isParticipant) {
+        setShowWinner(true);
+      }
     } else {
       setShowWinner(false);
     }
-  }, [roundData?.round.winnerId]);
+  }, [roundData?.round.winnerId, isParticipant]);
 
   const copyCA = () => {
     navigator.clipboard.writeText(PROTOCOL_CONFIG.MINT_ADDRESS);
@@ -226,63 +229,28 @@ export default function Home() {
 
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[320px]">
                   <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
-                    {roundData.round.status === 'IN_GAME' ? (
-                      <><Zap className="w-4 h-4 text-primary" /> Probability Analysis</>
-                    ) : (
-                      <><Users className="w-4 h-4 text-primary" /> Active Players</>
-                    )}
+                    <Users className="w-4 h-4 text-primary" /> Active Players
                   </h3>
                   
                   <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                     <AnimatePresence mode="popLayout">
-                      {roundData.round.status === 'IN_GAME' ? (
-                        sortedParticipants.map((p: any, idx) => (
-                          <motion.div 
-                            key={p.id}
-                            layout
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
-                                #{idx + 1}
-                              </div>
-                              <div className="flex flex-col">
-                                <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
-                                <div className="w-24 h-1 bg-white/10 rounded-full mt-1 overflow-hidden">
-                                  <motion.div 
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${p.prob}%` }}
-                                    transition={{ duration: 0.5 }}
-                                    className="h-full bg-primary shadow-[0_0_10px_rgba(34,197,94,0.5)]"
-                                  />
-                                </div>
-                              </div>
+                      {roundData.participants.map((p: any) => (
+                        <motion.div 
+                          key={p.id}
+                          layout
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
+                              {p.username[0].toUpperCase()}
                             </div>
-                            <span className="text-[10px] font-black text-primary">{p.prob}%</span>
-                          </motion.div>
-                        ))
-                      ) : (
-                        roundData.participants.map((p: any) => (
-                          <motion.div 
-                            key={p.id}
-                            layout
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
-                                {p.username[0].toUpperCase()}
-                              </div>
-                              <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
-                            </div>
-                            <ShieldCheck className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
-                          </motion.div>
-                        ))
-                      )}
+                            <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
+                          </div>
+                          <ShieldCheck className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
+                        </motion.div>
+                      ))}
                     </AnimatePresence>
                     {roundData.participants.length === 0 && (
                       <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
@@ -381,32 +349,59 @@ export default function Home() {
                             <p className="text-[10px] text-white/40 uppercase font-black tracking-widest text-center">Top Contenders</p>
                             <div className="space-y-3 min-h-[120px]">
                               <AnimatePresence mode="popLayout">
-                                {sortedParticipants.slice(0, 3).map((p: any, idx) => (
+                                {roundData.round.status === 'FINISHED' ? (
                                   <motion.div 
-                                    key={p.id} 
-                                    layout
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                    className="flex items-center justify-between"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="flex flex-col items-center justify-center py-4 space-y-4"
                                   >
-                                    <div className="flex items-center gap-3">
-                                      <span className="text-primary font-black italic w-6">#{idx+1}</span>
-                                      <span className="text-sm font-bold text-white/80 italic">@{formatAddress(p.username)}</span>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                      <div className="w-20 h-1 bg-white/5 rounded-full overflow-hidden">
-                                        <motion.div 
-                                          initial={{ width: 0 }}
-                                          animate={{ width: `${p.prob}%` }}
-                                          transition={{ duration: 0.5 }}
-                                          className="h-full bg-primary"
-                                        />
+                                    <div className="flex flex-col items-center gap-2">
+                                      <div className="flex items-center gap-3 text-primary">
+                                        <Trophy className="w-6 h-6 animate-bounce" />
+                                        <span className="text-xl font-black italic">@{formatAddress(roundData.round.winnerUsername || "")} WON!</span>
                                       </div>
-                                      <span className="text-[10px] font-black text-primary w-8 text-right">{p.prob}%</span>
+                                      <div className="flex items-center gap-1">
+                                        <Zap className="w-3 h-3 text-primary animate-pulse" />
+                                        <span className="text-[10px] text-primary font-black uppercase tracking-widest italic">Bingo Validated</span>
+                                      </div>
                                     </div>
+                                    <div className="flex flex-col items-center gap-2">
+                                      <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Prize Distributed</p>
+                                      <p className="text-2xl font-black text-primary italic">{roundData.round.prizePool} PUMP</p>
+                                      <a href={`https://solscan.io/tx/${roundData.round.serverSeed}`} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-[8px] text-primary/60 hover:text-primary transition-colors uppercase font-black tracking-widest">
+                                        <ShieldCheck className="w-3 h-3" /> Proof of Payout
+                                      </a>
+                                    </div>
+                                    <p className="text-[8px] text-white/20 uppercase font-black tracking-[0.2em] animate-pulse">Next sequence starting in 5s...</p>
                                   </motion.div>
-                                ))}
+                                ) : (
+                                  sortedParticipants.slice(0, 3).map((p: any, idx) => (
+                                    <motion.div 
+                                      key={p.id} 
+                                      layout
+                                      initial={{ opacity: 0, y: 10 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                      className="flex items-center justify-between"
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <span className="text-primary font-black italic w-6">#{idx+1}</span>
+                                        <span className="text-sm font-bold text-white/80 italic">@{formatAddress(p.username)}</span>
+                                      </div>
+                                      <div className="flex items-center gap-4">
+                                        <div className="w-20 h-1 bg-white/5 rounded-full overflow-hidden">
+                                          <motion.div 
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${p.prob}%` }}
+                                            transition={{ duration: 0.5 }}
+                                            className="h-full bg-primary"
+                                          />
+                                        </div>
+                                        <span className="text-[10px] font-black text-primary w-8 text-right">{p.prob}%</span>
+                                      </div>
+                                    </motion.div>
+                                  ))
+                                )}
                               </AnimatePresence>
                             </div>
                           </div>
