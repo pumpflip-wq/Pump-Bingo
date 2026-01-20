@@ -143,11 +143,240 @@ export default function Home() {
         <p className="text-primary/90 font-black uppercase tracking-[0.8em] text-sm md:text-base italic pl-[0.8em]">PROVABLY FAIR SOLANA GAMING</p>
       </section>
 
-      {latestRound && roundData ? (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* ... aside and main content ... */}
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-6">
+          <Loader2 className="w-16 h-16 text-primary animate-spin" />
+          <p className="font-mono text-xs text-primary uppercase tracking-[0.3em]">Connecting Node...</p>
         </div>
-      ) : null}
+      ) : latestRound && roundData ? (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <aside className="lg:col-span-3 space-y-8">
+            <div className="glass-card neon-border rounded-2xl p-6 shadow-xl">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-lg text-white uppercase font-black tracking-widest font-display">Live Stats</h3>
+                <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[10px] font-bold text-primary uppercase">Active</span>
+                </div>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="space-y-1">
+                  <p className="text-sm text-white/60 font-bold tracking-widest uppercase">Prize Pool</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-black text-primary font-display tracking-tighter drop-shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+                      {roundData.round.prizePool.toLocaleString()}
+                    </span>
+                    <span className="text-sm font-black text-primary italic uppercase tracking-widest">PUMP</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/5">
+                  <div className="space-y-1">
+                    <p className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Nodes</p>
+                    <p className="text-2xl font-black text-white font-display tracking-tight">{roundData.participantsCount}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Entry</p>
+                    <p className="text-2xl font-black text-white font-display tracking-tight">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[320px]">
+              <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
+                <Users className="w-4 h-4 text-primary" /> Active Players
+              </h3>
+              
+              <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                <AnimatePresence mode="popLayout">
+                  {roundData.participants.map((p: any) => (
+                    <motion.div 
+                      key={p.id}
+                      layout
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
+                          {p.username[0].toUpperCase()}
+                        </div>
+                        <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
+                      </div>
+                      <ShieldCheck className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                {roundData.participants.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
+                    <Globe className="w-10 h-10" />
+                    <p className="text-xs uppercase font-black tracking-widest text-white">Awaiting Nodes...</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </aside>
+
+          <main className="lg:col-span-6 space-y-8">
+            {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
+              <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-[600px] relative overflow-hidden">
+                <div className="space-y-10 relative z-10 w-full max-w-md">
+                  <div className="space-y-4">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest">
+                      {roundData.round.status === 'OPEN' ? `Accepting Entries - Round #${roundData.round.id}` : `Game Starting - Round #${roundData.round.id}`}
+                    </div>
+                    <h2 className="text-5xl md:text-8xl font-black font-display text-white tracking-tighter italic whitespace-nowrap">
+                      BINGO <span className="text-primary drop-shadow-[0_0_20px_rgba(34,197,94,0.3)]">LOBBY</span>
+                    </h2>
+                  </div>
+
+                  <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
+                    <p className="text-white/60 text-xs uppercase font-black tracking-[0.2em] mb-6 font-mono">Game Starting In</p>
+                    <CountdownTimer 
+                      targetDate={roundData.round.startTime?.toString() || null} 
+                      status={roundData.round.status}
+                      participantCount={roundData.participantsCount}
+                    />
+                    {roundData.participantsCount < 2 && (
+                      <p className="text-primary text-sm uppercase font-black mt-6 animate-pulse tracking-widest font-display">
+                        Waiting for at least 2 players to start timer...
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="w-full pt-4">
+                    {!connected ? (
+                      <div className="space-y-6">
+                        <p className="text-white/60 text-xs uppercase font-black tracking-widest italic">Connect Wallet to Start</p>
+                        <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-16 !px-10 !text-xl !rounded-2xl !w-full !font-black !italic !tracking-tighter !text-black shadow-lg" />
+                      </div>
+                    ) : participant ? (
+                      <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl">
+                        <p className="text-primary font-black text-3xl italic tracking-tighter mb-1">NODE CONNECTED</p>
+                        <p className="text-xs text-primary/70 uppercase font-black tracking-widest">Awaiting Sequence Start...</p>
+                      </div>
+                    ) : (
+                      <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <div className="flex justify-center">
+                  <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
+                </div>
+
+                {isParticipant && currentCard ? (
+                  <div className="relative space-y-10">
+                    <BingoCard 
+                      card={currentCard} 
+                      drawnNumbers={roundData.round.drawnNumbers || []} 
+                      className="w-full max-w-[540px] mx-auto"
+                    />
+                    
+                    <div className="flex justify-center">
+                      <BingoClaimButton 
+                        roundId={roundData.round.id} 
+                        userId={user?.id || 0} 
+                        card={currentCard}
+                        drawnNumbers={roundData.round.drawnNumbers || []}
+                        status={roundData.round.status}
+                        isBingoed={participant?.hasBingo || false}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-20 bg-card/80 rounded-[3rem] border border-dashed border-white/10 flex flex-col items-center justify-center min-h-[500px] space-y-6">
+                    <h2 className="text-3xl font-black font-display italic text-white tracking-tighter">SPECTATOR MODE</h2>
+                    <p className="text-white/40 text-xs uppercase font-black tracking-widest">WAIT FOR NEXT PROTOCOL</p>
+                    {!connected && (
+                      <WalletMultiButton className="!bg-primary !text-black !h-12 !px-8 !text-sm !rounded-xl !font-black" />
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </main>
+
+          <aside className="lg:col-span-3 space-y-8">
+            <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[600px] shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
+                  <History className="w-4 h-4 text-primary" /> Game History
+                </h3>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                <div className="space-y-4">
+                  {historyLoading ? (
+                    <div className="flex justify-center py-10">
+                      <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                    </div>
+                  ) : historyRounds?.length ? (
+                    historyRounds.map((hr) => (
+                      <HistoryItem 
+                        key={hr.id}
+                        id={hr.id} 
+                        winner={hr.winnerUsername || "No Winner"} 
+                        prize={hr.prizePool} 
+                        formatAddress={formatAddress}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-10 opacity-30">
+                      <p className="text-[10px] uppercase font-black tracking-widest text-white">No history yet</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="mt-8 pt-6 border-t border-white/10">
+                <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
+              </div>
+            </div>
+
+            <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[280px]">
+              <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
+                <ShieldCheck className="w-4 h-4 text-primary" /> My Stats
+              </h3>
+              
+              <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                {userTransactions?.length ? (
+                  userTransactions.map((tx: any) => (
+                    <div key={tx.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] uppercase font-black text-white/40 font-mono">{tx.type}</span>
+                        <span className="text-xs text-white/60 font-mono">{new Date(tx.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <span className={cn(
+                        "font-black italic font-display",
+                        tx.amount > 0 ? "text-primary" : "text-red-500"
+                      )}>
+                        {tx.amount > 0 ? '+' : ''}{tx.amount}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
+                    <p className="text-[10px] uppercase font-black tracking-widest text-white">No activity</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </aside>
+
+        </div>
+      ) : (
+        <div className="py-32 text-center bg-card/80 rounded-[4rem] border border-dashed border-white/10 space-y-6">
+          <Trophy className="w-16 h-16 text-primary mx-auto opacity-20" />
+          <h2 className="text-2xl font-black font-display italic text-white tracking-tighter uppercase">INITIALIZING BINGO...</h2>
+        </div>
+      )}
 
       <footer className="mt-20 py-12 border-t border-white/5 bg-black/40 backdrop-blur-xl rounded-t-[3rem]">
         <div className="max-w-4xl mx-auto px-6 flex flex-col items-center gap-8">
