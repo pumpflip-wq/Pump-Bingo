@@ -195,5 +195,12 @@ export async function registerRoutes(
     res.json({ message: "Round force started" });
   });
 
+  app.get(api.auth.me.path + "/transactions", async (req, res) => {
+    const userId = Number(req.params.id);
+    if (isNaN(userId)) return res.status(400).json({ message: "Invalid ID" });
+    const userTxs = await storage.getUserTransactions(userId);
+    res.json(userTxs);
+  });
+
   return httpServer;
 }

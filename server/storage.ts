@@ -102,6 +102,14 @@ export class DatabaseStorage implements IStorage {
     return Number(result.count);
   }
 
+  async getRoundTransactions(roundId: number): Promise<Transaction[]> {
+    return await db.select().from(transactions).where(eq(transactions.roundId, roundId));
+  }
+
+  async getUserTransactions(userId: number): Promise<Transaction[]> {
+    return await db.select().from(transactions).where(eq(transactions.userId, userId)).orderBy(sql`${transactions.id} DESC`);
+  }
+
   async createTransaction(tx: Partial<Transaction>): Promise<Transaction> {
     const [newTx] = await db.insert(transactions).values(tx as any).returning();
     return newTx;

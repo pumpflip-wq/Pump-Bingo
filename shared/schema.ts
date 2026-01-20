@@ -71,3 +71,5 @@ export const ROUND_STATUS = {
   IN_GAME: "IN_GAME",
   FINISHED: "FINISHED",
 } as const;
+
+export type RoundStatus = keyof typeof ROUND_STATUS;
