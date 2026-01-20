@@ -3,9 +3,11 @@ import { CyberButton } from "@/components/ui/CyberButton";
 import { BingoCard } from "@/components/BingoCard";
 import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
-import { Users, Trophy, Loader2, History, ShieldCheck, Zap, Globe } from "lucide-react";
+import { Users, Trophy, Loader2, History, ShieldCheck, Zap, Globe, Copy, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { PROTOCOL_CONFIG } from "@shared/config";
+import { useToast } from "@/hooks/use-toast";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
@@ -17,6 +19,7 @@ import { cn } from "@/lib/utils";
 export default function Home() {
   const { publicKey, connected } = useWallet();
   const walletAddress = publicKey?.toBase58();
+  const { toast } = useToast();
 
   const { data: rounds, isLoading: roundsLoading } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
@@ -58,19 +61,13 @@ export default function Home() {
     }
   }, [roundData?.round.winnerId]);
 
-  useEffect(() => {
-    // Play sound or effect when a new number is drawn
-    if (roundData?.round.drawnNumbers && roundData.round.drawnNumbers.length > 0) {
-      const lastNumber = roundData.round.drawnNumbers[roundData.round.drawnNumbers.length - 1];
-      // Logic for drawing effect can be added here if needed
-    }
-  }, [roundData?.round.drawnNumbers?.length]);
-
-  const { data: userTransactions } = useQuery<Transaction[]>({
-    queryKey: ["/api/auth/me/transactions", user?.id],
-    enabled: !!user?.id,
-    refetchInterval: 5000
-  });
+  const copyCA = () => {
+    navigator.clipboard.writeText(PROTOCOL_CONFIG.MINT_ADDRESS);
+    toast({
+      title: "Contract Address Copied",
+      description: "CA copied to clipboard successfully."
+    });
+  };
 
   const isLoading = roundsLoading || (latestRound && roundLoading);
 
@@ -85,10 +82,16 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em]"
+          className="inline-flex items-center gap-2 p-1 pl-3 pr-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em]"
         >
-          <Zap className="w-3 h-3" />
-          Powered by Solana Network
+          <span className="opacity-60">CA:</span>
+          <span className="font-mono">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
+          <button 
+            onClick={copyCA}
+            className="ml-2 p-1.5 rounded-full bg-primary/20 hover:bg-primary/30 transition-colors"
+          >
+            <Copy className="w-3 h-3" />
+          </button>
         </motion.div>
         
         <motion.h1 

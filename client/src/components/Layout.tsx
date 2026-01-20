@@ -1,7 +1,8 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { CyberButton } from "./ui/CyberButton";
-import { Wallet, Trophy, ShieldCheck, Github, Settings } from "lucide-react";
+import { Wallet, Trophy, ShieldCheck, Github, Settings, ShoppingCart, BarChart3 } from "lucide-react";
+import { PROTOCOL_CONFIG } from "@shared/config";
 
 const ADMIN_WALLET = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns";
 
@@ -14,6 +15,39 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Matrix-like subtle background grid */}
       <div className="fixed inset-0 bg-[linear-gradient(rgba(20,20,20,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(20,20,20,0.5)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none z-0" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(57,255,20,0.1),transparent_70%)] pointer-events-none z-0" />
+
+      {/* Top Navigation Bar */}
+      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/60 backdrop-blur-xl">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-bold text-black group-hover:scale-110 transition-transform">
+                P
+              </div>
+              <h1 className="text-xl font-black tracking-tighter uppercase italic hidden sm:block">PUMP BINGO</h1>
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <a href={PROTOCOL_CONFIG.PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">
+              <CyberButton size="sm" variant="outline" className="hidden md:flex gap-2 border-primary/20 hover:border-primary/50 text-[10px] font-black">
+                <ShoppingCart className="w-3 h-3 text-primary" /> BUY ${PROTOCOL_CONFIG.SYMBOL}
+              </CyberButton>
+            </a>
+            <a href={PROTOCOL_CONFIG.DEXSCANNER_URL} target="_blank" rel="noopener noreferrer">
+              <CyberButton size="sm" variant="outline" className="hidden md:flex gap-2 border-white/10 text-[10px] font-black">
+                <BarChart3 className="w-3 h-3" /> CHART
+              </CyberButton>
+            </a>
+            <div className="h-8 w-[1px] bg-white/10 hidden md:block mx-2" />
+            <Link href="/login">
+              <CyberButton size="sm" variant="primary" className="text-[10px] font-black h-9 px-4">
+                {user ? "PROFILE" : "SELECT WALLET"}
+              </CyberButton>
+            </Link>
+          </div>
+        </div>
+      </header>
 
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-8 relative z-10">
