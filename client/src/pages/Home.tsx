@@ -45,7 +45,7 @@ export default function Home() {
   const foundParticipant = roundData?.participants?.find((p: any) => p.username === walletAddress);
   const isParticipant = !!participant || !!foundParticipant;
   
-  const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
+  const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
   
   const [showWinner, setShowWinner] = useState(false);
   
