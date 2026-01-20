@@ -84,29 +84,40 @@ export default function Home() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 pb-20">
-      <section className="text-center pt-8 space-y-4">
+      <section className="text-center pt-12 pb-8 space-y-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 p-1 pl-3 pr-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em]"
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-24 h-24 bg-primary rounded-full mx-auto flex items-center justify-center shadow-[0_0_50px_rgba(34,197,94,0.4)]"
         >
-          <span className="opacity-60">CA:</span>
-          <span className="font-mono">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
-          <button 
-            onClick={copyCA}
-            className="ml-2 p-1.5 rounded-full bg-primary/20 hover:bg-primary/30 transition-colors"
-          >
-            <Copy className="w-3 h-3" />
-          </button>
+          <Zap className="w-12 h-12 text-black fill-current" />
         </motion.div>
         
-        <motion.h1 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-6xl md:text-8xl font-black font-display tracking-tighter text-white italic leading-tight"
-        >
-          PUMP <span className="text-primary">BINGO</span>
-        </motion.h1>
+        <div className="space-y-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 p-1 pl-3 pr-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em]"
+          >
+            <span className="opacity-60">CA:</span>
+            <span className="font-mono">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
+            <button 
+              onClick={copyCA}
+              className="ml-2 p-1.5 rounded-full bg-primary/20 hover:bg-primary/30 transition-colors"
+            >
+              <Copy className="w-3 h-3" />
+            </button>
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-7xl md:text-9xl font-black font-display tracking-tighter text-white italic leading-none"
+          >
+            PUMP <span className="text-primary drop-shadow-[0_0_30px_rgba(34,197,94,0.3)]">BINGO</span>
+          </motion.h1>
+          <p className="text-primary/60 font-black uppercase tracking-[0.5em] text-xs italic">The fairest game on Solana</p>
+        </div>
       </section>
 
       {isLoading ? (
@@ -405,16 +416,31 @@ function CountdownTimer({ targetDate, status, participantCount }: { targetDate: 
 
 function JoinButton({ roundId, price, userId }: { roundId: number, price: number, userId: number }) {
   const { mutate: joinRound, isPending } = useJoinRound();
+  const [isSigning, setIsSigning] = useState(false);
+
+  const handleJoin = async () => {
+    setIsSigning(true);
+    // Simulate wallet signature delay
+    await new Promise(r => setTimeout(r, 1500));
+    setIsSigning(false);
+    joinRound({ roundId, userId });
+  };
+
   return (
     <CyberButton 
       variant="primary" 
       size="xl"
       className="w-full !rounded-2xl"
-      onClick={() => joinRound({ roundId, userId })}
-      disabled={isPending}
+      onClick={handleJoin}
+      disabled={isPending || isSigning}
     >
-      {isPending ? (
-        <Loader2 className="animate-spin w-6 h-6" />
+      {isPending || isSigning ? (
+        <div className="flex items-center gap-3">
+          <Loader2 className="animate-spin w-6 h-6" />
+          <span className="text-xl italic tracking-tighter">
+            {isSigning ? "SIGNING..." : "JOINING..."}
+          </span>
+        </div>
       ) : (
         <div className="flex flex-col items-center">
           <span className="text-2xl italic tracking-tighter">JOIN ROUND</span>

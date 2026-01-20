@@ -8,7 +8,7 @@ import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
 import { CyberButton } from "@/components/ui/CyberButton";
 import { Input } from "@/components/ui/input";
-import { Loader2, AlertCircle, History, ShieldCheck, CheckCircle2, XCircle } from "lucide-react";
+import { Users, Loader2, AlertCircle, History, ShieldCheck, CheckCircle2, XCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import crypto from "crypto";
