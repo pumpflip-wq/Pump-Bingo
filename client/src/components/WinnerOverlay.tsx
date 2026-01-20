@@ -120,6 +120,9 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
                 </>
               ) : (
                 <div className="space-y-4 text-center">
+                  <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1 text-left">Winner</p>
+                  <p className="text-sm font-bold text-white italic text-left mb-4">@{username} claimed the prize</p>
+                  <div className="h-[1px] w-full bg-white/5 mb-4" />
                   <p className="text-sm text-white/60 font-medium italic">
                     The nodes didn't align in your favor this time. 
                   </p>

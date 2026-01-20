@@ -242,6 +242,7 @@ export default function Home() {
                             layout
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
                             className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
                           >
                             <div className="flex items-center gap-3">
@@ -254,7 +255,8 @@ export default function Home() {
                                   <motion.div 
                                     initial={{ width: 0 }}
                                     animate={{ width: `${p.prob}%` }}
-                                    className="h-full bg-primary"
+                                    transition={{ duration: 0.5 }}
+                                    className="h-full bg-primary shadow-[0_0_10px_rgba(34,197,94,0.5)]"
                                   />
                                 </div>
                               </div>
@@ -377,25 +379,35 @@ export default function Home() {
                         <div className="w-full max-w-md space-y-6 relative z-10">
                           <div className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/5 p-6 space-y-4">
                             <p className="text-[10px] text-white/40 uppercase font-black tracking-widest text-center">Top Contenders</p>
-                            <div className="space-y-3">
-                              {sortedParticipants.slice(0, 3).map((p: any, idx) => (
-                                <div key={p.id} className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <span className="text-primary font-black italic">#{idx+1}</span>
-                                    <span className="text-sm font-bold text-white/80 italic">@{formatAddress(p.username)}</span>
-                                  </div>
-                                  <div className="flex items-center gap-4">
-                                    <div className="w-20 h-1 bg-white/5 rounded-full overflow-hidden">
-                                      <motion.div 
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${p.prob}%` }}
-                                        className="h-full bg-primary"
-                                      />
+                            <div className="space-y-3 min-h-[120px]">
+                              <AnimatePresence mode="popLayout">
+                                {sortedParticipants.slice(0, 3).map((p: any, idx) => (
+                                  <motion.div 
+                                    key={p.id} 
+                                    layout
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                    className="flex items-center justify-between"
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-primary font-black italic w-6">#{idx+1}</span>
+                                      <span className="text-sm font-bold text-white/80 italic">@{formatAddress(p.username)}</span>
                                     </div>
-                                    <span className="text-[10px] font-black text-primary">{p.prob}%</span>
-                                  </div>
-                                </div>
-                              ))}
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-20 h-1 bg-white/5 rounded-full overflow-hidden">
+                                        <motion.div 
+                                          initial={{ width: 0 }}
+                                          animate={{ width: `${p.prob}%` }}
+                                          transition={{ duration: 0.5 }}
+                                          className="h-full bg-primary"
+                                        />
+                                      </div>
+                                      <span className="text-[10px] font-black text-primary w-8 text-right">{p.prob}%</span>
+                                    </div>
+                                  </motion.div>
+                                ))}
+                              </AnimatePresence>
                             </div>
                           </div>
 
