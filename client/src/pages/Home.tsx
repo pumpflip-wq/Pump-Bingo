@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { type User } from "@shared/schema";
 import { cn } from "@/lib/utils";
@@ -36,8 +36,7 @@ export default function Home() {
   }, [connected, walletAddress, login]);
 
   const { data: user } = useQuery<User>({ 
-    queryKey: ["/api/auth/me"],
-    staleTime: Infinity 
+    queryKey: ["/api/auth/me"]
   });
   
   const { data: participant } = useParticipant(latestRound?.id || 0, user?.id);
