@@ -58,6 +58,14 @@ export default function Home() {
     }
   }, [roundData?.round.winnerId]);
 
+  useEffect(() => {
+    // Play sound or effect when a new number is drawn
+    if (roundData?.round.drawnNumbers && roundData.round.drawnNumbers.length > 0) {
+      const lastNumber = roundData.round.drawnNumbers[roundData.round.drawnNumbers.length - 1];
+      // Logic for drawing effect can be added here if needed
+    }
+  }, [roundData?.round.drawnNumbers?.length]);
+
   const isLoading = roundsLoading || (latestRound && roundLoading);
 
   const formatAddress = (address: string) => {
