@@ -132,6 +132,13 @@ export class DatabaseStorage implements IStorage {
     const [newTx] = await db.insert(transactions).values(tx as any).returning();
     return newTx;
   }
+
+  async resetSystem(): Promise<void> {
+    await db.delete(transactions);
+    await db.delete(participants);
+    await db.delete(rounds);
+    // Keep users for now as they are wallet-based, but could clear if requested
+  }
 }
 
 export const storage = new DatabaseStorage();

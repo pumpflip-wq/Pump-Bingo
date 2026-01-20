@@ -83,7 +83,8 @@ export default function Home() {
   const isLoading = roundsLoading || (latestRound && roundLoading);
 
   const formatAddress = (address: string) => {
-    if (!address) return "";
+    if (!address || address === "No Winner") return address;
+    if (address.length < 10) return address;
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
@@ -252,7 +253,7 @@ export default function Home() {
                       participantCount={roundData.participantsCount}
                     />
                     {roundData.participantsCount < 2 && (
-                      <p className="text-primary text-[10px] uppercase font-black mt-4 animate-pulse">
+                      <p className="text-primary text-sm uppercase font-black mt-6 animate-pulse tracking-widest">
                         Waiting for at least 2 players to start timer...
                       </p>
                     )}
@@ -383,7 +384,7 @@ function HistoryItem({ id, winner, prize }: { id: number, winner: string, prize:
         <span className="text-primary font-black font-display italic text-sm">+{prize.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}</span>
       </div>
       <div className="flex justify-between items-center">
-        <span className="text-xs font-black text-white italic">@{winner}</span>
+        <span className="text-xs font-black text-white italic">@{formatAddress(winner)}</span>
         <div className="flex items-center gap-1">
           <ShieldCheck className="w-3 h-3 text-primary/40 group-hover:text-primary transition-colors" />
           <span className="text-[10px] text-white uppercase font-black group-hover:text-white transition-colors">VERIFIED</span>

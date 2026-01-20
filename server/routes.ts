@@ -222,5 +222,11 @@ export async function registerRoutes(
     res.json(userTxs);
   });
 
+  app.post("/api/admin/reset", async (_req, res) => {
+    // In a real app, check for admin auth here
+    await storage.resetSystem();
+    res.json({ message: "System reset successful" });
+  });
+
   return httpServer;
 }
