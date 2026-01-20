@@ -6,35 +6,26 @@
 
 @layer base {
   :root {
-    --background: 260 40% 2%;
+    --background: 110 50% 2%;
     --foreground: 0 0% 100%;
-    --card: 260 40% 4%;
+    --card: 110 50% 3%;
     --card-foreground: 0 0% 100%;
-    --popover: 260 40% 4%;
+    --popover: 110 50% 3%;
     --popover-foreground: 0 0% 100%;
-    --primary: 90 100% 61%;
-    --primary-foreground: 260 40% 2%;
-    --secondary: 280 100% 50%;
+    --primary: 90 100% 54%;
+    --primary-foreground: 110 50% 2%;
+    --secondary: 110 40% 10%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 260 20% 15%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 260 20% 15%;
+    --muted: 110 20% 8%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 110 40% 12%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 260 20% 15%;
-    --input: 260 20% 15%;
-    --ring: 90 100% 61%;
-    --radius: 1rem;
-  }
-
-  .dark {
-    --background: 260 40% 2%;
-    --foreground: 0 0% 100%;
-    --card: 260 40% 4%;
-    --card-foreground: 0 0% 100%;
-    --primary: 90 100% 61%;
-    --primary-foreground: 260 40% 2%;
+    --border: 110 40% 10%;
+    --input: 110 40% 10%;
+    --ring: 90 100% 54%;
+    --radius: 0.5rem;
   }
 }
 
@@ -69,15 +60,15 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
+    background: #000;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-white/10 rounded-full;
+    @apply bg-primary/20 rounded-full;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary/40;
+    @apply bg-primary/50;
   }
 }
