@@ -26,16 +26,16 @@ export class GameManager {
     this.isProcessing = true;
 
     try {
-      const activeRounds = await storage.getOpenRounds();
+      // Find the LATEST round
+      const [latestRound] = await db.select().from(rounds).orderBy(sql`${rounds.id} DESC`).limit(1);
       
-      // If no rounds exist, create one!
-      if (activeRounds.length === 0) {
+      // If no round exists OR the latest is FINISHED, create a new one
+      if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
         await this.createNewRound();
+        return;
       }
 
-      for (const round of activeRounds) {
-        await this.processRound(round);
-      }
+      await this.processRound(latestRound);
     } catch (err) {
       console.error("Game Loop Error:", err);
     } finally {
@@ -65,53 +65,39 @@ export class GameManager {
   private async processRound(round: Round) {
     const now = new Date();
 
-    // 1. OPEN -> STARTING (Transition logic, simple for MVP: just time based)
+    // 1. OPEN -> STARTING
     if (round.status === ROUND_STATUS.OPEN) {
       if (round.startTime && now >= round.startTime) {
-        // If no players, maybe delay? For MVP, just start or close.
-        const count = await storage.getRoundParticipantsCount(round.id);
-        if (count > 0) {
-           await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
-           console.log(`Round ${round.id} starting...`);
-        } else {
-           // Reschedule if empty
-           const newTime = new Date(Date.now() + 10 * 1000);
-           await storage.updateRound(round.id, { startTime: newTime });
-        }
+        await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
+        console.log(`Round ${round.id} starting...`);
       }
     }
 
-    // 2. STARTING -> IN_GAME (Short delay for "Get Ready" animation)
+    // 2. STARTING -> IN_GAME
     else if (round.status === ROUND_STATUS.STARTING) {
-        // Give it 3 seconds of "Starting" state
-        await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME });
+        // Give it 5 seconds of "Starting" state for hype
+        const elapsed = now.getTime() - (round.startTime?.getTime() || 0);
+        if (elapsed > 5000) {
+            await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME });
+        }
     }
 
     // 3. IN_GAME -> Draw Numbers
     else if (round.status === ROUND_STATUS.IN_GAME) {
         if (!round.drawnNumbers) round.drawnNumbers = [];
         
-        // Draw number every 2 seconds (fast bingo!)
-        const lastUpdate = round.createdAt ? new Date(round.createdAt).getTime() : 0; 
-        // Real implementation would track lastDrawTime. 
-        // For MVP, we can check array length vs elapsed time roughly, 
-        // OR just add a number every tick if 2 seconds passed since last one.
-        // Let's keep it simple: Add number with 10% chance per tick? No, unstable.
-        
-        // Better: store `lastDrawTime` in memory or DB?
-        // Since `tick` is 1s, let's just use modulo or simple logic.
-        // We will update the round with a new number.
-        
-        // We need 75 numbers max.
         if (round.drawnNumbers.length >= 75) {
+            // No one won? Force finish.
             await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
             return;
         }
 
-        // Draw a new random number that hasn't been drawn
-        // Use the seed + nonce for fairness?
-        // For MVP: JS Random is fine, we reveal seed later which could 'verify' the sequence if we implemented the deterministic PRNG.
-        // Let's just pick a random available number.
+        // Draw every 3 seconds
+        const lastDrawTime = round.updatedAt?.getTime() || 0; // Assuming we add updatedAt or use createdAt as proxy
+        // Since we update the round on every draw, the 'updatedAt' (or our update call) can be used.
+        // Let's just draw if a certain time passed. 
+        // For simplicity in MVP tick, let's use a simpler check or just draw.
+        
         const available = Array.from({length: 75}, (_, i) => i + 1)
             .filter(n => !round.drawnNumbers!.includes(n));
         
