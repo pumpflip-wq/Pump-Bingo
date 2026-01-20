@@ -63,10 +63,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <div className="space-y-4">
               <h3 className="text-xs font-black text-white/40 uppercase tracking-widest">Connect</h3>
               <div className="flex gap-4">
-                <CyberButton size="icon" variant="outline" className="h-8 w-8">
+                <CyberButton size="sm" variant="outline" className="h-8 w-8">
                   <Github className="w-4 h-4" />
                 </CyberButton>
-                <CyberButton size="icon" variant="outline" className="h-8 w-8 text-primary border-primary/20">
+                <CyberButton size="sm" variant="outline" className="h-8 w-8 text-primary border-primary/20">
                   <span className="font-black text-[10px]">X</span>
                 </CyberButton>
               </div>
