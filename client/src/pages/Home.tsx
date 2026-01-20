@@ -69,6 +69,11 @@ export default function Home() {
     });
   };
 
+  const { data: historyRounds, isLoading: historyLoading } = useQuery<(Round & { winnerUsername: string | null })[]>({
+    queryKey: ["/api/rounds/history"],
+    refetchInterval: 10000
+  });
+
   const { data: userTransactions } = useQuery<Transaction[]>({
     queryKey: ["/api/auth/me/transactions", user?.id],
     enabled: !!user?.id,
@@ -93,19 +98,19 @@ export default function Home() {
           <Zap className="w-12 h-12 text-black fill-current" />
         </motion.div>
         
-        <div className="space-y-2">
+        <div className="space-y-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 p-1 pl-3 pr-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em]"
+            className="inline-flex items-center gap-3 p-2 pl-4 pr-3 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-[0.2em]"
           >
             <span className="opacity-60">CA:</span>
-            <span className="font-mono">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
+            <span className="font-mono text-sm">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
             <button 
               onClick={copyCA}
-              className="ml-2 p-1.5 rounded-full bg-primary/20 hover:bg-primary/30 transition-colors"
+              className="ml-2 p-2 rounded-full bg-primary/20 hover:bg-primary/30 transition-colors"
             >
-              <Copy className="w-3 h-3" />
+              <Copy className="w-4 h-4" />
             </button>
           </motion.div>
           
@@ -116,7 +121,7 @@ export default function Home() {
           >
             PUMP <span className="text-primary drop-shadow-[0_0_30px_rgba(34,197,94,0.3)]">BINGO</span>
           </motion.h1>
-          <p className="text-primary/60 font-black uppercase tracking-[0.5em] text-xs italic">The fairest game on Solana</p>
+          <p className="text-primary/70 font-black uppercase tracking-[0.5em] text-sm md:text-base italic">The fairest game on Solana</p>
         </div>
       </section>
 
@@ -232,7 +237,7 @@ export default function Home() {
                 <div className="space-y-10 relative z-10 w-full max-w-md">
                   <div className="space-y-4">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest">
-                      {roundData.round.status === 'OPEN' ? 'Accepting Entries' : 'Game Starting'}
+                      {roundData.round.status === 'OPEN' ? `Accepting Entries - Round #${roundData.round.id}` : `Game Starting - Round #${roundData.round.id}`}
                     </div>
                     <h2 className="text-5xl md:text-7xl font-black font-display text-white tracking-tighter italic">
                       BINGO <span className="text-primary">LOBBY</span>
@@ -240,7 +245,7 @@ export default function Home() {
                   </div>
 
                   <div className="p-10 bg-black/40 rounded-[2rem] border border-white/10 backdrop-blur-xl">
-                    <p className="text-white text-xs uppercase font-black tracking-[0.2em] mb-6">Sequence Initiation In</p>
+                    <p className="text-white text-xs uppercase font-black tracking-[0.2em] mb-6">Game Starting In</p>
                     <CountdownTimer 
                       targetDate={roundData.round.startTime?.toString() || null} 
                       status={roundData.round.status}
@@ -318,10 +323,24 @@ export default function Home() {
               
               <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                 <div className="space-y-4">
-                  <HistoryItem id={latestRound.id - 1} winner="DegenKing" prize={5400} />
-                  <HistoryItem id={latestRound.id - 2} winner="SolWhale" prize={8200} />
-                  <HistoryItem id={latestRound.id - 3} winner="BingoMage" prize={3100} />
-                  <HistoryItem id={latestRound.id - 4} winner="AlphaNode" prize={12000} />
+                  {historyLoading ? (
+                    <div className="flex justify-center py-10">
+                      <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                    </div>
+                  ) : historyRounds?.length ? (
+                    historyRounds.map((hr) => (
+                      <HistoryItem 
+                        key={hr.id}
+                        id={hr.id} 
+                        winner={hr.winnerUsername || "No Winner"} 
+                        prize={hr.prizePool} 
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-10 opacity-30">
+                      <p className="text-[10px] uppercase font-black tracking-widest text-white">No history yet</p>
+                    </div>
+                  )}
                 </div>
               </div>
               

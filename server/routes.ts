@@ -54,6 +54,11 @@ export async function registerRoutes(
     res.json(rounds);
   });
 
+  app.get("/api/rounds/history", async (_req, res) => {
+    const history = await storage.getRecentFinishedRounds();
+    res.json(history);
+  });
+
   app.get(api.rounds.get.path, async (req, res) => {
     const roundId = Number(req.params.id);
     if (isNaN(roundId)) return res.status(400).json({ message: "Invalid round ID" });
