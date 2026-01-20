@@ -89,12 +89,12 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 pb-10">
-      <header className="flex flex-col md:flex-row items-center justify-between py-6 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 px-4 rounded-b-[2rem]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 pb-10">
+      <header className="flex flex-col md:flex-row items-center justify-between py-4 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 px-6 rounded-b-[2rem]">
         <div className="flex items-center gap-4 group cursor-pointer">
           <motion.div
             whileHover={{ rotate: 15, scale: 1.1 }}
-            className="w-16 h-16 rounded-full bg-primary p-0.5 shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all"
+            className="w-16 h-16 rounded-full p-0 transition-all"
           >
             <img 
               src="https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png" 
@@ -114,38 +114,38 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 p-1 pl-4 pr-1 rounded-full bg-black/60 border border-primary text-white text-[11px] font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+            className="inline-flex items-center gap-3 p-1.5 pl-6 pr-1.5 rounded-full bg-black/60 border border-primary text-white text-sm font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_20px_rgba(34,197,94,0.4)]"
           >
             <span className="text-primary font-mono font-bold">CA:</span>
-            <span className="font-mono tracking-tighter text-white font-bold">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
+            <span className="font-mono tracking-tighter text-white font-bold text-base">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
             <button 
               onClick={copyCA}
-              className="ml-2 p-1.5 rounded-full bg-primary text-black hover:scale-105 transition-all active:scale-95"
+              className="ml-2 p-2 rounded-full bg-primary text-black hover:scale-105 transition-all active:scale-95"
             >
-              <Copy className="w-3 h-3" />
+              <Copy className="w-4 h-4" />
             </button>
           </motion.div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <a 
               href={`https://pump.fun/${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="px-4 py-2 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-400 text-[10px] font-black uppercase tracking-widest hover:bg-purple-500/30 transition-all flex items-center gap-2"
+              className="px-6 py-3 rounded-full bg-purple-600/20 border-2 border-purple-500/50 text-purple-400 text-xs font-black uppercase tracking-widest hover:bg-purple-600/30 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
             >
-              Buy PUMP <ExternalLink className="w-3 h-3" />
+              Buy PUMP <ExternalLink className="w-4 h-4" />
             </a>
-            <WalletMultiButton className="!bg-primary !text-black !h-10 !px-6 !text-xs !rounded-xl !font-black !italic !tracking-tight !shadow-lg" />
+            <WalletMultiButton className="!bg-primary !text-black !h-12 !px-8 !text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)]" />
           </div>
         </div>
       </header>
 
-      <section className="text-center pt-4 pb-4 space-y-6 flex flex-col items-center">
+      <section className="text-center pt-2 pb-2 space-y-4 flex flex-col items-center">
         <div className="relative inline-block">
           <motion.h1 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-7xl md:text-9xl font-black font-display tracking-tighter text-white italic leading-[0.8] mb-2 drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
+            className="text-7xl md:text-9xl font-black font-display tracking-tighter text-white italic leading-[0.8] mb-1 drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
           >
             PUMP <span className="text-primary drop-shadow-[0_0_40px_rgba(34,197,94,0.4)]">BINGO</span>
           </motion.h1>
@@ -155,7 +155,7 @@ export default function Home() {
             className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 blur-sm"
           />
         </div>
-        <p className="text-primary/80 font-black uppercase tracking-[0.6em] text-[10px] md:text-xs italic pl-[0.6em]">PROVABLY FAIR SOLANA GAMING</p>
+        <p className="text-primary/90 font-black uppercase tracking-[0.8em] text-sm md:text-base italic pl-[0.8em]">PROVABLY FAIR SOLANA GAMING</p>
       </section>
 
       {isLoading ? (
@@ -272,7 +272,7 @@ export default function Home() {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest">
                       {roundData.round.status === 'OPEN' ? `Accepting Entries - Round #${roundData.round.id}` : `Game Starting - Round #${roundData.round.id}`}
                     </div>
-                    <h2 className="text-5xl md:text-8xl font-black font-display text-white tracking-tighter italic">
+                    <h2 className="text-5xl md:text-8xl font-black font-display text-white tracking-tighter italic whitespace-nowrap">
                       BINGO <span className="text-primary drop-shadow-[0_0_20px_rgba(34,197,94,0.3)]">LOBBY</span>
                     </h2>
                   </div>
