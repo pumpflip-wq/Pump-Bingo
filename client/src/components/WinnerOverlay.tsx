@@ -15,7 +15,7 @@ interface WinnerOverlayProps {
 }
 
 export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose }: WinnerOverlayProps) {
-  const [timeLeft, setLeft] = useState(5);
+  const [timeLeft, setLeft] = useState(15);
 
   useEffect(() => {
     if (show) {
@@ -56,7 +56,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
       }, 1000);
       return () => clearInterval(timer);
     } else {
-      setLeft(5);
+      setLeft(15);
     }
   }, [show, isWinner, onClose]);
 

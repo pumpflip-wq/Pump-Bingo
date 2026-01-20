@@ -57,7 +57,7 @@ export default function Home() {
   
   useEffect(() => {
     if (roundData?.round.winnerId) {
-      // Only show popup for participants (Winners/Losers)
+      // Show popup for participants (Winners/Losers)
       if (isParticipant) {
         setShowWinner(true);
       }
