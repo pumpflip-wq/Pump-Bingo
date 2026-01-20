@@ -11,7 +11,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { type User } from "@shared/schema";
+import { type Round, type User, type Participant, ROUND_STATUS, type Transaction } from "@shared/schema";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
@@ -65,6 +65,12 @@ export default function Home() {
       // Logic for drawing effect can be added here if needed
     }
   }, [roundData?.round.drawnNumbers?.length]);
+
+  const { data: userTransactions } = useQuery<Transaction[]>({
+    queryKey: ["/api/auth/me/transactions", user?.id],
+    enabled: !!user?.id,
+    refetchInterval: 5000
+  });
 
   const isLoading = roundsLoading || (latestRound && roundLoading);
 
@@ -136,35 +142,30 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-card/80 border border-white/10 rounded-2xl p-6 flex flex-col h-[480px]">
+            <div className="bg-card/80 border border-white/10 rounded-2xl p-6 flex flex-col h-[280px]">
               <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2">
-                <Users className="w-4 h-4 text-primary" /> Active Players
+                <History className="w-4 h-4 text-primary" /> My Transactions
               </h3>
               
               <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                <AnimatePresence mode="popLayout">
-                  {roundData.participants.map((p: any) => (
-                    <motion.div 
-                      key={p.id}
-                      layout
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-colors hover:border-primary/50"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20">
-                          {p.username[0].toUpperCase()}
-                        </div>
-                        <span className="text-sm font-bold text-white italic">@{formatAddress(p.username)}</span>
+                {userTransactions?.length ? (
+                  userTransactions.map((tx: any) => (
+                    <div key={tx.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] uppercase font-black text-white/40">{tx.type}</span>
+                        <span className="text-xs text-white/60">{new Date(tx.createdAt).toLocaleDateString()}</span>
                       </div>
-                      <ShieldCheck className="w-4 h-4 text-primary/40" />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                {roundData.participants.length === 0 && (
+                      <span className={cn(
+                        "font-black italic",
+                        tx.amount > 0 ? "text-primary" : "text-red-500"
+                      )}>
+                        {tx.amount > 0 ? '+' : ''}{tx.amount}
+                      </span>
+                    </div>
+                  ))
+                ) : (
                   <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
-                    <Globe className="w-10 h-10" />
-                    <p className="text-xs uppercase font-black tracking-widest text-white">Awaiting Nodes...</p>
+                    <p className="text-[10px] uppercase font-black tracking-widest text-white">No history</p>
                   </div>
                 )}
               </div>
