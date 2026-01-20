@@ -94,7 +94,7 @@ export default function Home() {
         <div className="flex items-center gap-4 group cursor-pointer">
           <motion.div
             whileHover={{ rotate: 15, scale: 1.1 }}
-            className="w-16 h-16 rounded-full p-0 transition-all"
+            className="w-20 h-20 rounded-full p-0 transition-all"
           >
             <img 
               src="https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png" 
@@ -103,35 +103,20 @@ export default function Home() {
             />
           </motion.div>
           <div className="flex flex-col">
-            <h1 className="text-2xl font-black font-display tracking-tighter text-white italic leading-none">
+            <h1 className="text-4xl font-black font-display tracking-tighter text-white italic leading-none">
               PUMP <span className="text-primary">BINGO</span>
             </h1>
-            <p className="text-[10px] text-primary/60 font-black uppercase tracking-[0.3em]">Provably Fair</p>
+            <p className="text-sm text-primary/80 font-black uppercase tracking-[0.4em]">Provably Fair</p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 h-12 px-6 rounded-full bg-black/60 border border-primary text-white text-sm font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_20px_rgba(34,197,94,0.4)]"
-          >
-            <span className="text-primary font-mono font-bold">CA:</span>
-            <span className="font-mono tracking-tighter text-white font-bold text-base">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
-            <button 
-              onClick={copyCA}
-              className="ml-2 p-2 rounded-full bg-primary text-black hover:scale-105 transition-all active:scale-95"
-            >
-              <Copy className="w-4 h-4" />
-            </button>
-          </motion.div>
-
           <div className="flex items-center gap-3">
             <a 
               href={`https://pump.fun/${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="h-12 px-8 rounded-full bg-primary/10 border border-primary text-primary text-sm font-black uppercase tracking-widest hover:bg-primary/20 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(34,197,94,0.2)]"
+              className="h-12 px-8 rounded-full bg-primary/10 border-2 border-primary/50 text-primary text-sm font-black uppercase tracking-widest hover:bg-primary/20 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(34,197,94,0.2)]"
             >
               Buy PUMP <ExternalLink className="w-4 h-4" />
             </a>
@@ -157,6 +142,42 @@ export default function Home() {
         </div>
         <p className="text-primary/90 font-black uppercase tracking-[0.8em] text-sm md:text-base italic pl-[0.8em]">PROVABLY FAIR SOLANA GAMING</p>
       </section>
+
+      {latestRound && roundData ? (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* ... aside and main content ... */}
+        </div>
+      ) : null}
+
+      <footer className="mt-20 py-12 border-t border-white/5 bg-black/40 backdrop-blur-xl rounded-t-[3rem]">
+        <div className="max-w-4xl mx-auto px-6 flex flex-col items-center gap-8">
+          <div className="flex flex-col items-center gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-3 h-12 px-8 rounded-full bg-black/60 border border-primary text-white text-sm font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+            >
+              <span className="text-primary font-mono font-bold">CONTRACT:</span>
+              <span className="font-mono tracking-tighter text-white font-bold text-base">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
+              <button 
+                onClick={copyCA}
+                className="ml-2 p-1.5 rounded-full bg-primary text-black hover:scale-110 transition-all active:scale-95"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+            </motion.div>
+            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.5em] font-mono">Verified Protocol v1.0.4</p>
+          </div>
+
+          <div className="flex gap-8 opacity-40 hover:opacity-100 transition-opacity">
+            <a href="#" className="text-xs font-black uppercase tracking-widest text-white hover:text-primary transition-colors">Twitter</a>
+            <a href="#" className="text-xs font-black uppercase tracking-widest text-white hover:text-primary transition-colors">Telegram</a>
+            <a href="#" className="text-xs font-black uppercase tracking-widest text-white hover:text-primary transition-colors">Discord</a>
+          </div>
+
+          <p className="text-[10px] text-white/20 uppercase font-black tracking-widest">© 2026 PUMP BINGO. ALL RIGHTS RESERVED.</p>
+        </div>
+      </footer>
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-32 space-y-6">
