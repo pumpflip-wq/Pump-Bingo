@@ -335,6 +335,7 @@ export default function Home() {
                         id={hr.id} 
                         winner={hr.winnerUsername || "No Winner"} 
                         prize={hr.prizePool} 
+                        formatAddress={formatAddress}
                       />
                     ))
                   ) : (
@@ -369,7 +370,7 @@ export default function Home() {
   );
 }
 
-function HistoryItem({ id, winner, prize }: { id: number, winner: string, prize: number }) {
+function HistoryItem({ id, winner, prize, formatAddress }: { id: number, winner: string, prize: number, formatAddress: (addr: string) => string }) {
   const explorerUrl = `https://explorer.solana.com/address/${PROTOCOL_CONFIG.MINT_ADDRESS}?cluster=${PROTOCOL_CONFIG.NETWORK}`;
   
   return (
