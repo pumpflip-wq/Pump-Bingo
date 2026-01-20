@@ -78,14 +78,14 @@ export class GameManager {
           console.log(`Round ${round.id} starting...`);
         }
       } else {
-        // Not enough players: reset/pause the start time to 60s in the future
-        // This effectively "freezes" the timer until 2+ players are present
+        // Not enough players: reset the start time to 60s in the future continuously
+        // This ensures the timer stays at 60s in the UI
         const currentStartTime = round.startTime ? new Date(round.startTime) : null;
         const sixtySecondsFromNow = new Date(Date.now() + 60 * 1000);
 
-        if (!currentStartTime || currentStartTime.getTime() < sixtySecondsFromNow.getTime() - 2000) {
+        // Update if the timer has drifted significantly (more than 1 second)
+        if (!currentStartTime || Math.abs(currentStartTime.getTime() - sixtySecondsFromNow.getTime()) > 1000) {
            await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
-           console.log(`Round ${round.id} waiting for more players (current: ${participantCount})`);
         }
       }
     }

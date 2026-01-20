@@ -86,7 +86,7 @@ export default function Home() {
           <aside className="lg:col-span-3 space-y-8">
             <div className="bg-card/80 border border-white/10 rounded-2xl p-6 shadow-xl">
               <div className="flex items-center justify-between mb-8">
-                <h3 className="text-xs text-white uppercase font-black tracking-widest">Live Stats</h3>
+                <h3 className="text-lg text-white uppercase font-black tracking-widest">Live Stats</h3>
                 <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                   <span className="text-[10px] font-bold text-primary uppercase">Active</span>
@@ -95,7 +95,7 @@ export default function Home() {
               
               <div className="space-y-6">
                 <div className="space-y-1">
-                  <p className="text-xs text-white/70 uppercase font-bold tracking-widest">Prize Pool</p>
+                  <p className="text-sm text-white/70 uppercase font-bold tracking-widest">Prize Pool</p>
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-black text-primary font-display tracking-tighter">
                       {roundData.round.prizePool.toLocaleString()}
@@ -118,8 +118,8 @@ export default function Home() {
             </div>
 
             <div className="bg-card/80 border border-white/10 rounded-2xl p-6 flex flex-col h-[480px]">
-              <h3 className="text-xs text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2">
-                <Users className="w-3 h-3 text-primary" /> Active Players
+              <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2">
+                <Users className="w-4 h-4 text-primary" /> Active Players
               </h3>
               
               <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
@@ -168,8 +168,10 @@ export default function Home() {
                   <div className="p-10 bg-black/40 rounded-[2rem] border border-white/10 backdrop-blur-xl">
                     <p className="text-white text-xs uppercase font-black tracking-[0.2em] mb-6">Sequence Initiation In</p>
                     <CountdownTimer targetDate={roundData.round.startTime?.toString() || null} />
-                    {roundData.participantsCount < 2 && roundData.round.status === 'STARTING' && (
-                      <p className="text-primary text-[10px] uppercase font-black mt-4 animate-pulse">Waiting for more players...</p>
+                    {roundData.participantsCount < 2 && (
+                      <p className="text-primary text-[10px] uppercase font-black mt-4 animate-pulse">
+                        Waiting for at least 2 players to start timer...
+                      </p>
                     )}
                   </div>
 
@@ -230,8 +232,8 @@ export default function Home() {
 
           <aside className="lg:col-span-3">
             <div className="bg-card/80 border border-white/10 rounded-2xl p-6 flex flex-col h-[600px] shadow-xl">
-              <h3 className="text-xs text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2">
-                <History className="w-3 h-3 text-primary" /> Protocol Archive
+              <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2">
+                <History className="w-4 h-4 text-primary" /> Protocol Archive
               </h3>
               
               <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
