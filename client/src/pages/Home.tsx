@@ -90,16 +90,36 @@ export default function Home() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 pb-20">
-      <section className="text-center pt-12 pb-8 space-y-6">
+      <section className="text-center pt-12 pb-8 space-y-8 flex flex-col items-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-24 h-24 bg-primary rounded-full mx-auto flex items-center justify-center shadow-[0_0_50px_rgba(34,197,94,0.4)]"
+          className="relative"
         >
-          <Zap className="w-12 h-12 text-black fill-current" />
+          <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+          <img 
+            src="https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png" 
+            alt="PUMP BINGO Logo" 
+            className="w-32 h-32 md:w-40 md:h-40 relative z-10 drop-shadow-[0_0_20px_rgba(34,197,94,0.5)]"
+          />
         </motion.div>
         
-        <div className="space-y-6">
+        <div className="space-y-6 flex flex-col items-center">
+          <div className="relative inline-block">
+            <motion.h1 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-8xl md:text-[10rem] font-black font-display tracking-tighter text-white italic leading-[0.8] mb-2 drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
+            >
+              PUMP <span className="text-primary drop-shadow-[0_0_40px_rgba(34,197,94,0.4)]">BINGO</span>
+            </motion.h1>
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 blur-sm"
+            />
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -115,20 +135,6 @@ export default function Home() {
             </button>
           </motion.div>
           
-          <div className="relative inline-block">
-            <motion.h1 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-8xl md:text-[10rem] font-black font-display tracking-tighter text-white italic leading-[0.8] mb-2 drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
-            >
-              PUMP <span className="text-primary drop-shadow-[0_0_40px_rgba(34,197,94,0.4)]">BINGO</span>
-            </motion.h1>
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 blur-sm"
-            />
-          </div>
           <p className="text-primary/80 font-black uppercase tracking-[0.8em] text-xs md:text-sm italic pl-[0.8em]">PROVABLY FAIR SOLANA GAMING</p>
         </div>
       </section>
@@ -241,8 +247,7 @@ export default function Home() {
 
           <main className="lg:col-span-6 space-y-8">
             {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
-              <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-[600px] relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-[600px] relative overflow-hidden">
                 <div className="space-y-10 relative z-10 w-full max-w-md">
                   <div className="space-y-4">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-black uppercase tracking-widest">
