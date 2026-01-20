@@ -7,12 +7,19 @@ import { api } from "@shared/routes";
 import { gameManager } from "./game";
 import { ROUND_STATUS, users, participants } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import { PROTOCOL_CONFIG } from "../shared/config";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
   
+  // Update game settings from config
+  gameManager.updateSettings({
+    price: PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE,
+    feePercentage: PROTOCOL_CONFIG.FEE_PERCENTAGE
+  });
+
   // Start the Game Loop
   gameManager.start();
 

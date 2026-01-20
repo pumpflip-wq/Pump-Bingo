@@ -139,7 +139,7 @@ export default function Home() {
                   </div>
                   <div className="space-y-1">
                     <p className="text-[10px] text-white font-bold tracking-widest">Entry</p>
-                    <p className="text-xl font-black text-white font-display">{roundData.round.price}</p>
+                    <p className="text-xl font-black text-white font-display">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
                   </div>
                 </div>
               </div>
@@ -248,7 +248,7 @@ export default function Home() {
                         <p className="text-xs text-primary/70 uppercase font-black tracking-widest">Awaiting Sequence Start...</p>
                       </div>
                     ) : (
-                      <JoinButton roundId={roundData.round.id} price={roundData.round.price} userId={user?.id || 0} />
+                      <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
                     )}
                   </div>
                 </div>
@@ -333,7 +333,7 @@ export default function Home() {
 }
 
 function HistoryItem({ id, winner, prize }: { id: number, winner: string, prize: number }) {
-  const explorerUrl = `https://explorer.solana.com/tx/sample-tx-id?cluster=devnet`;
+  const explorerUrl = `https://explorer.solana.com/address/${PROTOCOL_CONFIG.MINT_ADDRESS}?cluster=${PROTOCOL_CONFIG.NETWORK}`;
   
   return (
     <a 
@@ -344,7 +344,7 @@ function HistoryItem({ id, winner, prize }: { id: number, winner: string, prize:
     >
       <div className="flex justify-between items-start mb-2">
         <span className="font-mono text-[10px] text-white tracking-tighter">ROUND #{id}</span>
-        <span className="text-primary font-black font-display italic text-sm">+{prize.toLocaleString()} PUMP</span>
+        <span className="text-primary font-black font-display italic text-sm">+{prize.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}</span>
       </div>
       <div className="flex justify-between items-center">
         <span className="text-xs font-black text-white italic">@{winner}</span>
