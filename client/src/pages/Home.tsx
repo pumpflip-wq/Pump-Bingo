@@ -20,7 +20,7 @@ export default function Home() {
 
   const { data: rounds, isLoading: roundsLoading } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
-  const { data: roundData, isLoading: roundLoading } = useRound(latestRound?.id);
+  const { data: roundData, isLoading: roundLoading } = useRound(latestRound?.id || 0);
 
   const { mutate: login } = useMutation({
     mutationFn: (address: string) => apiRequest("POST", "/api/auth/login", { username: address }).then(res => res.json()),
@@ -45,7 +45,7 @@ export default function Home() {
   const foundParticipant = roundData?.participants?.find((p: any) => p.username === walletAddress);
   const isParticipant = !!participant || !!foundParticipant;
   
-  const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant?.card as number[][] | undefined);
+  const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
   
   const [showWinner, setShowWinner] = useState(false);
   
