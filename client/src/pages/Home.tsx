@@ -167,7 +167,11 @@ export default function Home() {
 
                   <div className="p-10 bg-black/40 rounded-[2rem] border border-white/10 backdrop-blur-xl">
                     <p className="text-white text-xs uppercase font-black tracking-[0.2em] mb-6">Sequence Initiation In</p>
-                    <CountdownTimer targetDate={roundData.round.startTime?.toString() || null} />
+                    <CountdownTimer 
+                      targetDate={roundData.round.startTime?.toString() || null} 
+                      status={roundData.round.status}
+                      participantCount={roundData.participantsCount}
+                    />
                     {roundData.participantsCount < 2 && (
                       <p className="text-primary text-[10px] uppercase font-black mt-4 animate-pulse">
                         Waiting for at least 2 players to start timer...
@@ -296,12 +300,18 @@ function HistoryItem({ id, winner, prize }: { id: number, winner: string, prize:
   );
 }
 
-function CountdownTimer({ targetDate }: { targetDate: string | null }) {
+function CountdownTimer({ targetDate, status, participantCount }: { targetDate: string | null, status: string, participantCount: number }) {
   const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
     if (!targetDate) return;
     const updateTimer = () => {
+      // If we are in OPEN status and have less than 2 players, strictly show 01:00
+      if (status === "OPEN" && participantCount < 2) {
+        setTimeLeft("01:00");
+        return;
+      }
+
       const now = new Date().getTime();
       const target = new Date(targetDate).getTime();
       const diff = target - now;
@@ -315,24 +325,17 @@ function CountdownTimer({ targetDate }: { targetDate: string | null }) {
       const seconds = totalSeconds % 60;
       const minutes = Math.floor(totalSeconds / 60);
       
-      // If we're waiting for players (status OPEN), force show 01:00
-      // We check if the round is in OPEN status via props or context if possible
-      // But based on current logic, if totalSeconds >= 60, it's effectively waiting
-      if (totalSeconds >= 60) {
-        setTimeLeft("01:00");
-      } else {
-        setTimeLeft(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-      }
+      setTimeLeft(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
     };
 
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [targetDate]);
+  }, [targetDate, status, participantCount]);
 
   return (
     <div className="text-8xl font-black font-display text-primary tracking-tighter drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
-      {timeLeft || "00:00"}
+      {timeLeft || "01:00"}
     </div>
   );
 }
