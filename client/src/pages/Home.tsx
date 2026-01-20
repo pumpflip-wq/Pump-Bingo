@@ -42,7 +42,10 @@ export default function Home() {
   const { data: participant } = useParticipant(latestRound?.id || 0, user?.id);
   
   // Also check roundData for current user's participation if hook is lagging
-  const isParticipant = !!participant || (roundData?.participants?.some((p: any) => p.username === walletAddress));
+  const foundParticipant = roundData?.participants?.find((p: any) => p.username === walletAddress);
+  const isParticipant = !!participant || !!foundParticipant;
+  
+  const currentCard = participant?.card as number[][] || foundParticipant?.card as number[][];
   
   const [showWinner, setShowWinner] = useState(false);
 
@@ -209,10 +212,10 @@ export default function Home() {
                   <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
                 </div>
 
-                {isParticipant ? (
+                {isParticipant && currentCard ? (
                   <div className="relative space-y-10">
                     <BingoCard 
-                      card={participant?.card as number[][] || roundData.participants.find((p: any) => p.username === walletAddress)?.card as number[][]} 
+                      card={currentCard} 
                       drawnNumbers={roundData.round.drawnNumbers || []} 
                       className="w-full max-w-[540px] mx-auto"
                     />
@@ -221,7 +224,7 @@ export default function Home() {
                       <BingoClaimButton 
                         roundId={roundData.round.id} 
                         userId={user?.id || 0} 
-                        card={participant?.card as number[][] || roundData.participants.find((p: any) => p.username === walletAddress)?.card as number[][]}
+                        card={currentCard}
                         drawnNumbers={roundData.round.drawnNumbers || []}
                         status={roundData.round.status}
                         isBingoed={participant?.hasBingo || false}

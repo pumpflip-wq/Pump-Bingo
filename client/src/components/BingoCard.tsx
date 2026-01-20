@@ -18,8 +18,8 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-50 group-hover:opacity-70 transition-opacity pointer-events-none" />
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
       
-      {card.map((row, rowIndex) => (
-        row.map((num, colIndex) => {
+      {card?.map((row, rowIndex) => (
+        row?.map((num, colIndex) => {
           const matched = isMatched(num);
           const isFreeSpace = num === 0; 
           
