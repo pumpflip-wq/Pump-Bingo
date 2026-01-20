@@ -114,7 +114,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 p-1.5 pl-6 pr-1.5 rounded-full bg-black/60 border border-primary text-white text-sm font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+            className="inline-flex items-center gap-3 h-12 px-6 rounded-full bg-black/60 border border-primary text-white text-sm font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_20px_rgba(34,197,94,0.4)]"
           >
             <span className="text-primary font-mono font-bold">CA:</span>
             <span className="font-mono tracking-tighter text-white font-bold text-base">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
@@ -131,11 +131,11 @@ export default function Home() {
               href={`https://pump.fun/${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="px-6 py-3 rounded-full bg-purple-600/20 border-2 border-purple-500/50 text-purple-400 text-xs font-black uppercase tracking-widest hover:bg-purple-600/30 transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+              className="h-12 px-8 rounded-full bg-primary/10 border border-primary text-primary text-sm font-black uppercase tracking-widest hover:bg-primary/20 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(34,197,94,0.2)]"
             >
               Buy PUMP <ExternalLink className="w-4 h-4" />
             </a>
-            <WalletMultiButton className="!bg-primary !text-black !h-12 !px-8 !text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)]" />
+            <WalletMultiButton className="!bg-primary !text-black !h-12 !px-8 !text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
           </div>
         </div>
       </header>
