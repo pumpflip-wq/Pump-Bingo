@@ -54,17 +54,19 @@ export default function Home() {
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
   
   const [showWinner, setShowWinner] = useState(false);
+  const [hasShownWinner, setHasShownWinner] = useState(false);
   
   useEffect(() => {
-    if (roundData?.round.winnerId) {
-      // Show popup for participants (Winners/Losers)
-      if (isParticipant) {
+    if (roundData?.round.status === 'FINISHED' && roundData?.round.winnerId) {
+      if (isParticipant && !hasShownWinner) {
         setShowWinner(true);
+        setHasShownWinner(true);
       }
-    } else {
+    } else if (roundData?.round.status !== 'FINISHED') {
       setShowWinner(false);
+      setHasShownWinner(false);
     }
-  }, [roundData?.round.winnerId, isParticipant]);
+  }, [roundData?.round.status, roundData?.round.winnerId, isParticipant, hasShownWinner]);
 
   const copyCA = () => {
     navigator.clipboard.writeText(PROTOCOL_CONFIG.MINT_ADDRESS);
