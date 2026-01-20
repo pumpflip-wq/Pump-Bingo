@@ -90,7 +90,16 @@ export class GameManager {
     else if (round.status === ROUND_STATUS.STARTING) {
         // Give it 5 seconds of "Starting" state for hype
         const elapsed = now.getTime() - (round.startTime?.getTime() || 0);
-        if (elapsed > 5000) {
+        const participantCount = await storage.getRoundParticipantsCount(round.id);
+
+        if (participantCount < 2) {
+            // Revert to OPEN if players left during STARTING
+            await storage.updateRound(round.id, { 
+                status: ROUND_STATUS.OPEN,
+                startTime: new Date(Date.now() + 60 * 1000) 
+            });
+            console.log(`Round ${round.id} reverted to OPEN - not enough players`);
+        } else if (elapsed > 5000) {
             await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME });
         }
     }
