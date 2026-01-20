@@ -234,7 +234,7 @@ export default function Home() {
             <div className="bg-card/80 border border-white/10 rounded-2xl p-6 flex flex-col h-[600px] shadow-xl">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2">
-                  <History className="w-4 h-4 text-primary" /> Protocol Archive
+                  <History className="w-4 h-4 text-primary" /> Game History
                 </h3>
               </div>
               
@@ -248,7 +248,7 @@ export default function Home() {
               </div>
               
               <div className="mt-8 pt-6 border-t border-white/10">
-                <p className="text-[10px] text-center text-white/30 uppercase font-black tracking-widest">PROVABLY FAIR SYSTEM ACTIVE</p>
+                <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest">PROVABLY FAIR SYSTEM ACTIVE</p>
               </div>
             </div>
           </aside>
@@ -301,21 +301,30 @@ function CountdownTimer({ targetDate }: { targetDate: string | null }) {
 
   useEffect(() => {
     if (!targetDate) return;
-    const interval = setInterval(() => {
+    const updateTimer = () => {
       const now = new Date().getTime();
       const target = new Date(targetDate).getTime();
       const diff = target - now;
 
       if (diff <= 0) {
         setTimeLeft("00:00");
-        clearInterval(interval);
         return;
       }
 
-      const seconds = Math.floor((diff / 1000) % 60);
-      const minutes = Math.floor((diff / 1000 / 60) % 60);
-      setTimeLeft(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-    }, 1000);
+      const totalSeconds = Math.ceil(diff / 1000);
+      const seconds = totalSeconds % 60;
+      const minutes = Math.floor(totalSeconds / 60);
+      
+      // If we're roughly at 60s or more and waiting for players, force show 01:00
+      if (totalSeconds >= 60) {
+        setTimeLeft("01:00");
+      } else {
+        setTimeLeft(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
   }, [targetDate]);
 

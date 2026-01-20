@@ -82,11 +82,11 @@ export class GameManager {
         // This stops the timer from "jumping" or ticking down in the UI
         const sixtySecondsFromNow = new Date(Date.now() + 60 * 1000);
         
-        // Always align to the nearest second to keep UI stable
-        sixtySecondsFromNow.setMilliseconds(0);
+        // Always align to the nearest minute/second to keep UI stable
+        sixtySecondsFromNow.setSeconds(0, 0);
 
         const currentStartTime = round.startTime ? new Date(round.startTime) : null;
-        if (!currentStartTime || Math.abs(currentStartTime.getTime() - sixtySecondsFromNow.getTime()) > 500) {
+        if (!currentStartTime || currentStartTime.getTime() !== sixtySecondsFromNow.getTime()) {
            await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
         }
       }
