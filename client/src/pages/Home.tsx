@@ -48,8 +48,9 @@ export default function Home() {
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant?.card as number[][] | undefined);
   
   const [showWinner, setShowWinner] = useState(false);
-
+  
   useEffect(() => {
+    // Only set showWinner if the winnerId is different from previous or exists
     if (roundData?.round.winnerId) {
       setShowWinner(true);
     } else {
