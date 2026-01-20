@@ -315,7 +315,9 @@ function CountdownTimer({ targetDate }: { targetDate: string | null }) {
       const seconds = totalSeconds % 60;
       const minutes = Math.floor(totalSeconds / 60);
       
-      // If we're roughly at 60s or more and waiting for players, force show 01:00
+      // If we're waiting for players (status OPEN), force show 01:00
+      // We check if the round is in OPEN status via props or context if possible
+      // But based on current logic, if totalSeconds >= 60, it's effectively waiting
       if (totalSeconds >= 60) {
         setTimeLeft("01:00");
       } else {

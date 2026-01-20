@@ -78,15 +78,14 @@ export class GameManager {
           console.log(`Round ${round.id} starting...`);
         }
       } else {
-        // Not enough players: strictly fix the start time to exactly 60s in the future
-        // This stops the timer from "jumping" or ticking down in the UI
+        // Not enough players: Freeze at exactly 60 seconds
         const sixtySecondsFromNow = new Date(Date.now() + 60 * 1000);
-        
-        // Always align to the nearest minute/second to keep UI stable
-        sixtySecondsFromNow.setSeconds(0, 0);
+        sixtySecondsFromNow.setSeconds(sixtySecondsFromNow.getSeconds(), 0);
+        sixtySecondsFromNow.setMilliseconds(0);
 
         const currentStartTime = round.startTime ? new Date(round.startTime) : null;
-        if (!currentStartTime || currentStartTime.getTime() !== sixtySecondsFromNow.getTime()) {
+        // If we don't have a start time, or it's not exactly 60s away, update it
+        if (!currentStartTime || Math.abs(currentStartTime.getTime() - sixtySecondsFromNow.getTime()) > 100) {
            await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
         }
       }
