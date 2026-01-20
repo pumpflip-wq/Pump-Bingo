@@ -68,11 +68,12 @@ export async function registerRoutes(
     
     const count = await storage.getRoundParticipantsCount(roundId);
     
-    // Fetch participants with usernames
+    // Fetch participants with usernames and cards
     const roundParticipants = await db.select({
       id: users.id,
       username: users.username,
-      joinedAt: participants.joinedAt
+      joinedAt: participants.joinedAt,
+      card: participants.card
     })
     .from(participants)
     .innerJoin(users, eq(participants.userId, users.id))
@@ -83,7 +84,8 @@ export async function registerRoutes(
       participantsCount: count,
       participants: roundParticipants.map(p => ({
         ...p,
-        joinedAt: p.joinedAt?.toISOString() || ""
+        joinedAt: p.joinedAt?.toISOString() || "",
+        card: p.card
       }))
     });
   });

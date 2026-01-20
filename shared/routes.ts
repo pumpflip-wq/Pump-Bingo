@@ -53,7 +53,8 @@ export const api = {
           participants: z.array(z.object({
             id: z.number(),
             username: z.string(),
-            joinedAt: z.string()
+            joinedAt: z.string(),
+            card: z.any()
           }))
         }),
         404: errorSchemas.notFound,
