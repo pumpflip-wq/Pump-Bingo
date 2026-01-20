@@ -4,7 +4,6 @@ import { CyberButton } from "@/components/ui/CyberButton";
 import { BingoCard } from "@/components/BingoCard";
 import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
-import { Link } from "wouter";
 import { Users, Trophy, Loader2, History, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -38,7 +37,7 @@ export default function Home() {
   }, [connected, walletAddress, login]);
 
   const user = queryClient.getQueryData<User>(["/api/auth/me"]);
-  const { data: participant } = useParticipant(latestRound?.id, user?.id);
+  const { data: participant } = useParticipant(latestRound?.id || 0, user?.id);
   const [showWinner, setShowWinner] = useState(false);
 
   useEffect(() => {
@@ -162,10 +161,10 @@ export default function Home() {
 
                   <div className="p-8 bg-black/40 rounded-3xl border border-white/5 backdrop-blur-sm">
                     <p className="text-muted-foreground text-xs uppercase font-bold mb-4">Starting In</p>
-                    <CountdownTimer targetDate={roundData.round.startTime} />
+                    <CountdownTimer targetDate={roundData.round.startTime?.toString() || null} />
                   </div>
 
-                  <div className="w-full max-w-sm pt-4">
+                  <div className="w-full max-sm pt-4">
                     {!connected ? (
                       <div className="space-y-4">
                         <p className="text-muted-foreground text-sm uppercase font-bold">Connect Wallet to Join</p>
@@ -203,7 +202,7 @@ export default function Home() {
                         card={participant.card as number[][]}
                         drawnNumbers={roundData.round.drawnNumbers || []}
                         status={roundData.round.status}
-                        isBingoed={participant.hasBingo}
+                        isBingoed={participant.hasBingo || false}
                       />
                     </div>
                   </div>
@@ -335,7 +334,7 @@ function BingoClaimButton({ roundId, userId, card, drawnNumbers, status, isBingo
   card: number[][], 
   drawnNumbers: number[],
   status: string,
-  isBingoed?: boolean
+  isBingoed: boolean
 }) {
   const { mutate: claimBingo, isPending } = useClaimBingo();
   
