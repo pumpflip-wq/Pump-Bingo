@@ -31,6 +31,7 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
+    if (!id || isNaN(id)) return undefined;
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
@@ -54,6 +55,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRound(id: number): Promise<Round | undefined> {
+    if (!id || isNaN(id)) return undefined;
     const [round] = await db.select().from(rounds).where(eq(rounds.id, id));
     return round;
   }
@@ -86,12 +88,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getParticipant(roundId: number, userId: number): Promise<Participant | undefined> {
+    if (!roundId || isNaN(roundId) || !userId || isNaN(userId)) return undefined;
     const [participant] = await db.select().from(participants)
       .where(sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${userId}`);
     return participant;
   }
 
   async getRoundParticipantsCount(roundId: number): Promise<number> {
+    if (!roundId || isNaN(roundId)) return 0;
     const [result] = await db.select({ count: sql<number>`count(*)` })
         .from(participants)
         .where(eq(participants.roundId, roundId));

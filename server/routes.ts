@@ -3,8 +3,7 @@ import type { Express } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { api, errorSchemas } from "@shared/routes";
-import { z } from "zod";
+import { api } from "@shared/routes";
 import { gameManager } from "./game";
 import { ROUND_STATUS, users, participants } from "@shared/schema";
 import { eq } from "drizzle-orm";
@@ -35,7 +34,9 @@ export async function registerRoutes(
   });
 
   app.get(api.auth.me.path, async (req, res) => {
-      const user = await storage.getUser(Number(req.params.id));
+      const id = Number(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
+      const user = await storage.getUser(id);
       if(!user) return res.status(404).json({message: "User not found"});
       res.json(user);
   });
@@ -48,6 +49,8 @@ export async function registerRoutes(
 
   app.get(api.rounds.get.path, async (req, res) => {
     const roundId = Number(req.params.id);
+    if (isNaN(roundId)) return res.status(400).json({ message: "Invalid round ID" });
+
     const round = await storage.getRound(roundId);
     if (!round) return res.status(404).json({ message: "Round not found" });
     
@@ -68,7 +71,7 @@ export async function registerRoutes(
       participantsCount: count,
       participants: roundParticipants.map(p => ({
         ...p,
-        joinedAt: p.joinedAt?.toISOString() || new Array().toString()
+        joinedAt: p.joinedAt?.toISOString() || ""
       }))
     });
   });
@@ -76,6 +79,8 @@ export async function registerRoutes(
   app.post(api.rounds.join.path, async (req, res) => {
     try {
       const roundId = Number(req.params.id);
+      if (isNaN(roundId)) return res.status(400).json({ message: "Invalid round ID" });
+
       const { userId } = api.rounds.join.input.parse(req.body);
 
       const round = await storage.getRound(roundId);
@@ -126,6 +131,8 @@ export async function registerRoutes(
 
   app.post(api.rounds.claim.path, async (req, res) => {
       const roundId = Number(req.params.id);
+      if (isNaN(roundId)) return res.status(400).json({ message: "Invalid round ID" });
+
       const { userId } = api.rounds.claim.input.parse(req.body);
 
       const round = await storage.getRound(roundId);
@@ -161,7 +168,10 @@ export async function registerRoutes(
 
   app.get(api.participants.get.path, async (req, res) => {
       const { roundId, userId } = req.params;
-      const participant = await storage.getParticipant(Number(roundId), Number(userId));
+      const rId = Number(roundId);
+      const uId = Number(userId);
+      if (isNaN(rId) || isNaN(uId)) return res.status(400).json({ message: "Invalid IDs" });
+      const participant = await storage.getParticipant(rId, uId);
       if (!participant) return res.status(404).json({ message: "Not found" });
       res.json(participant);
   });
