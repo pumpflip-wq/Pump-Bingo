@@ -9,16 +9,14 @@ interface BingoCardProps {
 }
 
 export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
-  // Flatten card for easier rendering if needed, but grid is better
-  // 5x5 grid
-  
   // Memoize the check for matched numbers
   const isMatched = (num: number) => drawnNumbers.includes(num);
 
   return (
-    <div className={cn("grid grid-cols-5 gap-2 p-4 bg-card rounded-xl border-2 border-white/10 shadow-2xl relative overflow-hidden", className)}>
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/5 to-transparent pointer-events-none" />
+    <div className={cn("grid grid-cols-5 gap-3 p-6 bg-black/60 backdrop-blur-2xl rounded-[2.5rem] border-2 border-white/5 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group", className)}>
+      {/* Dynamic background effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-50 group-hover:opacity-70 transition-opacity pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
       
       {card.map((row, rowIndex) => (
         row.map((num, colIndex) => {
@@ -28,26 +26,38 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
           return (
             <motion.div
               key={`${rowIndex}-${colIndex}`}
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: (rowIndex * 5 + colIndex) * 0.02 }}
+              transition={{ 
+                delay: (rowIndex * 5 + colIndex) * 0.01,
+                type: "spring",
+                stiffness: 400,
+                damping: 25
+              }}
               className={cn(
-                "aspect-square flex items-center justify-center rounded-lg font-display text-lg md:text-xl font-bold relative border-2 transition-all duration-300",
+                "aspect-square flex items-center justify-center rounded-2xl font-display relative transition-all duration-500",
                 matched || isFreeSpace
-                  ? "bg-primary text-black border-primary shadow-[0_0_15px_rgba(57,255,20,0.5)] scale-105 z-10" 
-                  : "bg-black/40 text-muted-foreground border-white/10 hover:border-primary/50"
+                  ? "bg-primary text-black shadow-[0_0_25px_rgba(57,255,20,0.4)] scale-105 z-10 font-black italic" 
+                  : "bg-white/[0.03] text-white/30 border border-white/5 font-bold hover:bg-white/[0.08] hover:text-white/60"
               )}
             >
-              {isFreeSpace ? (
-                <span className="text-xs md:text-sm font-black tracking-tighter">PUMP</span>
-              ) : (
-                num
+              <span className={cn(
+                "text-2xl md:text-3xl tracking-tighter",
+                (matched || isFreeSpace) ? "animate-pulse" : ""
+              )}>
+                {isFreeSpace ? "PUMP" : num}
+              </span>
+              
+              {/* Inner glow effect for matched numbers */}
+              {(matched || isFreeSpace) && (
+                <div className="absolute inset-0 rounded-2xl border-2 border-white/30 mix-blend-overlay animate-pulse" />
               )}
               
-              {/* Shine effect on match */}
-              {(matched || isFreeSpace) && (
-                <div className="absolute inset-0 bg-white/20 animate-pulse rounded-lg" />
-              )}
+              {/* Corner accent */}
+              <div className={cn(
+                "absolute top-1 left-1 w-1.5 h-1.5 border-t border-l rounded-tl-sm transition-colors",
+                (matched || isFreeSpace) ? "border-black/40" : "border-white/10"
+              )} />
             </motion.div>
           );
         })

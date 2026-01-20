@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { Zap } from "lucide-react";
 
 interface LastCalledNumberProps {
   numbers: number[];
@@ -8,36 +9,67 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
   const lastNumber = numbers.length > 0 ? numbers[numbers.length - 1] : null;
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-2">
-      <span className="text-xs uppercase tracking-widest text-muted-foreground font-display">Last Called</span>
-      <div className="relative w-24 h-24 flex items-center justify-center">
-        {/* Outer rotating ring */}
+    <div className="flex flex-col items-center justify-center space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="h-px w-8 bg-gradient-to-r from-transparent to-primary/50" />
+        <span className="text-[10px] uppercase font-black tracking-[0.4em] text-primary/60 font-display italic">Live Sequence</span>
+        <div className="h-px w-8 bg-gradient-to-l from-transparent to-primary/50" />
+      </div>
+
+      <div className="relative w-32 h-32 flex items-center justify-center">
+        {/* Professional Gaming Ring Effects */}
         <motion.div 
             animate={{ rotate: 360 }}
-            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 rounded-full border-2 border-dashed border-primary/30"
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 rounded-full border border-dashed border-primary/20"
+        />
+        <motion.div 
+            animate={{ rotate: -360 }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-[-8px] rounded-full border-2 border-primary/5"
         />
         
-        {/* Inner pulsing circle */}
-        <div className="absolute inset-2 rounded-full bg-black border border-primary/50 shadow-[0_0_30px_rgba(57,255,20,0.2)]" />
+        {/* Glow and Pulse Base */}
+        <div className="absolute inset-0 rounded-full bg-black/40 backdrop-blur-xl border border-primary/30 shadow-[0_0_40px_rgba(57,255,20,0.15)] flex items-center justify-center">
+          <div className="absolute inset-2 rounded-full border border-white/5 bg-gradient-to-br from-primary/5 to-transparent" />
+        </div>
         
         <AnimatePresence mode="popLayout">
           {lastNumber !== null ? (
             <motion.div
               key={lastNumber}
-              initial={{ scale: 0, rotate: -180, opacity: 0 }}
+              initial={{ scale: 0, rotate: -90, opacity: 0 }}
               animate={{ scale: 1, rotate: 0, opacity: 1 }}
-              exit={{ scale: 1.5, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="z-10 text-4xl font-display font-bold text-primary"
+              exit={{ scale: 1.5, opacity: 0, filter: "blur(10px)" }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className="z-10 flex flex-col items-center"
             >
-              {lastNumber}
+              <div className="text-6xl font-black font-display text-primary italic leading-none drop-shadow-[0_0_15px_rgba(57,255,20,0.4)]">
+                {lastNumber}
+              </div>
+              <div className="absolute -bottom-2 px-2 py-0.5 rounded bg-primary text-black text-[8px] font-black uppercase tracking-tighter italic">
+                Active
+              </div>
             </motion.div>
           ) : (
-            <span className="z-10 text-2xl font-display font-bold text-muted-foreground">--</span>
+            <div className="z-10 flex flex-col items-center space-y-1 opacity-20">
+              <Zap className="w-8 h-8 text-primary" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-widest">Awaiting</span>
+            </div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* History indicator */}
+      {numbers.length > 1 && (
+        <div className="flex gap-2 opacity-40">
+           {numbers.slice(-4, -1).reverse().map((n, i) => (
+             <div key={i} className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-[10px] font-black text-white italic">
+               {n}
+             </div>
+           ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -10,21 +10,21 @@ export interface ButtonProps
 const CyberButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", children, ...props }, ref) => {
     
-    const baseStyles = "relative inline-flex items-center justify-center font-display uppercase tracking-wider transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]";
+    const baseStyles = "relative inline-flex items-center justify-center font-display uppercase tracking-[0.1em] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-0 disabled:opacity-30 disabled:pointer-events-none active:scale-[0.97] overflow-hidden group";
     
     const variants = {
-      primary: "bg-primary text-black hover:bg-primary/90 shadow-[0_0_15px_rgba(57,255,20,0.4)] hover:shadow-[0_0_25px_rgba(57,255,20,0.6)] border-2 border-transparent",
-      secondary: "bg-secondary text-white hover:bg-secondary/90 shadow-[0_0_15px_rgba(157,0,255,0.4)] hover:shadow-[0_0_25px_rgba(157,0,255,0.6)] border-2 border-transparent",
-      outline: "bg-transparent text-primary border-2 border-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(57,255,20,0.2)]",
-      danger: "bg-destructive text-white hover:bg-destructive/90 border-2 border-transparent",
-      ghost: "bg-transparent text-muted-foreground hover:text-primary hover:bg-primary/5 border-2 border-transparent",
+      primary: "bg-primary text-black font-black italic shadow-[0_0_20px_rgba(57,255,20,0.3)] hover:shadow-[0_0_40px_rgba(57,255,20,0.5)] border-2 border-transparent",
+      secondary: "bg-[#9d00ff] text-white font-black italic shadow-[0_0_20px_rgba(157,0,255,0.3)] hover:shadow-[0_0_40px_rgba(157,0,255,0.5)] border-2 border-transparent",
+      outline: "bg-transparent text-primary font-bold border-2 border-primary/50 hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_20px_rgba(57,255,20,0.2)]",
+      danger: "bg-destructive text-white font-bold border-2 border-transparent hover:bg-destructive/90 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]",
+      ghost: "bg-transparent text-muted-foreground font-bold hover:text-primary hover:bg-primary/5 border-2 border-transparent",
     };
 
     const sizes = {
-      sm: "h-8 px-3 text-xs",
-      md: "h-12 px-6 text-sm font-bold",
-      lg: "h-14 px-8 text-base font-bold",
-      xl: "h-16 px-10 text-xl font-bold tracking-widest",
+      sm: "h-9 px-4 text-[10px]",
+      md: "h-12 px-7 text-xs font-black",
+      lg: "h-14 px-9 text-base font-black",
+      xl: "h-20 px-12 text-2xl font-black italic tracking-tighter",
     };
 
     return (
@@ -33,14 +33,25 @@ const CyberButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(baseStyles, variants[variant], sizes[size], className)}
         {...props}
       >
-        {/* Decorative corner accents for cyber feel */}
+        {/* Background glow animation */}
+        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+        
+        {/* Scanning line for primary buttons */}
+        {variant === 'primary' && (
+          <div className="absolute inset-0 w-full h-1 bg-white/30 -top-full group-hover:top-full transition-all duration-700 ease-in-out pointer-events-none" />
+        )}
+        
+        {/* Decorative corner accents */}
         {variant !== 'ghost' && (
           <>
-            <span className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-white/30" />
-            <span className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-white/30" />
+            <div className="absolute top-1 left-1 w-1.5 h-1.5 border-t border-l border-white/40" />
+            <div className="absolute bottom-1 right-1 w-1.5 h-1.5 border-b border-r border-white/40" />
           </>
         )}
-        {children}
+        
+        <span className="relative z-10 flex items-center justify-center gap-2">
+          {children}
+        </span>
       </button>
     )
   }

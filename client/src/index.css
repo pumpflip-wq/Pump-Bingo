@@ -1,93 +1,83 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* HSL format for better Tailwind color opacity handling */
-  --background: 0 0% 0%; /* Black */
-  --foreground: 0 0% 100%; /* White */
-  
-  --primary: 110 100% 54%; /* #39FF14 Neon Green */
-  --primary-foreground: 0 0% 0%; /* Black text on neon green */
-  
-  --secondary: 277 100% 50%; /* #9D00FF Deep Purple */
-  --secondary-foreground: 0 0% 100%;
-  
-  --accent: 277 100% 50%;
-  --accent-foreground: 0 0% 100%;
-  
-  --card: 0 0% 5%; /* Slightly lighter black */
-  --card-foreground: 0 0% 100%;
-  
-  --popover: 0 0% 5%;
-  --popover-foreground: 0 0% 100%;
-  
-  --muted: 0 0% 15%;
-  --muted-foreground: 0 0% 60%;
-  
-  --destructive: 0 100% 50%;
-  --destructive-foreground: 0 0% 100%;
-  
-  --border: 0 0% 20%;
-  --input: 0 0% 20%;
-  --ring: 110 100% 54%;
-  
-  --radius: 0.75rem;
-  
-  --font-display: 'IBM Plex Mono', monospace;
-  --font-body: 'DM Sans', sans-serif;
+@layer base {
+  :root {
+    --background: 260 40% 2%;
+    --foreground: 0 0% 100%;
+    --card: 260 40% 4%;
+    --card-foreground: 0 0% 100%;
+    --popover: 260 40% 4%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 90 100% 61%;
+    --primary-foreground: 260 40% 2%;
+    --secondary: 280 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 260 20% 15%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 260 20% 15%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 260 20% 15%;
+    --input: 260 20% 15%;
+    --ring: 90 100% 61%;
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 260 40% 2%;
+    --foreground: 0 0% 100%;
+    --card: 260 40% 4%;
+    --card-foreground: 0 0% 100%;
+    --primary: 90 100% 61%;
+    --primary-foreground: 260 40% 2%;
+  }
 }
 
 @layer base {
+  * {
+    @apply border-border;
+  }
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary selection:text-black;
-    font-family: var(--font-body);
+    font-family: 'Inter', sans-serif;
   }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
-    @apply font-bold tracking-tight uppercase;
+  .font-display {
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
   }
 }
 
 @layer utilities {
-  .text-neon-green {
-    color: #39FF14;
-    text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
-  }
-  
-  .border-neon-green {
-    border-color: #39FF14;
-    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
-  }
-  
-  .bg-neon-green {
-    background-color: #39FF14;
-  }
-  
-  .text-neon-purple {
-    color: #9D00FF;
-    text-shadow: 0 0 10px rgba(157, 0, 255, 0.5);
-  }
-  
   .animate-pulse-fast {
     animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
-}
+  
+  .animate-scan {
+    animation: scan 3s linear infinite;
+  }
 
-/* Custom Scrollbar for that terminal feel */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #000;
-}
-::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(200%); }
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-white/10 rounded-full;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/40;
+  }
 }

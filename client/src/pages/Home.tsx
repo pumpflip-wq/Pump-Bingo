@@ -1,10 +1,9 @@
 import { useRounds, useJoinRound, useRound, useClaimBingo, useParticipant } from "@/hooks/use-game";
-import { useAuth } from "@/hooks/use-auth";
 import { CyberButton } from "@/components/ui/CyberButton";
 import { BingoCard } from "@/components/BingoCard";
 import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
-import { Users, Trophy, Loader2, History, ShieldCheck } from "lucide-react";
+import { Users, Trophy, Loader2, History, ShieldCheck, Zap, Globe, Cpu } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
@@ -51,129 +50,159 @@ export default function Home() {
   const isLoading = roundsLoading || (latestRound && roundLoading);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      {/* Header Section */}
-      <section className="text-center pt-4">
-        <motion.h1 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-5xl md:text-7xl font-black font-display tracking-tighter text-white mb-2 italic"
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 pb-20">
+      {/* Hero Section */}
+      <section className="text-center pt-8 space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em]"
         >
-          PUMP <span className="text-primary">BINGO</span>
+          <Zap className="w-3 h-3" />
+          Powered by Solana Network
+        </motion.div>
+        
+        <motion.h1 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-6xl md:text-8xl font-black font-display tracking-tighter text-white italic leading-tight"
+        >
+          PUMP <span className="text-primary drop-shadow-[0_0_15px_rgba(57,255,20,0.5)]">BINGO</span>
         </motion.h1>
-        <div className="flex items-center justify-center gap-4 text-muted-foreground font-mono text-[10px] tracking-widest uppercase opacity-70">
-          <span>Fair • Fast • Fun</span>
-          <span className="w-1 h-1 bg-primary rounded-full" />
-          <span className="text-primary">Solana Network</span>
-        </div>
+        
+        <p className="max-w-xl mx-auto text-muted-foreground text-sm uppercase tracking-widest font-medium opacity-60">
+          THE FIRST PROVABLY FAIR MULTIPLAYER BINGO ON CHAIN
+        </p>
       </section>
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
-          <p className="font-mono text-xs text-muted-foreground">SYNCING WITH CHAIN...</p>
+        <div className="flex flex-col items-center justify-center py-32 space-y-6">
+          <div className="relative">
+            <Loader2 className="w-16 h-16 text-primary animate-spin" />
+            <div className="absolute inset-0 blur-xl bg-primary/20 animate-pulse" />
+          </div>
+          <p className="font-mono text-xs text-primary uppercase tracking-[0.3em] animate-pulse">Establishing Neural Link...</p>
         </div>
       ) : latestRound && roundData ? (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left Column: Round Details & Participants */}
-          <div className="lg:col-span-3 space-y-6">
-            <div className="bg-card border border-white/10 rounded-2xl p-6 shadow-2xl">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xs text-muted-foreground uppercase font-display font-bold">Live Stats</h3>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  <span className="text-[10px] font-mono text-primary uppercase">Active</span>
+          {/* Left Sidebar: Stats & Players */}
+          <aside className="lg:col-span-3 space-y-8 sticky top-24">
+            {/* Live Stats Card */}
+            <div className="bg-card/40 backdrop-blur-xl border border-white/5 rounded-3xl p-6 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Cpu className="w-12 h-12" />
+              </div>
+              
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em]">Live Protocol</h3>
+                <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[9px] font-bold text-primary uppercase">Syncing</span>
                 </div>
               </div>
               
-              <div className="space-y-4">
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase mb-1">Prize Pool</p>
-                  <p className="text-3xl font-black text-primary font-display tracking-tighter">
-                    {roundData.round.prizePool.toLocaleString()}
-                    <span className="text-sm ml-1 opacity-70">PUMP</span>
-                  </p>
-                </div>
-                <div className="h-px bg-white/5" />
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-[10px] text-muted-foreground uppercase mb-0.5">Players</p>
-                    <p className="text-xl font-bold text-white font-display">{roundData.participantsCount}</p>
+              <div className="space-y-6">
+                <div className="space-y-1">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Total Prize Pool</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-black text-primary font-display tracking-tighter">
+                      {roundData.round.prizePool.toLocaleString()}
+                    </span>
+                    <span className="text-sm font-black text-primary/50 font-display italic uppercase">PUMP</span>
                   </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground uppercase mb-0.5">Buy-in</p>
-                    <p className="text-xl font-bold text-white font-display">{roundData.round.price}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                  <div className="space-y-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Active nodes</p>
+                    <p className="text-xl font-black text-white font-display tracking-tight">{roundData.participantsCount}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest">Entry Fee</p>
+                    <p className="text-xl font-black text-white font-display tracking-tight">{roundData.round.price} <span className="text-[10px] text-white/40 italic">PUMP</span></p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Participants List */}
-            <div className="bg-card border border-white/10 rounded-2xl p-6 flex flex-col h-[400px]">
-              <h3 className="text-xs text-muted-foreground uppercase mb-4 font-display font-bold flex items-center gap-2">
-                <Users className="w-3 h-3 text-primary" /> Participants
-              </h3>
+            {/* Participants Panel */}
+            <div className="bg-card/40 backdrop-blur-xl border border-white/5 rounded-3xl p-6 flex flex-col h-[480px]">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em] flex items-center gap-2">
+                  <Users className="w-3 h-3 text-primary" /> Active Players
+                </h3>
+                <span className="text-[10px] font-mono text-white/20">0x...{latestRound.id}</span>
+              </div>
+              
               <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                <AnimatePresence>
+                <AnimatePresence mode="popLayout">
                   {roundData.participants.map((p: any) => (
                     <motion.div 
                       key={p.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="flex items-center justify-between p-2.5 bg-white/5 rounded-lg border border-white/5 group hover:border-primary/30 transition-colors"
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center justify-between p-3 bg-white/[0.03] hover:bg-white/[0.06] rounded-xl border border-white/5 transition-all group"
                     >
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 shadow-[0_0_10px_rgba(57,255,20,0.1)]">
                           {p.username[0].toUpperCase()}
                         </div>
-                        <span className="text-xs font-bold text-white/90">@{p.username}</span>
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-white group-hover:text-primary transition-colors italic">@{p.username}</span>
+                          <span className="text-[8px] font-mono text-white/30 uppercase">Verified Node</span>
+                        </div>
                       </div>
-                      <ShieldCheck className="w-3 h-3 text-primary/50" />
+                      <ShieldCheck className="w-3.5 h-3.5 text-primary/30 group-hover:text-primary transition-colors" />
                     </motion.div>
                   ))}
                 </AnimatePresence>
                 {roundData.participants.length === 0 && (
-                  <div className="flex flex-col items-center justify-center h-full opacity-30 text-center px-4">
-                    <Users className="w-8 h-8 mb-2" />
-                    <p className="text-[10px] uppercase font-bold">No players yet</p>
+                  <div className="flex flex-col items-center justify-center h-full opacity-20 text-center space-y-3">
+                    <Globe className="w-10 h-10 animate-pulse" />
+                    <p className="text-[10px] uppercase font-black tracking-widest">Awaiting Connections...</p>
                   </div>
                 )}
               </div>
             </div>
-          </div>
+          </aside>
 
-          {/* Center Column: Game Area */}
-          <div className="lg:col-span-6 space-y-6">
+          {/* Center Column: Primary Game Interface */}
+          <main className="lg:col-span-6 space-y-8">
             {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
-              <div className="bg-card border-2 border-primary/20 rounded-[2.5rem] p-12 text-center flex flex-col items-center justify-center min-h-[500px] shadow-[0_0_100px_rgba(57,255,20,0.05)] relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
+              <div className="bg-card/60 backdrop-blur-2xl border-2 border-primary/10 rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-[600px] shadow-[0_0_150px_rgba(57,255,20,0.03)] relative overflow-hidden group">
+                {/* Decorative scanning line animation */}
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent h-1/2 w-full animate-scan pointer-events-none" />
                 
-                <div className="space-y-8 relative z-10">
-                  <div className="space-y-2">
-                    <div className="inline-block px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest mb-4">
-                      {roundData.round.status === 'OPEN' ? 'Accepting Players' : 'Game Starting...'}
+                <div className="space-y-10 relative z-10 w-full max-w-md">
+                  <div className="space-y-4">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-[0.3em]">
+                      {roundData.round.status === 'OPEN' ? 'ACCEPTING ENTRIES' : 'SECURE CONNECTION ACTIVE'}
                     </div>
-                    <h2 className="text-4xl md:text-6xl font-black font-display text-white tracking-tighter italic">
-                      PRE-GAME <span className="text-primary">LOBBY</span>
+                    <h2 className="text-5xl md:text-7xl font-black font-display text-white tracking-tighter italic leading-none">
+                      BINGO <span className="text-primary drop-shadow-[0_0_20px_rgba(57,255,20,0.3)]">LOBBY</span>
                     </h2>
                   </div>
 
-                  <div className="p-8 bg-black/40 rounded-3xl border border-white/5 backdrop-blur-sm">
-                    <p className="text-muted-foreground text-xs uppercase font-bold mb-4">Starting In</p>
+                  <div className="p-10 bg-black/40 rounded-[2rem] border border-white/5 backdrop-blur-xl shadow-inner relative group-hover:border-primary/20 transition-colors">
+                    <p className="text-white/40 text-[10px] uppercase font-black tracking-[0.4em] mb-6">Sequence Initiation In</p>
                     <CountdownTimer targetDate={roundData.round.startTime?.toString() || null} />
                   </div>
 
-                  <div className="w-full max-sm pt-4">
+                  <div className="w-full pt-4">
                     {!connected ? (
-                      <div className="space-y-4">
-                        <p className="text-muted-foreground text-sm uppercase font-bold">Connect Wallet to Join</p>
-                        <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-14 !px-8 !text-lg !rounded-xl w-full" />
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <p className="text-muted-foreground text-[10px] uppercase font-black tracking-widest italic opacity-60">Authentication Required</p>
+                          <div className="h-0.5 w-12 bg-primary/30 mx-auto rounded-full" />
+                        </div>
+                        <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-16 !px-10 !text-xl !rounded-2xl !w-full !font-black !italic !tracking-tighter !shadow-[0_0_30px_rgba(57,255,20,0.3)]" />
                       </div>
                     ) : participant ? (
-                      <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-2xl">
-                        <p className="text-primary font-black text-xl italic tracking-tighter">YOU ARE IN!</p>
-                        <p className="text-[10px] text-primary/70 uppercase font-bold mt-1">Wait for game to start</p>
+                      <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl shadow-[0_0_40px_rgba(57,255,20,0.1)] animate-pulse">
+                        <p className="text-primary font-black text-3xl italic tracking-tighter leading-none mb-1">NODE CONNECTED</p>
+                        <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest">Awaiting Sequence Start...</p>
                       </div>
                     ) : (
                       <JoinButton roundId={roundData.round.id} price={roundData.round.price} userId={user?.id || 0} />
@@ -182,17 +211,17 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-6">
-                <div className="flex justify-center mb-8">
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="flex justify-center">
                   <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
                 </div>
 
                 {participant ? (
-                  <div className="relative space-y-8">
+                  <div className="relative space-y-10">
                     <BingoCard 
                       card={participant.card as number[][]} 
                       drawnNumbers={roundData.round.drawnNumbers || []} 
-                      className="w-full max-w-[500px] mx-auto"
+                      className="w-full max-w-[540px] mx-auto"
                     />
                     
                     <div className="flex justify-center">
@@ -207,55 +236,69 @@ export default function Home() {
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-20 bg-card/50 rounded-[2.5rem] border border-dashed border-white/10 flex flex-col items-center justify-center min-h-[400px]">
-                    <Users className="w-16 h-16 text-muted-foreground mb-4 opacity-20" />
-                    <h2 className="text-2xl font-black font-display italic text-white mb-2">SPECTATOR MODE</h2>
-                    <p className="text-muted-foreground text-sm max-w-xs uppercase font-bold tracking-tight opacity-60">
-                      You missed this round. Wait for the next one to start!
-                    </p>
+                  <div className="text-center py-20 bg-card/40 backdrop-blur-xl rounded-[3rem] border border-dashed border-white/10 flex flex-col items-center justify-center min-h-[500px] space-y-6">
+                    <div className="p-6 rounded-full bg-white/5 border border-white/10">
+                      <Users className="w-16 h-16 text-white/10" />
+                    </div>
+                    <div className="space-y-2">
+                      <h2 className="text-3xl font-black font-display italic text-white tracking-tighter">SPECTATOR MODE</h2>
+                      <p className="text-muted-foreground text-xs max-w-[240px] mx-auto uppercase font-black tracking-widest opacity-40 leading-relaxed">
+                        SYNCHRONIZATION WINDOW CLOSED. PLEASE WAIT FOR NEXT PROTOCOL.
+                      </p>
+                    </div>
                     {!connected && (
-                      <div className="mt-6">
-                        <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-10 !px-4 !text-sm !rounded-lg" />
+                      <div className="mt-8">
+                        <WalletMultiButton className="!bg-primary/20 !hover:bg-primary/30 !border !border-primary/50 !h-12 !px-8 !text-sm !rounded-xl !text-primary" />
                       </div>
                     )}
                   </div>
                 )}
               </div>
             )}
-          </div>
+          </main>
 
-          {/* Right Column: History & Proof */}
-          <div className="lg:col-span-3 space-y-6">
-            <div className="bg-card border border-white/10 rounded-2xl p-6 flex flex-col h-full min-h-[500px]">
-              <h3 className="text-xs text-muted-foreground uppercase mb-4 font-display font-bold flex items-center gap-2">
-                <History className="w-3 h-3 text-secondary" /> Round History
+          {/* Right Sidebar: History & Integrity */}
+          <aside className="lg:col-span-3 space-y-8 sticky top-24">
+            <div className="bg-card/40 backdrop-blur-xl border border-white/5 rounded-3xl p-6 flex flex-col h-[600px] shadow-2xl relative overflow-hidden">
+              <h3 className="text-[10px] text-muted-foreground uppercase font-black tracking-[0.2em] mb-6 flex items-center gap-2">
+                <History className="w-3 h-3 text-secondary" /> Protocol Archive
               </h3>
-              <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
-                <div className="space-y-3 opacity-60">
+              
+              <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                <div className="space-y-4 opacity-50 hover:opacity-100 transition-opacity">
                   <HistoryItem id={latestRound.id - 1} winner="DegenKing" prize={5400} />
                   <HistoryItem id={latestRound.id - 2} winner="SolWhale" prize={8200} />
                   <HistoryItem id={latestRound.id - 3} winner="BingoMage" prize={3100} />
+                  <HistoryItem id={latestRound.id - 4} winner="AlphaNode" prize={12000} />
+                  <HistoryItem id={latestRound.id - 5} winner="BlockGod" prize={4500} />
                 </div>
               </div>
               
-              <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
-                <div className="bg-black/50 p-3 rounded-xl border border-white/5">
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold mb-2 flex items-center gap-1.5">
-                    <ShieldCheck className="w-3 h-3 text-primary" /> Active Round Hash
-                  </p>
-                  <p className="text-[9px] font-mono text-white/40 break-all leading-relaxed">
+              <div className="mt-8 pt-6 border-t border-white/5 space-y-4 relative z-10">
+                <div className="bg-black/80 p-5 rounded-2xl border border-white/5 shadow-inner">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[9px] text-primary uppercase font-black tracking-[0.2em] flex items-center gap-1.5">
+                      <ShieldCheck className="w-3 h-3" /> Integrity Hash
+                    </p>
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                  </div>
+                  <p className="text-[9px] font-mono text-white/30 break-all leading-loose tracking-tight selection:bg-primary selection:text-black">
                     {roundData.round.publicHash}
                   </p>
                 </div>
+                <p className="text-[8px] text-center text-muted-foreground uppercase font-black tracking-widest opacity-30">PROVABLY FAIR SYSTEM ACTIVE</p>
               </div>
             </div>
-          </div>
+          </aside>
 
         </div>
       ) : (
-        <div className="py-20 text-center bg-card rounded-[2.5rem] border border-dashed border-white/10">
-          <Trophy className="w-12 h-12 text-primary mx-auto mb-4 opacity-20" />
-          <h2 className="text-xl font-bold font-display italic">INITIALIZING BINGO NETWORK...</h2>
+        <div className="py-32 text-center bg-card/40 backdrop-blur-xl rounded-[4rem] border border-dashed border-white/10 space-y-6">
+          <Trophy className="w-16 h-16 text-primary mx-auto opacity-10 animate-bounce" />
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black font-display italic text-white tracking-tighter uppercase">INITIALIZING BINGO PROTOCOL...</h2>
+            <p className="text-muted-foreground text-[10px] uppercase font-black tracking-[0.4em] opacity-30">Scanning Blockchain States</p>
+          </div>
         </div>
       )}
 
@@ -271,14 +314,17 @@ export default function Home() {
 
 function HistoryItem({ id, winner, prize }: { id: number, winner: string, prize: number }) {
   return (
-    <div className="p-3 bg-white/5 rounded-xl border border-white/5 text-[10px]">
-      <div className="flex justify-between items-start mb-1">
-        <span className="font-mono text-muted-foreground">ROUND #{id.toString().padStart(4, '0')}</span>
-        <span className="text-primary font-bold">+{prize} PUMP</span>
+    <div className="p-4 bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl border border-white/5 transition-all group">
+      <div className="flex justify-between items-start mb-2">
+        <span className="font-mono text-[9px] text-white/20 tracking-tighter group-hover:text-white/40 transition-colors">BLOCK #{id.toString().padStart(6, '0')}</span>
+        <span className="text-primary font-black font-display italic text-xs tracking-tight">+{prize.toLocaleString()} <span className="text-[8px] opacity-50">PUMP</span></span>
       </div>
-      <div className="flex justify-between">
-        <span className="text-white font-bold italic">@{winner}</span>
-        <span className="text-muted-foreground uppercase">Verified</span>
+      <div className="flex justify-between items-center">
+        <span className="text-[11px] font-black text-white/80 italic tracking-tight group-hover:text-primary transition-colors">@{winner}</span>
+        <div className="flex items-center gap-1">
+          <ShieldCheck className="w-2.5 h-2.5 text-primary/40" />
+          <span className="text-[8px] text-white/20 uppercase font-black tracking-widest">VERIFIED</span>
+        </div>
       </div>
     </div>
   );
@@ -308,7 +354,7 @@ function CountdownTimer({ targetDate }: { targetDate: string | null }) {
   }, [targetDate]);
 
   return (
-    <div className="text-6xl md:text-7xl font-black font-display text-primary tracking-tighter animate-pulse-fast">
+    <div className="text-7xl md:text-8xl font-black font-display text-primary tracking-tighter drop-shadow-[0_0_20px_rgba(57,255,20,0.4)]">
       {timeLeft || "00:00"}
     </div>
   );
@@ -319,11 +365,22 @@ function JoinButton({ roundId, price, userId }: { roundId: number, price: number
   return (
     <CyberButton 
       variant="primary" 
-      className="w-full h-20 text-2xl font-black italic tracking-tighter"
+      size="xl"
+      className="w-full !rounded-2xl"
       onClick={() => joinRound({ roundId, userId })}
       disabled={isPending}
     >
-      {isPending ? <Loader2 className="animate-spin" /> : `JOIN ROUND (${price} PUMP)`}
+      {isPending ? (
+        <div className="flex items-center gap-3">
+          <Loader2 className="animate-spin w-6 h-6" />
+          <span className="italic tracking-tighter">JOINING PROTOCOL...</span>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center">
+          <span className="text-2xl italic tracking-tighter">JOIN ROUND</span>
+          <span className="text-[10px] font-black tracking-[0.2em] opacity-70">PAY {price} PUMP FEE</span>
+        </div>
+      )}
     </CyberButton>
   );
 }
@@ -355,17 +412,28 @@ function BingoClaimButton({ roundId, userId, card, drawnNumbers, status, isBingo
 
   return (
     <motion.div
-      animate={canClaim ? { scale: [1, 1.05, 1] } : {}}
-      transition={{ repeat: Infinity, duration: 1 }}
+      animate={canClaim ? { scale: [1, 1.02, 1] } : {}}
+      transition={{ repeat: Infinity, duration: 1.5 }}
       className="w-full max-w-sm"
     >
       <CyberButton 
         variant="primary" 
-        className={`w-full h-20 text-3xl font-black italic tracking-tighter transition-all ${!canClaim ? 'opacity-50 grayscale' : 'shadow-[0_0_30px_rgba(57,255,20,0.4)]'}`}
+        size="xl"
+        className={cn(
+          "w-full !rounded-[2rem] transition-all duration-500",
+          !canClaim ? "opacity-30 grayscale blur-[1px]" : "shadow-[0_0_50px_rgba(57,255,20,0.5)] border-primary hover:scale-[1.02]"
+        )}
         disabled={!canClaim || isPending}
         onClick={() => claimBingo({ roundId, userId })}
       >
-        {isPending ? <Loader2 className="animate-spin" /> : "BINGO!"}
+        {isPending ? (
+          <div className="flex items-center gap-3">
+            <Loader2 className="animate-spin w-8 h-8" />
+            <span className="text-3xl italic tracking-tighter">VERIFYING...</span>
+          </div>
+        ) : (
+          <span className="text-4xl font-black italic tracking-tighter">BINGO!</span>
+        )}
       </CyberButton>
     </motion.div>
   );
