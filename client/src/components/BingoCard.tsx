@@ -24,16 +24,8 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
           const isFreeSpace = num === 0; 
           
           return (
-            <motion.div
+            <div
               key={`${rowIndex}-${colIndex}`}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ 
-                delay: (rowIndex * 5 + colIndex) * 0.01,
-                type: "spring",
-                stiffness: 400,
-                damping: 25
-              }}
               className={cn(
                 "aspect-square flex items-center justify-center rounded-2xl font-display relative transition-all duration-500",
                 matched || isFreeSpace
@@ -58,7 +50,7 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
                 "absolute top-1 left-1 w-1.5 h-1.5 border-t border-l rounded-tl-sm transition-colors",
                 (matched || isFreeSpace) ? "border-black/40" : "border-white/10"
               )} />
-            </motion.div>
+            </div>
           );
         })
       ))}
