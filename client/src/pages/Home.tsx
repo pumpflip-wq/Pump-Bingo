@@ -226,39 +226,63 @@ export default function Home() {
 
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[320px]">
                   <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
-                    <Users className="w-4 h-4 text-primary" /> Probability Analysis
+                    {roundData.round.status === 'IN_GAME' ? (
+                      <><Zap className="w-4 h-4 text-primary" /> Probability Analysis</>
+                    ) : (
+                      <><Users className="w-4 h-4 text-primary" /> Active Players</>
+                    )}
                   </h3>
                   
                   <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                     <AnimatePresence mode="popLayout">
-                      {sortedParticipants.map((p: any, idx) => (
-                        <motion.div 
-                          key={p.id}
-                          layout
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
-                              #{idx + 1}
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
-                              <div className="w-24 h-1 bg-white/10 rounded-full mt-1 overflow-hidden">
-                                <motion.div 
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${p.prob}%` }}
-                                  className="h-full bg-primary"
-                                />
+                      {roundData.round.status === 'IN_GAME' ? (
+                        sortedParticipants.map((p: any, idx) => (
+                          <motion.div 
+                            key={p.id}
+                            layout
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
+                                #{idx + 1}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
+                                <div className="w-24 h-1 bg-white/10 rounded-full mt-1 overflow-hidden">
+                                  <motion.div 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${p.prob}%` }}
+                                    className="h-full bg-primary"
+                                  />
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <span className="text-[10px] font-black text-primary">{p.prob}%</span>
-                        </motion.div>
-                      ))}
+                            <span className="text-[10px] font-black text-primary">{p.prob}%</span>
+                          </motion.div>
+                        ))
+                      ) : (
+                        roundData.participants.map((p: any) => (
+                          <motion.div 
+                            key={p.id}
+                            layout
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
+                                {p.username[0].toUpperCase()}
+                              </div>
+                              <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
+                            </div>
+                            <ShieldCheck className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
+                          </motion.div>
+                        ))
+                      )}
                     </AnimatePresence>
-                    {sortedParticipants.length === 0 && (
+                    {roundData.participants.length === 0 && (
                       <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
                         <Globe className="w-10 h-10" />
                         <p className="text-xs uppercase font-black tracking-widest text-white">Awaiting Nodes...</p>
@@ -339,12 +363,51 @@ export default function Home() {
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center py-20 bg-card/80 rounded-[3rem] border border-dashed border-white/10 flex flex-col items-center justify-center min-h-[500px] space-y-6">
-                        <h2 className="text-3xl font-black font-display italic text-white tracking-tighter">SPECTATOR MODE</h2>
-                        <p className="text-white/40 text-xs uppercase font-black tracking-widest">WAIT FOR NEXT PROTOCOL</p>
-                        {!connected && (
-                          <WalletMultiButton className="!bg-primary !text-black !h-12 !px-8 !text-sm !rounded-xl !font-black" />
-                        )}
+                      <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-center space-y-8 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
+                        <div className="text-center space-y-4 relative z-10">
+                          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
+                            <Globe className="w-3 h-3 animate-spin-slow" /> Live Feed Active
+                          </div>
+                          <h2 className="text-4xl md:text-6xl font-black font-display italic text-white tracking-tighter uppercase">
+                            SPECTATING <span className="text-primary">ROUND #{roundData.round.id}</span>
+                          </h2>
+                        </div>
+
+                        <div className="w-full max-w-md space-y-6 relative z-10">
+                          <div className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/5 p-6 space-y-4">
+                            <p className="text-[10px] text-white/40 uppercase font-black tracking-widest text-center">Top Contenders</p>
+                            <div className="space-y-3">
+                              {sortedParticipants.slice(0, 3).map((p: any, idx) => (
+                                <div key={p.id} className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-primary font-black italic">#{idx+1}</span>
+                                    <span className="text-sm font-bold text-white/80 italic">@{formatAddress(p.username)}</span>
+                                  </div>
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-20 h-1 bg-white/5 rounded-full overflow-hidden">
+                                      <motion.div 
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${p.prob}%` }}
+                                        className="h-full bg-primary"
+                                      />
+                                    </div>
+                                    <span className="text-[10px] font-black text-primary">{p.prob}%</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="text-center">
+                            <p className="text-white/30 text-[10px] uppercase font-black tracking-[0.3em] italic">Wait for next sequence to engage</p>
+                            {!connected && (
+                              <div className="mt-6">
+                                <WalletMultiButton className="!bg-primary !text-black !h-12 !px-8 !text-sm !rounded-xl !font-black" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

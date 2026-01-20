@@ -15,29 +15,31 @@ interface WinnerOverlayProps {
 }
 
 export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose }: WinnerOverlayProps) {
-  const [timeLeft, setLeft] = useState(10);
+  const [timeLeft, setLeft] = useState(15);
 
   useEffect(() => {
     if (show) {
       if (isWinner) {
-        const duration = 2000;
+        const duration = 5000;
         const end = Date.now() + duration;
         const frame = () => {
           confetti({
-            particleCount: 2,
+            particleCount: 3,
             angle: 60,
             spread: 55,
             origin: { x: 0 },
             colors: ['#39FF14', '#ffffff']
           });
           confetti({
-            particleCount: 2,
+            particleCount: 3,
             angle: 120,
             spread: 55,
             origin: { x: 1 },
             colors: ['#39FF14', '#ffffff']
           });
-          if (Date.now() < end) requestAnimationFrame(frame);
+          if (Date.now() < end) {
+            setTimeout(() => requestAnimationFrame(frame), 50);
+          }
         };
         frame();
       }
@@ -54,7 +56,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
       }, 1000);
       return () => clearInterval(timer);
     } else {
-      setLeft(10);
+      setLeft(15);
     }
   }, [show, isWinner, onClose]);
 
