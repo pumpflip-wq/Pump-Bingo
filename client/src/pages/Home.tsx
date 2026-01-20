@@ -90,6 +90,41 @@ export default function Home() {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
+  const calculateWinProb = (card: number[][], drawn: number[]) => {
+    const drawnSet = new Set(drawn);
+    let minMissing = 5;
+
+    // Rows
+    for (let r = 0; r < 5; r++) {
+      const missing = card[r].filter(n => n !== 0 && !drawnSet.has(n)).length;
+      minMissing = Math.min(minMissing, missing);
+    }
+    // Cols
+    for (let c = 0; c < 5; c++) {
+      let missing = 0;
+      for (let r = 0; r < 5; r++) {
+        const n = card[r][c];
+        if (n !== 0 && !drawnSet.has(n)) missing++;
+      }
+      minMissing = Math.min(minMissing, missing);
+    }
+    // Diagonals
+    let d1 = 0, d2 = 0;
+    for (let i = 0; i < 5; i++) {
+      if (card[i][i] !== 0 && !drawnSet.has(card[i][i])) d1++;
+      if (card[i][4-i] !== 0 && !drawnSet.has(card[i][4-i])) d2++;
+    }
+    minMissing = Math.min(minMissing, d1, d2);
+
+    if (minMissing === 0) return 100;
+    return Math.max(5, 100 - (minMissing * 20));
+  };
+
+  const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
+    ...p,
+    prob: calculateWinProb(p.card, roundData.round.drawnNumbers || [])
+  })).sort((a, b) => b.prob - a.prob) : [];
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col space-y-4 pb-10">
@@ -191,12 +226,12 @@ export default function Home() {
 
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[320px]">
                   <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
-                    <Users className="w-4 h-4 text-primary" /> Active Players
+                    <Users className="w-4 h-4 text-primary" /> Probability Analysis
                   </h3>
                   
                   <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                     <AnimatePresence mode="popLayout">
-                      {roundData.participants.map((p: any) => (
+                      {sortedParticipants.map((p: any, idx) => (
                         <motion.div 
                           key={p.id}
                           layout
@@ -205,16 +240,25 @@ export default function Home() {
                           className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
-                              {p.username[0].toUpperCase()}
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
+                              #{idx + 1}
                             </div>
-                            <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
+                              <div className="w-24 h-1 bg-white/10 rounded-full mt-1 overflow-hidden">
+                                <motion.div 
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${p.prob}%` }}
+                                  className="h-full bg-primary"
+                                />
+                              </div>
+                            </div>
                           </div>
-                          <ShieldCheck className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
+                          <span className="text-[10px] font-black text-primary">{p.prob}%</span>
                         </motion.div>
                       ))}
                     </AnimatePresence>
-                    {roundData.participants.length === 0 && (
+                    {sortedParticipants.length === 0 && (
                       <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
                         <Globe className="w-10 h-10" />
                         <p className="text-xs uppercase font-black tracking-widest text-white">Awaiting Nodes...</p>
@@ -416,8 +460,10 @@ export default function Home() {
 
       <WinnerOverlay 
         show={showWinner} 
-        username={roundData?.round.winnerId ? "WinnerPlayer" : "Unknown"} 
+        username={roundData?.round.winnerId ? (roundData.participants.find(p => p.id === roundData.round.winnerId)?.username || "WinnerPlayer") : "WinnerPlayer"} 
         prize={roundData?.round.prizePool || 0}
+        isWinner={roundData?.round.winnerId === user?.id}
+        txHash={roundData?.round.winnerId === user?.id ? "BINGOV1PROOF" : undefined}
         onClose={() => setShowWinner(false)}
       />
     </div>
