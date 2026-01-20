@@ -1,6 +1,8 @@
 
 import { storage } from "./storage";
-import { type Round, ROUND_STATUS } from "@shared/schema";
+import { db } from "./db";
+import { type Round, ROUND_STATUS, rounds } from "@shared/schema";
+import { sql } from "drizzle-orm";
 import crypto from "crypto";
 
 // Bingo Game Logic

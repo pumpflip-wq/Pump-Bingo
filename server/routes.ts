@@ -2,10 +2,12 @@
 import type { Express } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
 import { api, errorSchemas } from "@shared/routes";
 import { z } from "zod";
 import { gameManager } from "./game";
-import { ROUND_STATUS } from "@shared/schema";
+import { ROUND_STATUS, users, participants } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export async function registerRoutes(
   httpServer: Server,
