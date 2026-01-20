@@ -114,10 +114,10 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 p-1 pl-4 pr-1 rounded-full bg-black/60 border border-primary/50 text-white text-[11px] font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_15px_rgba(34,197,94,0.2)]"
+            className="inline-flex items-center gap-3 p-1 pl-4 pr-1 rounded-full bg-black/60 border border-primary text-white text-[11px] font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_15px_rgba(34,197,94,0.3)]"
           >
-            <span className="text-primary/80 font-mono">CA:</span>
-            <span className="font-mono tracking-tighter text-white">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
+            <span className="text-primary font-mono font-bold">CA:</span>
+            <span className="font-mono tracking-tighter text-white font-bold">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
             <button 
               onClick={copyCA}
               className="ml-2 p-1.5 rounded-full bg-primary text-black hover:scale-105 transition-all active:scale-95"
