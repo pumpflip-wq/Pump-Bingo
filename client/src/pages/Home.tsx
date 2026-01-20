@@ -69,6 +69,12 @@ export default function Home() {
     });
   };
 
+  const { data: userTransactions } = useQuery<Transaction[]>({
+    queryKey: ["/api/auth/me/transactions", user?.id],
+    enabled: !!user?.id,
+    refetchInterval: 5000
+  });
+
   const isLoading = roundsLoading || (latestRound && roundLoading);
 
   const formatAddress = (address: string) => {
