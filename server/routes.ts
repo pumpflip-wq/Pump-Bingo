@@ -157,8 +157,9 @@ export async function registerRoutes(
               winnerId: userId 
           });
           
-          // Payout (90%)
-          const payout = Math.floor(round.prizePool * 0.9);
+          // Payout based on feePercentage
+          const payoutMultiplier = (100 - PROTOCOL_CONFIG.FEE_PERCENTAGE) / 100;
+          const payout = Math.floor(round.prizePool * payoutMultiplier);
           await storage.updateUserBalance(userId, payout);
           await storage.createTransaction({
               userId,

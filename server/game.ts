@@ -7,14 +7,22 @@ import crypto from "crypto";
 
 // Bingo Game Logic
 export class GameManager {
-  private loopInterval: NodeJS.Timeout | null = null;
-  private isProcessing = false;
+  private price = 100;
+  private feePercentage = 10;
+
+  updateSettings(settings: { price: number; feePercentage: number }) {
+    this.price = settings.price;
+    this.feePercentage = settings.feePercentage;
+  }
 
   start() {
     if (this.loopInterval) return;
     console.log("Starting Game Manager Loop...");
     this.loopInterval = setInterval(() => this.tick(), 1000); // 1 tick per second
   }
+
+  private loopInterval: NodeJS.Timeout | null = null;
+  private isProcessing = false;
 
   stop() {
     if (this.loopInterval) {
@@ -57,7 +65,7 @@ export class GameManager {
       serverSeed: seed,
       publicHash: hash,
       startTime: startTime,
-      price: 100, // 100 PUMP default
+      price: this.price, 
       prizePool: 0,
       drawnNumbers: []
     });
