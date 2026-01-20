@@ -41,11 +41,11 @@ export async function registerRoutes(
   });
 
   app.get(api.auth.me.path, async (req, res) => {
-      const id = Number(req.params.id);
-      if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
-      const user = await storage.getUser(id);
-      if(!user) return res.status(404).json({message: "User not found"});
-      res.json(user);
+    const userId = Number(req.params.id);
+    if (isNaN(userId)) return res.status(400).json({ message: "Invalid ID" });
+    const user = await storage.getUser(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
   });
 
   // === ROUNDS ===

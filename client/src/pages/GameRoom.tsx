@@ -31,6 +31,8 @@ export default function GameRoom() {
   useEffect(() => {
     if (roundData?.round.winnerId) {
       setShowWinner(true);
+    } else {
+      setShowWinner(false);
     }
   }, [roundData?.round.winnerId]);
 
