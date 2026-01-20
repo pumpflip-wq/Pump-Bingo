@@ -95,7 +95,7 @@ export default function Home() {
               
               <div className="space-y-6">
                 <div className="space-y-1">
-                  <p className="text-sm text-white/70 uppercase font-bold tracking-widest">Prize Pool</p>
+                  <p className="text-sm text-white font-bold tracking-widest">Prize Pool</p>
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-black text-primary font-display tracking-tighter">
                       {roundData.round.prizePool.toLocaleString()}
@@ -106,11 +106,11 @@ export default function Home() {
 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
                   <div className="space-y-1">
-                    <p className="text-[10px] text-white/70 uppercase font-bold tracking-widest">Nodes</p>
+                    <p className="text-[10px] text-white font-bold tracking-widest">Nodes</p>
                     <p className="text-xl font-black text-white font-display">{roundData.participantsCount}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] text-white/70 uppercase font-bold tracking-widest">Entry</p>
+                    <p className="text-[10px] text-white font-bold tracking-widest">Entry</p>
                     <p className="text-xl font-black text-white font-display">{roundData.round.price}</p>
                   </div>
                 </div>
@@ -232,9 +232,15 @@ export default function Home() {
 
           <aside className="lg:col-span-3">
             <div className="bg-card/80 border border-white/10 rounded-2xl p-6 flex flex-col h-[600px] shadow-xl">
-              <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2">
-                <History className="w-4 h-4 text-primary" /> Protocol Archive
-              </h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2">
+                  <History className="w-4 h-4 text-primary" /> Protocol Archive
+                </h3>
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="w-1 h-1 rounded-full bg-emerald-500" />
+                  <span className="text-[8px] font-bold text-emerald-500 uppercase">Mainnet-Beta Sync</span>
+                </div>
+              </div>
               
               <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                 <div className="space-y-4">
@@ -270,20 +276,27 @@ export default function Home() {
 }
 
 function HistoryItem({ id, winner, prize }: { id: number, winner: string, prize: number }) {
+  const explorerUrl = `https://explorer.solana.com/tx/sample-tx-id?cluster=devnet`;
+  
   return (
-    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:border-primary/50">
+    <a 
+      href={explorerUrl} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="block p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:border-primary/50 hover:bg-white/10 group"
+    >
       <div className="flex justify-between items-start mb-2">
-        <span className="font-mono text-[10px] text-white/40 tracking-tighter">ROUND #{id}</span>
+        <span className="font-mono text-[10px] text-white/60 tracking-tighter">ROUND #{id}</span>
         <span className="text-primary font-black font-display italic text-sm">+{prize.toLocaleString()} PUMP</span>
       </div>
       <div className="flex justify-between items-center">
         <span className="text-xs font-black text-white italic">@{winner}</span>
         <div className="flex items-center gap-1">
-          <ShieldCheck className="w-3 h-3 text-primary/40" />
-          <span className="text-[10px] text-white/40 uppercase font-black">VERIFIED</span>
+          <ShieldCheck className="w-3 h-3 text-primary/40 group-hover:text-primary transition-colors" />
+          <span className="text-[10px] text-white/60 uppercase font-black group-hover:text-white transition-colors">VERIFIED</span>
         </div>
       </div>
-    </div>
+    </a>
   );
 }
 
