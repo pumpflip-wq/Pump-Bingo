@@ -23,8 +23,8 @@ export default function VerifyPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col space-y-4">
+    <div className="flex flex-col bg-background text-foreground">
+      <div className="w-full flex-1 flex flex-col space-y-4">
         <header className="flex flex-col md:flex-row items-center justify-between py-4 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 px-6 rounded-b-[2rem]">
           <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
             <motion.div
