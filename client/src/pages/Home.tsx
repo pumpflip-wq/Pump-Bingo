@@ -48,6 +48,8 @@ export default function Home() {
   
   const { data: participant } = useParticipant(latestRound?.id || 0, user?.id);
   
+  const isLoading = roundsLoading || (latestRound && roundLoading);
+
   const foundParticipant = roundData?.participants?.find((p: any) => p.username === walletAddress);
   const isParticipant = !!participant || !!foundParticipant;
   
@@ -101,7 +103,7 @@ export default function Home() {
     }
   }, [roundData?.round.drawnNumbers?.length]);
 
-  return (
+  const formatAddress = (address: string) => {
     if (!address || address === "No Winner") return address;
     if (address.length < 10) return address;
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
