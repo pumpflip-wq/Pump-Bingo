@@ -227,26 +227,30 @@ export default function Home() {
           ) : latestRound && roundData ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
-            <aside className="lg:col-span-3 space-y-8 h-full flex flex-col">
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0">
-                  <h3 className="text-lg text-white uppercase font-black tracking-widest mb-4 flex items-center gap-2 font-display">
-                    <ShieldCheck className="w-4 h-4 text-primary" /> My Stats
+            <aside className="lg:col-span-3 space-y-8 h-[700px] flex flex-col">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 h-[250px]">
+                  <h3 className="text-lg text-white uppercase font-black tracking-widest mb-4 flex items-center justify-between font-display">
+                    <span className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-primary" /> My Stats
+                    </span>
                   </h3>
                   
-                  <div className="space-y-4 flex-1">
+                  <div className="space-y-4 overflow-y-auto custom-scrollbar">
                     <div className="flex flex-col gap-1">
                       <span className="text-xs uppercase font-black text-white font-mono">Wallet Address</span>
                       <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs text-white font-mono">{formatAddress(walletAddress || "")}</span>
-                        <Copy 
-                          className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
-                          onClick={() => {
-                            if (walletAddress) {
-                              navigator.clipboard.writeText(walletAddress);
-                              toast({ title: "Address Copied" });
-                            }
-                          }}
-                        />
+                        <div className="flex items-center gap-2">
+                          <Copy 
+                            className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
+                            onClick={() => {
+                              if (walletAddress) {
+                                navigator.clipboard.writeText(walletAddress);
+                                toast({ title: "Address Copied" });
+                              }
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -270,7 +274,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 min-h-[400px]">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
                       <Users className="w-4 h-4 text-primary" /> Active Players
@@ -279,24 +283,38 @@ export default function Home() {
                   
                   <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                     <AnimatePresence mode="popLayout">
-                      {roundData.participants.map((p: any) => (
+                      {sortedParticipants.map((p: any) => (
                         <motion.div 
                           key={p.id}
                           layout
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
-                          className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group transition-all hover:border-primary/50 hover:bg-white/10"
+                          className={cn(
+                            "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
+                            p.username === walletAddress ? "border-primary bg-primary/10" : "border-white/5"
+                          )}
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
+                            <div className={cn(
+                              "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black border transition-colors",
+                              p.username === walletAddress 
+                                ? "bg-primary text-black border-primary" 
+                                : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-black"
+                            )}>
                               {p.username[0].toUpperCase()}
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
+                              <span className="text-sm font-bold text-white italic tracking-tight flex items-center gap-1">
+                                @{formatAddress(p.username)}
+                                {p.username === walletAddress && <span className="text-[10px] text-primary">(YOU)</span>}
+                              </span>
                               <span className="text-[10px] text-primary/60 font-black font-mono">100 PUMP</span>
                             </div>
                           </div>
-                          <ShieldCheck className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
+                          <ShieldCheck className={cn(
+                            "w-4 h-4 transition-colors",
+                            p.username === walletAddress ? "text-primary" : "text-primary/40 group-hover:text-primary"
+                          )} />
                         </motion.div>
                       ))}
                     </AnimatePresence>
@@ -310,9 +328,9 @@ export default function Home() {
                 </div>
               </aside>
 
-              <main className="lg:col-span-6 space-y-8">
+              <main className="lg:col-span-6 space-y-8 h-[700px] flex flex-col overflow-y-auto custom-scrollbar">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
-                  <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-start min-h-[600px] relative overflow-hidden">
+                  <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-start min-h-[600px] relative overflow-hidden shrink-0">
                     <div className="space-y-10 relative z-10 w-full">
                       <div className="grid grid-cols-3 gap-4 mb-8">
                         <div className="glass-card bg-black/40 border-primary/20 p-4 rounded-2xl text-center">
@@ -502,12 +520,13 @@ export default function Home() {
                 )}
               </main>
 
-              <aside className="lg:col-span-3 space-y-8">
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[600px] shadow-xl">
+            <aside className="lg:col-span-3 space-y-8 h-[600px] flex flex-col">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-full overflow-hidden">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
                       <History className="w-4 h-4 text-primary" /> Game History
                     </h3>
+                    <Link href="/verify" className="text-[10px] font-black text-primary/60 hover:text-primary uppercase tracking-widest underline transition-colors">Full View</Link>
                   </div>
                   
                   <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
@@ -517,7 +536,7 @@ export default function Home() {
                           <Loader2 className="w-6 h-6 text-primary animate-spin" />
                         </div>
                       ) : historyRounds?.length ? (
-                        historyRounds.map((hr) => (
+                        historyRounds.slice(0, 10).map((hr) => (
                           <HistoryItem 
                             key={hr.id}
                             id={hr.id} 
