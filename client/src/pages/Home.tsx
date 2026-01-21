@@ -87,6 +87,14 @@ export default function Home() {
     refetchInterval: 5000
   });
 
+  const stats = useMemo(() => {
+    if (!userTransactions) return { wins: 0, losses: 0, pnl: 0 };
+    const wins = userTransactions.filter(tx => tx.type === "PRIZE").length;
+    const losses = userTransactions.filter(tx => tx.type === "BUY_IN").length;
+    const pnl = userTransactions.reduce((acc, tx) => acc + tx.amount, 0);
+    return { wins, losses, pnl };
+  }, [userTransactions]);
+
   const isLoading = roundsLoading || (latestRound && roundLoading);
 
   const formatAddress = (address: string) => {
@@ -197,31 +205,58 @@ export default function Home() {
               
               <aside className="lg:col-span-3 space-y-8">
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[280px]">
-                  <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
+                  <h3 className="text-lg text-white uppercase font-black tracking-widest mb-4 flex items-center gap-2 font-display">
                     <ShieldCheck className="w-4 h-4 text-primary" /> My Stats
                   </h3>
                   
-                  <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                    {userTransactions?.length ? (
-                      userTransactions.map((tx: any) => (
-                        <div key={tx.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
-                          <div className="flex flex-col">
-                            <span className="text-[10px] uppercase font-black text-white/40 font-mono">{tx.type}</span>
-                            <span className="text-xs text-white/60 font-mono">{new Date(tx.createdAt).toLocaleDateString()}</span>
-                          </div>
+                  <div className="space-y-4 flex-1">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] uppercase font-black text-white/40 font-mono">Wallet Address</span>
+                      <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
+                        <span className="text-xs text-white font-mono">{formatAddress(walletAddress || "")}</span>
+                        <Copy 
+                          className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
+                          onClick={() => {
+                            if (walletAddress) {
+                              navigator.clipboard.writeText(walletAddress);
+                              toast({ title: "Address Copied" });
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
+                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">Wins</span>
+                        <span className="text-sm font-black text-primary">{stats.wins}</span>
+                      </div>
+                      <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
+                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">Losses</span>
+                        <span className="text-sm font-black text-red-500">{stats.losses}</span>
+                      </div>
+                      <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
+                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">PNL</span>
+                        <span className={cn(
+                          "text-sm font-black",
+                          stats.pnl >= 0 ? "text-primary" : "text-red-500"
+                        )}>{stats.pnl >= 0 ? '+' : ''}{stats.pnl}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto space-y-1 mt-2 pr-1 custom-scrollbar max-h-[60px]">
+                      {userTransactions?.slice(0, 3).map((tx: any) => (
+                        <div key={tx.id} className="flex items-center justify-between text-[10px] py-1 border-b border-white/5 last:border-0">
+                          <span className="text-white/40 font-mono uppercase">{tx.type}</span>
                           <span className={cn(
-                            "font-black italic font-display",
+                            "font-bold font-mono",
                             tx.amount > 0 ? "text-primary" : "text-red-500"
                           )}>
                             {tx.amount > 0 ? '+' : ''}{tx.amount}
                           </span>
                         </div>
-                      ))
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
-                        <p className="text-[10px] uppercase font-black tracking-widest text-white">No activity</p>
-                      </div>
-                    )}
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -266,23 +301,17 @@ export default function Home() {
                     <div className="space-y-10 relative z-10 w-full">
                       <div className="grid grid-cols-3 gap-4 mb-8">
                         <div className="glass-card bg-black/40 border-primary/20 p-4 rounded-2xl text-center">
-                          <p className="text-[10px] text-primary font-black uppercase tracking-widest mb-1">Room</p>
-                          <p className="text-2xl font-black text-white font-display">#{roundData.round.id}</p>
+                          <p className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-1 font-mono">Room</p>
+                          <p className="text-2xl font-black text-white font-display italic">#{roundData.round.id}</p>
+                        </div>
+                        <div className="glass-card bg-black/60 border-primary/40 p-4 rounded-2xl text-center shadow-[0_0_30px_rgba(34,197,94,0.1)]">
+                          <p className="text-[10px] text-primary font-black uppercase tracking-widest mb-1 font-mono">Prize Pool</p>
+                          <p className="text-4xl font-black text-primary font-display italic drop-shadow-[0_0_15px_rgba(34,197,94,0.4)]">{roundData.round.prizePool}</p>
                         </div>
                         <div className="glass-card bg-black/40 border-primary/20 p-4 rounded-2xl text-center">
-                          <p className="text-[10px] text-primary font-black uppercase tracking-widest mb-1">Prize Pool</p>
-                          <p className="text-2xl font-black text-primary font-display drop-shadow-[0_0_10px_rgba(34,197,94,0.3)]">{roundData.round.prizePool}</p>
+                          <p className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-1 font-mono">Players</p>
+                          <p className="text-2xl font-black text-white font-display italic">{roundData.participantsCount}</p>
                         </div>
-                        <div className="glass-card bg-black/40 border-primary/20 p-4 rounded-2xl text-center">
-                          <p className="text-[10px] text-primary font-black uppercase tracking-widest mb-1">Players</p>
-                          <p className="text-2xl font-black text-white font-display">{roundData.participantsCount}</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <h2 className="text-5xl md:text-8xl font-black font-display text-white tracking-tighter italic whitespace-nowrap">
-                          BINGO <span className="text-primary drop-shadow-[0_0_20px_rgba(34,197,94,0.3)]">LOBBY</span>
-                        </h2>
                       </div>
 
                       <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
@@ -383,7 +412,7 @@ export default function Home() {
                                     <div className="flex flex-col items-center gap-2">
                                       <div className="flex items-center gap-3 text-primary">
                                         <Trophy className="w-6 h-6 animate-bounce" />
-                                        <span className="text-xl font-black italic">@{formatAddress(roundData.round.winnerUsername || "")} WON!</span>
+                                        <span className="text-xl font-black italic">@{formatAddress((roundData.round as any).winnerUsername || "")} WON!</span>
                                       </div>
                                       <div className="flex items-center gap-1">
                                         <Zap className="w-3 h-3 text-primary animate-pulse" />
