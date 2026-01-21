@@ -15,12 +15,13 @@ interface WinnerOverlayProps {
 }
 
 export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose }: WinnerOverlayProps) {
-  const [timeLeft, setLeft] = useState(5);
+  const [timeLeft, setLeft] = useState(15);
 
   useEffect(() => {
     if (show) {
+      setLeft(15);
       if (isWinner) {
-        const duration = 5000;
+        const duration = 10000;
         const end = Date.now() + duration;
         const frame = () => {
           confetti({
@@ -55,8 +56,6 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
         });
       }, 1000);
       return () => clearInterval(timer);
-    } else {
-      setLeft(5);
     }
   }, [show, isWinner, onClose]);
 

@@ -157,7 +157,6 @@ export default function Home() {
               <h1 className="text-4xl font-black font-display tracking-tighter text-white italic leading-none">
                 PUMP <span className="text-primary">BINGO</span>
               </h1>
-              <p className="text-sm text-primary/80 font-black uppercase tracking-[0.4em]">Provably Fair</p>
             </div>
           </div>
 
@@ -202,7 +201,7 @@ export default function Home() {
           ) : latestRound && roundData ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
-              <aside className="lg:col-span-3 space-y-8 h-full flex flex-col">
+            <aside className="lg:col-span-3 space-y-8 h-full flex flex-col">
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0">
                   <h3 className="text-lg text-white uppercase font-black tracking-widest mb-4 flex items-center gap-2 font-display">
                     <ShieldCheck className="w-4 h-4 text-primary" /> My Stats
@@ -210,11 +209,11 @@ export default function Home() {
                   
                   <div className="space-y-4 flex-1">
                     <div className="flex flex-col gap-1">
-                      <span className="text-xs uppercase font-black text-white font-mono">Wallet Address</span>
+                      <span className="text-sm uppercase font-black text-white font-mono">Wallet Address</span>
                       <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-xs text-white font-mono">{formatAddress(walletAddress || "")}</span>
+                        <span className="text-sm text-white font-mono">{formatAddress(walletAddress || "")}</span>
                         <Copy 
-                          className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
+                          className="w-4 h-4 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
                           onClick={() => {
                             if (walletAddress) {
                               navigator.clipboard.writeText(walletAddress);
@@ -228,16 +227,16 @@ export default function Home() {
                     <div className="grid grid-cols-3 gap-2">
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs uppercase font-black text-white font-mono">Wins</span>
-                        <span className="text-sm font-black text-primary">{stats.wins}</span>
+                        <span className="text-xl font-black text-primary">{stats.wins}</span>
                       </div>
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs uppercase font-black text-white font-mono">Losses</span>
-                        <span className="text-sm font-black text-red-500">{stats.losses}</span>
+                        <span className="text-xl font-black text-red-500">{stats.losses}</span>
                       </div>
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs uppercase font-black text-white font-mono">PNL</span>
                         <span className={cn(
-                          "text-sm font-black",
+                          "text-xl font-black",
                           stats.pnl >= 0 ? "text-primary" : "text-red-500"
                         )}>{stats.pnl >= 0 ? '+' : ''}{stats.pnl}</span>
                       </div>
@@ -245,7 +244,24 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 min-h-[400px]">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0">
+                  <h3 className="text-lg text-white uppercase font-black tracking-widest mb-4 flex items-center gap-2 font-display">
+                    <History className="w-4 h-4 text-primary" /> Last Winners
+                  </h3>
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto custom-scrollbar pr-2">
+                    {historyRounds?.map((r) => (
+                      <div key={r.id} className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-white">@{formatAddress(r.winnerUsername || "No Winner")}</span>
+                          <span className="text-[10px] text-primary/60 font-mono">Round #{r.id}</span>
+                        </div>
+                        <span className="text-xs font-black text-primary">+{r.prizePool}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 min-h-[300px]">
                   <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
                     <Users className="w-4 h-4 text-primary" /> Active Players
                   </h3>
