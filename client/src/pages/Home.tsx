@@ -202,7 +202,7 @@ export default function Home() {
         </header>
 
           <div className="flex-1 flex flex-col space-y-4">
-            <section className="text-center pt-2 pb-2 space-y-4 flex flex-col items-center">
+            <section className="text-center pt-2 pb-2 space-y-4 flex flex-col items-center hidden">
               <div className="relative inline-block">
                 <motion.h1 
                   initial={{ opacity: 0, scale: 0.95 }}
