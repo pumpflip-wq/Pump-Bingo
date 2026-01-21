@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
@@ -167,7 +168,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col space-y-4">
         <header className="flex flex-col md:flex-row items-center justify-between py-4 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 px-6 rounded-b-[2rem]">
-          <div className="flex items-center gap-4 group cursor-pointer">
+          <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
             <motion.div
               whileHover={{ rotate: 15, scale: 1.1 }}
               className="w-20 h-20 rounded-full p-0 transition-all"
@@ -183,7 +184,7 @@ export default function Home() {
                 PUMP <span className="text-primary">BINGO</span>
               </h1>
             </div>
-          </div>
+          </Link>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <div className="flex items-center gap-3">
