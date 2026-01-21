@@ -47,29 +47,30 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
               <div className="absolute inset-0 border-2 border-primary/20 rounded-full" />
               <motion.div 
                 animate={{ rotate: 360 }}
-                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 className="relative w-20 h-20"
               >
-                {[...Array(6)].map((_, i) => (
+                {[...Array(4)].map((_, i) => (
                   <motion.div
                     key={i}
                     animate={{ 
-                      x: [0, (Math.random() - 0.5) * 40, 0],
-                      y: [0, (Math.random() - 0.5) * 40, 0],
+                      x: [0, Math.cos(i * (Math.PI / 2)) * 30, 0],
+                      y: [0, Math.sin(i * (Math.PI / 2)) * 30, 0],
                       rotate: [0, 360],
                     }}
                     transition={{ 
-                      duration: 3 + Math.random() * 2, 
+                      duration: 8, 
                       repeat: Infinity, 
-                      ease: "linear" 
+                      ease: "linear",
+                      delay: i * 1.5
                     }}
-                    className="absolute w-6 h-6 rounded-full bg-gradient-to-br from-white via-primary/40 to-primary/80 border border-white/20 shadow-lg flex items-center justify-center overflow-hidden"
+                    className="absolute w-7 h-7 rounded-full bg-gradient-to-br from-white via-primary/40 to-primary/80 border border-white/20 shadow-lg flex items-center justify-center overflow-hidden"
                     style={{
-                      left: `${20 + (i * 10)}%`,
-                      top: `${20 + (i * 5)}%`,
+                      left: '35%',
+                      top: '35%',
                     }}
                   >
-                    <span className="text-[7px] font-black text-black">{Math.floor(Math.random() * 75) + 1}</span>
+                    <span className="text-[8px] font-black text-black">{Math.floor(Math.random() * 75) + 1}</span>
                   </motion.div>
                 ))}
               </motion.div>
