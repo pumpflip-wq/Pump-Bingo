@@ -225,57 +225,28 @@ export default function Home() {
               <p className="font-mono text-xs text-primary uppercase tracking-[0.3em]">Connecting Node...</p>
             </div>
           ) : latestRound && roundData ? (
-            <div className="flex flex-col gap-8 items-start flex-1 w-full max-w-7xl mx-auto">
-              {/* Professional Stats Header */}
-              <div className="w-full glass-card neon-border rounded-[2rem] p-6 bg-black/40 backdrop-blur-md border-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_0_50px_rgba(34,197,94,0.05)]">
-                <div className="flex flex-col items-center md:items-start">
-                  <span className="text-[10px] text-primary/60 font-black uppercase tracking-[0.3em] mb-1">Status</span>
-                  <h2 className="text-2xl font-black text-white italic tracking-tighter uppercase font-display flex items-center gap-3">
-                    <Zap className="w-5 h-5 text-primary animate-pulse" /> BINGO LOBBY
-                  </h2>
-                </div>
-                
-                <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-                  <div className="flex flex-col items-center">
-                    <span className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-1">Room</span>
-                    <span className="text-3xl font-black text-white font-display italic tracking-tighter">#{roundData.round.id}</span>
-                  </div>
-                  
-                  <div className="h-12 w-px bg-white/10 hidden md:block" />
-                  
-                  <div className="flex flex-col items-center px-6 py-2 bg-primary/10 rounded-2xl border border-primary/30 relative group hover:scale-105 transition-transform">
-                    <span className="text-[10px] text-primary font-black uppercase tracking-widest mb-1 relative z-10">Total Prize Pool</span>
-                    <div className="flex items-baseline gap-2 relative z-10">
-                      <span className="text-4xl font-black text-primary font-display italic drop-shadow-[0_0_15px_rgba(34,197,94,0.6)] leading-none">
-                        {roundData.round.prizePool}
-                      </span>
-                      <span className="text-[10px] text-primary font-black font-mono">PUMP</span>
-                    </div>
-                  </div>
-
-                  <div className="h-12 w-px bg-white/10 hidden md:block" />
-
-                  <div className="flex flex-col items-center">
-                    <span className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-1">Active Players</span>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-primary" />
-                      <span className="text-3xl font-black text-white font-display italic tracking-tighter">{roundData.participantsCount}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="hidden md:flex flex-col items-end">
-                  <span className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-1">Network</span>
-                  <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
-                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <span className="text-[10px] font-black text-white italic">SOLANA MAINNET</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
-            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px] order-2 lg:order-3">
+            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
+                <div className="glass-card neon-border rounded-2xl p-8 flex flex-col shrink-0 bg-black/60 border-primary/30 shadow-[0_0_40px_rgba(34,197,94,0.1)]">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-primary/40 transition-all duration-300">
+                      <p className="text-[11px] text-primary/70 font-black uppercase tracking-widest mb-2 font-mono group-hover:text-primary">Room</p>
+                      <p className="text-2xl font-black text-white font-display italic tracking-tighter">#{roundData.round.id}</p>
+                    </div>
+                    <div className="flex flex-col items-center justify-center p-4 bg-primary/10 rounded-2xl border-2 border-primary shadow-[0_0_25px_rgba(34,197,94,0.2)] relative overflow-hidden group hover:scale-105 transition-transform duration-300">
+                      <div className="absolute inset-0 bg-primary/5 animate-pulse" />
+                      <p className="text-[11px] text-primary font-black uppercase tracking-widest mb-2 font-mono relative z-10">Prize</p>
+                      <p className="text-3xl font-black text-primary font-display italic drop-shadow-[0_0_15px_rgba(34,197,94,0.8)] relative z-10 leading-none">{roundData.round.prizePool}</p>
+                      <span className="text-[8px] text-primary font-black font-mono relative z-10 mt-1">PUMP</span>
+                    </div>
+                    <div className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-primary/40 transition-all duration-300">
+                      <p className="text-[11px] text-primary/70 font-black uppercase tracking-widest mb-2 font-mono group-hover:text-primary">Players</p>
+                      <p className="text-2xl font-black text-white font-display italic tracking-tighter">{roundData.participantsCount}</p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
@@ -351,7 +322,7 @@ export default function Home() {
                 </div>
               </aside>
 
-              <main className="lg:col-span-6 space-y-8 h-[750px] flex flex-col overflow-hidden order-1 lg:order-2">
+              <main className="lg:col-span-6 space-y-8 h-[750px] flex flex-col overflow-hidden">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-0 h-full relative overflow-hidden shrink-0">
                     <div className="space-y-10 relative z-10 w-full">
@@ -394,14 +365,14 @@ export default function Home() {
                     </div>
 
                     {isParticipant && currentCard ? (
-                      <div className="relative space-y-8 flex flex-col items-center w-full">
+                      <div className="relative space-y-6 flex flex-col items-center">
                         <BingoCard 
                           card={currentCard} 
                           drawnNumbers={roundData.round.drawnNumbers || []} 
-                          className="w-full max-w-[440px]"
+                          className="w-full max-w-[440px] scale-90 md:scale-100"
                         />
                         
-                        <div className="flex justify-center w-full max-w-[440px]">
+                        <div className="flex justify-center mt-[-1rem]">
                           <BingoClaimButton 
                             roundId={roundData.round.id} 
                             userId={user?.id || 0} 
@@ -473,10 +444,8 @@ export default function Home() {
                   </div>
                 )}
               </main>
-            </div>
-          ) : (
 
-            <aside className="lg:col-span-3 flex flex-col h-[750px] order-3 lg:order-1">
+            <aside className="lg:col-span-3 flex flex-col h-[750px]">
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-full overflow-hidden bg-black/20">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
