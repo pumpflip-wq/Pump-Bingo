@@ -32,7 +32,7 @@ function App() {
           <div className="flex h-screen w-full bg-background text-foreground overflow-hidden">
             <div className="flex flex-col flex-1">
               <main className="flex-1 overflow-y-auto flex flex-col">
-                <div className="flex-1 pb-20">
+                <div className="flex-1 pb-10">
                   <Router />
                 </div>
                 <Footer />
