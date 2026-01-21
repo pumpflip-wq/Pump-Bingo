@@ -306,9 +306,9 @@ export default function Home() {
                   <main className="lg:col-span-6 space-y-4 h-[850px] flex flex-col overflow-hidden">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-0 h-full relative overflow-hidden shrink-0">
-                    <div className="space-y-10 relative z-10 w-full">
-                      {/* Integrated Stats Header - Moved outside the black box but inside green border */}
-                      <div className="flex flex-row items-center justify-between px-10 py-6 mb-[-2.5rem] relative z-20">
+                    <div className="space-y-6 relative z-10 w-full">
+                      {/* Integrated Stats Header - Outside black box, inside green border, with its own glass-card style */}
+                      <div className="glass-card neon-border rounded-2xl p-6 bg-black/60 border-primary/30 flex flex-row items-center justify-between w-full">
                         <div className="flex flex-col text-left">
                           <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
                           <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} PUMP</span>
