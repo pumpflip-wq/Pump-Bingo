@@ -165,7 +165,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col space-y-4 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col space-y-4">
         <header className="flex flex-col md:flex-row items-center justify-between py-4 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 px-6 rounded-b-[2rem]">
           <div className="flex items-center gap-4 group cursor-pointer">
             <motion.div
@@ -274,23 +274,6 @@ export default function Home() {
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
                       <Users className="w-4 h-4 text-primary" /> Active Players
                     </h3>
-                    {latestRound && (
-                      <CyberButton 
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          const verificationData = {
-                            roundId: latestRound.id,
-                            seed: latestRound.serverSeed,
-                            hash: latestRound.publicHash,
-                          };
-                          alert(`Provably Fair Verification (Round #${verificationData.roundId}):\n\nPublic Hash: ${verificationData.hash}\n\nServer Seed: ${verificationData.seed || "Hidden until round ends"}\n\nTo verify: SHA256(ServerSeed) should match Public Hash.`);
-                        }}
-                        className="h-8 px-3 text-[10px] border-white/5 bg-white/5"
-                      >
-                        <ShieldCheck className="w-3 h-3 mr-1" /> VERIFY
-                      </CyberButton>
-                    )}
                   </div>
                   
                   <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
@@ -370,6 +353,21 @@ export default function Home() {
                           <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl">
                             <p className="text-primary font-black text-3xl italic tracking-tighter mb-1">NODE CONNECTED</p>
                             <p className="text-xs text-primary/70 uppercase font-black tracking-widest">Awaiting Sequence Start...</p>
+                            <div className="mt-4 pt-4 border-t border-primary/20">
+                              <p className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-2">Round Integrity Hash</p>
+                              <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
+                                <p className="text-[10px] font-mono text-primary truncate flex-1">
+                                  {roundData.round.publicHash}
+                                </p>
+                                <Copy 
+                                  className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(roundData.round.publicHash);
+                                    toast({ title: "Hash Copied" });
+                                  }}
+                                />
+                              </div>
+                            </div>
                           </div>
                         ) : (
                           <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
@@ -378,20 +376,13 @@ export default function Home() {
                       
                       {roundData.round.status === 'FINISHED' && (
                         <div className="w-full pt-4">
-                          <CyberButton 
-                            onClick={() => {
-                              const verificationData = {
-                                roundId: roundData.round.id,
-                                seed: roundData.round.serverSeed,
-                                hash: roundData.round.publicHash,
-                                drawnNumbers: roundData.round.drawnNumbers
-                              };
-                              alert(`Round Verification:\n\nRound ID: ${verificationData.roundId}\nServer Seed: ${verificationData.seed}\nPublic Hash: ${verificationData.hash}\n\nYou can verify this by hashing the Server Seed with SHA-256 and checking if it matches the Public Hash.`);
-                            }}
-                            className="w-full h-12 text-sm bg-white/5 border-white/10"
-                          >
-                            VERIFY FAIRNESS
-                          </CyberButton>
+                          <Link href="/verify">
+                            <CyberButton 
+                              className="w-full h-12 text-sm bg-white/5 border-white/10"
+                            >
+                              VERIFY FAIRNESS
+                            </CyberButton>
+                          </Link>
                         </div>
                       )}
                     </div>
