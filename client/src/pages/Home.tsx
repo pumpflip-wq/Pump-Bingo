@@ -473,63 +473,6 @@ export default function Home() {
                 </div>
               </aside>
 
-            <aside className="lg:col-span-3 space-y-8 h-[600px] flex flex-col">
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-full overflow-hidden">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
-                      <History className="w-4 h-4 text-primary" /> Game History
-                    </h3>
-                    <Link href="/verify" className="text-[10px] font-black text-primary/60 hover:text-primary uppercase tracking-widest underline transition-colors">Full View</Link>
-                  </div>
-                  
-                  <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                    <div className="space-y-4">
-                      {historyLoading ? (
-                        <div className="flex justify-center py-10">
-                          <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                        </div>
-                      ) : historyRounds?.length ? (
-                        historyRounds.slice(0, 10).map((hr) => (
-                          <HistoryItem 
-                            key={hr.id}
-                            id={hr.id} 
-                            winner={hr.winnerUsername || "No Winner"} 
-                            prize={hr.prizePool} 
-                            formatAddress={formatAddress}
-                          />
-                        ))
-                      ) : (
-                        <div className="text-center py-10 opacity-30">
-                          <p className="text-[10px] uppercase font-black tracking-widest text-white">No history yet</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="mt-8 pt-6 border-t border-white/10 space-y-4">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-primary/60">
-                        <span>Current Room #{roundData.round.id} Hash</span>
-                        <Link href="/verify" className="underline hover:text-primary transition-colors">Verify</Link>
-                      </div>
-                      <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
-                        <p className="text-[10px] font-mono text-primary truncate flex-1">
-                          {roundData.round.publicHash}
-                        </p>
-                        <Copy 
-                          className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
-                          onClick={() => {
-                            navigator.clipboard.writeText(roundData.round.publicHash);
-                            toast({ title: "Hash Copied" });
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
-                  </div>
-                </div>
-              </aside>
-
             </div>
           ) : (
             <div className="py-32 text-center bg-card/80 rounded-[4rem] border border-dashed border-white/10 space-y-6 flex-1">
