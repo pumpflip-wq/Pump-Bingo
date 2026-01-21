@@ -227,7 +227,7 @@ export default function Home() {
           ) : latestRound && roundData ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
-            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[850px]">
+            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
@@ -303,10 +303,10 @@ export default function Home() {
                 </div>
               </aside>
 
-                  <main className="lg:col-span-6 space-y-4 h-[850px] flex flex-col overflow-hidden">
+                  <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
-                  <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-0 h-full relative overflow-hidden shrink-0">
-                    <div className="space-y-6 relative z-10 w-full">
+                  <div className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-start min-h-0 h-full relative overflow-hidden shrink-0">
+                    <div className="space-y-6 relative z-10 w-full mt-0">
                       {/* Integrated Stats Header - Outside black box, inside green border, with its own glass-card style */}
                       <div className="glass-card neon-border rounded-2xl p-6 bg-black/60 border-primary/30 flex flex-row items-center justify-between w-full">
                         <div className="flex flex-col text-left">
