@@ -99,26 +99,26 @@ export default function Home() {
 
   useEffect(() => {
     if (roundData?.round.drawnNumbers && roundData.round.drawnNumbers.length > 0) {
-      // Use a set of high-quality sound effects from a public CDN
-      const drawSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3");
+      // Use more reliable CDN for game sounds
+      const drawSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73456.mp3");
       drawSound.volume = 0.4;
-      drawSound.play().catch(() => {});
+      drawSound.play().catch(e => console.log("Sound play failed:", e));
     }
   }, [roundData?.round.drawnNumbers?.length]);
 
   useEffect(() => {
     if (roundData?.round.status === 'FINISHED' && roundData.round.winnerId) {
-      const winSound = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
+      const winSound = new Audio("https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3");
       winSound.volume = 0.5;
-      winSound.play().catch(() => {});
+      winSound.play().catch(e => console.log("Sound play failed:", e));
     }
-  }, [roundData?.round.status, roundData?.round.winnerId]);
+  }, [roundData?.round.status, roundData.round.winnerId]);
 
   useEffect(() => {
     if (participant) {
-      const joinSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
+      const joinSound = new Audio("https://cdn.pixabay.com/audio/2022/03/10/audio_c3527058c0.mp3");
       joinSound.volume = 0.3;
-      joinSound.play().catch(() => {});
+      joinSound.play().catch(e => console.log("Sound play failed:", e));
     }
   }, [!!participant]);
 
@@ -354,7 +354,10 @@ export default function Home() {
                             <p className="text-primary font-black text-3xl italic tracking-tighter mb-1">NODE CONNECTED</p>
                             <p className="text-xs text-primary/70 uppercase font-black tracking-widest">Awaiting Sequence Start...</p>
                             <div className="mt-4 pt-4 border-t border-primary/20">
-                              <p className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-2">Round Integrity Hash</p>
+                              <p className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-2 flex items-center justify-between">
+                                Round Integrity Hash
+                                <Link href="/verify" className="text-[8px] underline hover:text-primary transition-colors">WHAT IS THIS?</Link>
+                              </p>
                               <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
                                 <p className="text-[10px] font-mono text-primary truncate flex-1">
                                   {roundData.round.publicHash}
@@ -563,36 +566,6 @@ export default function Home() {
           )}
         </div>
       </div>
-
-      <footer className="w-full py-12 border-t border-white/5 bg-black/40 backdrop-blur-xl rounded-t-[3rem]">
-        <div className="max-w-4xl mx-auto px-6 flex flex-col items-center gap-8">
-          <div className="flex flex-col items-center gap-4">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-3 h-12 px-8 rounded-full bg-black/60 border border-primary text-white text-sm font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_20px_rgba(34,197,94,0.4)]"
-            >
-              <span className="text-primary font-mono font-bold">CONTRACT:</span>
-              <span className="font-mono tracking-tighter text-white font-bold text-base">{formatAddress(PROTOCOL_CONFIG.MINT_ADDRESS)}</span>
-              <button 
-                onClick={copyCA}
-                className="ml-2 p-1.5 rounded-full bg-primary text-black hover:scale-110 transition-all active:scale-95"
-              >
-                <Copy className="w-4 h-4" />
-              </button>
-            </motion.div>
-            <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.5em] font-mono">Verified Protocol v1.0.4</p>
-          </div>
-
-          <div className="flex gap-8 opacity-40 hover:opacity-100 transition-opacity">
-            <a href="#" className="text-xs font-black uppercase tracking-widest text-white hover:text-primary transition-colors">Twitter</a>
-            <a href="#" className="text-xs font-black uppercase tracking-widest text-white hover:text-primary transition-colors">Telegram</a>
-            <a href="#" className="text-xs font-black uppercase tracking-widest text-white hover:text-primary transition-colors">Discord</a>
-          </div>
-
-          <p className="text-[10px] text-white/20 uppercase font-black tracking-widest">© 2026 PUMP BINGO. ALL RIGHTS RESERVED.</p>
-        </div>
-      </footer>
 
       <WinnerOverlay 
         show={showWinner} 

@@ -31,8 +31,10 @@ function App() {
         <TooltipProvider>
           <div className="flex h-screen w-full bg-background text-foreground overflow-hidden">
             <div className="flex flex-col flex-1">
-              <main className="flex-1 overflow-y-auto">
-                <Router />
+              <main className="flex-1 overflow-y-auto flex flex-col">
+                <div className="flex-1">
+                  <Router />
+                </div>
                 <Footer />
               </main>
             </div>
