@@ -166,8 +166,8 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col space-y-4 w-full max-w-7xl mx-auto px-4 md:px-8">
-        <header className="flex flex-col md:flex-row items-center justify-between py-4 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 px-6 rounded-b-[2rem]">
+      <div className="flex flex-col w-full max-w-7xl mx-auto px-4 md:px-8 pt-0">
+        <header className="flex flex-col md:flex-row items-center justify-between pb-4 pt-0 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 px-6 rounded-b-[2rem] mb-6">
           <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
             <motion.div
               whileHover={{ rotate: 15, scale: 1.1 }}
@@ -228,19 +228,21 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
             <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
-                <div className="glass-card neon-border rounded-2xl p-4 flex flex-col shrink-0 bg-black/40 border-primary/20">
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
-                      <p className="text-[9px] text-primary/60 font-black uppercase tracking-widest mb-1 font-mono">Room</p>
-                      <p className="text-sm font-black text-white font-display italic">#{roundData.round.id}</p>
+                <div className="glass-card neon-border rounded-2xl p-8 flex flex-col shrink-0 bg-black/60 border-primary/30 shadow-[0_0_40px_rgba(34,197,94,0.1)]">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-primary/40 transition-all duration-300">
+                      <p className="text-[11px] text-primary/70 font-black uppercase tracking-widest mb-2 font-mono group-hover:text-primary">Room</p>
+                      <p className="text-2xl font-black text-white font-display italic tracking-tighter">#{roundData.round.id}</p>
                     </div>
-                    <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-primary/20 shadow-[0_0_15px_rgba(34,197,94,0.1)]">
-                      <p className="text-[9px] text-primary font-black uppercase tracking-widest mb-1 font-mono">Prize</p>
-                      <p className="text-sm font-black text-primary font-display italic drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">{roundData.round.prizePool}</p>
+                    <div className="flex flex-col items-center justify-center p-4 bg-primary/10 rounded-2xl border-2 border-primary shadow-[0_0_25px_rgba(34,197,94,0.2)] relative overflow-hidden group hover:scale-105 transition-transform duration-300">
+                      <div className="absolute inset-0 bg-primary/5 animate-pulse" />
+                      <p className="text-[11px] text-primary font-black uppercase tracking-widest mb-2 font-mono relative z-10">Prize</p>
+                      <p className="text-3xl font-black text-primary font-display italic drop-shadow-[0_0_15px_rgba(34,197,94,0.8)] relative z-10 leading-none">{roundData.round.prizePool}</p>
+                      <span className="text-[8px] text-primary font-black font-mono relative z-10 mt-1">PUMP</span>
                     </div>
-                    <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
-                      <p className="text-[9px] text-primary/60 font-black uppercase tracking-widest mb-1 font-mono">Players</p>
-                      <p className="text-sm font-black text-white font-display italic">{roundData.participantsCount}</p>
+                    <div className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-primary/40 transition-all duration-300">
+                      <p className="text-[11px] text-primary/70 font-black uppercase tracking-widest mb-2 font-mono group-hover:text-primary">Players</p>
+                      <p className="text-2xl font-black text-white font-display italic tracking-tighter">{roundData.participantsCount}</p>
                     </div>
                   </div>
                 </div>
@@ -391,10 +393,51 @@ export default function Home() {
                           <h2 className="text-4xl md:text-6xl font-black font-display italic text-white tracking-tighter uppercase">
                             WATCHING <span className="text-primary">LIVE</span>
                           </h2>
-                          <p className="text-white/40 uppercase font-black tracking-widest text-[10px] max-w-xs mx-auto">
-                            You are observing round #{roundData.round.id}. Connect wallet and join the next round to win!
-                          </p>
+                          <div className="flex items-center justify-center gap-4 mt-4">
+                            <div className="flex flex-col items-center px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+                              <span className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-1">Pot</span>
+                              <span className="text-xl font-black text-primary italic">{roundData.round.prizePool} PUMP</span>
+                            </div>
+                            <div className="flex flex-col items-center px-4 py-2 bg-white/5 rounded-xl border border-white/10">
+                              <span className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-1">Active</span>
+                              <span className="text-xl font-black text-white italic">{roundData.participantsCount} Users</span>
+                            </div>
+                          </div>
                         </div>
+
+                        <div className="w-full max-w-md space-y-6 relative z-10">
+                          <div className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/5 p-6 space-y-4">
+                            <p className="text-[10px] text-white/40 uppercase font-black tracking-widest text-center">Live Probability Feed</p>
+                            <div className="space-y-4 min-h-[120px]">
+                              <AnimatePresence mode="popLayout">
+                                {sortedParticipants.slice(0, 3).map((p: any, idx: number) => (
+                                  <motion.div 
+                                    key={p.id}
+                                    layout
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="flex items-center justify-between"
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-primary font-black italic w-6">#{idx + 1}</span>
+                                      <span className="text-sm font-bold text-white/80 italic">@{formatAddress(p.username)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                        <motion.div 
+                                          initial={{ width: 0 }}
+                                          animate={{ width: `${p.prob}%` }}
+                                          transition={{ duration: 0.5 }}
+                                          className="h-full bg-primary"
+                                        />
+                                      </div>
+                                      <span className="text-[10px] font-black text-primary w-8 text-right">{p.prob}%</span>
+                                    </div>
+                                  </motion.div>
+                                ))}
+                              </AnimatePresence>
+                            </div>
+                          </div>
                       </div>
                     )}
                   </div>
