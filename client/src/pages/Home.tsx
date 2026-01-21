@@ -275,7 +275,7 @@ export default function Home() {
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
               
-            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px] order-2 lg:order-1">
+            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px] order-2 lg:order-3">
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
@@ -351,7 +351,7 @@ export default function Home() {
                 </div>
               </aside>
 
-              <main className="lg:col-span-6 space-y-8 h-[750px] flex flex-col overflow-hidden">
+              <main className="lg:col-span-6 space-y-8 h-[750px] flex flex-col overflow-hidden order-1 lg:order-2">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-0 h-full relative overflow-hidden shrink-0">
                     <div className="space-y-10 relative z-10 w-full">
@@ -473,8 +473,10 @@ export default function Home() {
                   </div>
                 )}
               </main>
+            </div>
+          ) : (
 
-            <aside className="lg:col-span-3 flex flex-col h-[750px]">
+            <aside className="lg:col-span-3 flex flex-col h-[750px] order-3 lg:order-1">
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-full overflow-hidden bg-black/20">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
