@@ -2,7 +2,7 @@ import { useRounds, useRound, useParticipant } from "@/hooks/use-game";
 import { BingoCard } from "@/components/BingoCard";
 import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
-import { Users, Trophy, Loader2, History, ShieldCheck, Zap, Globe, Copy, ExternalLink } from "lucide-react";
+import { Users, Trophy, Loader2, History, ShieldCheck, Zap, Globe, Copy, ExternalLink, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { PROTOCOL_CONFIG } from "@shared/config";
@@ -117,335 +117,190 @@ export default function Home() {
   })).sort((a: any, b: any) => b.prob - a.prob);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1 flex flex-col space-y-8 pb-10">
-        <header className="flex flex-col md:flex-row items-center justify-between py-6 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 px-8 rounded-b-[3rem]">
-          <div className="flex items-center gap-4 group cursor-pointer">
-            <motion.div
-              whileHover={{ rotate: 15, scale: 1.1 }}
-              className="w-16 h-16 rounded-full p-0 transition-all"
-            >
-              <img 
-                src="https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png" 
-                alt="PUMP BINGO" 
-                className="w-full h-full rounded-full object-cover"
-              />
-            </motion.div>
-            <div className="flex flex-col">
-              <h1 className="text-3xl font-black font-display tracking-tighter text-white italic leading-none">
-                PUMP <span className="text-primary">BINGO</span>
-              </h1>
-              <p className="text-[10px] text-primary/80 font-black uppercase tracking-[0.4em]">Provably Fair</p>
-            </div>
+    <div className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden">
+      <div className="w-full max-w-[1600px] mx-auto px-4 flex-1 flex flex-col space-y-4 pb-4">
+        <header className="flex items-center justify-between py-4 border-b border-white/5 bg-background/80 backdrop-blur-xl sticky top-0 z-50 px-4">
+          <div className="flex items-center gap-3">
+            <img src="https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png" alt="LOGO" className="w-10 h-10 rounded-full object-cover border border-primary/20" />
+            <h1 className="text-xl font-black font-display tracking-tighter italic">PUMP <span className="text-primary">BINGO</span></h1>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <div className="flex items-center gap-8 mr-4">
-              <Link href="/profile">
-                <span className="cursor-pointer text-xs font-black uppercase tracking-widest text-white/60 hover:text-primary transition-colors flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4" /> Profile
-                </span>
-              </Link>
-              <Link href="/history">
-                <span className="cursor-pointer text-xs font-black uppercase tracking-widest text-white/60 hover:text-primary transition-colors flex items-center gap-2">
-                  <History className="w-4 h-4" /> History
-                </span>
-              </Link>
-            </div>
-            <div className="flex items-center gap-3">
-              <a 
-                href={`https://pump.fun/${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="h-11 px-6 rounded-full bg-primary/10 border-2 border-primary/50 text-primary text-[10px] font-black uppercase tracking-widest hover:bg-primary/20 transition-all flex items-center gap-2"
-              >
-                Buy PUMP <ExternalLink className="w-3 h-3" />
-              </a>
-              <WalletMultiButton className="!bg-primary !text-black !h-11 !px-6 !text-[10px] !rounded-full !font-black !italic !tracking-tight !border-none" />
-            </div>
+          <div className="flex items-center gap-4">
+            <Link href="/profile">
+              <span className="cursor-pointer text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-primary flex items-center gap-1.5 transition-colors">
+                <ShieldCheck className="w-3 h-3" /> Profile
+              </span>
+            </Link>
+            <Link href="/history">
+              <span className="cursor-pointer text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-primary flex items-center gap-1.5 transition-colors">
+                <History className="w-3 h-3" /> History
+              </span>
+            </Link>
+            <div className="h-4 w-px bg-white/10 mx-2" />
+            <WalletMultiButton className="!bg-primary !text-black !h-9 !px-4 !text-[10px] !rounded-full !font-black !border-none shadow-[0_0_15px_rgba(57,255,20,0.3)]" />
           </div>
         </header>
 
-        <div className="flex-1 flex flex-col space-y-12 items-center">
-          <section className="text-center space-y-4 flex flex-col items-center">
-            <div className="relative inline-block">
-              <motion.h1 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-6xl md:text-8xl font-black font-display tracking-tighter text-white italic leading-[0.8] mb-1 drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
-              >
-                PUMP <span className="text-primary drop-shadow-[0_0_40px_rgba(34,197,94,0.4)]">BINGO</span>
-              </motion.h1>
-              <motion.div 
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 blur-sm"
-              />
-            </div>
-            <p className="text-primary/90 font-black uppercase tracking-[0.8em] text-xs md:text-sm italic pl-[0.8em]">PROVABLY FAIR SOLANA GAMING</p>
-          </section>
+        {isLoading ? (
+          <div className="flex-1 flex flex-col items-center justify-center py-20">
+            <Loader2 className="w-10 h-10 text-primary animate-spin" />
+            <p className="mt-4 text-[10px] font-black text-primary uppercase tracking-[0.4em]">Initializing Sequence...</p>
+          </div>
+        ) : latestRound && roundData ? (
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+            {/* Sidebar Left: Network Activity */}
+            <aside className="xl:col-span-3 space-y-4 order-2 xl:order-1">
+              <div className="glass-card neon-border rounded-3xl p-6 bg-black/40">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-6 flex items-center gap-2 italic">
+                  <Activity className="w-3 h-3 text-primary" /> Active Nodes
+                </h3>
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  {participants.map((p: any) => (
+                    <div key={p.id} className="flex items-center justify-between p-3 bg-white/[0.03] border border-white/5 rounded-2xl hover:border-primary/30 transition-all group">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black">
+                          {p.username[0].toUpperCase()}
+                        </div>
+                        <span className="text-[11px] font-bold text-white/80 italic">@{formatAddress(p.username)}</span>
+                      </div>
+                      <span className="text-[9px] text-primary font-black uppercase animate-pulse">+100 P</span>
+                    </div>
+                  ))}
+                  {participants.length === 0 && <p className="text-center text-[9px] uppercase font-black opacity-20 py-10">Scanning nodes...</p>}
+                </div>
+              </div>
+            </aside>
 
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1">
-              <Loader2 className="w-16 h-16 text-primary animate-spin" />
-              <p className="font-mono text-xs text-primary uppercase tracking-[0.3em]">Connecting Node...</p>
-            </div>
-          ) : latestRound && roundData ? (
-            <div className="max-w-4xl w-full flex-1 flex flex-col space-y-16">
-              
-              <main className="space-y-16">
+            {/* Main Center: Game Area */}
+            <main className="xl:col-span-6 space-y-6 order-1 xl:order-2">
+              <div className="glass-card neon-border rounded-[2.5rem] bg-black/60 p-8 shadow-2xl relative overflow-hidden min-h-[600px] flex flex-col items-center">
+                {/* Compact Info Bar */}
+                <div className="w-full flex items-center justify-between mb-8 px-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black text-primary uppercase tracking-widest italic">Sequence</span>
+                    <span className="text-lg font-black text-white italic">#{(roundData as any).round.id}</span>
+                  </div>
+                  
+                  <div className="text-center bg-primary/10 px-6 py-2 rounded-2xl border border-primary/20">
+                    <p className="text-[9px] text-primary font-black uppercase tracking-[0.2em] italic">Jackpot Pool</p>
+                    <p className="text-3xl font-black text-primary font-display drop-shadow-[0_0_15px_rgba(57,255,20,0.4)] animate-pulse">
+                      {(roundData as any).round.prizePool.toLocaleString()} <span className="text-sm">PUMP</span>
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black text-primary uppercase tracking-widest italic">Live Nodes</span>
+                    <span className="text-lg font-black text-white italic">{(roundData as any).participantsCount}</span>
+                  </div>
+                </div>
+
+                {/* Status indicator */}
+                <div className="mb-6 flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10">
+                   <Activity className="w-3 h-3 text-primary animate-pulse" />
+                   <span className="text-[9px] font-black text-white/60 uppercase tracking-widest italic">
+                     {(roundData as any).round.status === 'OPEN' || (roundData as any).round.status === 'STARTING' ? 'Sequence Initializing' : 'Sequence In Progress'}
+                   </span>
+                </div>
+
+                {/* Main Action Component */}
                 {(roundData as any).round.status === 'OPEN' || (roundData as any).round.status === 'STARTING' ? (
-                  <div className="glass-card neon-border rounded-[4rem] p-16 text-center flex flex-col items-center justify-start min-h-[750px] relative overflow-hidden shadow-[0_0_100px_rgba(34,197,94,0.1)]">
-                    <div className="space-y-16 relative z-10 w-full">
-                      <div className="grid grid-cols-3 gap-10 mb-4 w-full">
-                        <div className="glass-card bg-black/60 border-primary/20 p-10 rounded-[2rem] text-center shadow-2xl">
-                          <p className="text-xs text-primary font-black uppercase tracking-widest mb-2 italic">Sequence</p>
-                          <p className="text-4xl font-black text-white font-display">#{(roundData as any).round.id}</p>
+                  <div className="flex-1 flex flex-col items-center justify-center space-y-10 w-full">
+                    <div className="p-10 bg-black/80 rounded-[3rem] border-2 border-primary/30 backdrop-blur-3xl shadow-2xl max-w-sm w-full text-center">
+                      <p className="text-white/40 text-[9px] uppercase font-black tracking-[0.4em] mb-8 font-mono italic">Start Countdown</p>
+                      <CountdownTimer 
+                        targetDate={(roundData as any).round.startTime?.toString() || null} 
+                        status={(roundData as any).round.status}
+                        participantCount={(roundData as any).participantsCount}
+                      />
+                    </div>
+                    
+                    <div className="w-full max-w-xs">
+                      {!connected ? (
+                        <div className="text-center space-y-4">
+                          <p className="text-white/30 text-[9px] font-black uppercase tracking-widest">Connect to Engage</p>
+                          <WalletMultiButton className="!bg-primary !text-black !h-14 !px-8 !text-lg !rounded-2xl !w-full !font-black !shadow-[0_0_20px_rgba(57,255,20,0.3)]" />
                         </div>
-                        <div className="glass-card bg-primary/20 border-primary/60 p-12 rounded-[2.5rem] text-center shadow-[0_0_50px_rgba(34,197,94,0.3)] scale-125 z-20">
-                          <p className="text-xs text-primary font-black uppercase tracking-widest mb-2 italic">Jackpot Pool</p>
-                          <p className="text-6xl font-black text-primary font-display drop-shadow-[0_0_30px_rgba(34,197,94,0.6)] animate-pulse">{(roundData as any).round.prizePool.toLocaleString()} <span className="text-2xl">PUMP</span></p>
+                      ) : participant ? (
+                        <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-[2rem] text-center">
+                          <p className="text-primary font-black text-2xl italic tracking-tighter animate-pulse">NODE ENGAGED</p>
                         </div>
-                        <div className="glass-card bg-black/60 border-primary/20 p-10 rounded-[2rem] text-center shadow-2xl">
-                          <p className="text-xs text-primary font-black uppercase tracking-widest mb-2 italic">Nodes</p>
-                          <p className="text-4xl font-black text-white font-display">{(roundData as any).participantsCount}</p>
-                        </div>
-                      </div>
-
-                      <div className="p-12 bg-black/80 rounded-[3rem] border-2 border-primary/30 backdrop-blur-3xl shadow-2xl relative overflow-hidden max-w-2xl mx-auto">
-                        <div className="absolute top-0 left-0 w-full h-2 bg-primary animate-pulse" />
-                        <p className="text-white/60 text-[10px] uppercase font-black tracking-[0.4em] mb-10 font-mono italic">Initialization Countdown</p>
-                        <CountdownTimer 
-                          targetDate={(roundData as any).round.startTime?.toString() || null} 
-                          status={(roundData as any).round.status}
-                          participantCount={(roundData as any).participantsCount}
-                        />
-                        {(roundData as any).participantsCount < 2 && (
-                          <p className="text-primary text-xs uppercase font-black mt-10 animate-pulse tracking-[0.3em] font-display italic">
-                            Awaiting minimum node density...
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="w-full pt-4 max-w-md mx-auto">
-                        {!connected ? (
-                          <div className="space-y-8">
-                            <p className="text-white/40 text-[10px] uppercase font-black tracking-[0.5em] italic">Connect Wallet to Interface</p>
-                            <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-20 !px-12 !text-2xl !rounded-3xl !w-full !font-black !italic !tracking-tighter !text-black shadow-[0_0_40px_rgba(34,197,94,0.4)]" />
-                          </div>
-                        ) : participant ? (
-                          <div className="p-12 bg-primary/10 border-4 border-primary/40 rounded-[3rem] shadow-[0_0_60px_rgba(34,197,94,0.2)] animate-pulse">
-                            <p className="text-primary font-black text-5xl italic tracking-tighter mb-3">NODE ENGAGED</p>
-                            <p className="text-xs text-primary/70 uppercase font-black tracking-[0.4em]">Data Stream Validated</p>
-                          </div>
-                        ) : (
-                          <JoinButton roundId={(roundData as any).round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
-                        )}
-                      </div>
-
-                      <div className="pt-20 border-t border-white/5 w-full">
-                        <h3 className="text-base text-white/60 uppercase font-black tracking-[0.5em] mb-12 flex items-center justify-center gap-4 font-display italic">
-                          <Users className="w-5 h-5 text-primary" /> Network Participants
-                        </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                          <AnimatePresence mode="popLayout">
-                            {participants.map((p: any) => (
-                              <motion.div 
-                                key={p.id}
-                                layout
-                                initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                className="flex items-center gap-4 p-5 bg-white/[0.03] rounded-2xl border border-white/10 group transition-all hover:border-primary/50 hover:bg-white/10 shadow-xl"
-                              >
-                                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-base font-black text-primary border-2 border-primary/20 group-hover:bg-primary group-hover:text-black transition-all">
-                                  {p.username[0].toUpperCase()}
-                                </div>
-                                <div className="flex flex-col items-start">
-                                  <span className="text-xs font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
-                                  <span className="text-[10px] text-primary font-black uppercase tracking-widest animate-pulse">+100 PUMP</span>
-                                </div>
-                              </motion.div>
-                            ))}
-                          </AnimatePresence>
-                          {participants.length === 0 && (
-                            <div className="col-span-full flex flex-col items-center justify-center py-20 opacity-20 text-center space-y-6">
-                              <Globe className="w-20 h-20 animate-spin-slow text-primary" />
-                              <p className="text-xs uppercase font-black tracking-[0.8em] text-white">Scanning Global Network...</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      ) : (
+                        <JoinButton roundId={(roundData as any).round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                      )}
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-16 w-full flex flex-col items-center">
-                    <div className="glass-card bg-black/60 border-primary/30 p-10 rounded-[3rem] flex items-center justify-around w-full shadow-2xl relative overflow-hidden max-w-4xl">
-                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-                      <div className="text-center">
-                        <p className="text-[10px] text-primary font-black uppercase tracking-widest mb-2">Sequence</p>
-                        <p className="text-3xl font-black text-white font-display italic">#{(roundData as any).round.id}</p>
-                      </div>
-                      <div className="text-center scale-125 z-10">
-                        <p className="text-[10px] text-primary font-black uppercase tracking-widest mb-2">Jackpot</p>
-                        <p className="text-5xl font-black text-primary font-display drop-shadow-[0_0_20px_rgba(34,197,94,0.5)] animate-pulse italic">{(roundData as any).round.prizePool.toLocaleString()} PUMP</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-[10px] text-primary font-black uppercase tracking-widest mb-2">Nodes</p>
-                        <p className="text-3xl font-black text-white font-display italic">{(roundData as any).participantsCount}</p>
-                      </div>
-                    </div>
+                  <div className="flex-1 flex flex-col items-center space-y-10 w-full">
+                    <LastCalledNumber numbers={(roundData as any).round.drawnNumbers || []} />
                     
-                    <div className="flex justify-center scale-110">
-                      <LastCalledNumber numbers={(roundData as any).round.drawnNumbers || []} />
-                    </div>
-
                     {isParticipant && currentCard ? (
-                      <div className="relative space-y-16 w-full flex flex-col items-center">
-                        <BingoCard 
-                          card={currentCard} 
-                          drawnNumbers={(roundData as any).round.drawnNumbers || []} 
-                          className="w-full max-w-[700px] shadow-[0_0_100px_rgba(34,197,94,0.15)]"
+                      <div className="w-full flex flex-col items-center space-y-8">
+                        <BingoCard card={currentCard} drawnNumbers={(roundData as any).round.drawnNumbers || []} className="w-full max-w-[500px]" />
+                        <BingoClaimButton 
+                          roundId={(roundData as any).round.id} 
+                          userId={user?.id || 0} 
+                          card={currentCard}
+                          drawnNumbers={(roundData as any).round.drawnNumbers || []}
+                          status={(roundData as any).round.status}
+                          isBingoed={participant?.hasBingo || false}
                         />
-                        
-                        <div className="flex justify-center scale-125">
-                          <BingoClaimButton 
-                            roundId={(roundData as any).round.id} 
-                            userId={user?.id || 0} 
-                            card={currentCard}
-                            drawnNumbers={(roundData as any).round.drawnNumbers || []}
-                            status={(roundData as any).round.status}
-                            isBingoed={participant?.hasBingo || false}
-                          />
-                        </div>
                       </div>
                     ) : (
-                      <div className="glass-card neon-border rounded-[4rem] p-16 min-h-[600px] flex flex-col items-center justify-center space-y-16 relative overflow-hidden w-full max-w-4xl shadow-2xl">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-                        <div className="text-center space-y-8 relative z-10">
-                          <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-black uppercase tracking-[0.3em] italic animate-pulse">
-                            <Globe className="w-4 h-4 animate-spin-slow" /> Network Feed Synchronized
-                          </div>
-                          <h2 className="text-6xl md:text-8xl font-black font-display italic text-white tracking-tighter uppercase leading-none">
-                            SPECTATING <span className="text-primary">SEQUENCE #{(roundData as any).round.id}</span>
-                          </h2>
-                        </div>
-
-                        <div className="w-full max-w-3xl space-y-10 relative z-10">
-                          <div className="bg-black/60 backdrop-blur-3xl rounded-[3rem] border border-white/10 p-12 space-y-8 shadow-2xl relative">
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1 bg-primary text-black text-[10px] font-black uppercase tracking-widest rounded-full">LIVE TELEMETRY</div>
-                            <p className="text-xs text-white/40 uppercase font-black tracking-[0.4em] text-center italic">Probability Analysis</p>
-                            <div className="space-y-6 min-h-[200px]">
-                              <AnimatePresence mode="popLayout">
-                                {(roundData as any).round.status === 'FINISHED' ? (
-                                  <motion.div 
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="flex flex-col items-center justify-center py-8 space-y-10"
-                                  >
-                                    <div className="flex flex-col items-center gap-6">
-                                      <div className="flex items-center gap-6 text-primary scale-125">
-                                        <Trophy className="w-16 h-16 animate-bounce" />
-                                        <span className="text-5xl font-black italic tracking-tighter">@{formatAddress(participants.find((p: any) => p.id === (roundData as any).round.winnerId)?.username || "")} WON!</span>
-                                      </div>
-                                      <div className="flex items-center gap-3">
-                                        <Zap className="w-5 h-5 text-primary animate-pulse" />
-                                        <span className="text-sm text-primary font-black uppercase tracking-[0.3em] italic">Consensus Reached - Bingo Validated</span>
-                                      </div>
-                                    </div>
-                                    <div className="flex flex-col items-center gap-4 bg-primary/5 p-8 rounded-[2rem] border border-primary/20 w-full">
-                                      <p className="text-xs text-white/40 uppercase font-black tracking-widest">Rewards Distributed</p>
-                                      <p className="text-6xl font-black text-primary italic drop-shadow-[0_0_20px_rgba(34,197,94,0.4)]">{(roundData as any).round.prizePool.toLocaleString()} PUMP</p>
-                                      <a href={`https://solscan.io/tx/${(roundData as any).round.serverSeed}`} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-xs text-primary/60 hover:text-primary transition-colors uppercase font-black tracking-[0.2em] mt-4">
-                                        <ShieldCheck className="w-5 h-5" /> View Proof on Explorer
-                                      </a>
-                                    </div>
-                                    <p className="text-xs text-white/20 uppercase font-black tracking-[0.5em] animate-pulse italic">Next Sequence Sequence starting in 5s...</p>
-                                  </motion.div>
-                                ) : (
-                                  sortedParticipants.slice(0, 5).map((p: any, idx: number) => (
-                                    <motion.div 
-                                      key={p.id} 
-                                      layout
-                                      initial={{ opacity: 0, x: -20 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-primary/40 transition-all group"
-                                    >
-                                      <div className="flex items-center gap-6">
-                                        <span className="text-primary font-black italic w-12 text-3xl">#{idx+1}</span>
-                                        <span className="text-xl font-bold text-white/90 italic">@{formatAddress(p.username)}</span>
-                                      </div>
-                                      <div className="flex items-center gap-10 flex-1 max-w-[300px] ml-auto">
-                                        <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden border border-white/10 shadow-inner">
-                                          <motion.div 
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${p.prob}%` }}
-                                            transition={{ duration: 0.5 }}
-                                            className="h-full bg-gradient-to-r from-primary/40 to-primary shadow-[0_0_15px_rgba(34,197,94,0.5)]"
-                                          />
-                                        </div>
-                                        <span className="text-sm font-black text-primary w-16 text-right">{p.prob}%</span>
-                                      </div>
-                                    </motion.div>
-                                  ))
-                                )}
-                              </AnimatePresence>
-                            </div>
-                          </div>
-
-                          <div className="text-center">
-                            <p className="text-white/20 text-xs uppercase font-black tracking-[0.5em] italic">Synchronize with the next sequence to engage</p>
-                            {!connected && (
-                              <div className="mt-12">
-                                <WalletMultiButton className="!bg-primary !text-black !h-16 !px-12 !text-lg !rounded-2xl !font-black !shadow-[0_0_40px_rgba(34,197,94,0.3)]" />
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                      <div className="text-center space-y-6 pt-10">
+                        <Globe className="w-12 h-12 text-primary mx-auto animate-spin-slow opacity-20" />
+                        <p className="text-xl font-black italic text-white/40 uppercase tracking-tighter">SPECTATING SEQUENCE</p>
+                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] italic animate-pulse">Wait for next cycle to join</p>
                       </div>
                     )}
                   </div>
                 )}
-              </main>
-            </div>
-          ) : (
-            <div className="py-40 text-center bg-black/40 rounded-[5rem] border-2 border-dashed border-white/5 space-y-8 flex-1 w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
-              <Trophy className="w-24 h-24 text-primary opacity-20 animate-pulse" />
-              <h2 className="text-4xl font-black font-display italic text-white/40 tracking-tighter uppercase">Initializing Global Protocol...</h2>
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            </div>
-          )}
-        </div>
+              </div>
+            </main>
+
+            {/* Sidebar Right: Analytics */}
+            <aside className="xl:col-span-3 space-y-4 order-3">
+              <div className="glass-card neon-border rounded-3xl p-6 bg-black/40">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 mb-6 flex items-center gap-2 italic">
+                  <Zap className="w-3 h-3 text-primary" /> Probability Analysis
+                </h3>
+                <div className="space-y-4">
+                  <AnimatePresence mode="popLayout">
+                    {sortedParticipants.slice(0, 6).map((p: any, idx: number) => (
+                      <div key={p.id} className="space-y-2 group">
+                        <div className="flex justify-between items-center text-[10px] font-black uppercase">
+                          <span className="text-white/60 italic">#{idx+1} @{formatAddress(p.username)}</span>
+                          <span className="text-primary italic">{p.prob}%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${p.prob}%` }}
+                            className="h-full bg-gradient-to-r from-primary/40 to-primary"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </AnimatePresence>
+                  {sortedParticipants.length === 0 && <p className="text-center text-[9px] uppercase font-black opacity-20 py-10">Nodes calibrating...</p>}
+                </div>
+              </div>
+
+              <div className="glass-card rounded-2xl p-4 bg-primary/5 border border-primary/20 text-center">
+                <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] italic mb-1">Network Synchronization</p>
+                <div className="flex items-center justify-center gap-1.5 text-[8px] font-bold text-white/40">
+                   <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                   FEED SYNCHRONIZED
+                </div>
+              </div>
+            </aside>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center py-20 opacity-20">
+            <Globe className="w-16 h-16 text-primary animate-spin-slow" />
+            <h2 className="mt-4 text-sm font-black text-white uppercase tracking-[0.5em]">Establishing Connection...</h2>
+          </div>
+        )}
       </div>
-
-      <footer className="w-full py-16 border-t border-white/5 bg-black/60 backdrop-blur-3xl rounded-t-[5rem]">
-        <div className="max-w-4xl mx-auto px-10 flex flex-col items-center gap-10">
-          <div className="flex flex-col items-center gap-6">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-4 h-14 px-10 rounded-full bg-black/80 border-2 border-primary/30 text-white text-base font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_30px_rgba(34,197,94,0.2)]"
-            >
-              <span className="text-primary font-mono font-bold italic">CA:</span>
-              <span className="font-mono tracking-tighter text-white font-bold text-lg">{PROTOCOL_CONFIG.MINT_ADDRESS.slice(0, 16)}...</span>
-              <button 
-                onClick={copyCA}
-                className="ml-4 p-2 rounded-full bg-primary text-black hover:scale-110 transition-all active:scale-95 shadow-lg"
-              >
-                <Copy className="w-5 h-5" />
-              </button>
-            </motion.div>
-            <p className="text-[10px] text-white/30 uppercase font-black tracking-[0.8em] font-mono">Consensus Validated Protocol v1.0.8</p>
-          </div>
-
-          <div className="flex gap-12 opacity-30 hover:opacity-100 transition-opacity">
-            <a href="#" className="text-[10px] font-black uppercase tracking-[0.4em] text-white hover:text-primary transition-colors">Twitter</a>
-            <a href="#" className="text-[10px] font-black uppercase tracking-[0.4em] text-white hover:text-primary transition-colors">Telegram</a>
-            <a href="#" className="text-[10px] font-black uppercase tracking-[0.4em] text-white hover:text-primary transition-colors">Discord</a>
-          </div>
-
-          <p className="text-[10px] text-white/10 uppercase font-black tracking-[0.5em]">© 2026 PUMP BINGO. DECENTRALIZED GAMING PROTOCOL.</p>
-        </div>
-      </footer>
 
       <WinnerOverlay 
         show={showWinner} 
