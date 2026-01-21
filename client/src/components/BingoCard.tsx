@@ -112,7 +112,7 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
                 "absolute top-1 left-1 w-1.5 h-1.5 border-t border-l rounded-tl-sm transition-colors",
                 (matched || isFreeSpace) ? "border-black/40" : "border-white/10"
               )} />
-            </div>
+            </motion.div>
           );
         })
       ))}
