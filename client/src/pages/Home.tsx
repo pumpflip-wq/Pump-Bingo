@@ -304,30 +304,29 @@ export default function Home() {
               </aside>
 
                   <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 w-fit mx-auto mb-[-1rem] relative z-30">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-xs text-primary font-black uppercase tracking-widest">Active</span>
+                </div>
+
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <div className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-between min-h-0 h-full relative overflow-hidden shrink-0">
                     <div className="flex-1 flex flex-col items-center justify-between py-4 w-full h-full">
                       {/* Integrated Stats Header - Outside black box, inside green border, with its own glass-card style */}
                       <div className="glass-card neon-border rounded-2xl p-6 bg-black/60 border-primary/30 flex flex-row items-center justify-between w-full mt-2">
-                        <div className="flex flex-col text-left">
+                        <div className="flex flex-col text-left flex-1">
                           <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Room</p>
                           <p className="text-2xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
                         </div>
                         
-                        <div className="flex flex-col text-center">
+                        <div className="flex flex-col text-center flex-1">
                           <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
                           <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} PUMP</span>
                         </div>
 
-                        <div className="flex gap-12">
-                          <div className="text-right">
-                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
-                            <p className="text-2xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
-                          </div>
-                          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 h-fit self-center">
-                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                            <span className="text-xs text-primary font-black uppercase tracking-widest">Active</span>
-                          </div>
+                        <div className="flex flex-col text-right flex-1">
+                          <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
+                          <p className="text-2xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                         </div>
                       </div>
 

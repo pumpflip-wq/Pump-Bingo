@@ -47,30 +47,29 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
               <div className="absolute inset-0 border-2 border-primary/20 rounded-full" />
               <motion.div 
                 animate={{ rotate: 360 }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
                 className="relative w-20 h-20"
               >
                 {[...Array(6)].map((_, i) => (
                   <motion.div
                     key={i}
                     animate={{ 
-                      x: [0, Math.random() * 40 - 20, 0],
-                      y: [0, Math.random() * 40 - 20, 0],
+                      x: [0, (Math.random() - 0.5) * 40, 0],
+                      y: [0, (Math.random() - 0.5) * 40, 0],
                       rotate: [0, 360],
-                      scale: [0.8, 1, 0.8]
                     }}
                     transition={{ 
-                      duration: 2 + Math.random() * 2, 
+                      duration: 3 + Math.random() * 2, 
                       repeat: Infinity, 
-                      ease: "easeInOut" 
+                      ease: "linear" 
                     }}
                     className="absolute w-6 h-6 rounded-full bg-gradient-to-br from-white via-primary/40 to-primary/80 border border-white/20 shadow-lg flex items-center justify-center overflow-hidden"
                     style={{
-                      left: `${20 + Math.random() * 40}%`,
-                      top: `${20 + Math.random() * 40}%`,
+                      left: `${20 + (i * 10)}%`,
+                      top: `${20 + (i * 5)}%`,
                     }}
                   >
-                    <span className="text-[6px] font-black text-black/40">{Math.floor(Math.random() * 75) + 1}</span>
+                    <span className="text-[7px] font-black text-black">{Math.floor(Math.random() * 75) + 1}</span>
                   </motion.div>
                 ))}
               </motion.div>
