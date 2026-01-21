@@ -112,7 +112,7 @@ export default function Home() {
       winSound.volume = 0.5;
       winSound.play().catch(e => console.log("Sound play failed:", e));
     }
-  }, [roundData?.round.status, roundData.round.winnerId]);
+  }, [roundData?.round?.status, roundData?.round?.winnerId]);
 
   useEffect(() => {
     if (participant) {
