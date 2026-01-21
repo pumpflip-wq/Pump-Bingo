@@ -135,8 +135,7 @@ export class GameManager {
         }
 
         if (round.drawnNumbers.length >= 75) {
-            // End game if all numbers drawn
-            await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
+            // Stop drawing but keep game open for winner claim
             return;
         }
 

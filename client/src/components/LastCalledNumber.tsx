@@ -14,7 +14,7 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
         <span className="text-sm text-white uppercase font-black tracking-widest font-display">Live Feed</span>
       </div>
 
-      <div className="relative w-24 h-24 flex items-center justify-center">
+      <div className="relative w-32 h-32 flex items-center justify-center">
         {/* Professional Gaming Ring Effects */}
         <motion.div 
             animate={{ rotate: 360 }}
@@ -37,7 +37,7 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
               className="z-10 flex flex-col items-center"
             >
-              <div className="text-4xl font-black font-display text-primary italic leading-none drop-shadow-[0_0_15px_rgba(57,255,20,0.4)]">
+              <div className="text-6xl font-black font-display text-primary italic leading-none drop-shadow-[0_0_15px_rgba(57,255,20,0.4)]">
                 {lastNumber}
               </div>
             </motion.div>

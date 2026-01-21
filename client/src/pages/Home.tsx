@@ -262,7 +262,7 @@ export default function Home() {
                                   ? "bg-primary text-black border-primary" 
                                   : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-black"
                               )}>
-                                {p.username[0].toUpperCase()}
+                                {roundData.round.status === 'IN_GAME' ? `#${p.ranking || sortedParticipants.indexOf(p) + 1}` : p.username[0].toUpperCase()}
                               </div>
                               <div className="flex flex-col">
                                 <span className="text-sm font-bold text-white italic tracking-tight flex items-center gap-1">
@@ -305,8 +305,8 @@ export default function Home() {
 
                   <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
-                  <div className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-start min-h-0 h-full relative overflow-hidden shrink-0">
-                    <div className="space-y-6 relative z-10 w-full mt-0">
+                  <div className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-center min-h-0 h-full relative overflow-hidden shrink-0">
+                    <div className="space-y-6 relative z-10 w-full">
                       {/* Integrated Stats Header - Outside black box, inside green border, with its own glass-card style */}
                       <div className="glass-card neon-border rounded-2xl p-6 bg-black/60 border-primary/30 flex flex-row items-center justify-between w-full">
                         <div className="flex flex-col text-left">
