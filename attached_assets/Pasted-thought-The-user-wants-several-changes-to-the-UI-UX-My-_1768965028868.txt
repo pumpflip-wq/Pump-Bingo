@@ -1,0 +1,51 @@
+thought:
+The user wants several changes to the UI/UX:
+
+My Stats: Display wallet address, wins, losses, and PNL.
+Lobby UI:
+Remove "BINGO LOBBY" header (redundant with PUMP BINGO).
+Refine the stats boxes (Room, Prize Pool, Players) to match the game view's style.
+Make the Prize Pool more prominent (larger) but without making the whole area too big.
+Reduce scrolling (keep it compact).
+Bingo Card: Replace "PUMP" in the center with our logo.
+LSP Errors: Fix any syntax/type errors in Home.tsx.
+Let's check the current state of client/src/pages/Home.tsx and fix the issues.
+
+My Stats Logic:
+I need to calculate wins, losses, and PNL from userTransactions.
+thought:
+The user wants to improve the "My Stats" section, clean up the lobby headers, refine the stats grid, and update the bingo card center logo.
+
+Plan:
+
+Fix LSP Errors:
+CountdownTimer and BingoClaimButton imports seem wrong if they are not in client/src/components. I'll check ls client/src/components.
+roundData.round.winnerUsername is missing on the type Round. I'll check shared/schema.ts.
+My Stats:
+Display: Wallet Address, Wins, Losses, PNL.
+Wins/Losses can be derived from userTransactions or historyRounds. userTransactions is more reliable for the specific user.
+Lobby UI:
+Remove "BINGO LOBBY" header.
+Update stats grid (Room, Prize Pool, Players) to match the game view style.
+Make Prize Pool larger/bold.
+Bingo Card:
+Replace "PUMP" in center with logo. I'll read client/src/components/BingoCard.tsx.
+Home.tsx:
+Clean up redundant headers.
+Refine stats grid.
+Let's start by exploring the components and schema.
+
+thought:
+Okay, I have a clear plan. I'll address all the user's requests in this turn to stay within the 3-turn target for Fast mode.
+
+Changes:
+Home.tsx:
+Fix Imports: Update imports to @/components/... if needed, although the ls showed they are in client/src/components. Wait, the LSP said Cannot find module '@/components/CountdownTimer'. This usually means the alias @/components is pointed to client/src/components but maybe there's a typo or it expects relative path if not configured. Actually, looking at Home.tsx, it uses @/components/CountdownTimer. I'll try changing it to absolute or relative if it persists, but first I'll fix the logic.
+My Stats:
+Calculate Wins (count of transactions with type PRIZE).
+Calculate Losses (count of transactions with type BUY_IN that didn't result in a win? No, actually every buy-in is a loss unless there's a prize).
+Calculate PNL (sum of all transactions amounts).
+Display Wallet Address (formatted).
+Lobby Header: Remove "BINGO LOBBY" header.
+Stats Grid: Refine the design of Room, Prize Pool, Players to match the game view. Make Prize Pool larger.
+LSP Fix: Cast hr in history rounds to any or fix the type to include winnerUsername.
