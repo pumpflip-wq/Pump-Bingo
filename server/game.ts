@@ -204,6 +204,7 @@ export class GameManager {
   }
 
   validateBingo(card: number[][], drawn: number[]): boolean {
+    if (!drawn || drawn.length < 4) return false; // Minimum 4 numbers needed for bingo (including free space)
     const isMarked = (n: number) => n === 0 || drawn.includes(n);
 
     // Rows

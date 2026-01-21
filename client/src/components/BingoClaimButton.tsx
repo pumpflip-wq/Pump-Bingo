@@ -14,6 +14,7 @@ interface BingoClaimButtonProps {
 }
 
 function checkBingo(card: number[][], drawnNumbers: number[]): boolean {
+  if (!drawnNumbers || drawnNumbers.length < 4) return false;
   const drawn = new Set(drawnNumbers);
   
   for (let row = 0; row < 5; row++) {
