@@ -244,24 +244,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0">
-                  <h3 className="text-lg text-white uppercase font-black tracking-widest mb-4 flex items-center gap-2 font-display">
-                    <History className="w-4 h-4 text-primary" /> Last Winners
-                  </h3>
-                  <div className="space-y-2 max-h-[200px] overflow-y-auto custom-scrollbar pr-2">
-                    {historyRounds?.map((r) => (
-                      <div key={r.id} className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold text-white">@{formatAddress(r.winnerUsername || "No Winner")}</span>
-                          <span className="text-[10px] text-primary/60 font-mono">Round #{r.id}</span>
-                        </div>
-                        <span className="text-xs font-black text-primary">+{r.prizePool}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 min-h-[300px]">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 min-h-[400px]">
                   <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
                     <Users className="w-4 h-4 text-primary" /> Active Players
                   </h3>
