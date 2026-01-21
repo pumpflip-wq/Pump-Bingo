@@ -70,7 +70,7 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
                       top: '35%',
                     }}
                   >
-                    <span className="text-[8px] font-black text-black">{Math.floor(Math.random() * 75) + 1}</span>
+                    <span className="text-[8px] font-black text-black">?</span>
                   </motion.div>
                 ))}
               </motion.div>

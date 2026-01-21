@@ -307,30 +307,25 @@ export default function Home() {
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <div className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-between min-h-0 h-full relative overflow-hidden shrink-0">
                     <div className="flex-1 flex flex-col items-center justify-between py-4 w-full h-full">
-                      <div className="w-full space-y-4">
-                        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 w-fit mx-auto relative z-30">
-                          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                          <span className="text-xs text-primary font-black uppercase tracking-widest">Active</span>
-                        </div>
-
+                      <div className="w-full space-y-8">
                         {/* Integrated Stats Header - Outside black box, inside green border, with its own glass-card style */}
-                        <div className="glass-card neon-border rounded-2xl p-6 bg-black/60 border-primary/30 flex flex-row items-center justify-center gap-16 w-full">
+                        <div className="glass-card neon-border rounded-2xl p-8 bg-black/60 border-primary/30 flex flex-row items-center justify-center gap-24 w-full">
                           <div className="flex flex-col text-center">
-                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Room</p>
-                            <p className="text-2xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
+                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Room</p>
+                            <p className="text-3xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
                           </div>
                           
-                          <div className="flex flex-col text-center">
-                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
+                          <div className="flex flex-col text-center scale-110">
+                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
                             <div className="flex flex-col items-center">
-                              <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool}</span>
-                              <span className="text-xs text-primary font-black uppercase tracking-widest mt-1">PUMP</span>
+                              <span className="text-5xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{roundData.round.prizePool}</span>
+                              <span className="text-sm text-primary font-black uppercase tracking-widest mt-1">PUMP</span>
                             </div>
                           </div>
 
                           <div className="flex flex-col text-center">
-                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
-                            <p className="text-2xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Players</p>
+                            <p className="text-3xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                           </div>
                         </div>
                       </div>
