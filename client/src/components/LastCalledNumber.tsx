@@ -42,26 +42,40 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
               </div>
             </motion.div>
           ) : (
-            <div className="z-10 flex items-center justify-center w-full h-full relative">
+            <div className="z-10 flex items-center justify-center w-full h-full relative overflow-hidden rounded-full">
+              {/* Bingo Cage Simulation */}
+              <div className="absolute inset-0 border-2 border-primary/20 rounded-full" />
               <motion.div 
-                animate={{ 
-                  rotate: 360,
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{ 
-                  rotate: { duration: 3, repeat: Infinity, ease: "linear" },
-                  scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-                }}
-                className="relative w-16 h-16"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                className="relative w-20 h-20"
               >
-                {/* Visual balls spinning animation */}
-                <motion.div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary/40 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-                <motion.div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary/20 shadow-[0_0_10px_rgba(34,197,94,0.3)]" />
-                <motion.div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary/60 shadow-[0_0_10px_rgba(34,197,94,0.7)]" />
-                <motion.div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary/30 shadow-[0_0_10px_rgba(34,197,94,0.4)]" />
+                {[...Array(6)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    animate={{ 
+                      x: [0, Math.random() * 40 - 20, 0],
+                      y: [0, Math.random() * 40 - 20, 0],
+                      rotate: [0, 360],
+                      scale: [0.8, 1, 0.8]
+                    }}
+                    transition={{ 
+                      duration: 2 + Math.random() * 2, 
+                      repeat: Infinity, 
+                      ease: "easeInOut" 
+                    }}
+                    className="absolute w-6 h-6 rounded-full bg-gradient-to-br from-white via-primary/40 to-primary/80 border border-white/20 shadow-lg flex items-center justify-center overflow-hidden"
+                    style={{
+                      left: `${20 + Math.random() * 40}%`,
+                      top: `${20 + Math.random() * 40}%`,
+                    }}
+                  >
+                    <span className="text-[6px] font-black text-black/40">{Math.floor(Math.random() * 75) + 1}</span>
+                  </motion.div>
+                ))}
               </motion.div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[8px] font-black text-primary uppercase tracking-widest animate-pulse">Waiting</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-center justify-center pointer-events-none">
+                <span className="text-[8px] font-black text-primary uppercase tracking-widest animate-pulse mt-12">Shuffling...</span>
               </div>
             </div>
           )}
