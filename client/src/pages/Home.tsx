@@ -352,8 +352,8 @@ export default function Home() {
                           </div>
                         ) : participant ? (
                           <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl">
-                            <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">NODE CONNECTED</p>
-                            <p className="text-xs text-primary/70 uppercase font-black tracking-widest text-center">Awaiting Sequence Start...</p>
+                            <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">YOU'RE IN THE GAME!</p>
+                            <p className="text-xs text-primary/70 uppercase font-black tracking-widest text-center">Waiting for additional players or round start...</p>
                           </div>
                         ) : (
                           <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
