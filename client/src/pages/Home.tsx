@@ -228,22 +228,59 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
             <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
-                <div className="glass-card neon-border rounded-2xl p-8 flex flex-col shrink-0 bg-black/60 border-primary/30 shadow-[0_0_40px_rgba(34,197,94,0.1)]">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-primary/40 transition-all duration-300">
-                      <p className="text-[11px] text-primary/70 font-black uppercase tracking-widest mb-2 font-mono group-hover:text-primary">Room</p>
-                      <p className="text-2xl font-black text-white font-display italic tracking-tighter">#{roundData.round.id}</p>
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 bg-black/60 border-primary/30 shadow-[0_0_40px_rgba(34,197,94,0.1)]">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg text-white uppercase font-black tracking-widest font-display">
+                      Live Stats
+                    </h3>
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                      <span className="text-[10px] text-primary font-black uppercase tracking-widest">Active</span>
                     </div>
-                    <div className="flex flex-col items-center justify-center p-4 bg-primary/10 rounded-2xl border-2 border-primary shadow-[0_0_25px_rgba(34,197,94,0.2)] relative overflow-hidden group hover:scale-105 transition-transform duration-300">
-                      <div className="absolute inset-0 bg-primary/5 animate-pulse" />
-                      <p className="text-[11px] text-primary font-black uppercase tracking-widest mb-2 font-mono relative z-10">Prize</p>
-                      <p className="text-3xl font-black text-primary font-display italic drop-shadow-[0_0_15px_rgba(34,197,94,0.8)] relative z-10 leading-none">{roundData.round.prizePool}</p>
-                      <span className="text-[8px] text-primary font-black font-mono relative z-10 mt-1">PUMP</span>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-[10px] text-white/40 font-black uppercase tracking-widest mb-1 font-mono">Prize Pool</p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-5xl font-black text-primary font-display italic drop-shadow-[0_0_15px_rgba(34,197,94,0.5)] leading-none">{roundData.round.prizePool}</span>
+                        <span className="text-xs font-black text-primary font-mono italic">PUMP</span>
+                      </div>
                     </div>
-                    <div className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-primary/40 transition-all duration-300">
-                      <p className="text-[11px] text-primary/70 font-black uppercase tracking-widest mb-2 font-mono group-hover:text-primary">Players</p>
-                      <p className="text-2xl font-black text-white font-display italic tracking-tighter">{roundData.participantsCount}</p>
+
+                    <div className="pt-4 border-t border-white/5 grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-[10px] text-white/40 font-black uppercase tracking-widest mb-1 font-mono">Nodes</p>
+                        <p className="text-xl font-black text-white font-display italic">{roundData.participantsCount}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-white/40 font-black uppercase tracking-widest mb-1 font-mono">Entry</p>
+                        <p className="text-xl font-black text-white font-display italic">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
+                      </div>
                     </div>
+                  </div>
+                </div>
+
+                <div className="glass-card neon-border rounded-2xl p-4 flex flex-col shrink-0 bg-black/40 border-primary/20">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-[10px] text-white/40 uppercase font-black tracking-widest font-display">
+                      Recent Numbers
+                    </h3>
+                  </div>
+                  <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto custom-scrollbar">
+                    {roundData.round.drawnNumbers?.slice(-20).reverse().map((num, idx) => (
+                      <motion.div
+                        key={`${num}-${idx}`}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-xs font-black text-primary italic"
+                      >
+                        {num}
+                      </motion.div>
+                    ))}
+                    {(!roundData.round.drawnNumbers || roundData.round.drawnNumbers.length === 0) && (
+                      <p className="text-[10px] text-white/20 uppercase font-black tracking-widest w-full text-center py-4">Waiting for draw...</p>
+                    )}
                   </div>
                 </div>
 
@@ -322,7 +359,7 @@ export default function Home() {
                 </div>
               </aside>
 
-              <main className="lg:col-span-6 space-y-8 h-[750px] flex flex-col overflow-hidden">
+                  <main className="lg:col-span-6 space-y-8 h-[750px] flex flex-col overflow-hidden">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-0 h-full relative overflow-hidden shrink-0">
                     <div className="space-y-10 relative z-10 w-full">
@@ -359,11 +396,7 @@ export default function Home() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-8 flex-1 overflow-y-auto custom-scrollbar pr-2 h-full">
-                    <div className="flex justify-center">
-                      <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
-                    </div>
-
+                  <div className="space-y-8 flex-1 overflow-hidden h-full">
                     {isParticipant && currentCard ? (
                       <div className="relative space-y-6 flex flex-col items-center">
                         <BingoCard 
@@ -446,7 +479,43 @@ export default function Home() {
               </main>
 
             <aside className="lg:col-span-3 flex flex-col h-[750px]">
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-full overflow-hidden bg-black/20">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 bg-black/20 mb-4 h-[180px]">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
+                      <Zap className="w-4 h-4 text-primary" /> Live Draw
+                    </h3>
+                  </div>
+                  <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
+                    <div className="flex flex-wrap gap-2">
+                      <AnimatePresence mode="popLayout">
+                        {roundData.round.drawnNumbers?.slice().reverse().map((num, idx) => (
+                          <motion.div
+                            key={`${num}-${idx}`}
+                            layout
+                            initial={{ scale: 0, rotate: -45 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            className={cn(
+                              "w-10 h-10 rounded-full flex items-center justify-center text-sm font-black italic shadow-lg border-2",
+                              idx === 0 
+                                ? "bg-primary text-black border-primary animate-bounce shadow-primary/50" 
+                                : "bg-black/60 text-primary border-primary/30"
+                            )}
+                          >
+                            {num}
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                      {(!roundData.round.drawnNumbers || roundData.round.drawnNumbers.length === 0) && (
+                        <div className="w-full flex flex-col items-center justify-center py-4 opacity-20">
+                          <Loader2 className="w-6 h-6 animate-spin mb-2" />
+                          <p className="text-[10px] font-black uppercase tracking-widest">Awaiting Draw</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden bg-black/20">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
                       <History className="w-4 h-4 text-primary" /> Game History
