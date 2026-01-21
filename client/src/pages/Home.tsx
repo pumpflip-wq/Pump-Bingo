@@ -227,46 +227,53 @@ export default function Home() {
           ) : latestRound && roundData ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
-            <aside className="lg:col-span-3 space-y-8 h-[700px] flex flex-col">
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 h-[250px]">
-                  <h3 className="text-lg text-white uppercase font-black tracking-widest mb-4 flex items-center justify-between font-display">
-                    <span className="flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-primary" /> My Stats
-                    </span>
-                  </h3>
+            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
+                <div className="glass-card neon-border rounded-2xl p-4 flex flex-col shrink-0 bg-black/40 border-primary/20">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
+                      <p className="text-[9px] text-primary/60 font-black uppercase tracking-widest mb-1 font-mono">Room</p>
+                      <p className="text-sm font-black text-white font-display italic">#{roundData.round.id}</p>
+                    </div>
+                    <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-primary/20 shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                      <p className="text-[9px] text-primary font-black uppercase tracking-widest mb-1 font-mono">Prize</p>
+                      <p className="text-sm font-black text-primary font-display italic drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">{roundData.round.prizePool}</p>
+                    </div>
+                    <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
+                      <p className="text-[9px] text-primary/60 font-black uppercase tracking-widest mb-1 font-mono">Players</p>
+                      <p className="text-sm font-black text-white font-display italic">{roundData.participantsCount}</p>
+                    </div>
+                  </div>
                   
-                  <div className="space-y-4 overflow-y-auto custom-scrollbar">
+                  <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
                     <div className="flex flex-col gap-1">
-                      <span className="text-xs uppercase font-black text-white font-mono">Wallet Address</span>
+                      <span className="text-[9px] uppercase font-black text-white/40 font-mono">Wallet</span>
                       <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-xs text-white font-mono">{formatAddress(walletAddress || "")}</span>
-                        <div className="flex items-center gap-2">
-                          <Copy 
-                            className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
-                            onClick={() => {
-                              if (walletAddress) {
-                                navigator.clipboard.writeText(walletAddress);
-                                toast({ title: "Address Copied" });
-                              }
-                            }}
-                          />
-                        </div>
+                        <span className="text-[9px] text-white font-mono">{formatAddress(walletAddress || "")}</span>
+                        <Copy 
+                          className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
+                          onClick={() => {
+                            if (walletAddress) {
+                              navigator.clipboard.writeText(walletAddress);
+                              toast({ title: "Address Copied" });
+                            }
+                          }}
+                        />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-2">
-                      <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-xs uppercase font-black text-white font-mono">Wins</span>
-                        <span className="text-xl font-black text-primary">{stats.wins}</span>
+                      <div className="flex flex-col items-center p-1 bg-white/5 rounded-lg border border-white/5">
+                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">Wins</span>
+                        <span className="text-xs font-black text-primary">{stats.wins}</span>
                       </div>
-                      <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-xs uppercase font-black text-white font-mono">Losses</span>
-                        <span className="text-xl font-black text-red-500">{stats.losses}</span>
+                      <div className="flex flex-col items-center p-1 bg-white/5 rounded-lg border border-white/5">
+                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">Losses</span>
+                        <span className="text-xs font-black text-red-500">{stats.losses}</span>
                       </div>
-                      <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-xs uppercase font-black text-white font-mono">PNL</span>
+                      <div className="flex flex-col items-center p-1 bg-white/5 rounded-lg border border-white/5">
+                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">PNL</span>
                         <span className={cn(
-                          "text-xl font-black",
+                          "text-xs font-black",
                           stats.pnl >= 0 ? "text-primary" : "text-red-500"
                         )}>{stats.pnl >= 0 ? '+' : ''}{stats.pnl}</span>
                       </div>
@@ -274,7 +281,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
                       <Users className="w-4 h-4 text-primary" /> Active Players
@@ -291,7 +298,7 @@ export default function Home() {
                           animate={{ opacity: 1, x: 0 }}
                           className={cn(
                             "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
-                            p.username === walletAddress ? "border-primary bg-primary/10" : "border-white/5"
+                            p.username === walletAddress ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5"
                           )}
                         >
                           <div className="flex items-center gap-3">
@@ -306,7 +313,7 @@ export default function Home() {
                             <div className="flex flex-col">
                               <span className="text-sm font-bold text-white italic tracking-tight flex items-center gap-1">
                                 @{formatAddress(p.username)}
-                                {p.username === walletAddress && <span className="text-[10px] text-primary">(YOU)</span>}
+                                {p.username === walletAddress && <span className="text-[10px] text-primary font-black">(YOU)</span>}
                               </span>
                               <span className="text-[10px] text-primary/60 font-black font-mono">100 PUMP</span>
                             </div>
@@ -328,9 +335,143 @@ export default function Home() {
                 </div>
               </aside>
 
-              <main className="lg:col-span-6 space-y-8 h-[700px] flex flex-col overflow-y-auto custom-scrollbar">
+              <main className="lg:col-span-6 space-y-8 h-[750px] flex flex-col overflow-hidden">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
-                  <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-start min-h-[600px] relative overflow-hidden shrink-0">
+                  <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-0 h-full relative overflow-hidden shrink-0">
+                    <div className="space-y-10 relative z-10 w-full">
+                      <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
+                        <p className="text-white/60 text-xs uppercase font-black tracking-[0.2em] mb-6 font-mono">Game Starting In</p>
+                        <CountdownTimer 
+                          targetDate={roundData.round.startTime?.toString() || null} 
+                          status={roundData.round.status}
+                          participantCount={roundData.participantsCount}
+                        />
+                        {roundData.participantsCount < 2 && (
+                          <p className="text-primary text-sm uppercase font-black mt-6 animate-pulse tracking-widest font-display">
+                            Waiting for players...
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="w-full pt-4 max-w-md mx-auto">
+                        {!connected ? (
+                          <div className="space-y-6">
+                            <p className="text-white/60 text-xs uppercase font-black tracking-widest italic">Connect Wallet to Start</p>
+                            <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-16 !px-10 !text-xl !rounded-2xl !w-full !font-black !italic !tracking-tighter !text-black shadow-lg" />
+                          </div>
+                        ) : participant ? (
+                          <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl">
+                            <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">YOU'RE IN THE GAME!</p>
+                            <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">Waiting for players or round start...</p>
+                          </div>
+                        ) : (
+                          <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-8 flex-1 overflow-y-auto custom-scrollbar pr-2 h-full">
+                    <div className="flex justify-center">
+                      <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
+                    </div>
+
+                    {isParticipant && currentCard ? (
+                      <div className="relative space-y-10">
+                        <BingoCard 
+                          card={currentCard} 
+                          drawnNumbers={roundData.round.drawnNumbers || []} 
+                          className="w-full max-w-[540px] mx-auto"
+                        />
+                        
+                        <div className="flex justify-center">
+                          <BingoClaimButton 
+                            roundId={roundData.round.id} 
+                            userId={user?.id || 0} 
+                            card={currentCard}
+                            drawnNumbers={roundData.round.drawnNumbers || []}
+                            status={roundData.round.status}
+                            isBingoed={participant?.hasBingo || false}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-center space-y-8 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
+                        <div className="text-center space-y-4 relative z-10">
+                          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
+                            <Globe className="w-3 h-3 animate-spin-slow" /> Live Feed Active
+                          </div>
+                          <h2 className="text-4xl md:text-6xl font-black font-display italic text-white tracking-tighter uppercase">
+                            WATCHING <span className="text-primary">LIVE</span>
+                          </h2>
+                          <p className="text-white/40 uppercase font-black tracking-widest text-[10px] max-w-xs mx-auto">
+                            You are observing round #{roundData.round.id}. Connect wallet and join the next round to win!
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </main>
+
+            <aside className="lg:col-span-3 flex flex-col h-[750px]">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-full overflow-hidden bg-black/20">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
+                      <History className="w-4 h-4 text-primary" /> Game History
+                    </h3>
+                    <Link href="/verify" className="text-[10px] font-black text-primary/60 hover:text-primary uppercase tracking-widest underline transition-colors">Full View</Link>
+                  </div>
+                  
+                  <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                    <div className="space-y-4">
+                      {historyLoading ? (
+                        <div className="flex justify-center py-10">
+                          <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                        </div>
+                      ) : historyRounds?.length ? (
+                        historyRounds.slice(0, 10).map((hr) => (
+                          <HistoryItem 
+                            key={hr.id}
+                            id={hr.id} 
+                            winner={hr.winnerUsername || "No Winner"} 
+                            prize={hr.prizePool} 
+                            formatAddress={formatAddress}
+                          />
+                        ))
+                      ) : (
+                        <div className="text-center py-10 opacity-30">
+                          <p className="text-[10px] uppercase font-black tracking-widest text-white">No history yet</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="mt-8 pt-6 border-t border-white/10 space-y-4">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-primary/60">
+                        <span>Current Room #{roundData.round.id} Hash</span>
+                        <Link href="/verify" className="underline hover:text-primary transition-colors">Verify</Link>
+                      </div>
+                      <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
+                        <p className="text-[10px] font-mono text-primary truncate flex-1">
+                          {roundData.round.publicHash}
+                        </p>
+                        <Copy 
+                          className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
+                          onClick={() => {
+                            navigator.clipboard.writeText(roundData.round.publicHash);
+                            toast({ title: "Hash Copied" });
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
+                  </div>
+                </div>
+              </aside>
                     <div className="space-y-10 relative z-10 w-full">
                       <div className="grid grid-cols-3 gap-4 mb-8">
                         <div className="glass-card bg-black/40 border-primary/20 p-4 rounded-2xl text-center">
