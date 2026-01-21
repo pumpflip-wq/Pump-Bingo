@@ -295,8 +295,8 @@ export default function Home() {
                     </AnimatePresence>
                     {roundData.participants.length === 0 && (
                       <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
-                        <Globe className="w-10 h-10" />
-                        <p className="text-xs uppercase font-black tracking-widest text-white">Awaiting Nodes...</p>
+                        <Globe className="w-10 h-10 text-white" />
+                        <p className="text-sm uppercase font-black tracking-widest text-white">Waiting for players...</p>
                       </div>
                     )}
                   </div>
@@ -349,7 +349,7 @@ export default function Home() {
                       <div className="w-full max-w-md mx-auto mb-2">
                         {!connected ? (
                           <div className="space-y-6">
-                            <p className="text-white/60 text-xs uppercase font-black tracking-widest italic">Connect Wallet to Start</p>
+                            <p className="text-white text-sm uppercase font-black tracking-widest italic">Connect Wallet to Start</p>
                             <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-16 !px-10 !text-xl !rounded-2xl !w-full !font-black !italic !tracking-tighter !text-black shadow-lg" />
                           </div>
                         ) : participant || foundParticipant ? (
