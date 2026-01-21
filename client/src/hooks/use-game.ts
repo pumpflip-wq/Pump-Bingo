@@ -32,12 +32,12 @@ export function useRound(id: number) {
 export function useJoinRound() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ roundId, userId }: { roundId: number; userId: number }) => {
+    mutationFn: async ({ roundId, userId, txSignature }: { roundId: number; userId: number; txSignature?: string }) => {
       const url = buildUrl(api.rounds.join.path, { id: roundId });
       const res = await fetch(url, {
         method: api.rounds.join.method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userId, txSignature }),
       });
       
       if (!res.ok) {

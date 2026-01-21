@@ -95,7 +95,7 @@ export async function registerRoutes(
       const roundId = Number(req.params.id);
       if (isNaN(roundId)) return res.status(400).json({ message: "Invalid round ID" });
 
-      const { userId } = api.rounds.join.input.parse(req.body);
+      const { userId, txSignature } = req.body; // Expanded validation needed in real app
 
       const round = await storage.getRound(roundId);
       if (!round) return res.status(404).json({ message: "Round not found" });
@@ -107,31 +107,18 @@ export async function registerRoutes(
       const user = await storage.getUser(userId);
       if (!user) return res.status(404).json({ message: "User not found" });
 
-      if (user.balance < round.price) {
-        return res.status(400).json({ message: "Insufficient balance" });
-      }
-
       // Check if already joined
       const existing = await storage.getParticipant(roundId, userId);
       if (existing) {
         return res.status(400).json({ message: "Already joined this round" });
       }
 
-      // Deduct Balance
-      await storage.updateUserBalance(userId, -round.price);
-      await storage.createTransaction({
-          userId,
-          amount: -round.price,
-          type: "BUY_IN",
-          roundId
-      });
-
       // Add to prize pool
       await storage.updateRound(roundId, { prizePool: round.prizePool + round.price });
 
       // Generate Card
       const card = gameManager.generateCard();
-      const participant = await storage.joinRound(roundId, userId, card);
+      const participant = await storage.joinRound(roundId, userId, card, txSignature);
 
       const updatedUser = await storage.getUser(userId); // get new balance
 

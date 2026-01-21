@@ -21,7 +21,7 @@ export interface IStorage {
   updateRound(id: number, updates: Partial<Round>): Promise<Round>;
   
   // Participant
-  joinRound(roundId: number, userId: number, card: number[][]): Promise<Participant>;
+  joinRound(roundId: number, userId: number, card: number[][], txSignature?: string): Promise<Participant>;
   getParticipant(roundId: number, userId: number): Promise<Participant | undefined>;
   getRoundParticipantsCount(roundId: number): Promise<number>;
   getRecentFinishedRounds(): Promise<(Round & { winnerUsername: string | null })[]>;
@@ -81,9 +81,9 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  async joinRound(roundId: number, userId: number, card: number[][]): Promise<Participant> {
+  async joinRound(roundId: number, userId: number, card: number[][], txSignature?: string): Promise<Participant> {
     const [participant] = await db.insert(participants)
-      .values({ roundId, userId, card })
+      .values({ roundId, userId, card, txSignature })
       .returning();
     return participant;
   }

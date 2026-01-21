@@ -95,9 +95,13 @@ export default function Home() {
     return { wins, losses, pnl };
   }, [userTransactions]);
 
-  const isLoading = roundsLoading || (latestRound && roundLoading);
+  useEffect(() => {
+    if (roundData?.round.drawnNumbers && roundData.round.drawnNumbers.length > 0) {
+      new Audio("/sounds/draw.mp3").play().catch(() => {});
+    }
+  }, [roundData?.round.drawnNumbers?.length]);
 
-  const formatAddress = (address: string) => {
+  return (
     if (!address || address === "No Winner") return address;
     if (address.length < 10) return address;
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
@@ -331,6 +335,25 @@ export default function Home() {
                           <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
                         )}
                       </div>
+                      
+                      {roundData.round.status === 'FINISHED' && (
+                        <div className="w-full pt-4">
+                          <CyberButton 
+                            onClick={() => {
+                              const verificationData = {
+                                roundId: roundData.round.id,
+                                seed: roundData.round.serverSeed,
+                                hash: roundData.round.publicHash,
+                                drawnNumbers: roundData.round.drawnNumbers
+                              };
+                              alert(`Round Verification:\n\nRound ID: ${verificationData.roundId}\nServer Seed: ${verificationData.seed}\nPublic Hash: ${verificationData.hash}\n\nYou can verify this by hashing the Server Seed with SHA-256 and checking if it matches the Public Hash.`);
+                            }}
+                            className="w-full h-12 text-sm bg-white/5 border-white/10"
+                          >
+                            VERIFY FAIRNESS
+                          </CyberButton>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : (
