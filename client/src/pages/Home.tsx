@@ -209,11 +209,11 @@ export default function Home() {
                   
                   <div className="space-y-4 flex-1">
                     <div className="flex flex-col gap-1">
-                      <span className="text-sm uppercase font-black text-white font-mono">Wallet Address</span>
+                      <span className="text-xs uppercase font-black text-white font-mono">Wallet Address</span>
                       <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-sm text-white font-mono">{formatAddress(walletAddress || "")}</span>
+                        <span className="text-xs text-white font-mono">{formatAddress(walletAddress || "")}</span>
                         <Copy 
-                          className="w-4 h-4 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
+                          className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
                           onClick={() => {
                             if (walletAddress) {
                               navigator.clipboard.writeText(walletAddress);
@@ -227,16 +227,16 @@ export default function Home() {
                     <div className="grid grid-cols-3 gap-2">
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs uppercase font-black text-white font-mono">Wins</span>
-                        <span className="text-xl font-black text-primary">{stats.wins}</span>
+                        <span className="text-sm font-black text-primary">{stats.wins}</span>
                       </div>
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs uppercase font-black text-white font-mono">Losses</span>
-                        <span className="text-xl font-black text-red-500">{stats.losses}</span>
+                        <span className="text-sm font-black text-red-500">{stats.losses}</span>
                       </div>
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs uppercase font-black text-white font-mono">PNL</span>
                         <span className={cn(
-                          "text-xl font-black",
+                          "text-sm font-black",
                           stats.pnl >= 0 ? "text-primary" : "text-red-500"
                         )}>{stats.pnl >= 0 ? '+' : ''}{stats.pnl}</span>
                       </div>
