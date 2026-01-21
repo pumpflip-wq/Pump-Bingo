@@ -352,26 +352,8 @@ export default function Home() {
                           </div>
                         ) : participant ? (
                           <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl">
-                            <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase">NODE CONNECTED</p>
-                            <p className="text-xs text-primary/70 uppercase font-black tracking-widest">Awaiting Sequence Start...</p>
-                            <div className="mt-4 pt-4 border-t border-primary/20">
-                              <p className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-2 flex items-center justify-between">
-                                Round Integrity Hash
-                                <Link href="/verify" className="text-[8px] underline hover:text-primary transition-colors">WHAT IS THIS?</Link>
-                              </p>
-                              <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
-                                <p className="text-[10px] font-mono text-primary truncate flex-1">
-                                  {roundData.round.publicHash}
-                                </p>
-                                <Copy 
-                                  className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(roundData.round.publicHash);
-                                    toast({ title: "Hash Copied" });
-                                  }}
-                                />
-                              </div>
-                            </div>
+                            <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">NODE CONNECTED</p>
+                            <p className="text-xs text-primary/70 uppercase font-black tracking-widest text-center">Awaiting Sequence Start...</p>
                           </div>
                         ) : (
                           <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />

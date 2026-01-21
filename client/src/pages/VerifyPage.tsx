@@ -75,33 +75,6 @@ export default function VerifyPage() {
 
           <div className="glass-card neon-border rounded-[2rem] p-6 space-y-6">
             <h2 className="text-2xl font-black italic text-white uppercase tracking-tighter flex items-center gap-3">
-              <ShieldCheck className="w-6 h-6 text-primary" /> Current Round
-            </h2>
-            {rounds && rounds[0] && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5 p-6 rounded-2xl border border-white/10">
-                <div className="space-y-2">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-white/60">Round ID</p>
-                  <p className="text-xl font-black text-white font-display italic">#{rounds[0].id}</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-white/60">Public Hash (Integrity)</p>
-                  <div className="flex items-center gap-2 bg-black/40 p-3 rounded-xl border border-primary/20">
-                    <p className="text-xs font-mono text-primary truncate flex-1">{rounds[0].publicHash}</p>
-                    <Copy 
-                      className="w-4 h-4 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
-                      onClick={() => {
-                        navigator.clipboard.writeText(rounds[0].publicHash);
-                        toast({ title: "Hash Copied" });
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="glass-card neon-border rounded-[2rem] p-6 space-y-6">
-            <h2 className="text-2xl font-black italic text-white uppercase tracking-tighter flex items-center gap-3">
               <Search className="w-6 h-6 text-primary" /> Recent Rounds
             </h2>
             
