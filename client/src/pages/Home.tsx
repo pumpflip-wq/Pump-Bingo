@@ -99,9 +99,28 @@ export default function Home() {
 
   useEffect(() => {
     if (roundData?.round.drawnNumbers && roundData.round.drawnNumbers.length > 0) {
-      new Audio("/sounds/draw.mp3").play().catch(() => {});
+      // Use a set of high-quality sound effects from a public CDN
+      const drawSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3");
+      drawSound.volume = 0.4;
+      drawSound.play().catch(() => {});
     }
   }, [roundData?.round.drawnNumbers?.length]);
+
+  useEffect(() => {
+    if (roundData?.round.status === 'FINISHED' && roundData.round.winnerId) {
+      const winSound = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
+      winSound.volume = 0.5;
+      winSound.play().catch(() => {});
+    }
+  }, [roundData?.round.status, roundData?.round.winnerId]);
+
+  useEffect(() => {
+    if (participant) {
+      const joinSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
+      joinSound.volume = 0.3;
+      joinSound.play().catch(() => {});
+    }
+  }, [!!participant]);
 
   const formatAddress = (address: string) => {
     if (!address || address === "No Winner") return address;
@@ -251,9 +270,28 @@ export default function Home() {
                 </div>
 
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 min-h-[400px]">
-                  <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
-                    <Users className="w-4 h-4 text-primary" /> Active Players
-                  </h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
+                      <Users className="w-4 h-4 text-primary" /> Active Players
+                    </h3>
+                    {latestRound && (
+                      <CyberButton 
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          const verificationData = {
+                            roundId: latestRound.id,
+                            seed: latestRound.serverSeed,
+                            hash: latestRound.publicHash,
+                          };
+                          alert(`Provably Fair Verification (Round #${verificationData.roundId}):\n\nPublic Hash: ${verificationData.hash}\n\nServer Seed: ${verificationData.seed || "Hidden until round ends"}\n\nTo verify: SHA256(ServerSeed) should match Public Hash.`);
+                        }}
+                        className="h-8 px-3 text-[10px] border-white/5 bg-white/5"
+                      >
+                        <ShieldCheck className="w-3 h-3 mr-1" /> VERIFY
+                      </CyberButton>
+                    )}
+                  </div>
                   
                   <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                     <AnimatePresence mode="popLayout">
