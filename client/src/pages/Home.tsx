@@ -306,9 +306,9 @@ export default function Home() {
                   <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <div className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-between min-h-0 h-full relative overflow-hidden shrink-0">
-                    <div className="flex-1 flex flex-col items-center justify-center w-full space-y-12">
+                    <div className="flex-1 flex flex-col items-center justify-between py-4 w-full h-full">
                       {/* Integrated Stats Header - Outside black box, inside green border, with its own glass-card style */}
-                      <div className="glass-card neon-border rounded-2xl p-6 bg-black/60 border-primary/30 flex flex-row items-center justify-between w-full">
+                      <div className="glass-card neon-border rounded-2xl p-6 bg-black/60 border-primary/30 flex flex-row items-center justify-between w-full mt-2">
                         <div className="flex flex-col text-left">
                           <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
                           <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} PUMP</span>
@@ -329,7 +329,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl">
+                      <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto">
                         <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
                         
                         <p className="text-white/60 text-xs uppercase font-black tracking-[0.2em] mb-6 font-mono">Game Starting In</p>
@@ -345,7 +345,7 @@ export default function Home() {
                         )}
                       </div>
 
-                      <div className="w-full max-w-md mx-auto">
+                      <div className="w-full max-w-md mx-auto mb-2">
                         {!connected ? (
                           <div className="space-y-6">
                             <p className="text-white/60 text-xs uppercase font-black tracking-widest italic">Connect Wallet to Start</p>

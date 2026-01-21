@@ -42,9 +42,27 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
               </div>
             </motion.div>
           ) : (
-            <div className="z-10 flex flex-col items-center space-y-1 opacity-20">
-              <Zap className="w-6 h-6 text-primary" />
-              <span className="text-[8px] font-black text-primary uppercase tracking-widest">Awaiting</span>
+            <div className="z-10 flex items-center justify-center w-full h-full relative">
+              <motion.div 
+                animate={{ 
+                  rotate: 360,
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  rotate: { duration: 3, repeat: Infinity, ease: "linear" },
+                  scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                }}
+                className="relative w-16 h-16"
+              >
+                {/* Visual balls spinning animation */}
+                <motion.div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary/40 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                <motion.div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-primary/20 shadow-[0_0_10px_rgba(34,197,94,0.3)]" />
+                <motion.div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary/60 shadow-[0_0_10px_rgba(34,197,94,0.7)]" />
+                <motion.div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-primary/30 shadow-[0_0_10px_rgba(34,197,94,0.4)]" />
+              </motion.div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-[8px] font-black text-primary uppercase tracking-widest animate-pulse">Waiting</span>
+              </div>
             </div>
           )}
         </AnimatePresence>
