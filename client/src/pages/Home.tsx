@@ -176,26 +176,25 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="flex-1 flex flex-col space-y-4">
-          <section className="text-center pt-2 pb-2 space-y-4 flex flex-col items-center">
-            <div className="relative inline-block">
-              <motion.h1 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-7xl md:text-9xl font-black font-display tracking-tighter text-white italic leading-[0.8] mb-1 drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
-              >
-                PUMP <span className="text-primary drop-shadow-[0_0_40px_rgba(34,197,94,0.4)]">BINGO</span>
-              </motion.h1>
-              <motion.div 
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 blur-sm"
-              />
-            </div>
-            <p className="text-primary/90 font-black uppercase tracking-[0.8em] text-sm md:text-base italic pl-[0.8em]">PROVABLY FAIR SOLANA GAMING</p>
-          </section>
+          <div className="flex-1 flex flex-col space-y-4">
+            <section className="text-center pt-2 pb-2 space-y-4 flex flex-col items-center">
+              <div className="relative inline-block">
+                <motion.h1 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-7xl md:text-9xl font-black font-display tracking-tighter text-white italic leading-[0.8] mb-1 drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]"
+                >
+                  PUMP <span className="text-primary drop-shadow-[0_0_40px_rgba(34,197,94,0.4)]">BINGO</span>
+                </motion.h1>
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  className="h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 blur-sm"
+                />
+              </div>
+            </section>
 
-          {isLoading ? (
+            {isLoading ? (
             <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1">
               <Loader2 className="w-16 h-16 text-primary animate-spin" />
               <p className="font-mono text-xs text-primary uppercase tracking-[0.3em]">Connecting Node...</p>
@@ -203,15 +202,15 @@ export default function Home() {
           ) : latestRound && roundData ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
-              <aside className="lg:col-span-3 space-y-8">
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[280px]">
+              <aside className="lg:col-span-3 space-y-8 h-full flex flex-col">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0">
                   <h3 className="text-lg text-white uppercase font-black tracking-widest mb-4 flex items-center gap-2 font-display">
                     <ShieldCheck className="w-4 h-4 text-primary" /> My Stats
                   </h3>
                   
                   <div className="space-y-4 flex-1">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[10px] uppercase font-black text-white/40 font-mono">Wallet Address</span>
+                      <span className="text-xs uppercase font-black text-white font-mono">Wallet Address</span>
                       <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs text-white font-mono">{formatAddress(walletAddress || "")}</span>
                         <Copy 
@@ -228,39 +227,25 @@ export default function Home() {
 
                     <div className="grid grid-cols-3 gap-2">
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">Wins</span>
+                        <span className="text-xs uppercase font-black text-white font-mono">Wins</span>
                         <span className="text-sm font-black text-primary">{stats.wins}</span>
                       </div>
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">Losses</span>
+                        <span className="text-xs uppercase font-black text-white font-mono">Losses</span>
                         <span className="text-sm font-black text-red-500">{stats.losses}</span>
                       </div>
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">PNL</span>
+                        <span className="text-xs uppercase font-black text-white font-mono">PNL</span>
                         <span className={cn(
                           "text-sm font-black",
                           stats.pnl >= 0 ? "text-primary" : "text-red-500"
                         )}>{stats.pnl >= 0 ? '+' : ''}{stats.pnl}</span>
                       </div>
                     </div>
-
-                    <div className="flex-1 overflow-y-auto space-y-1 mt-2 pr-1 custom-scrollbar max-h-[60px]">
-                      {userTransactions?.slice(0, 3).map((tx: any) => (
-                        <div key={tx.id} className="flex items-center justify-between text-[10px] py-1 border-b border-white/5 last:border-0">
-                          <span className="text-white/40 font-mono uppercase">{tx.type}</span>
-                          <span className={cn(
-                            "font-bold font-mono",
-                            tx.amount > 0 ? "text-primary" : "text-red-500"
-                          )}>
-                            {tx.amount > 0 ? '+' : ''}{tx.amount}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 </div>
 
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[320px]">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 min-h-[400px]">
                   <h3 className="text-lg text-white uppercase font-black tracking-widest mb-6 flex items-center gap-2 font-display">
                     <Users className="w-4 h-4 text-primary" /> Active Players
                   </h3>
@@ -279,7 +264,10 @@ export default function Home() {
                             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 group-hover:bg-primary group-hover:text-black transition-colors">
                               {p.username[0].toUpperCase()}
                             </div>
-                            <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-bold text-white italic tracking-tight">@{formatAddress(p.username)}</span>
+                              <span className="text-[10px] text-primary/60 font-black font-mono">100 PUMP</span>
+                            </div>
                           </div>
                           <ShieldCheck className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
                         </motion.div>
@@ -348,18 +336,18 @@ export default function Home() {
                   </div>
                 ) : (
                   <div className="space-y-8">
-                    <div className="glass-card bg-black/40 border-primary/20 p-4 rounded-2xl flex items-center justify-around">
+                    <div className="glass-card bg-black/40 border-primary/20 p-6 rounded-2xl flex items-center justify-around">
                       <div className="text-center">
-                        <p className="text-[8px] text-primary font-black uppercase tracking-widest">Round</p>
-                        <p className="text-sm font-black text-white">#{roundData.round.id}</p>
+                        <p className="text-xs text-primary font-black uppercase tracking-widest mb-1">Round</p>
+                        <p className="text-2xl font-black text-white font-display italic">#{roundData.round.id}</p>
+                      </div>
+                      <div className="text-center scale-110">
+                        <p className="text-xs text-primary font-black uppercase tracking-widest mb-1">Prize Pool</p>
+                        <p className="text-4xl font-black text-primary font-display italic drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">{roundData.round.prizePool}</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-[8px] text-primary font-black uppercase tracking-widest">Prize Pool</p>
-                        <p className="text-sm font-black text-primary drop-shadow-[0_0_5px_rgba(34,197,94,0.3)]">{roundData.round.prizePool}</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-[8px] text-primary font-black uppercase tracking-widest">Players</p>
-                        <p className="text-sm font-black text-white">{roundData.participantsCount}</p>
+                        <p className="text-xs text-primary font-black uppercase tracking-widest mb-1">Players</p>
+                        <p className="text-2xl font-black text-white font-display italic">{roundData.participantsCount}</p>
                       </div>
                     </div>
                     

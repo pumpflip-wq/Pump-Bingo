@@ -34,11 +34,11 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
               )}
             >
               {isFreeSpace ? (
-                <div className="w-full h-full p-2">
+                <div className="w-full h-full p-1">
                   <img 
                     src="https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png" 
                     alt="LOGO" 
-                    className="w-full h-full object-cover rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)]"
+                    className="w-full h-full object-cover rounded-md"
                   />
                 </div>
               ) : (
