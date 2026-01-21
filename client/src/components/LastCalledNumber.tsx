@@ -9,12 +9,12 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
   const lastNumber = numbers.length > 0 ? numbers[numbers.length - 1] : null;
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4">
+    <div className="flex flex-col items-center justify-center space-y-3">
       <div className="flex items-center gap-3">
-        <span className="text-xl text-white uppercase font-black tracking-widest font-display">Recent Numbers</span>
+        <span className="text-sm text-white uppercase font-black tracking-widest font-display">Live Feed</span>
       </div>
 
-      <div className="relative w-28 h-28 flex items-center justify-center">
+      <div className="relative w-24 h-24 flex items-center justify-center">
         {/* Professional Gaming Ring Effects */}
         <motion.div 
             animate={{ rotate: 360 }}
@@ -37,14 +37,14 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
               className="z-10 flex flex-col items-center"
             >
-              <div className="text-5xl font-black font-display text-primary italic leading-none drop-shadow-[0_0_15px_rgba(57,255,20,0.4)]">
+              <div className="text-4xl font-black font-display text-primary italic leading-none drop-shadow-[0_0_15px_rgba(57,255,20,0.4)]">
                 {lastNumber}
               </div>
             </motion.div>
           ) : (
             <div className="z-10 flex flex-col items-center space-y-1 opacity-20">
-              <Zap className="w-8 h-8 text-primary" />
-              <span className="text-[10px] font-black text-primary uppercase tracking-widest">Awaiting</span>
+              <Zap className="w-6 h-6 text-primary" />
+              <span className="text-[8px] font-black text-primary uppercase tracking-widest">Awaiting</span>
             </div>
           )}
         </AnimatePresence>
@@ -52,9 +52,9 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
 
       {/* History indicator */}
       {numbers.length > 1 && (
-        <div className="flex gap-2">
-           {numbers.slice(-5, -1).reverse().map((n, i) => (
-             <div key={i} className="w-10 h-10 rounded-full bg-black/40 border-2 border-primary/30 flex items-center justify-center text-xs font-black text-primary italic shadow-lg">
+        <div className="flex gap-1.5">
+           {numbers.slice(-6, -1).reverse().map((n, i) => (
+             <div key={i} className="w-8 h-8 rounded-full bg-black/40 border border-primary/30 flex items-center justify-center text-[10px] font-black text-primary italic shadow-lg">
                {n}
              </div>
            ))}
