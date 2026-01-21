@@ -227,7 +227,7 @@ export default function Home() {
           ) : latestRound && roundData ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
-            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
+            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[850px]">
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
@@ -271,7 +271,7 @@ export default function Home() {
                                 </span>
                                 <div className="flex items-center gap-2">
                                   <span className="text-[10px] text-primary/60 font-black font-mono">100 PUMP</span>
-                                  {roundData.round.status === 'ACTIVE' && (
+                                  {roundData.round.status === 'IN_GAME' && (
                                     <div className="flex items-center gap-1">
                                       <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
                                         <div 
@@ -303,35 +303,36 @@ export default function Home() {
                 </div>
               </aside>
 
-                  <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden">
+                  <main className="lg:col-span-6 space-y-4 h-[850px] flex flex-col overflow-hidden">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
+                  <div className="flex flex-col">
+                    <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} PUMP</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-12">
+                    <div className="text-right">
+                      <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
+                      <p className="text-2xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Entry</p>
+                      <p className="text-2xl font-black text-white font-display italic leading-none">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
+                    </div>
+                    <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 h-fit self-center">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                      <span className="text-xs text-primary font-black uppercase tracking-widest">Active</span>
+                    </div>
+                  </div>
+                </div>
+
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-0 h-full relative overflow-hidden shrink-0">
                     <div className="space-y-10 relative z-10 w-full">
                       <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
                         
-                        {/* Integrated Stats Header */}
-                        <div className="flex flex-row items-center justify-between mb-10 pb-6 border-b border-white/5">
-                          <div className="flex flex-col text-left">
-                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
-                            <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} PUMP</span>
-                          </div>
-                          <div className="flex gap-12">
-                            <div className="text-right">
-                              <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
-                              <p className="text-2xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Entry</p>
-                              <p className="text-2xl font-black text-white font-display italic leading-none">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
-                            </div>
-                            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 h-fit self-center">
-                              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                              <span className="text-xs text-primary font-black uppercase tracking-widest">Active</span>
-                            </div>
-                          </div>
-                        </div>
-
                         <p className="text-white/60 text-xs uppercase font-black tracking-[0.2em] mb-6 font-mono">Game Starting In</p>
                         <CountdownTimer 
                           targetDate={roundData.round.startTime?.toString() || null} 
