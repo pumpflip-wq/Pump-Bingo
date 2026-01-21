@@ -457,34 +457,7 @@ export default function Home() {
 
             <aside className="lg:col-span-3 flex flex-col h-[750px]">
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 bg-black/40 border-primary/20 mb-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl text-white uppercase font-black tracking-widest font-display">
-                      Recent Numbers
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-4 gap-3">
-                    <AnimatePresence mode="popLayout">
-                      {roundData.round.drawnNumbers?.slice().reverse().slice(0, 8).map((num, idx) => (
-                        <motion.div
-                          key={`${num}-${idx}`}
-                          layout
-                          initial={{ scale: 0, rotate: -45 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          className={cn(
-                            "w-10 h-10 rounded-full flex items-center justify-center text-sm font-black italic shadow-lg border-2 transition-all",
-                            idx === 0 
-                              ? "bg-primary text-black border-primary shadow-[0_0_15px_rgba(34,197,94,0.5)]" 
-                              : "bg-black/40 text-primary border-primary/30"
-                          )}
-                        >
-                          {num}
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                    {(!roundData.round.drawnNumbers || roundData.round.drawnNumbers.length === 0) && (
-                      <p className="text-xs text-white/20 uppercase font-black tracking-widest col-span-4 text-center py-4">Waiting for draw...</p>
-                    )}
-                  </div>
+                  <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
                 </div>
 
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden bg-black/20">
