@@ -45,7 +45,7 @@ function App() {
                 ref={scrollRef}
                 className="flex-1 overflow-y-auto flex flex-col"
               >
-                <div className="flex-1 px-4 sm:px-6 lg:px-8 pt-2 pb-12">
+                <div className="flex-1 px-4 sm:px-6 lg:px-8 py-8">
                   <Router />
                 </div>
                 <Footer />
