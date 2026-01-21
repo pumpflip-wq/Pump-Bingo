@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
 import { CyberButton } from './ui/CyberButton';
 import { Trophy, ExternalLink, Frown } from 'lucide-react';
 import { PROTOCOL_CONFIG } from '@shared/config';
@@ -19,6 +20,31 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
   useEffect(() => {
     if (show) {
       setLeft(15);
+      if (isWinner) {
+        const duration = 10000;
+        const end = Date.now() + duration;
+        const frame = () => {
+          confetti({
+            particleCount: 3,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: ['#39FF14', '#ffffff']
+          });
+          confetti({
+            particleCount: 3,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: ['#39FF14', '#ffffff']
+          });
+          if (Date.now() < end) {
+            setTimeout(() => requestAnimationFrame(frame), 50);
+          }
+        };
+        frame();
+      }
+
       const timer = setInterval(() => {
         setLeft((prev) => {
           if (prev <= 1) {

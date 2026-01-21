@@ -227,16 +227,16 @@ export default function Home() {
                     <div className="grid grid-cols-3 gap-2">
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs uppercase font-black text-white font-mono">Wins</span>
-                        <span className="text-sm font-black text-primary">{stats.wins}</span>
+                        <span className="text-xl font-black text-primary">{stats.wins}</span>
                       </div>
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs uppercase font-black text-white font-mono">Losses</span>
-                        <span className="text-sm font-black text-red-500">{stats.losses}</span>
+                        <span className="text-xl font-black text-red-500">{stats.losses}</span>
                       </div>
                       <div className="flex flex-col items-center p-2 bg-white/5 rounded-lg border border-white/5">
                         <span className="text-xs uppercase font-black text-white font-mono">PNL</span>
                         <span className={cn(
-                          "text-sm font-black",
+                          "text-xl font-black",
                           stats.pnl >= 0 ? "text-primary" : "text-red-500"
                         )}>{stats.pnl >= 0 ? '+' : ''}{stats.pnl}</span>
                       </div>
