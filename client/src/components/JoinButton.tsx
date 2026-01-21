@@ -29,23 +29,28 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
     }
 
     try {
-      // 1. Create Solana Transaction (Buy-in)
-      const treasury = new PublicKey("DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns");
-      // Calculate lamports (1 SOL = 10^9 lamports). For MVP using SOL instead of SPL for simplicity
-      const lamports = price * 1000000; // Mocking price to lamports conversion
+      // 1. Solana Transaction (Buy-in) - DISABLED FOR TESTING
+      let signature = "TEST_TX_SIG_" + Date.now();
+      
+      const USE_REAL_SOLANA = false; // Toggle for testing
 
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: treasury,
-          lamports,
-        })
-      );
+      if (USE_REAL_SOLANA) {
+        const treasury = new PublicKey("DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns");
+        const lamports = price * 1000000;
 
-      const signature = await sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature, "confirmed");
+        const transaction = new Transaction().add(
+          SystemProgram.transfer({
+            fromPubkey: publicKey,
+            toPubkey: treasury,
+            lamports,
+          })
+        );
 
-      // 2. Join Round with Tx Signature
+        signature = await sendTransaction(transaction, connection);
+        await connection.confirmTransaction(signature, "confirmed");
+      }
+
+      // 2. Join Round with Tx Signature (Mocked if disabled)
       joinRound(
         { roundId, userId, txSignature: signature },
         {
