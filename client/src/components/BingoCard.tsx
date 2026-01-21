@@ -37,7 +37,13 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
                 "text-2xl md:text-3xl tracking-tighter",
                 (matched || isFreeSpace) ? "animate-pulse" : ""
               )}>
-                {isFreeSpace ? "PUMP" : num}
+                {isFreeSpace ? (
+                  <img 
+                    src="https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png" 
+                    alt="LOGO" 
+                    className="w-10 h-10 object-cover rounded-full"
+                  />
+                ) : num}
               </span>
               
               {/* Inner glow effect for matched numbers */}

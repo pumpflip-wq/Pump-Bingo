@@ -28,8 +28,8 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
       {
         onSuccess: () => {
           toast({
-            title: "Successfully Joined",
-            description: "You have entered the bingo round!",
+            title: "TRANSACTION CONFIRMED",
+            description: `NODE @${userId} ENGAGED: +100 PUMP DEPOSITED TO SEQUENCE #${roundId}`,
           });
         },
         onError: (error: Error) => {
