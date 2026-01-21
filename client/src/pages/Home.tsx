@@ -267,19 +267,19 @@ export default function Home() {
                       Recent Numbers
                     </h3>
                   </div>
-                  <div className="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto custom-scrollbar">
+                  <div className="grid grid-cols-4 gap-3">
                     <AnimatePresence mode="popLayout">
-                      {roundData.round.drawnNumbers?.slice().reverse().map((num, idx) => (
+                      {roundData.round.drawnNumbers?.slice().reverse().slice(0, 8).map((num, idx) => (
                         <motion.div
                           key={`${num}-${idx}`}
                           layout
                           initial={{ scale: 0, rotate: -45 }}
                           animate={{ scale: 1, rotate: 0 }}
                           className={cn(
-                            "w-10 h-10 rounded-full flex items-center justify-center text-sm font-black italic shadow-lg border-2 transition-all",
+                            "w-12 h-12 rounded-full flex items-center justify-center text-sm font-black italic shadow-lg border-2 transition-all",
                             idx === 0 
-                              ? "bg-primary text-black border-primary animate-bounce shadow-[0_0_15px_rgba(34,197,94,0.5)]" 
-                              : "bg-black/60 text-primary border-primary/30"
+                              ? "bg-primary text-black border-primary shadow-[0_0_15px_rgba(34,197,94,0.5)]" 
+                              : "bg-black/40 text-primary border-primary/30"
                           )}
                         >
                           {num}
@@ -287,12 +287,12 @@ export default function Home() {
                       ))}
                     </AnimatePresence>
                     {(!roundData.round.drawnNumbers || roundData.round.drawnNumbers.length === 0) && (
-                      <p className="text-xs text-white/20 uppercase font-black tracking-widest w-full text-center py-4">Waiting for draw...</p>
+                      <p className="text-xs text-white/20 uppercase font-black tracking-widest col-span-4 text-center py-4">Waiting for draw...</p>
                     )}
                   </div>
                 </div>
 
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden bg-black/20">
+                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
                       <Users className="w-4 h-4 text-primary" /> Active Players
