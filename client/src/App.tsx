@@ -5,8 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
-import Profile from "@/pages/Profile";
-import HistoryPage from "@/pages/History";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 
 import { SolanaProvider } from "./components/SolanaProvider";
@@ -17,8 +15,6 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/history" component={HistoryPage} />
       <Route path="/admin" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>

@@ -41,23 +41,6 @@ export class GameManager {
       
       // If no round exists OR the latest is FINISHED, create a new one
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
-        // Add 5 second delay between rounds
-        if (latestRound && latestRound.status === ROUND_STATUS.FINISHED) {
-          const now = new Date();
-          const finishedAt = latestRound.finishedAt ? new Date(latestRound.finishedAt) : null;
-          
-          if (finishedAt) {
-            const delayMs = 5000;
-            const elapsed = now.getTime() - finishedAt.getTime();
-            if (elapsed < delayMs) {
-              return; // Wait longer
-            }
-          } else {
-            // If finishedAt is not set, set it now to start the 5s timer
-            await storage.updateRound(latestRound.id, { finishedAt: now });
-            return;
-          }
-        }
         await this.createNewRound();
         return;
       }
