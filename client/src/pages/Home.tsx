@@ -304,34 +304,34 @@ export default function Home() {
               </aside>
 
                   <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden">
-                    <div className="glass-card neon-border rounded-2xl p-6 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
-                      <div className="flex flex-col">
-                        <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} PUMP</span>
-                        </div>
-                      </div>
-                      <div className="flex gap-12">
-                        <div className="text-right">
-                          <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
-                          <p className="text-2xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Entry</p>
-                          <p className="text-2xl font-black text-white font-display italic leading-none">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
-                        </div>
-                        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 h-fit self-center">
-                          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                          <span className="text-xs text-primary font-black uppercase tracking-widest">Active</span>
-                        </div>
-                      </div>
-                    </div>
-
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <div className="glass-card neon-border rounded-[3rem] p-12 text-center flex flex-col items-center justify-center min-h-0 h-full relative overflow-hidden shrink-0">
                     <div className="space-y-10 relative z-10 w-full">
                       <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
+                        
+                        {/* Integrated Stats Header */}
+                        <div className="flex flex-row items-center justify-between mb-10 pb-6 border-b border-white/5">
+                          <div className="flex flex-col text-left">
+                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
+                            <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} PUMP</span>
+                          </div>
+                          <div className="flex gap-12">
+                            <div className="text-right">
+                              <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
+                              <p className="text-2xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Entry</p>
+                              <p className="text-2xl font-black text-white font-display italic leading-none">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
+                            </div>
+                            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 h-fit self-center">
+                              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                              <span className="text-xs text-primary font-black uppercase tracking-widest">Active</span>
+                            </div>
+                          </div>
+                        </div>
+
                         <p className="text-white/60 text-xs uppercase font-black tracking-[0.2em] mb-6 font-mono">Game Starting In</p>
                         <CountdownTimer 
                           targetDate={roundData.round.startTime?.toString() || null} 
@@ -363,16 +363,39 @@ export default function Home() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-8 flex-1 overflow-hidden h-full">
+                  <div className="space-y-4 flex-1 overflow-hidden h-full flex flex-col">
+                    <div className="glass-card neon-border rounded-2xl p-6 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
+                      <div className="flex flex-col">
+                        <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} PUMP</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-12">
+                        <div className="text-right">
+                          <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
+                          <p className="text-2xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Entry</p>
+                          <p className="text-2xl font-black text-white font-display italic leading-none">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 h-fit self-center">
+                          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                          <span className="text-xs text-primary font-black uppercase tracking-widest">Active</span>
+                        </div>
+                      </div>
+                    </div>
+
                     {isParticipant && currentCard ? (
                       <div className="relative space-y-6 flex flex-col items-center">
-                        <BingoCard 
+                          <BingoCard 
                           card={currentCard} 
                           drawnNumbers={roundData.round.drawnNumbers || []} 
-                          className="w-full max-w-[500px] scale-100"
+                          className="w-full max-w-[550px] scale-100 mb-4"
                         />
                         
-                        <div className="flex justify-center mt-[-1rem]">
+                        <div className="flex justify-center w-full max-w-[550px]">
                           <BingoClaimButton 
                             roundId={roundData.round.id} 
                             userId={user?.id || 0} 
@@ -380,11 +403,12 @@ export default function Home() {
                             drawnNumbers={roundData.round.drawnNumbers || []}
                             status={roundData.round.status}
                             isBingoed={participant?.hasBingo || false}
+                            className="w-full h-20 text-3xl font-black italic tracking-tighter"
                           />
                         </div>
                       </div>
                     ) : (
-                      <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-center space-y-8 relative overflow-hidden">
+                      <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-center space-y-8 relative overflow-hidden flex-1">
                         <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
                         <div className="text-center space-y-4 relative z-10">
                           <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
@@ -393,16 +417,6 @@ export default function Home() {
                           <h2 className="text-4xl md:text-6xl font-black font-display italic text-white tracking-tighter uppercase">
                             WATCHING <span className="text-primary">LIVE</span>
                           </h2>
-                          <div className="flex items-center justify-center gap-4 mt-4">
-                            <div className="flex flex-col items-center px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                              <span className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-1">Pot</span>
-                              <span className="text-xl font-black text-primary italic">{roundData.round.prizePool} PUMP</span>
-                            </div>
-                            <div className="flex flex-col items-center px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-                              <span className="text-[10px] text-primary/60 font-black uppercase tracking-widest mb-1">Active</span>
-                              <span className="text-xl font-black text-white italic">{roundData.participantsCount} Users</span>
-                            </div>
-                          </div>
                         </div>
 
                         <div className="w-full max-w-md space-y-6 relative z-10">
