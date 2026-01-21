@@ -166,7 +166,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col space-y-4 w-full">
+      <div className="flex flex-col space-y-4 w-full max-w-7xl mx-auto px-4 md:px-8">
         <header className="flex flex-col md:flex-row items-center justify-between py-4 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 px-6 rounded-b-[2rem]">
           <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
             <motion.div
@@ -243,42 +243,6 @@ export default function Home() {
                       <p className="text-sm font-black text-white font-display italic">{roundData.participantsCount}</p>
                     </div>
                   </div>
-                  
-                  <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[9px] uppercase font-black text-white/40 font-mono">Wallet</span>
-                      <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-[9px] text-white font-mono">{formatAddress(walletAddress || "")}</span>
-                        <Copy 
-                          className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
-                          onClick={() => {
-                            if (walletAddress) {
-                              navigator.clipboard.writeText(walletAddress);
-                              toast({ title: "Address Copied" });
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="flex flex-col items-center p-1 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">Wins</span>
-                        <span className="text-xs font-black text-primary">{stats.wins}</span>
-                      </div>
-                      <div className="flex flex-col items-center p-1 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">Losses</span>
-                        <span className="text-xs font-black text-red-500">{stats.losses}</span>
-                      </div>
-                      <div className="flex flex-col items-center p-1 bg-white/5 rounded-lg border border-white/5">
-                        <span className="text-[8px] uppercase font-black text-white/40 font-mono">PNL</span>
-                        <span className={cn(
-                          "text-xs font-black",
-                          stats.pnl >= 0 ? "text-primary" : "text-red-500"
-                        )}>{stats.pnl >= 0 ? '+' : ''}{stats.pnl}</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
@@ -290,40 +254,61 @@ export default function Home() {
                   
                   <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                     <AnimatePresence mode="popLayout">
-                      {sortedParticipants.map((p: any) => (
-                        <motion.div 
-                          key={p.id}
-                          layout
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className={cn(
-                            "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
-                            p.username === walletAddress ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5"
-                          )}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className={cn(
-                              "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black border transition-colors",
-                              p.username === walletAddress 
-                                ? "bg-primary text-black border-primary" 
-                                : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-black"
-                            )}>
-                              {p.username[0].toUpperCase()}
+                      {[
+                        ...(walletAddress && sortedParticipants.some(p => p.username === walletAddress) 
+                          ? [] 
+                          : (walletAddress && (participant || foundParticipant) ? [{ id: 'me', username: walletAddress, prob: 0 }] : [])),
+                        ...sortedParticipants
+                      ].map((p: any) => {
+                        const isMe = p.username === walletAddress;
+                        return (
+                          <motion.div 
+                            key={p.id}
+                            layout
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className={cn(
+                              "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
+                              isMe ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5"
+                            )}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={cn(
+                                "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black border transition-colors",
+                                isMe 
+                                  ? "bg-primary text-black border-primary" 
+                                  : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-black"
+                              )}>
+                                {p.username[0].toUpperCase()}
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-bold text-white italic tracking-tight flex items-center gap-1">
+                                  @{formatAddress(p.username)}
+                                  {isMe && <span className="text-[10px] text-primary font-black">(YOU)</span>}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] text-primary/60 font-black font-mono">100 PUMP</span>
+                                  {roundData.round.status === 'ACTIVE' && (
+                                    <div className="flex items-center gap-1">
+                                      <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
+                                        <div 
+                                          style={{ width: `${p.prob}%` }}
+                                          className="h-full bg-primary"
+                                        />
+                                      </div>
+                                      <span className="text-[8px] font-black text-primary">{p.prob}%</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-bold text-white italic tracking-tight flex items-center gap-1">
-                                @{formatAddress(p.username)}
-                                {p.username === walletAddress && <span className="text-[10px] text-primary font-black">(YOU)</span>}
-                              </span>
-                              <span className="text-[10px] text-primary/60 font-black font-mono">100 PUMP</span>
-                            </div>
-                          </div>
-                          <ShieldCheck className={cn(
-                            "w-4 h-4 transition-colors",
-                            p.username === walletAddress ? "text-primary" : "text-primary/40 group-hover:text-primary"
-                          )} />
-                        </motion.div>
-                      ))}
+                            <ShieldCheck className={cn(
+                              "w-4 h-4 transition-colors",
+                              isMe ? "text-primary" : "text-primary/40 group-hover:text-primary"
+                            )} />
+                          </motion.div>
+                        );
+                      })}
                     </AnimatePresence>
                     {roundData.participants.length === 0 && (
                       <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
@@ -360,7 +345,7 @@ export default function Home() {
                             <p className="text-white/60 text-xs uppercase font-black tracking-widest italic">Connect Wallet to Start</p>
                             <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-16 !px-10 !text-xl !rounded-2xl !w-full !font-black !italic !tracking-tighter !text-black shadow-lg" />
                           </div>
-                        ) : participant ? (
+                        ) : participant || foundParticipant ? (
                           <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl">
                             <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">YOU'RE IN THE GAME!</p>
                             <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">Waiting for players or round start...</p>
@@ -378,14 +363,14 @@ export default function Home() {
                     </div>
 
                     {isParticipant && currentCard ? (
-                      <div className="relative space-y-10">
+                      <div className="relative space-y-6 flex flex-col items-center">
                         <BingoCard 
                           card={currentCard} 
                           drawnNumbers={roundData.round.drawnNumbers || []} 
-                          className="w-full max-w-[540px] mx-auto"
+                          className="w-full max-w-[440px] scale-90 md:scale-100"
                         />
                         
-                        <div className="flex justify-center">
+                        <div className="flex justify-center mt-[-1rem]">
                           <BingoClaimButton 
                             roundId={roundData.round.id} 
                             userId={user?.id || 0} 
