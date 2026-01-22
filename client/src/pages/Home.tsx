@@ -272,9 +272,9 @@ export default function Home() {
                             </div>
                           </div>
                         </div>
-                        <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto min-h-[280px] flex flex-col justify-center">
+                        <div className="p-8 bg-black/60 rounded-[2.5rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto min-h-[220px] flex flex-col justify-center">
                           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-                          <p className="text-white text-xl uppercase font-black tracking-[0.2em] mb-6 font-mono">
+                          <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-4 font-mono">
                             {roundData.round.status === 'STARTING' ? 'SECURING GAME PROTOCOL...' : 
                              roundData.participantsCount < 2 ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
                           </p>
@@ -284,12 +284,12 @@ export default function Home() {
                             participantCount={roundData.participantsCount}
                           />
                           {roundData.participantsCount < 2 && (
-                            <div className="space-y-3 mt-8">
-                              <p className="text-primary text-2xl uppercase font-black animate-pulse tracking-[0.2em] font-display">
+                            <div className="space-y-1 mt-6">
+                              <p className="text-primary text-lg uppercase font-black animate-pulse tracking-[0.15em] font-display">
                                 Waiting for Players...
                               </p>
-                              <p className="text-base text-white uppercase font-black tracking-[0.15em]">
-                                Minimum 2 participants required to launch the round
+                              <p className="text-[10px] text-white uppercase font-black tracking-[0.1em] opacity-80">
+                                Minimum 2 participants required to start
                               </p>
                             </div>
                           )}
@@ -297,21 +297,21 @@ export default function Home() {
                         <div className="w-full max-w-2xl mx-auto mb-2">
                           {!connected ? (
                             <div className="space-y-6">
-                              <p className="text-white text-lg uppercase font-black tracking-widest italic">Connect Wallet to Start</p>
+                              <p className="text-white text-sm uppercase font-black tracking-widest italic">Connect Wallet to Start</p>
                               <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-16 !px-10 !text-xl !rounded-2xl !w-full !font-black !italic !tracking-tighter !text-black shadow-lg" />
                             </div>
                           ) : participant || foundParticipant ? (
-                            <div className="p-10 bg-primary/10 border-2 border-primary/30 rounded-[2.5rem] shadow-[0_0_40px_rgba(34,197,94,0.15)] w-full">
-                              <p className="text-primary font-black text-5xl italic tracking-tighter mb-4 uppercase text-center">YOU'RE IN THE GAME!</p>
-                              <div className="space-y-3">
-                                <p className="text-xl text-primary font-black tracking-widest text-center whitespace-nowrap">CARD SECURED • ENTRY PAID</p>
-                                <p className="text-sm text-white uppercase font-black tracking-widest text-center opacity-100">CARD ACTIVATES AUTOMATICALLY ON START</p>
+                            <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-[2rem] shadow-[0_0_30px_rgba(34,197,94,0.1)] w-full">
+                              <p className="text-primary font-black text-2xl italic tracking-tighter mb-1 uppercase text-center">YOU'RE IN THE GAME!</p>
+                              <div className="space-y-1">
+                                <p className="text-sm text-primary font-black tracking-widest text-center whitespace-nowrap">CARD SECURED • ENTRY PAID</p>
+                                <p className="text-[9px] text-white uppercase font-black tracking-widest text-center opacity-80">CARD ACTIVATES AUTOMATICALLY ON START</p>
                               </div>
                             </div>
                           ) : (
-                            <div className="space-y-6">
-                              <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} className="w-full h-20 text-3xl font-black italic tracking-tighter" />
-                              <p className="text-lg text-white uppercase font-black tracking-[0.3em] text-center">JOIN BEFORE GAME STARTS</p>
+                            <div className="space-y-3">
+                              <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} className="w-full h-14 text-xl font-black italic tracking-tighter" />
+                              <p className="text-[10px] text-white uppercase font-black tracking-[0.2em] text-center opacity-80">JOIN BEFORE GAME STARTS</p>
                             </div>
                           )}
                         </div>
