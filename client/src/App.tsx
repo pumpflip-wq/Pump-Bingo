@@ -45,7 +45,7 @@ function App() {
       <SolanaProvider>
         <TooltipProvider>
           <div className="flex flex-col min-h-screen w-full bg-background text-foreground overflow-y-auto" ref={scrollRef as any}>
-            <header className="w-full flex flex-col md:flex-row items-center justify-between pb-4 pt-4 gap-6 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-8 max-w-[1450px] mx-auto">
+            <header className="sticky top-0 w-full flex flex-col md:flex-row items-center justify-between pb-4 pt-4 gap-6 z-[100] bg-background/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-8 max-w-[1450px] mx-auto">
               <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
                 <motion.div
                   whileHover={{ rotate: 15, scale: 1.1 }}
@@ -96,9 +96,11 @@ function App() {
                 </div>
               </div>
             </header>
-            <main className="flex-1 flex flex-col">
-              <div className="w-full max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-0">
-                <Router />
+            <main className="flex-1 flex flex-col min-h-0">
+              <div className="w-full max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-6 flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col justify-start">
+                  <Router />
+                </div>
               </div>
               <Footer />
             </main>
