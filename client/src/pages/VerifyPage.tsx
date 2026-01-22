@@ -16,20 +16,20 @@ export default function VerifyPage() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    const roundId = searchParams.get('roundId');
+    const rId = searchParams.get('roundId');
     
-    if (roundId && rounds && rounds.length > 0) {
-      const round = rounds.find(r => r.id === Number(roundId));
-      if (round) {
-        setManualHash(round.publicHash);
-        if (round.status === 'FINISHED' && round.serverSeed) {
-          setManualSeed(round.serverSeed);
+    if (rId && rounds && rounds.length > 0) {
+      const targetRound = rounds.find(r => r.id === Number(rId));
+      if (targetRound) {
+        setManualHash(targetRound.publicHash);
+        if (targetRound.status === 'FINISHED' && targetRound.serverSeed) {
+          setManualSeed(targetRound.serverSeed);
         } else {
           setManualSeed("");
         }
       }
     }
-  }, [rounds, window.location.search]);
+  }, [rounds, location, window.location.search]);
 
   const verifySeed = (seed: string, expectedHash: string) => {
     try {
@@ -43,7 +43,7 @@ export default function VerifyPage() {
   return (
     <div className="flex flex-col bg-background text-foreground min-h-screen">
       <div className="w-full flex-1 flex flex-col space-y-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <header className="flex flex-col md:flex-row items-center justify-between pb-4 pt-0 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 rounded-b-[2rem] mb-6 px-6">
+        <header className="flex flex-col md:flex-row items-center justify-between pb-4 pt-0 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 rounded-b-[2rem] mb-6 px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
             <motion.div
               whileHover={{ rotate: 15, scale: 1.1 }}
