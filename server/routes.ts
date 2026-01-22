@@ -5,8 +5,9 @@ import { storage } from "./storage";
 import { db } from "./db";
 import { api } from "@shared/routes";
 import { gameManager } from "./game";
-import { ROUND_STATUS, users, participants } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { solanaManager } from "./solana";
+import { ROUND_STATUS, users, participants, transactions } from "@shared/schema";
+import { eq, desc, sum } from "drizzle-orm";
 import { PROTOCOL_CONFIG } from "../shared/config";
 
 export async function registerRoutes(
@@ -22,6 +23,29 @@ export async function registerRoutes(
 
   // Start the Game Loop
   gameManager.start();
+
+  // === ADMIN STATS ===
+  app.get("/api/admin/stats", async (req, res) => {
+    // Basic admin check (could be improved with proper auth)
+    const totalPrizePool = await db.select({ value: sum(transactions.amount) })
+      .from(transactions)
+      .where(eq(transactions.type, "PRIZE"));
+    
+    const totalBuyIns = await db.select({ value: sum(transactions.amount) })
+      .from(transactions)
+      .where(eq(transactions.type, "BUY_IN"));
+
+    const userCount = await db.select({ count: sum(sql`1`) }).from(users);
+    const walletBalance = await solanaManager.getMasterBalance();
+
+    res.json({
+      totalDistributed: Math.abs(Number(totalPrizePool[0]?.value || 0)),
+      totalRevenue: Math.abs(Number(totalBuyIns[0]?.value || 0)),
+      userCount: Number(userCount[0]?.count || 0),
+      masterWalletBalance: walletBalance,
+      isTestMode: !process.env.SOLANA_MASTER_WALLET_KEY
+    });
+  });
 
   // === AUTH ===
   app.post(api.auth.login.path, async (req, res) => {
@@ -166,10 +190,13 @@ export async function registerRoutes(
       
       if (hasBingo) {
           // WINNER!
+          const txSignature = await solanaManager.sendReward(participant.username, payout);
+
           await storage.updateRound(roundId, { 
               status: ROUND_STATUS.IN_GAME, // Keep in game for the 10s delay
               winnerId: userId,
-              completedAt: new Date() // Use this as "winnerDeclaredAt" effectively
+              completedAt: new Date(), // Use this as "winnerDeclaredAt" effectively
+              txHash: txSignature || undefined
           });
           
           // Payout based on feePercentage

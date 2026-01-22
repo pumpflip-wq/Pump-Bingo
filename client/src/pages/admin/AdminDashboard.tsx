@@ -2,17 +2,25 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Round, type Participant, type User, ROUND_STATUS } from "@shared/schema";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Loader2, ShieldCheck, Settings, Users, Play, Search, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import { Loader2, ShieldCheck, Settings, Users, Play, Search, CheckCircle2, XCircle, AlertTriangle, Wallet, TrendingUp, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import crypto from "crypto";
 
 const ADMIN_WALLET = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns";
+
+interface AdminStats {
+  totalDistributed: number;
+  totalRevenue: number;
+  userCount: number;
+  masterWalletBalance: number;
+  isTestMode: boolean;
+}
 
 export default function AdminDashboard() {
   const queryClient = useQueryClient();
@@ -25,6 +33,11 @@ export default function AdminDashboard() {
   const { data: rounds, isLoading: roundsLoading } = useQuery<Round[]>({ 
     queryKey: ["/api/rounds"],
     refetchInterval: 2000
+  });
+
+  const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
+    queryKey: ["/api/admin/stats"],
+    refetchInterval: 5000
   });
 
   if (!user || user.username !== ADMIN_WALLET) {
@@ -51,7 +64,7 @@ export default function AdminDashboard() {
 
   const forceStartMutation = useMutation({
     mutationFn: async (roundId: number) => {
-      await apiRequest("POST", `/api/rounds/${roundId}/force-start`, {});
+      await apiRequest("POST", `/api/rounds/${roundId}/force-start`, { adminWallet: ADMIN_WALLET });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
@@ -69,7 +82,7 @@ export default function AdminDashboard() {
     }
   });
   
-  if (roundsLoading) {
+  if (roundsLoading || statsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -87,28 +100,72 @@ export default function AdminDashboard() {
         </h1>
         <div className="flex gap-4">
           <div className="bg-card p-4 rounded-xl border border-white/10 flex items-center gap-3">
-            <Settings className="text-primary w-5 h-5" />
+            <Activity className="text-primary w-5 h-5" />
             <div>
               <p className="text-[10px] uppercase font-black text-white/40">Active Rounds</p>
               <p className="text-xl font-black text-white italic">{activeRoundsCount}</p>
             </div>
           </div>
+          <div className="bg-card p-4 rounded-xl border border-white/10 flex items-center gap-3">
+            <Users className="text-primary w-5 h-5" />
+            <div>
+              <p className="text-[10px] uppercase font-black text-white/40">Total Users</p>
+              <p className="text-xl font-black text-white italic">{stats?.userCount}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-card/80 border-white/10">
-          <CardHeader>
-            <CardTitle className="text-sm font-black uppercase text-white/60">System Status</CardTitle>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-card/80 border-white/10 overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-2">
+            <div className={cn(
+              "px-2 py-0.5 rounded text-[8px] font-black uppercase",
+              stats?.isTestMode ? "bg-yellow-500/20 text-yellow-500" : "bg-primary/20 text-primary"
+            )}>
+              {stats?.isTestMode ? "Test Mode" : "Live Mode"}
+            </div>
+          </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase text-white/40 flex items-center gap-2">
+              <Wallet className="w-3 h-3" /> Master Wallet
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2 text-primary">
-              <ShieldCheck className="w-5 h-5" />
-              <span className="font-black italic uppercase">Firewall Active</span>
-            </div>
+            <p className="text-3xl font-black text-white italic">
+              {formatCurrency(stats?.masterWalletBalance || 0, false)} <span className="text-sm">PUMP</span>
+            </p>
           </CardContent>
         </Card>
 
+        <Card className="bg-card/80 border-white/10">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase text-white/40 flex items-center gap-2">
+              <TrendingUp className="w-3 h-3 text-primary" /> Total Distributed
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-black text-primary italic">
+              {formatCurrency(stats?.totalDistributed || 0, false)} <span className="text-sm text-white/60">PUMP</span>
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/80 border-white/10">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase text-white/40 flex items-center gap-2">
+              <ShieldCheck className="w-3 h-3 text-primary" /> System Revenue
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-black text-white italic">
+              {formatCurrency(stats?.totalRevenue || 0, false)} <span className="text-sm text-white/60">PUMP</span>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-card/80 border-white/10">
           <CardHeader>
             <CardTitle className="text-sm font-black uppercase text-white/60">Fairness Verifier</CardTitle>
@@ -147,6 +204,28 @@ export default function AdminDashboard() {
             )}
           </CardContent>
         </Card>
+
+        <Card className="bg-card/80 border-white/10">
+          <CardHeader>
+            <CardTitle className="text-sm font-black uppercase text-white/60">Admin Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col gap-2">
+              <Button 
+                variant="destructive" 
+                className="font-black italic uppercase"
+                onClick={() => {
+                  if (confirm("Are you sure? This will reset the entire system!")) {
+                    apiRequest("POST", "/api/admin/reset", {});
+                  }
+                }}
+              >
+                <AlertTriangle className="w-4 h-4 mr-2" /> EMERGENCY RESET
+              </Button>
+              <p className="text-[10px] text-white/40 uppercase font-black text-center italic">Use only in case of critical failure</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card className="bg-card/80 border-white/10">
@@ -173,7 +252,7 @@ export default function AdminDashboard() {
                       {round.status}
                     </span>
                   </TableCell>
-                  <TableCell className="font-black text-white italic">{round.prizePool} PUMP</TableCell>
+                  <TableCell className="font-black text-white italic">{formatCurrency(round.prizePool || 0, false)} PUMP</TableCell>
                   <TableCell>
                     {round.status === ROUND_STATUS.OPEN && (
                       <Button 
