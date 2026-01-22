@@ -1,7 +1,7 @@
 export const PROTOCOL_CONFIG = {
   // Replace with your actual Token Mint Address (CA)
   MINT_ADDRESS: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-  SYMBOL: "PBINGO",
+  SYMBOL: "$PBINGO",
   DECIMALS: 6,
 
   // Game Settings
