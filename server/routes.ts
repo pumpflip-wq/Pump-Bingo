@@ -97,7 +97,10 @@ export async function registerRoutes(
       const roundId = Number(req.params.id);
       if (isNaN(roundId)) return res.status(400).json({ message: "Invalid round ID" });
 
-      const { userId, txSignature } = req.body; // Expanded validation needed in real app
+      const { userId, txSignature } = req.body;
+      if (!userId || isNaN(Number(userId))) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
 
       const round = await storage.getRound(roundId);
       if (!round) return res.status(404).json({ message: "Round not found" });
@@ -141,12 +144,13 @@ export async function registerRoutes(
       res.json({ participant, balance: updatedUser?.balance || 0 });
 
     } catch (err) {
-       console.error(err);
-       res.status(500).json({ message: "Internal Server Error" });
+       console.error("Error joining round:", err);
+       res.status(500).json({ message: "Failed to join round. Please try again." });
     }
   });
 
   app.post(api.rounds.claim.path, async (req, res) => {
+    try {
       const roundId = Number(req.params.id);
       if (isNaN(roundId)) return res.status(400).json({ message: "Invalid round ID" });
 
@@ -168,8 +172,10 @@ export async function registerRoutes(
           });
           
           // Payout based on feePercentage
-          const payoutMultiplier = (100 - PROTOCOL_CONFIG.FEE_PERCENTAGE) / 100;
+          const fee = Math.max(0, Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 10));
+          const payoutMultiplier = (100 - fee) / 100;
           const payout = Math.floor(round.prizePool * payoutMultiplier);
+          
           await storage.updateUserBalance(userId, payout);
           await storage.createTransaction({
               userId,
@@ -182,6 +188,10 @@ export async function registerRoutes(
       } else {
           return res.json({ valid: false, message: "Not a valid Bingo yet!" });
       }
+    } catch (err) {
+      console.error("Error claiming bingo:", err);
+      res.status(500).json({ message: "Failed to claim bingo" });
+    }
   });
 
   app.get(api.participants.get.path, async (req, res) => {
@@ -195,29 +205,35 @@ export async function registerRoutes(
   });
 
   app.post(api.rounds.get.path + "/force-start", async (req, res) => {
-    // Basic admin restriction on the backend as well
-    const ADMIN_WALLET = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns";
-    
-    // In a real app we'd check the session/token, for MVP we can check a header or keep it simple
-    // Since we don't have a robust middleware here yet, we'll let the frontend handle the main gate
-    // but we should still implement a basic check if possible.
-    
-    const roundId = Number(req.params.id);
-    if (isNaN(roundId)) return res.status(400).json({ message: "Invalid round ID" });
+    try {
+      // Basic admin restriction on the backend as well
+      const ADMIN_WALLET = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns";
+      const { adminWallet } = req.body;
 
-    const round = await storage.getRound(roundId);
-    if (!round) return res.status(404).json({ message: "Round not found" });
+      if (adminWallet !== ADMIN_WALLET) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+      
+      const roundId = Number(req.params.id);
+      if (isNaN(roundId)) return res.status(400).json({ message: "Invalid round ID" });
 
-    if (round.status !== ROUND_STATUS.OPEN) {
-      return res.status(400).json({ message: "Round is not in OPEN state" });
+      const round = await storage.getRound(roundId);
+      if (!round) return res.status(404).json({ message: "Round not found" });
+
+      if (round.status !== ROUND_STATUS.OPEN) {
+        return res.status(400).json({ message: "Round is not in OPEN state" });
+      }
+
+      await storage.updateRound(roundId, { 
+        status: ROUND_STATUS.STARTING,
+        startTime: new Date()
+      });
+
+      res.json({ message: "Round force started" });
+    } catch (err) {
+      console.error("Error force starting round:", err);
+      res.status(500).json({ message: "Failed to force start round" });
     }
-
-    await storage.updateRound(roundId, { 
-      status: ROUND_STATUS.STARTING,
-      startTime: new Date()
-    });
-
-    res.json({ message: "Round force started" });
   });
 
   app.get(api.auth.me.path + "/transactions", async (req, res) => {
