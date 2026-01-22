@@ -11,7 +11,7 @@ import { useSound } from '@/contexts/SoundContext';
 // Default styles that can be overridden by your app
 import '@solana/wallet-adapter-react-ui/styles.css';
 
-const AudioInitializer = ({ children }: { children: React.ReactNode }) => {
+export const AudioInitializer = ({ children }: { children: React.ReactNode }) => {
     const { playSound } = useSound();
     const { connected } = useWallet();
 
@@ -42,9 +42,7 @@ export const SolanaProvider = ({ children }: { children: React.ReactNode }) => {
         <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={wallets} autoConnect>
                 <WalletModalProvider>
-                    <AudioInitializer>
-                        {children}
-                    </AudioInitializer>
+                    {children}
                 </WalletModalProvider>
             </WalletProvider>
         </ConnectionProvider>
