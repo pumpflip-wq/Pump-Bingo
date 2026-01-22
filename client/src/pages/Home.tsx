@@ -284,11 +284,11 @@ export default function Home() {
                             participantCount={roundData.participantsCount}
                           />
                           {roundData.participantsCount < 2 && (
-                            <div className="space-y-1 mt-6">
+                            <div className="space-y-2 mt-6">
                               <p className="text-primary text-lg uppercase font-black animate-pulse tracking-[0.15em] font-display">
                                 Waiting for Players...
                               </p>
-                              <p className="text-[10px] text-white uppercase font-black tracking-[0.1em] opacity-80">
+                              <p className="text-[13px] text-white uppercase font-black tracking-[0.1em] opacity-90">
                                 Minimum 2 participants required to start
                               </p>
                             </div>
@@ -304,14 +304,16 @@ export default function Home() {
                             <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-[2rem] shadow-[0_0_30px_rgba(34,197,94,0.1)] w-full">
                               <p className="text-primary font-black text-2xl italic tracking-tighter mb-1 uppercase text-center">YOU'RE IN THE GAME!</p>
                               <div className="space-y-1">
-                                <p className="text-sm text-primary font-black tracking-widest text-center whitespace-nowrap">CARD SECURED • ENTRY PAID</p>
-                                <p className="text-[9px] text-white uppercase font-black tracking-widest text-center opacity-80">CARD ACTIVATES AUTOMATICALLY ON START</p>
+                              <p className="text-base text-primary font-black tracking-widest text-center whitespace-nowrap">CARD SECURED • ENTRY PAID</p>
+                              <div className="space-y-1">
+                                <p className="text-[13px] text-white uppercase font-black tracking-widest text-center opacity-90">CARD ACTIVATES AUTOMATICALLY ON START</p>
+                              </div>
                               </div>
                             </div>
                           ) : (
-                            <div className="space-y-3">
+                            <div className="space-y-5">
                               <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} className="w-full h-14 text-xl font-black italic tracking-tighter" />
-                              <p className="text-[10px] text-white uppercase font-black tracking-[0.2em] text-center opacity-80">JOIN BEFORE GAME STARTS</p>
+                              <p className="text-[13px] text-white uppercase font-black tracking-[0.2em] text-center opacity-90">JOIN BEFORE GAME STARTS</p>
                             </div>
                           )}
                         </div>
