@@ -39,8 +39,15 @@ export class GameManager {
       // Find the LATEST round
       const [latestRound] = await db.select().from(rounds).orderBy(sql`${rounds.id} DESC`).limit(1);
       
-      // If no round exists OR the latest is FINISHED, create a new one
+      // If no round exists OR the latest is FINISHED
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
+        // Wait at least 10 seconds after round finished before starting a new one
+        if (latestRound && latestRound.completedAt) {
+          const finishedAt = new Date(latestRound.completedAt).getTime();
+          if (Date.now() - finishedAt < 10000) {
+            return;
+          }
+        }
         await this.createNewRound();
         return;
       }
@@ -65,6 +72,9 @@ export class GameManager {
   }
 
   private async createNewRound() {
+    const [latestRound] = await db.select().from(rounds).orderBy(sql`${rounds.id} DESC`).limit(1);
+    const nextId = latestRound ? latestRound.id + 1 : 1;
+
     const seed = crypto.randomBytes(32).toString('hex');
     const hash = crypto.createHash('sha256').update(seed).digest('hex');
     
@@ -72,9 +82,10 @@ export class GameManager {
     const now = Date.now();
     const startTime = new Date(now + 60 * 1000); 
 
-    console.log(`Creating new round with seed: ${seed} and hash: ${hash}`);
+    console.log(`Creating new round #${nextId} with seed: ${seed} and hash: ${hash}`);
 
-    await storage.createRound({
+    await db.insert(rounds).values({
+      id: nextId,
       status: ROUND_STATUS.OPEN,
       serverSeed: seed,
       publicHash: hash,
@@ -83,7 +94,7 @@ export class GameManager {
       prizePool: 0,
       drawnNumbers: []
     });
-    console.log("Created new round");
+    console.log(`Created new round #${nextId}`);
   }
 
   private async processRound(round: Round) {

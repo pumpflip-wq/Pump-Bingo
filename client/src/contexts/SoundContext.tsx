@@ -21,7 +21,10 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   const toggleMute = () => setIsMuted(!isMuted);
 
   const playSound = (soundPath: string, volume = 0.5) => {
-    if (isMuted) return;
+    if (isMuted) {
+      console.log("Sound muted, skipping:", soundPath);
+      return;
+    }
     const audio = new Audio(soundPath);
     audio.volume = volume;
     audio.play().catch(err => console.error("Sound play blocked or error:", err));
