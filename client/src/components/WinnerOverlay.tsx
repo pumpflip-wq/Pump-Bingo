@@ -51,13 +51,16 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
   }, [show, isWinner, hasPlayedSound, playSound]);
 
   useEffect(() => {
-    if (!show) return;
+    if (!show) {
+      if (timeLeft !== 10) setLeft(10);
+      return;
+    }
 
     const interval = setInterval(() => {
       setLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          onClose();
+          handleClose();
           return 0;
         }
         return prev - 1;
@@ -65,9 +68,12 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [show, onClose]);
+  }, [show, timeLeft]);
 
-  const explorerUrl = txHash ? `https://explorer.solana.com/tx/${txHash}?cluster=${PROTOCOL_CONFIG.NETWORK}` : null;
+  const handleClose = () => {
+    onClose();
+    setLeft(10);
+  };
 
   return (
     <AnimatePresence>
@@ -136,7 +142,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
             </div>
 
             <div className="pt-2">
-              <CyberButton onClick={onClose} variant={isWinner ? "primary" : "outline"} className="w-full h-16 text-xl font-black italic tracking-tighter shadow-2xl">
+              <CyberButton onClick={handleClose} variant={isWinner ? "primary" : "outline"} className="w-full h-16 text-xl font-black italic tracking-tighter shadow-2xl">
                 RETURN TO LOBBY ({timeLeft}s)
               </CyberButton>
             </div>

@@ -125,7 +125,7 @@ export default function Home() {
     const currentRoundId = roundData?.round.id;
     
     if ((isFinished || (roundData?.round.status === 'IN_GAME' && hasWinner)) && hasWinner) {
-      if (isParticipant && (!overlayData || overlayData.roundId !== currentRoundId)) {
+      if (isParticipant && (!overlayData || (overlayData.roundId !== currentRoundId && overlayData.show === true))) {
         const isMe = roundData.round.winnerId === user?.id;
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
         // Correctly use the wallet address (username) instead of numeric ID if available
@@ -140,7 +140,7 @@ export default function Home() {
           roundId: currentRoundId
         });
       }
-    } else if (roundData?.round.status !== 'FINISHED' && !hasWinner) {
+    } else {
       if (overlayData) setOverlayData(null);
     }
   }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.id, isParticipant, user?.id, walletAddress, overlayData, roundData?.participants]);
