@@ -34,16 +34,15 @@ export default function GameHistory() {
 
   return (
     <div className="flex flex-col bg-background text-foreground">
-      <div className="w-full flex-1 flex flex-col space-y-4 max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div className="flex-1 space-y-8 py-8">
-          <div className="text-center space-y-2">
-            <h1 className="text-4xl md:text-6xl font-black font-display italic tracking-tighter uppercase flex items-center justify-center gap-4">
+      <div className="w-full flex-1 flex flex-col space-y-4 max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="space-y-8 py-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter text-white uppercase leading-none flex items-center justify-center gap-4">
               <History className="w-10 h-10 text-primary" />
-              Game <span className="text-primary">History</span>
+              GAME <span className="text-primary">HISTORY</span>
             </h1>
-            <p className="text-white/40 font-mono text-sm tracking-widest uppercase">
-              Full record of all completed bingo rounds
+            <p className="text-white uppercase font-black tracking-widest text-sm max-w-2xl mx-auto drop-shadow-sm">
+              Full record of all completed bingo rounds. Transparent and verifiable.
             </p>
           </div>
 
