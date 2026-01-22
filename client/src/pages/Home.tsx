@@ -168,6 +168,7 @@ export default function Home() {
       const winnerDeclaredAt = roundData.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
       if (winnerDeclaredAt) {
         const elapsed = currentTime - winnerDeclaredAt;
+        // Total fixed display time 10s
         if (elapsed >= 10000 && !hasManuallyClosed) {
           setHasManuallyClosed(true);
         }
