@@ -12,7 +12,8 @@ import { Link } from "wouter";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { type Round, type User, type Participant, ROUND_STATUS, type Transaction } from "@shared/schema";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,9 @@ export default function Home() {
     mutationFn: (address: string) => apiRequest("POST", "/api/auth/login", { username: address }).then(res => res.json()),
     onSuccess: (data) => {
       queryClient.setQueryData(["/api/auth/me"], data);
+      const joinSound = new Audio("https://cdn.pixabay.com/audio/2022/03/10/audio_c3527058c0.mp3");
+      joinSound.volume = 0.4;
+      joinSound.play().catch(() => {});
     }
   });
 
@@ -242,42 +246,33 @@ export default function Home() {
                               isMe ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5"
                             )}
                           >
-                            <div className="flex items-center gap-3">
-                              {roundData.round.status === 'IN_GAME' && (
-                                <div className={cn(
-                                  "w-10 h-10 rounded-lg flex items-center justify-center text-sm font-black border transition-colors",
-                                  isMe 
-                                    ? "bg-primary text-black border-primary" 
-                                    : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-black"
-                                )}>
-                                  {Math.round(p.prob)}%
-                                </div>
-                              )}
-                              <div className="flex flex-col">
-                                <span className="text-xl font-black text-white italic tracking-tight flex items-center gap-1">
+                            <div className="flex flex-col flex-1">
+                              <div className="flex items-center justify-between w-full">
+                                <span className="text-sm font-black text-white italic tracking-tight flex items-center gap-1">
                                   @{formatAddress(p.username)}
-                                  {isMe && <span className="text-sm text-primary font-black ml-1">(YOU)</span>}
+                                  {isMe && <span className="text-[10px] text-primary font-black ml-1">(YOU)</span>}
                                 </span>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm text-primary font-black font-mono">100 {PROTOCOL_CONFIG.SYMBOL}</span>
-                                </div>
+                                {roundData.round.status === 'IN_GAME' && (
+                                  <span className="text-xs font-black text-primary">{Math.round(p.prob)}%</span>
+                                )}
+                              </div>
+                              <div className="flex flex-col gap-1 mt-1">
+                                <span className="text-[10px] text-primary font-black font-mono">+{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} {PROTOCOL_CONFIG.SYMBOL}</span>
+                                {roundData.round.status === 'IN_GAME' && (
+                                  <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div 
+                                      initial={{ width: 0 }}
+                                      animate={{ width: `${p.prob}%` }}
+                                      className="h-full bg-primary"
+                                    />
+                                  </div>
+                                )}
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              {roundData.round.status === 'IN_GAME' && (
-                                <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                  <motion.div 
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${p.prob}%` }}
-                                    className="h-full bg-primary"
-                                  />
-                                </div>
-                              )}
-                              <ShieldCheck className={cn(
-                                "w-5 h-5 transition-colors",
-                                isMe ? "text-primary" : "text-primary/40 group-hover:text-primary"
-                              )} />
-                            </div>
+                            <ShieldCheck className={cn(
+                              "w-4 h-4 transition-colors shrink-0 ml-2",
+                              isMe ? "text-primary" : "text-primary/40 group-hover:text-primary"
+                            )} />
                           </motion.div>
                         );
                       })}
@@ -295,10 +290,10 @@ export default function Home() {
                   <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden relative">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.05 }}
-                    transition={{ duration: 0.5 }}
+                    initial={{ opacity: 0, rotateY: -90 }}
+                    animate={{ opacity: 1, rotateY: 0 }}
+                    exit={{ opacity: 0, rotateY: 90 }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
                     className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-between min-h-0 h-full relative overflow-hidden shrink-0"
                   >
                     <div className="flex-1 flex flex-col items-center justify-between py-4 w-full h-full">

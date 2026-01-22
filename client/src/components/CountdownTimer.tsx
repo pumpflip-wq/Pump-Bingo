@@ -34,10 +34,10 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
   }, [targetDate, participantCount]);
 
   useEffect(() => {
-    if (timeLeft.minutes === 0 && timeLeft.seconds <= 5 && timeLeft.seconds > 0 && participantCount >= 2) {
-      const tickSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73456.mp3");
-      tickSound.volume = 0.2;
-      tickSound.play().catch(() => {});
+    if (timeLeft.minutes === 0 && timeLeft.seconds <= 3 && timeLeft.seconds > 0 && participantCount >= 2) {
+      const tensionSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73456.mp3");
+      tensionSound.volume = 0.5;
+      tensionSound.play().catch(() => {});
     }
     if (timeLeft.minutes === 0 && timeLeft.seconds === 1 && participantCount >= 2) {
       const transitionSound = new Audio("https://cdn.pixabay.com/audio/2022/03/10/audio_c3527058c0.mp3");

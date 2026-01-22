@@ -102,6 +102,13 @@ export class GameManager {
         }
 
         const startTime = new Date(round.startTime);
+        // Correctly handle the case where we want to ensure exactly 60 seconds
+        const diff = startTime.getTime() - now.getTime();
+        if (diff > 60000) {
+           await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
+           return;
+        }
+
         if (now >= startTime) {
           await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
           console.log(`Round ${round.id} starting...`);
