@@ -6,7 +6,7 @@ export const PROTOCOL_CONFIG = {
 
   // Game Settings
   DEFAULT_ENTRY_PRICE: 100000,
-  FEE_PERCENTAGE: 10,
+  FEE_PERCENTAGE: 0, // No fees initially to maximize engagement
 
   // Links
   PUMP_FUN_URL: "https://pump.fun/",
