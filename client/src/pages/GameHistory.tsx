@@ -63,12 +63,12 @@ export default function GameHistory() {
                     <Table>
                       <TableHeader className="bg-white/5">
                         <TableRow>
-                          <TableHead className="font-black uppercase tracking-widest text-white/60 text-sm">Round</TableHead>
-                          <TableHead className="font-black uppercase tracking-widest text-white/60 text-sm">Winner</TableHead>
-                          <TableHead className="font-black uppercase tracking-widest text-white/60 text-sm">Prize Pool</TableHead>
-                          <TableHead className="font-black uppercase tracking-widest text-white/60 text-sm">Verification Info</TableHead>
-                          <TableHead className="font-black uppercase tracking-widest text-white/60 text-sm">Date</TableHead>
-                          <TableHead className="text-right font-black uppercase tracking-widest text-white/60 text-sm">Verify</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white text-sm">Round</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white text-sm">Winner</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white text-sm">Prize Pool</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white text-sm">Verification Info</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white text-sm">Date</TableHead>
+                          <TableHead className="text-right font-black uppercase tracking-widest text-white text-sm">Verify</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -89,7 +89,7 @@ export default function GameHistory() {
                             <TableCell>
                               <div className="flex flex-col gap-1 min-w-[240px]">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs text-white/40 uppercase font-bold">Hash:</span>
+                                  <span className="text-xs text-white uppercase font-bold">Hash:</span>
                                   <span className="text-xs font-mono text-white truncate max-w-[150px]">{round.publicHash}</span>
                                   <Copy className="w-4 h-4 text-white/20 cursor-pointer hover:text-primary transition-colors" onClick={() => {
                                     navigator.clipboard.writeText(round.publicHash);
@@ -98,7 +98,7 @@ export default function GameHistory() {
                                 </div>
                                 {round.serverSeed && (
                                   <div className="flex items-center gap-2">
-                                    <span className="text-xs text-primary/40 uppercase font-bold">Seed:</span>
+                                    <span className="text-xs text-primary uppercase font-bold">Seed:</span>
                                     <span className="text-xs font-mono text-primary truncate max-w-[150px]">{round.serverSeed}</span>
                                     <Copy className="w-4 h-4 text-primary/20 cursor-pointer hover:text-primary transition-colors" onClick={() => {
                                       navigator.clipboard.writeText(round.serverSeed);
