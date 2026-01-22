@@ -56,21 +56,30 @@ export default function Home() {
   
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
   
-  const [showWinner, setShowWinner] = useState(false);
-  const [hasShownWinner, setHasShownWinner] = useState(false);
+  const [overlayData, setOverlayData] = useState<{
+    show: boolean;
+    username: string;
+    prize: number;
+    isWinner: boolean;
+    txHash?: string;
+  } | null>(null);
   
   useEffect(() => {
     if (roundData?.round.status === 'FINISHED' && roundData?.round.winnerId) {
-      // Only show overlay for active participants who played in this round
-      if (isParticipant && !hasShownWinner) {
-        setShowWinner(true);
-        setHasShownWinner(true);
+      if (isParticipant && !overlayData) {
+        const isMe = roundData.round.winnerId === user?.id;
+        setOverlayData({
+          show: true,
+          username: roundData.round.winnerUsername || 'Unknown',
+          prize: roundData.round.prizePool || 0,
+          isWinner: isMe,
+          txHash: roundData.round.txHash
+        });
       }
     } else if (roundData?.round.status !== 'FINISHED') {
-      setShowWinner(false);
-      setHasShownWinner(false);
+      setOverlayData(null);
     }
-  }, [roundData?.round.status, roundData?.round.winnerId, isParticipant, hasShownWinner]);
+  }, [roundData?.round.status, roundData?.round.winnerId, isParticipant, user?.id, overlayData]);
 
   const copyCA = () => {
     navigator.clipboard.writeText(PROTOCOL_CONFIG.MINT_ADDRESS);
@@ -500,14 +509,16 @@ export default function Home() {
         </div>
       </div>
 
-      <WinnerOverlay 
-        show={showWinner} 
-        username={roundData?.round.winnerId ? (roundData.participants.find(p => p.id === roundData.round.winnerId)?.username || "WinnerPlayer") : "WinnerPlayer"} 
-        prize={roundData?.round.prizePool || 0}
-        isWinner={roundData?.round.winnerId === user?.id}
-        txHash={roundData?.round.winnerId === user?.id ? "BINGOV1PROOF" : undefined}
-        onClose={() => setShowWinner(false)}
-      />
+      {overlayData && (
+        <WinnerOverlay 
+          show={overlayData.show} 
+          username={overlayData.username} 
+          prize={overlayData.prize}
+          isWinner={overlayData.isWinner}
+          txHash={overlayData.txHash}
+          onClose={() => setOverlayData(null)}
+        />
+      )}
     </>
   );
 }
