@@ -24,7 +24,7 @@ export function ProbabilityFeed({ participants, formatAddress, roundStatus, winn
             <div className="flex items-center gap-3">
               <span className="text-primary font-black italic w-6">#{idx + 1}</span>
               <span className="text-sm font-bold text-white/80 italic flex items-center gap-2">
-                @{formatAddress(p.username)}
+                {formatAddress(p.username)}
                 {roundStatus === 'FINISHED' && p.userId === winnerId && (
                   <Trophy className="w-3 h-3 text-primary animate-bounce" />
                 )}

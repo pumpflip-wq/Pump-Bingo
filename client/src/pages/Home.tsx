@@ -273,7 +273,7 @@ export default function Home() {
                           </div>
                         </div>
                       </div>
-                          {isParticipant && currentCard && roundData.round.status !== 'FINISHED' ? (
+                          {isParticipant && currentCard && roundData.round.status !== 'FINISHED' && !roundData.round.winnerId ? (
                             <div className="relative space-y-4 flex flex-col items-center flex-1 min-h-0 justify-center w-full">
                                 <BingoCard 
                                 card={currentCard} 
@@ -297,10 +297,10 @@ export default function Home() {
                               <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
                               <div className="text-center space-y-4 relative z-10">
                                 <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
-                                  <Globe className="w-3 h-3 animate-spin-slow" /> {roundData.round.status === 'FINISHED' ? 'ROUND COMPLETED' : 'Live Feed Active'}
+                                  <Globe className="w-3 h-3 animate-spin-slow" /> {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? 'ROUND COMPLETED' : 'Live Feed Active'}
                                 </div>
                                 <h2 className="text-4xl md:text-6xl font-black font-display italic text-white tracking-tighter uppercase">
-                                  {roundData.round.status === 'FINISHED' ? 'WAITING FOR' : 'WATCHING'} <span className="text-primary">{roundData.round.status === 'FINISHED' ? 'NEXT ROUND' : 'LIVE'}</span>
+                                  {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? 'WAITING FOR' : 'WATCHING'} <span className="text-primary">{roundData.round.winnerId || roundData.round.status === 'FINISHED' ? 'NEXT ROUND' : 'LIVE'}</span>
                                 </h2>
                               </div>
                               <div className="w-full max-w-md mx-auto mb-2">
@@ -362,7 +362,7 @@ function HistoryItem({ id, winner, prize, formatAddress, completedAt }: { id: nu
         <span className="text-primary font-black font-display italic text-lg">+{prize.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}</span>
       </div>
       <div className="flex justify-between items-center">
-        <span className="text-sm font-black text-white italic">@{formatAddress(winner)}</span>
+        <span className="text-sm font-black text-white italic">{formatAddress(winner)}</span>
         <div className="flex items-center gap-2">
           <ExternalLink className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
         </div>

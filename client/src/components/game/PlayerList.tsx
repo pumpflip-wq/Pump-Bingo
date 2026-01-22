@@ -36,7 +36,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                 <div className="flex flex-col flex-1">
                   <div className="flex items-center justify-between w-full">
                     <span className="text-sm font-black text-white italic tracking-tight flex items-center gap-1">
-                      @{formatAddress(p.username)}
+                      {formatAddress(p.username)}
                       {isMe && <span className="text-[10px] text-primary font-black ml-1">(YOU)</span>}
                     </span>
                     <span className="text-sm font-black text-primary min-w-[3ch] text-right">

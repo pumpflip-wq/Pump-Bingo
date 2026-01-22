@@ -4,7 +4,6 @@ import confetti from 'canvas-confetti';
 import { CyberButton } from './ui/CyberButton';
 import { Trophy, ExternalLink, Frown } from 'lucide-react';
 import { formatAddress } from "@/lib/utils";
-import { useSound } from "@/contexts/SoundContext";
 import { PROTOCOL_CONFIG } from "@shared/config";
 
 interface WinnerOverlayProps {
@@ -18,37 +17,28 @@ interface WinnerOverlayProps {
 
 export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose }: WinnerOverlayProps) {
   const [timeLeft, setLeft] = useState(10);
-  const { playSound } = useSound();
-  const [hasPlayedSound, setHasPlayedSound] = useState(false);
-
   const [isClosing, setIsClosing] = useState(false);
 
-  // Reset timer and sound state in a safe way
+  // Reset timer in a safe way
   useEffect(() => {
     if (show) {
       setLeft(10);
-      setHasPlayedSound(false);
       setIsClosing(false);
     }
   }, [show]);
 
   useEffect(() => {
-    if (show && !hasPlayedSound) {
+    if (show) {
       if (isWinner) {
-        playSound("/sounds/start.mp3", 0.6);
-        setHasPlayedSound(true);
         confetti({
           particleCount: 200,
           spread: 80,
           origin: { y: 0.5 },
           colors: ['#39FF14', '#ffffff', '#9945FF']
         });
-      } else {
-        playSound("/sounds/transition.mp3", 0.5);
-        setHasPlayedSound(true);
       }
     }
-  }, [show, isWinner, hasPlayedSound]);
+  }, [show, isWinner]);
 
   useEffect(() => {
     if (!show || isClosing) return;
