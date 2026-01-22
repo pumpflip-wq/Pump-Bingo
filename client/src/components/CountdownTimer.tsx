@@ -35,6 +35,94 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 
+  if (status === ROUND_STATUS.STARTING) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-4">
+        <motion.div
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.5, 1, 0.5]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin"
+        />
+        <div className="text-2xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase">
+          Verifying
+        </div>
+      </div>
+    );
+  }
+
+  if (status === ROUND_STATUS.STARTING) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-4">
+        <motion.div
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.5, 1, 0.5]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin"
+        />
+        <div className="text-2xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase">
+          Verifying
+        </div>
+      </div>
+    );
+  }
+
+  if (status === ROUND_STATUS.STARTING) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-4">
+        <motion.div
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.5, 1, 0.5]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin"
+        />
+        <div className="text-2xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase">
+          Verifying
+        </div>
+      </div>
+    );
+  }
+
+  if (status === ROUND_STATUS.STARTING) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-4">
+        <motion.div
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.5, 1, 0.5]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin"
+        />
+        <div className="text-2xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase">
+          Verifying
+        </div>
+      </div>
+    );
+  }
+
   if (status === ROUND_STATUS.IN_GAME || status === ROUND_STATUS.FINISHED) {
     return (
       <div className="text-6xl md:text-8xl font-black font-mono text-primary tracking-tighter">

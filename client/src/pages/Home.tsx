@@ -123,43 +123,41 @@ export default function Home() {
 
     const winKey = hasWinner ? `${currentRoundId}_win` : null;
     
-    // Logic to ensure overlay state is clean
-    if (currentRoundId && currentRoundId !== lastOverlayRoundId) {
-      setLastOverlayRoundId(currentRoundId);
-      setHasManuallyClosed(false);
-      setLastWinKey(null);
-    }
-
+    // Check winKey but ensure it's not already closed manually for THIS win
     if (winKey && winKey !== lastWinKey) {
       setLastWinKey(winKey);
       setHasManuallyClosed(false);
     }
 
-    // Immediately stop if manually closed or timer expired
+    // Don't show if manually closed
     if (hasManuallyClosed) {
       return null;
     }
 
     if (hasWinner && winnerDeclaredAt) {
       const elapsed = currentTime - winnerDeclaredAt;
-      const totalDisplayTime = 10000;
+      const totalDisplayTime = 10000; // Total display time for the overlay
       const remaining = Math.max(0, Math.ceil((totalDisplayTime - elapsed) / 1000));
       
-      if (remaining > 0) {
-        const isMe = roundData.round.winnerId === user?.id;
-        // Search in participants for the winner
-        const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
-        const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
-        
-        return {
-          show: true,
-          username: winnerUsername,
-          prize: roundData.round.prizePool || 0,
-          isWinner: isMe,
-          txHash: (roundData.round as any).txHash,
-          timeLeft: remaining
-        };
+      // Stop showing if timer expired - ensure clean exit
+      if (remaining <= 0) {
+        // Do not update state in useMemo
+        return null;
       }
+
+      const isMe = roundData.round.winnerId === user?.id;
+      // Search in participants for the winner
+      const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
+      const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
+      
+      return {
+        show: true,
+        username: winnerUsername,
+        prize: roundData.round.prizePool || 0,
+        isWinner: isMe,
+        txHash: (roundData.round as any).txHash,
+        timeLeft: remaining
+      };
     }
 
     return null;
@@ -349,17 +347,47 @@ export default function Home() {
                                   ) : 'WATCHING LIVE'}
                                 </h2>
                                 {!roundData.round.winnerId && roundData.round.status !== 'FINISHED' && (
-                                  <p className="text-white/60 text-sm uppercase font-black tracking-[0.2em] font-mono">SPECTATOR MODE ACTIVE</p>
+                                  <div className="space-y-6 w-full max-w-xl mx-auto mt-8">
+                                    <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest mb-4">
+                                      <Globe className="w-3 h-3 animate-spin-slow" /> SPECTATOR MODE ACTIVE
+                                    </div>
+                                    <div className="space-y-4">
+                                      <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mb-4">Live Player Rankings</p>
+                                      <div className="grid gap-3">
+                                        {sortedParticipants.slice(0, 5).map((p, idx) => (
+                                          <div key={p.id || idx} className="bg-black/40 border border-white/5 rounded-xl p-3 flex items-center justify-between group hover:border-primary/30 transition-all duration-300">
+                                            <div className="flex items-center gap-3 overflow-hidden">
+                                              <div className="w-6 h-6 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-black text-primary shrink-0">
+                                                {idx + 1}
+                                              </div>
+                                              <span className="font-mono text-xs text-white/90 truncate max-w-[100px]">{formatAddress(p.username)}</span>
+                                            </div>
+                                            <div className="flex items-center gap-4 shrink-0">
+                                              <div className="w-32 h-1.5 bg-white/5 rounded-full overflow-hidden hidden sm:block">
+                                                <motion.div 
+                                                  initial={{ width: 0 }}
+                                                  animate={{ width: `${p.prob}%` }}
+                                                  className="h-full bg-primary shadow-[0_0_10px_rgba(34,197,94,0.5)]"
+                                                />
+                                              </div>
+                                              <span className="text-primary font-black text-xs min-w-[40px] text-right">{p.prob}%</span>
+                                            </div>
+                                          </div>
+                                        ))}
+                                        {sortedParticipants.length === 0 && (
+                                          <div className="py-8 text-center border border-dashed border-white/5 rounded-2xl">
+                                            <Users className="w-8 h-8 text-white/10 mx-auto mb-2" />
+                                            <p className="text-[10px] text-white/20 font-black uppercase tracking-widest">No Active Players</p>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
                                 )}
                               </div>
                               <div className="w-full max-w-md mx-auto mb-2">
-                                {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
+                                {(roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING') && (
                                   <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
-                                ) : (
-                                  <div className="p-8 bg-white/5 border border-white/10 rounded-3xl text-center">
-                                    <p className="text-white/40 font-black text-xl italic tracking-tighter uppercase">GAME IN PROGRESS</p>
-                                    <p className="text-[10px] text-white/20 uppercase font-black tracking-widest mt-2">Wait for the next round to join</p>
-                                  </div>
                                 )}
                               </div>
                             </div>
