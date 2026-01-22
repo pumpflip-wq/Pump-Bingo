@@ -168,8 +168,8 @@ export default function Home() {
       const winnerDeclaredAt = roundData.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
       if (winnerDeclaredAt) {
         const elapsed = currentTime - winnerDeclaredAt;
-        // Total fixed display time 10s
-        if (elapsed >= 10000 && !hasManuallyClosed) {
+        // Increase threshold to match server transition (11s)
+        if (elapsed >= 10500 && !hasManuallyClosed) {
           setHasManuallyClosed(true);
         }
       }
@@ -177,13 +177,13 @@ export default function Home() {
   }, [roundData?.round.status, roundData?.round.completedAt, currentTime, hasManuallyClosed]);
 
   const nextRoundTimer = useMemo(() => {
-    if (roundData?.round.status === 'FINISHED' && roundData.round.completedAt) {
+    if ((roundData?.round.status === 'FINISHED' || roundData?.round.winnerId) && roundData.round.completedAt) {
       const completedAt = new Date(roundData.round.completedAt).getTime();
       const elapsed = currentTime - completedAt;
       return Math.max(0, Math.ceil((10000 - elapsed) / 1000));
     }
     return 0;
-  }, [roundData?.round.status, roundData?.round.completedAt, currentTime]);
+  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.completedAt, currentTime]);
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
     ...p,
@@ -337,12 +337,25 @@ export default function Home() {
                                 <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
                                   <Globe className="w-3 h-3 animate-spin-slow" /> {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? 'ROUND COMPLETED' : 'Live Feed Active'}
                                 </div>
-                                <h2 className="text-4xl md:text-6xl font-black font-display italic text-white tracking-tighter uppercase">
+                                <h2 className="text-5xl md:text-7xl font-black font-display italic text-white tracking-tighter uppercase">
                                   {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? (
-                                    <div className="flex flex-col items-center">
-                                      <span>WAITING FOR NEXT ROUND</span>
+                                    <div className="flex flex-col items-center gap-6">
+                                      <span className="text-primary animate-pulse">BINGO! ROUND WON</span>
+                                      <div className="bg-primary/10 border border-primary/30 rounded-[2rem] p-8 w-full max-w-2xl">
+                                        <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.4em] mb-4">Winner Summary</p>
+                                        <div className="flex flex-col gap-4">
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-xs text-white/60 uppercase font-black">Winner:</span>
+                                            <span className="text-2xl font-black text-white italic">{formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}</span>
+                                          </div>
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-xs text-white/60 uppercase font-black">Prize:</span>
+                                            <span className="text-4xl font-black text-primary italic leading-none">{formatCurrency(roundData.round.prizePool || 0)} PBINGO</span>
+                                          </div>
+                                        </div>
+                                      </div>
                                       {roundData.round.completedAt && (
-                                        <span className="text-primary text-xl mt-4 uppercase font-black tracking-widest">NEXT ROUND IN {nextRoundTimer}S</span>
+                                        <span className="text-white/60 text-xl uppercase font-black tracking-[0.3em] mt-2">NEXT ROUND IN {nextRoundTimer}S</span>
                                       )}
                                     </div>
                                   ) : 'WATCHING LIVE'}
@@ -355,26 +368,46 @@ export default function Home() {
                                     <div className="space-y-4">
                                       <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mb-4">Live Player Rankings</p>
                                       <div className="grid gap-3">
-                                        {sortedParticipants.slice(0, 5).map((p, idx) => (
-                                          <div key={p.id || idx} className="bg-black/40 border border-white/5 rounded-xl p-3 flex items-center justify-between group hover:border-primary/30 transition-all duration-300">
-                                            <div className="flex items-center gap-3 overflow-hidden">
-                                              <div className="w-6 h-6 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-black text-primary shrink-0">
-                                                {idx + 1}
+                                        {sortedParticipants.slice(0, 5).map((p, idx) => {
+                                          const isSpectator = !isParticipant;
+                                          return (
+                                            <div key={p.id || idx} className={cn(
+                                              "bg-black/40 border rounded-xl p-3 flex items-center justify-between group transition-all duration-300",
+                                              idx === 0 && roundData.round.winnerId ? "border-primary bg-primary/5 shadow-[0_0_20px_rgba(34,197,94,0.1)]" : "border-white/5 hover:border-primary/30"
+                                            )}>
+                                              <div className="flex items-center gap-3 overflow-hidden">
+                                                <div className={cn(
+                                                  "w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0",
+                                                  idx === 0 && roundData.round.winnerId ? "bg-primary text-black" : "bg-primary/10 border border-primary/20 text-primary"
+                                                )}>
+                                                  {idx + 1}
+                                                </div>
+                                                <span className={cn(
+                                                  "font-mono text-xs truncate max-w-[100px]",
+                                                  idx === 0 && roundData.round.winnerId ? "text-primary font-black" : "text-white/90"
+                                                )}>{formatAddress(p.username)}</span>
                                               </div>
-                                              <span className="font-mono text-xs text-white/90 truncate max-w-[100px]">{formatAddress(p.username)}</span>
-                                            </div>
-                                            <div className="flex items-center gap-4 shrink-0">
-                                              <div className="w-32 h-1.5 bg-white/5 rounded-full overflow-hidden hidden sm:block">
-                                                <motion.div 
-                                                  initial={{ width: 0 }}
-                                                  animate={{ width: `${p.prob}%` }}
-                                                  className="h-full bg-primary shadow-[0_0_10px_rgba(34,197,94,0.5)]"
-                                                />
+                                              <div className="flex items-center gap-4 shrink-0">
+                                                {!isSpectator ? (
+                                                  <>
+                                                    <div className="w-32 h-1.5 bg-white/5 rounded-full overflow-hidden hidden sm:block">
+                                                      <motion.div 
+                                                        initial={{ width: 0 }}
+                                                        animate={{ width: `${p.prob}%` }}
+                                                        className="h-full bg-primary shadow-[0_0_100px_rgba(34,197,94,0.5)]"
+                                                      />
+                                                    </div>
+                                                    <span className="text-primary font-black text-xs min-w-[40px] text-right">{p.prob}%</span>
+                                                  </>
+                                                ) : (
+                                                  <div className="text-[10px] text-white/40 uppercase font-black tracking-widest">
+                                                    IN GAME
+                                                  </div>
+                                                )}
                                               </div>
-                                              <span className="text-primary font-black text-xs min-w-[40px] text-right">{p.prob}%</span>
                                             </div>
-                                          </div>
-                                        ))}
+                                          );
+                                        })}
                                         {sortedParticipants.length === 0 && (
                                           <div className="py-8 text-center border border-dashed border-white/5 rounded-2xl">
                                             <Users className="w-8 h-8 text-white/10 mx-auto mb-2" />

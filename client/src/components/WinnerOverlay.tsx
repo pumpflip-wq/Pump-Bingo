@@ -61,12 +61,12 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
               </div>
             </div>
 
-            <h2 className={`text-5xl font-display font-black mb-4 tracking-tighter uppercase italic ${isWinner ? 'text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'text-red-500'}`}>
+            <h2 className={`text-6xl font-display font-black mb-4 tracking-tighter uppercase italic ${isWinner ? 'text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'text-red-500'}`}>
               {isWinner ? 'YOU WIN!' : 'GAME OVER'}
             </h2>
             
             {isWinner && (
-              <p className="text-white/60 font-black uppercase tracking-[0.3em] text-[10px] mb-6">
+              <p className="text-white font-black uppercase tracking-[0.3em] text-[10px] mb-6">
                 CONGRATULATIONS CHAMPION
               </p>
             )}

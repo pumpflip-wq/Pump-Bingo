@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Lock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { ROUND_STATUS } from "@shared/schema";
 
@@ -38,86 +39,28 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
 
   if (status === ROUND_STATUS.STARTING) {
     return (
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <motion.div
-          animate={{ 
-            scale: [1, 1.1, 1],
-            opacity: [0.5, 1, 0.5]
-          }}
-          transition={{ 
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin"
-        />
-        <div className="text-2xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase">
-          Verifying
+      <div className="flex flex-col items-center justify-center space-y-6">
+        <div className="relative">
+          <motion.div
+            animate={{ 
+              rotate: 360
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary shadow-[0_0_20px_rgba(34,197,94,0.2)]"
+          />
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <Lock className="w-8 h-8 text-primary" />
+          </motion.div>
         </div>
-      </div>
-    );
-  }
-
-  if (status === ROUND_STATUS.STARTING) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <motion.div
-          animate={{ 
-            scale: [1, 1.1, 1],
-            opacity: [0.5, 1, 0.5]
-          }}
-          transition={{ 
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin"
-        />
-        <div className="text-2xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase">
-          Verifying
-        </div>
-      </div>
-    );
-  }
-
-  if (status === ROUND_STATUS.STARTING) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <motion.div
-          animate={{ 
-            scale: [1, 1.1, 1],
-            opacity: [0.5, 1, 0.5]
-          }}
-          transition={{ 
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin"
-        />
-        <div className="text-2xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase">
-          Verifying
-        </div>
-      </div>
-    );
-  }
-
-  if (status === ROUND_STATUS.STARTING) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <motion.div
-          animate={{ 
-            scale: [1, 1.1, 1],
-            opacity: [0.5, 1, 0.5]
-          }}
-          transition={{ 
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin"
-        />
-        <div className="text-2xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase">
+        <div className="text-3xl font-black font-mono text-primary tracking-[0.3em] animate-pulse uppercase italic">
           Verifying
         </div>
       </div>
