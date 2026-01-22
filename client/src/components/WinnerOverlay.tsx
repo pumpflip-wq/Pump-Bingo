@@ -75,6 +75,8 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
     setLeft(10);
   };
 
+  const explorerUrl = txHash ? `https://explorer.solana.com/tx/${txHash}?cluster=${PROTOCOL_CONFIG.NETWORK}` : null;
+
   return (
     <AnimatePresence>
       {show && (
