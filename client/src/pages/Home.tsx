@@ -107,7 +107,9 @@ export default function Home() {
       setHasManuallyClosed(false);
     }
 
-    if (hasManuallyClosed) {
+    // Only show overlay if the user is the winner OR explicitly watching their own game
+    const isMe = roundData?.round.winnerId === user?.id;
+    if (hasManuallyClosed || !isMe) {
       return null;
     }
 
@@ -158,17 +160,17 @@ export default function Home() {
     return 0;
   }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.completedAt, currentTime]);
 
-  const sortedParticipants = useMemo(() => {
+  const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];
-    
-    const withProb = roundData.participants.map(p => ({
+    return roundData.participants.map(p => ({
       ...p,
       prob: calculateWinProb(p.card, roundData.round.drawnNumbers || [])
     }));
-
-    // Always sort by probability descending to ensure correct ranking
-    return withProb.sort((a, b) => b.prob - a.prob);
   }, [roundData?.participants, roundData?.round.drawnNumbers]);
+
+  const sortedParticipants = useMemo(() => {
+    return [...participantsList].sort((a, b) => b.prob - a.prob);
+  }, [participantsList]);
 
   return (
     <>
@@ -185,10 +187,10 @@ export default function Home() {
             <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
               <PlayerList 
                 participants={[
-                  ...(walletAddress && sortedParticipants.some(p => p.username === walletAddress) 
+                  ...(walletAddress && participantsList.some(p => p.username === walletAddress) 
                     ? [] 
                     : (walletAddress && (participant || foundParticipant) ? [{ id: 'me', username: walletAddress, prob: 0 }] : [])),
-                  ...sortedParticipants
+                  ...participantsList
                 ]}
                 walletAddress={walletAddress}
                 formatAddress={formatAddress}
@@ -331,15 +333,15 @@ export default function Home() {
                                         <p className="text-lg text-white uppercase font-black tracking-[0.4em] mb-8 text-center border-b border-white/10 pb-4">ROUND STATISTICS</p>
                                         <div className="space-y-10">
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-xl text-white uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
-                                            <span className="text-5xl md:text-8xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                                            <span className="text-sm text-white uppercase font-black tracking-widest opacity-70">🏆 WINNING PLAYER</span>
+                                            <span className="text-4xl md:text-6xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                                               {formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}
                                             </span>
                                           </div>
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-xl text-white uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
-                                            <span className="text-6xl md:text-9xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
-                                              {formatCurrency(roundData.round.prizePool || 0)} <span className="text-4xl">PBINGO</span>
+                                            <span className="text-sm text-white uppercase font-black tracking-widest opacity-70">💰 TOTAL REWARD</span>
+                                            <span className="text-5xl md:text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
+                                              {formatCurrency(roundData.round.prizePool || 0)} <span className="text-2xl">PBINGO</span>
                                             </span>
                                           </div>
                                         </div>
