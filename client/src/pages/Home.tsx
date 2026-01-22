@@ -296,7 +296,7 @@ export default function Home() {
                             </div>
                           ) : (
                             <div className="space-y-4">
-                              <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                              <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} className="w-full h-14 text-xl font-black italic tracking-tighter" />
                               <p className="text-[12px] text-white uppercase font-black tracking-[0.2em] text-center opacity-80">JOIN BEFORE GAME STARTS</p>
                             </div>
                           )}
@@ -445,7 +445,7 @@ export default function Home() {
                               </div>
                               <div className="w-full max-w-md mx-auto mb-2">
                                 {(roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING') && (
-                                  <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                                  <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} className="w-full h-14 text-xl font-black italic tracking-tighter" />
                                 )}
                               </div>
                             </div>
