@@ -1,3 +1,6 @@
+import { ProbabilityFeed } from "@/components/game/ProbabilityFeed";
+import { PlayerList } from "@/components/game/PlayerList";
+import { GameHistory } from "@/components/game/GameHistory";
 import { useRounds, useRound, useParticipant } from "@/hooks/use-game";
 import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
@@ -160,72 +163,18 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
             <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
-                      <Users className="w-4 h-4 text-primary" /> Active Players
-                    </h3>
-                  </div>
-                  <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                    <AnimatePresence mode="popLayout">
-                      {[
-                        ...(walletAddress && sortedParticipants.some(p => p.username === walletAddress) 
-                          ? [] 
-                          : (walletAddress && (participant || foundParticipant) ? [{ id: 'me', username: walletAddress, prob: 0 }] : [])),
-                        ...sortedParticipants
-                      ].map((p: any) => {
-                        const isMe = p.username === walletAddress;
-                        return (
-                          <motion.div 
-                            key={p.id}
-                            layout
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className={cn(
-                              "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
-                              isMe ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5"
-                            )}
-                          >
-                            <div className="flex flex-col flex-1">
-                              <div className="flex items-center justify-between w-full">
-                                <span className="text-sm font-black text-white italic tracking-tight flex items-center gap-1">
-                                  @{formatAddress(p.username)}
-                                  {isMe && <span className="text-[10px] text-primary font-black ml-1">(YOU)</span>}
-                                </span>
-                                {roundData.round.status === 'IN_GAME' && (
-                                  <span className="text-xs font-black text-primary">{Math.round(p.prob)}%</span>
-                                )}
-                              </div>
-                              <div className="flex flex-col gap-1 mt-1">
-                                <span className="text-[10px] text-primary font-black font-mono">+{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} {PROTOCOL_CONFIG.SYMBOL}</span>
-                                {roundData.round.status === 'IN_GAME' && (
-                                  <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                                    <motion.div 
-                                      initial={{ width: 0 }}
-                                      animate={{ width: `${p.prob}%` }}
-                                      className="h-full bg-primary"
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <ShieldCheck className={cn(
-                              "w-4 h-4 transition-colors shrink-0 ml-2",
-                              isMe ? "text-primary" : "text-primary/40 group-hover:text-primary"
-                            )} />
-                          </motion.div>
-                        );
-                      })}
-                    </AnimatePresence>
-                    {roundData.participants.length === 0 && (
-                      <div className="flex flex-col items-center justify-center h-full opacity-30 text-center space-y-3">
-                        <Globe className="w-10 h-10 text-white" />
-                        <p className="text-sm uppercase font-black tracking-widest text-white">Waiting for players...</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </aside>
+              <PlayerList 
+                participants={[
+                  ...(walletAddress && sortedParticipants.some(p => p.username === walletAddress) 
+                    ? [] 
+                    : (walletAddress && (participant || foundParticipant) ? [{ id: 'me', username: walletAddress, prob: 0 }] : [])),
+                  ...sortedParticipants
+                ]}
+                walletAddress={walletAddress}
+                formatAddress={formatAddress}
+                roundStatus={roundData.round.status}
+              />
+            </aside>
 
               <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden relative" style={{ perspective: "1000px" }}>
                 <AnimatePresence mode="wait">
@@ -349,40 +298,12 @@ export default function Home() {
                           <div className="w-full max-w-md space-y-6 relative z-10">
                             <div className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/5 p-6 space-y-4">
                               <p className="text-[10px] text-white/40 uppercase font-black tracking-widest text-center">Live Probability Feed</p>
-                              <div className="space-y-4 min-h-[120px]">
-                                <AnimatePresence mode="popLayout">
-                                  {sortedParticipants.slice(0, 3).map((p: any, idx: number) => (
-                                    <motion.div 
-                                      key={p.id}
-                                      layout
-                                      initial={{ opacity: 0, y: 10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      className="flex items-center justify-between"
-                                    >
-                                      <div className="flex items-center gap-3">
-                                        <span className="text-primary font-black italic w-6">#{idx + 1}</span>
-                                        <span className="text-sm font-bold text-white/80 italic flex items-center gap-2">
-                                          @{formatAddress(p.username)}
-                                        {roundData?.round.status === 'FINISHED' && p.username === sortedParticipants.find((sp: any) => sp.userId === roundData.round.winnerId)?.username && (
-                                          <Trophy className="w-3 h-3 text-primary animate-bounce" />
-                                        )}
-                                        </span>
-                                      </div>
-                                      <div className="flex items-center gap-4">
-                                        <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                          <motion.div 
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${p.prob}%` }}
-                                            transition={{ duration: 0.5 }}
-                                            className="h-full bg-primary"
-                                          />
-                                        </div>
-                                        <span className="text-[10px] font-black text-primary w-8 text-right">{p.prob}%</span>
-                                      </div>
-                                    </motion.div>
-                                  ))}
-                                </AnimatePresence>
-                              </div>
+                              <ProbabilityFeed 
+                                participants={sortedParticipants}
+                                formatAddress={formatAddress}
+                                roundStatus={roundData.round.status}
+                                winnerId={roundData.round.winnerId}
+                              />
                             </div>
                           </div>
                         </div>
@@ -393,63 +314,36 @@ export default function Home() {
               </main>
 
             <aside className="lg:col-span-3 flex flex-col h-[750px]">
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 bg-black/40 border-primary/20 mb-4">
-                  <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
-                </div>
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden bg-black/20">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
-                      <History className="w-4 h-4 text-primary" /> Game History
-                    </h3>
-                    <Link href="/history" className="text-[10px] font-black text-primary/60 hover:text-primary uppercase tracking-widest underline transition-colors">Full View</Link>
+              <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 bg-black/40 border-primary/20 mb-4">
+                <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
+              </div>
+              <GameHistory 
+                historyRounds={historyRounds}
+                historyLoading={historyLoading}
+                formatAddress={formatAddress}
+              />
+              <div className="mt-8 pt-6 border-t border-white/10 space-y-4">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-primary/60">
+                    <span>Current Room #{roundData.round.id} Hash</span>
+                    <Link href="/verify" className="underline hover:text-primary transition-colors">Verify</Link>
                   </div>
-                  <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                    <div className="space-y-4">
-                      {historyLoading ? (
-                        <div className="flex justify-center py-10">
-                          <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                        </div>
-                      ) : historyRounds?.rounds?.length ? (
-                        historyRounds.rounds.slice(0, 5).map((hr) => (
-                          <HistoryItem 
-                            key={hr.id}
-                            id={hr.id} 
-                            winner={hr.winnerUsername || "No Winner"} 
-                            prize={hr.prizePool} 
-                            formatAddress={formatAddress}
-                            completedAt={hr.completedAt ? hr.completedAt.toString() : null}
-                          />
-                        ))
-                      ) : (
-                        <div className="text-center py-10 opacity-30">
-                          <p className="text-[10px] uppercase font-black tracking-widest text-white">No history yet</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="mt-8 pt-6 border-t border-white/10 space-y-4">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-primary/60">
-                        <span>Current Room #{roundData.round.id} Hash</span>
-                        <Link href="/verify" className="underline hover:text-primary transition-colors">Verify</Link>
-                      </div>
-                      <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
-                        <p className="text-[10px] font-mono text-primary truncate flex-1">
-                          {roundData.round.publicHash}
-                        </p>
-                        <Copy 
-                          className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
-                          onClick={() => {
-                            navigator.clipboard.writeText(roundData.round.publicHash);
-                            toast({ title: "Hash Copied" });
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
+                  <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
+                    <p className="text-[10px] font-mono text-primary truncate flex-1">
+                      {roundData.round.publicHash}
+                    </p>
+                    <Copy 
+                      className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
+                      onClick={() => {
+                        navigator.clipboard.writeText(roundData.round.publicHash);
+                        toast({ title: "Hash Copied" });
+                      }}
+                    />
                   </div>
                 </div>
-              </aside>
+                <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
+              </div>
+            </aside>
             </div>
           ) : (
             <div className="py-32 text-center bg-card/80 rounded-[4rem] border border-dashed border-white/10 space-y-6 flex-1">
