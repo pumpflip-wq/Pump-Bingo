@@ -137,7 +137,7 @@ export default function Home() {
         const isMe = roundData.round.winnerId === user?.id;
         // Search in participants for the winner
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
-        const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerUsername || roundData.round.winnerId.toString()));
+        const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
         
         return {
           show: true,

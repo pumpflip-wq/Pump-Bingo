@@ -1,3 +1,4 @@
+import { History, Loader2, ExternalLink } from "lucide-react";
 import { formatAddress, formatCurrency } from "@/lib/utils";
 import { Link } from "wouter";
 import { format } from "date-fns";

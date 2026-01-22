@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { formatAddress, formatCurrency } from "@/lib/utils";
 import { useJoinRound } from "@/hooks/use-game";
 import { useGameState } from "@/hooks/useGameState";
