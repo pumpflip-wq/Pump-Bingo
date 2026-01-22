@@ -88,10 +88,16 @@ export default function Home() {
     
     // Very conservative growth: 0% for only 1 hit, very low for 2 hits
     if (maxMarked < 2) return 0;
+    
+    // If we have 2 hits, start with a very low percentage (1-3%)
     if (maxMarked === 2) return Math.min(3, drawn.length);
     
-    const baseProb = (maxMarked / 5) * 60; // Max 60% from marking 4/5
-    const proximityBonus = potentialLines * 10; // 10% for each line that is 4/5
+    // Calculate base probability based on max marks
+    // 3 marks -> ~15-20%
+    // 4 marks -> ~40-60%
+    const baseProb = (maxMarked === 3) ? 15 : (maxMarked === 4 ? 45 : 0);
+    
+    const proximityBonus = potentialLines * 8; // 8% for each line that is 4/5
     const gameProgress = (drawn.length / 75) * 10; // Max 10% from game length
     
     const finalProb = Math.min(99, Math.floor(baseProb + proximityBonus + gameProgress));

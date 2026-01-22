@@ -40,8 +40,10 @@ export class GameManager {
       
       // If no round exists OR the latest is FINISHED
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
-        // Create new round immediately after the 10s wait in processRound
-        await this.createNewRound();
+        // Only create if we haven't already just created one (prevents race condition)
+        if (!latestRound || (latestRound.completedAt && Date.now() - new Date(latestRound.completedAt).getTime() > 1000)) {
+           await this.createNewRound();
+        }
         return;
       }
 
@@ -156,12 +158,13 @@ export class GameManager {
         // Check if winner was already declared (e.g. via claim route)
         if (round.winnerId) {
             // Wait exactly 10 seconds post-win before moving to FINISHED
-            // This matches the client-side 10s countdown exactly
             const winnerDeclaredAt = round.completedAt ? new Date(round.completedAt).getTime() : Date.now();
             
             if (Date.now() - winnerDeclaredAt >= 10000) {
                 console.log(`Round ${round.id} reached 10s post-win delay, finishing...`);
                 await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
+                // IMMEDIATELY create new round to avoid delay
+                await this.createNewRound();
             }
             return;
         }

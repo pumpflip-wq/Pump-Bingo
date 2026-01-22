@@ -28,14 +28,15 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
       </div>
       <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
         <AnimatePresence mode="popLayout">
-          {(amIParticipating ? sortedParticipants : participants).map((p: any) => {
+          {participants.map((p: any) => {
             const isMe = p.username === walletAddress;
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
+            const amIParticipating = participants.some(participant => participant.username === walletAddress);
             const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && amIParticipating;
             
             return (
               <motion.div 
-                layout
+                layout={amIParticipating}
                 key={p.id}
                 className={cn(
                   "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
