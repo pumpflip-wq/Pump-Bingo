@@ -13,10 +13,11 @@ import { useEffect, useRef } from "react";
 
 import { SolanaProvider } from "./components/SolanaProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { ThemeToggle } from "./components/ThemeToggle";
 import { motion } from "framer-motion";
 import { History, ShieldCheck } from "lucide-react";
 import { PROTOCOL_CONFIG } from "@shared/config";
+
+const logoPng = "https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png";
 
 function Router() {
   return (
@@ -44,16 +45,16 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <SolanaProvider>
         <TooltipProvider>
-          <div className="flex flex-col h-screen w-full bg-background text-foreground overflow-hidden">
-            <header className="flex-none w-full z-[100] bg-background/80 backdrop-blur-xl border-b border-white/5">
-              <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between py-4 gap-6">
+          <div className="flex flex-col min-h-screen w-full bg-background text-foreground overflow-y-auto overflow-x-hidden" ref={scrollRef as any}>
+            <header className="sticky top-0 w-full z-[100] bg-background/80 backdrop-blur-xl border-b border-white/5">
+              <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between py-6 gap-6">
                 <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
                   <motion.div
                     whileHover={{ rotate: 15, scale: 1.1 }}
                     className="w-20 h-20 rounded-full p-0 transition-all"
                   >
                     <img 
-                      src="https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png" 
+                      src={logoPng} 
                       alt="PUMP BINGO" 
                       className="w-full h-full rounded-full object-cover"
                     />
@@ -98,8 +99,8 @@ function App() {
                 </div>
               </div>
             </header>
-            <main className="flex-1 overflow-y-auto flex flex-col" ref={scrollRef as any}>
-              <div className="w-full max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1">
+            <main className="flex-1 flex flex-col">
+              <div className="w-full max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2 flex-1">
                 <Router />
               </div>
               <Footer />
