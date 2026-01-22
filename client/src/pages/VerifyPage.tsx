@@ -55,7 +55,15 @@ export default function VerifyPage() {
       const trimmedSeed = seed.trim().toLowerCase();
       const trimmedHash = expectedHash.trim().toLowerCase();
       
+      // Fixed verification logic to use consistent hashing
       const hash = crypto.createHash('sha256').update(trimmedSeed).digest('hex').toLowerCase();
+      
+      console.log("Verification Logic Debug:", { 
+        rawSeed: seed,
+        trimmedSeed,
+        computedHash: hash, 
+        expectedHash: trimmedHash 
+      });
       
       return hash === trimmedHash;
     } catch (e) {

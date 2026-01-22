@@ -68,18 +68,19 @@ export default function Home() {
     if (roundData?.round.status === 'FINISHED' && roundData?.round.winnerId) {
       if (isParticipant && !overlayData) {
         const isMe = roundData.round.winnerId === user?.id;
+        const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId);
         setOverlayData({
           show: true,
-          username: roundData.round.winnerUsername || 'Unknown',
+          username: (winner as any)?.username || roundData.round.winnerId.toString(),
           prize: roundData.round.prizePool || 0,
           isWinner: isMe,
-          txHash: roundData.round.txHash
+          txHash: (roundData.round as any).txHash
         });
       }
     } else if (roundData?.round.status !== 'FINISHED') {
       setOverlayData(null);
     }
-  }, [roundData?.round.status, roundData?.round.winnerId, isParticipant, user?.id, overlayData]);
+  }, [roundData?.round.status, roundData?.round.winnerId, isParticipant, user?.id, overlayData, roundData?.participants]);
 
   const { data: historyRounds, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
     queryKey: ["/api/rounds/history", 1],
@@ -105,26 +106,40 @@ export default function Home() {
     let minMissing = 5;
 
     for (let r = 0; r < 5; r++) {
-      const missing = card[r].filter(n => n !== 0 && !drawnSet.has(n)).length;
+      const rowNumbers = card[r].filter(n => n !== 0);
+      const missing = rowNumbers.filter(n => !drawnSet.has(n)).length;
       minMissing = Math.min(minMissing, missing);
     }
     for (let c = 0; c < 5; c++) {
       let missing = 0;
+      let totalInCol = 0;
       for (let r = 0; r < 5; r++) {
         const n = card[r][c];
-        if (n !== 0 && !drawnSet.has(n)) missing++;
+        if (n !== 0) {
+          totalInCol++;
+          if (!drawnSet.has(n)) missing++;
+        }
       }
-      minMissing = Math.min(minMissing, missing);
+      if (totalInCol > 0) minMissing = Math.min(minMissing, missing);
     }
-    let d1 = 0, d2 = 0;
+    let d1Missing = 0, d1Total = 0;
+    let d2Missing = 0, d2Total = 0;
     for (let i = 0; i < 5; i++) {
-      if (card[i][i] !== 0 && !drawnSet.has(card[i][i])) d1++;
-      if (card[i][4-i] !== 0 && !drawnSet.has(card[i][4-i])) d2++;
+      if (card[i][i] !== 0) {
+        d1Total++;
+        if (!drawnSet.has(card[i][i])) d1Missing++;
+      }
+      if (card[i][4-i] !== 0) {
+        d2Total++;
+        if (!drawnSet.has(card[i][4-i])) d2Missing++;
+      }
     }
-    minMissing = Math.min(minMissing, d1, d2);
+    if (d1Total > 0) minMissing = Math.min(minMissing, d1Missing);
+    if (d2Total > 0) minMissing = Math.min(minMissing, d2Missing);
+
     if (minMissing === 0) return 100;
     const probMap: Record<number, number> = { 5: 0, 4: 15, 3: 40, 2: 70, 1: 90, 0: 100 };
-    return probMap[minMissing] || 0;
+    return probMap[minMissing] ?? 0;
   };
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
@@ -348,9 +363,9 @@ export default function Home() {
                                         <span className="text-primary font-black italic w-6">#{idx + 1}</span>
                                         <span className="text-sm font-bold text-white/80 italic flex items-center gap-2">
                                           @{formatAddress(p.username)}
-                                          {roundData?.round.status === 'FINISHED' && p.username === roundData?.round.winnerUsername && (
-                                            <Trophy className="w-3 h-3 text-primary animate-bounce" />
-                                          )}
+                                        {roundData?.round.status === 'FINISHED' && p.username === sortedParticipants.find((sp: any) => sp.userId === roundData.round.winnerId)?.username && (
+                                          <Trophy className="w-3 h-3 text-primary animate-bounce" />
+                                        )}
                                         </span>
                                       </div>
                                       <div className="flex items-center gap-4">
@@ -402,7 +417,7 @@ export default function Home() {
                             winner={hr.winnerUsername || "No Winner"} 
                             prize={hr.prizePool} 
                             formatAddress={formatAddress}
-                            completedAt={hr.completedAt}
+                            completedAt={hr.completedAt ? hr.completedAt.toString() : null}
                           />
                         ))
                       ) : (

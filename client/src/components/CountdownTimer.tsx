@@ -31,26 +31,32 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
     };
 
     calculateTimeLeft();
-    const interval = setInterval(calculateTimeLeft, 1000);
+    const interval = setInterval(() => {
+      calculateTimeLeft();
+      const left = {
+        minutes: Math.floor(((new Date(targetDate!).getTime() - Date.now()) % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor(((new Date(targetDate!).getTime() - Date.now()) % (1000 * 60)) / 1000)
+      };
+
+      if (left.minutes === 0 && left.seconds > 0 && left.seconds <= 5 && left.seconds !== lastTick) {
+        playSound("/sounds/tick.mp3", 0.3);
+        setLastTick(left.seconds);
+      }
+      if (left.minutes === 0 && left.seconds === 0 && lastTick !== 0) {
+        playSound("/sounds/start.mp3", 0.5);
+        setLastTick(0);
+      }
+    }, 100);
 
     return () => clearInterval(interval);
   }, [targetDate, participantCount]);
 
   useEffect(() => {
-    if (timeLeft.minutes === 0 && timeLeft.seconds > 0 && participantCount >= 2) {
-      if (timeLeft.seconds <= 3 && timeLeft.seconds !== lastTick) {
-        playSound("/sounds/join.mp3", 0.5);
-        setLastTick(timeLeft.seconds);
-      }
-    }
-    if (timeLeft.minutes === 0 && timeLeft.seconds === 1 && participantCount >= 2) {
-      playSound("/sounds/transition.mp3", 0.4);
-    }
     // Sound when timer first starts (at 60s)
     if (timeLeft.minutes === 1 && timeLeft.seconds === 0 && participantCount >= 2) {
       playSound("/sounds/start.mp3", 0.5);
     }
-  }, [timeLeft.seconds, timeLeft.minutes, participantCount, playSound, lastTick]);
+  }, [timeLeft.seconds, timeLeft.minutes, participantCount, playSound]);
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 

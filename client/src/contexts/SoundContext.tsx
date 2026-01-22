@@ -20,29 +20,49 @@ export function SoundProvider({ children }: { children: ReactNode }) {
 
   const toggleMute = () => setIsMuted(!isMuted);
 
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  useEffect(() => {
+    const handleInteraction = () => {
+      setHasInteracted(true);
+      window.removeEventListener('mousedown', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+    };
+    window.addEventListener('mousedown', handleInteraction);
+    window.addEventListener('keydown', handleInteraction);
+    window.addEventListener('touchstart', handleInteraction);
+    return () => {
+      window.removeEventListener('mousedown', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+    };
+  }, []);
+
   const playSound = (soundPath: string, volume = 0.5) => {
-    if (isMuted) {
-      console.log("Sound muted, skipping:", soundPath);
-      return;
-    }
+    if (isMuted) return;
     
-    // Create audio once to help with browser caching and performance
     const audio = new Audio(soundPath);
     audio.volume = volume;
     
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(err => {
-        // Fallback for autoplay policy - most browsers allow audio after first interaction
-        console.warn("Autoplay prevented sound. Retrying on next interaction:", soundPath, err);
-        const retryOnInteraction = () => {
-          audio.play().catch(() => {});
-          window.removeEventListener('click', retryOnInteraction);
-          window.removeEventListener('keydown', retryOnInteraction);
-        };
-        window.addEventListener('click', retryOnInteraction, { once: true });
-        window.addEventListener('keydown', retryOnInteraction, { once: true });
+    const play = () => {
+      audio.play().catch(err => {
+        console.warn("Playback failed:", soundPath, err);
       });
+    };
+
+    if (hasInteracted) {
+      play();
+    } else {
+      const playOnInteraction = () => {
+        play();
+        window.removeEventListener('mousedown', playOnInteraction);
+        window.removeEventListener('keydown', playOnInteraction);
+        window.removeEventListener('touchstart', playOnInteraction);
+      };
+      window.addEventListener('mousedown', playOnInteraction);
+      window.addEventListener('keydown', playOnInteraction);
+      window.addEventListener('touchstart', playOnInteraction);
     }
   };
 

@@ -39,6 +39,10 @@ function App() {
   const scrollRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    // Force dark mode globally
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("theme", "dark");
+    
     if (scrollRef.current) {
       scrollRef.current.scrollTo(0, 0);
     }
