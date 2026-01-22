@@ -148,8 +148,9 @@ export default function GameHistory() {
                             <TableCell className="text-right">
                               <div className="flex justify-end items-center gap-2">
                                 <Link href={`/verify?roundId=${round.id}`}>
-                                  <Button variant="ghost" size="icon" className="hover:text-primary transition-colors">
+                                  <Button variant="ghost" size="sm" className="hover:text-primary transition-colors flex items-center gap-2 px-3">
                                     <Search className="w-4 h-4" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">בדיקה</span>
                                   </Button>
                                 </Link>
                                 <Button variant="ghost" size="icon" className="hover:text-primary transition-colors" asChild>

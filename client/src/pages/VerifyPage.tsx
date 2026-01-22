@@ -21,10 +21,14 @@ export default function VerifyPage() {
       const round = rounds.find(r => r.id === Number(roundId));
       if (round) {
         setManualHash(round.publicHash);
-        if (round.serverSeed) setManualSeed(round.serverSeed);
+        if (round.status === 'FINISHED' && round.serverSeed) {
+          setManualSeed(round.serverSeed);
+        } else {
+          setManualSeed("");
+        }
       }
     }
-  }, [rounds]);
+  }, [rounds, window.location.search]);
 
   const verifySeed = (seed: string, expectedHash: string) => {
     try {
