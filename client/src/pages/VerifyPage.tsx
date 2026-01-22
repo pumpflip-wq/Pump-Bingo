@@ -52,7 +52,7 @@ export default function VerifyPage() {
 
   return (
     <div className="flex flex-col bg-background text-foreground">
-      <div className="w-full flex-1 flex flex-col space-y-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full flex-1 flex flex-col space-y-4 max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="flex-1 space-y-6 py-4">
           <div className="text-center space-y-3">
