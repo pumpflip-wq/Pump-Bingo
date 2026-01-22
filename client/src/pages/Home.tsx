@@ -107,20 +107,23 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  const [lastWinKey, setLastWinKey] = useState<string | null>(null);
+
   const overlayState = useMemo(() => {
     const hasWinner = !!roundData?.round.winnerId;
     const currentRoundId = roundData?.round.id;
     const winnerDeclaredAt = roundData?.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
 
-    // Reset manual close state only when a NEW round gets a winner
-    // We use a combined key of roundId + hasWinner to detect the exact moment a win happens
-    const winKey = hasWinner ? `${currentRoundId}_win` : null;
-    const [lastWinKey, setLastWinKey] = useState<string | null>(null);
-    
-    // Memo hooks cannot call other hooks, so we manage this in a simpler way in Home.tsx if needed
-    // But for now let's just use currentRoundId reset
+    // Reset manual close state only when a NEW round starts
     if (currentRoundId && currentRoundId !== lastOverlayRoundId) {
       setLastOverlayRoundId(currentRoundId);
+      setHasManuallyClosed(false);
+      setLastWinKey(null);
+    }
+
+    const winKey = hasWinner ? `${currentRoundId}_win` : null;
+    if (winKey && winKey !== lastWinKey) {
+      setLastWinKey(winKey);
       setHasManuallyClosed(false);
     }
 
