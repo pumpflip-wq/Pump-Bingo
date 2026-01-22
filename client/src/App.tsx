@@ -12,6 +12,7 @@ import { Footer } from "./components/Footer";
 import { useEffect, useRef, useState } from "react";
 
 import { SolanaProvider, AudioInitializer } from "./components/SolanaProvider";
+import { SoundProvider } from "./contexts/SoundContext";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import { History, ShieldCheck } from "lucide-react";
@@ -155,9 +156,11 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <SolanaProvider>
-        <AppContent />
-      </SolanaProvider>
+      <SoundProvider>
+        <SolanaProvider>
+          <AppContent />
+        </SolanaProvider>
+      </SoundProvider>
     </QueryClientProvider>
   );
 }
