@@ -55,16 +55,34 @@ export default function GameHistory() {
           </Link>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
+            <nav className="hidden md:flex items-center gap-6 mr-4">
+              <Link href="/history" className="text-xs font-black uppercase tracking-widest text-primary transition-all flex items-center gap-2">
+                <History className="w-4 h-4" /> History
+              </Link>
+              <Link href="/verify" className="text-xs font-black uppercase tracking-widest text-white hover:text-primary transition-all flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4" /> Verify
+              </Link>
+            </nav>
             <div className="flex items-center gap-3">
               <a 
-                href={`https://pump.fun/`} 
+                href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="h-12 px-8 rounded-full bg-primary/10 border-2 border-primary/50 text-primary text-sm font-black uppercase tracking-widest hover:bg-primary/20 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(34,197,94,0.2)]"
+                className="w-11 h-11 rounded-xl bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center hover:scale-105 active:scale-95"
+                title="Trade on Pump.fun"
               >
-                Buy PUMP <ExternalLink className="w-4 h-4" />
+                <img src="https://pump.fun/favicon.ico" className="w-6 h-6 object-contain" alt="Pump.fun" />
               </a>
-              <WalletMultiButton className="!bg-primary !text-black !h-12 !px-8 !text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
+              <a 
+                href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-xl bg-white/5 hover:bg-white/10 transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
+                title="Chart on Dexscreener"
+              >
+                <img src="https://dexscreener.com/favicon.png" className="w-6 h-6 object-contain" alt="Dexscreener" />
+              </a>
+              <WalletMultiButton className="!bg-primary !text-black !h-11 !px-8 !text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
             </div>
           </div>
         </header>

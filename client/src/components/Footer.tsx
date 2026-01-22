@@ -1,4 +1,4 @@
-import { ShieldCheck, Zap, Globe, ShoppingCart, Twitter } from "lucide-react";
+import { ShieldCheck, Zap, Globe, ShoppingCart, Twitter, History } from "lucide-react";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { Link } from "wouter";
 
@@ -25,6 +25,9 @@ export function Footer() {
 
           <div className="flex flex-wrap items-center justify-center gap-8">
             <nav className="flex items-center gap-6">
+              <Link href="/history" className="text-[11px] font-black uppercase tracking-widest text-white hover:text-primary transition-colors flex items-center gap-2">
+                <History className="w-3.5 h-3.5 text-primary" /> History
+              </Link>
               <Link href="/verify" className="text-[11px] font-black uppercase tracking-widest text-white hover:text-primary transition-colors flex items-center gap-2">
                 <ShieldCheck className="w-3.5 h-3.5 text-primary" /> Verify
               </Link>
@@ -32,22 +35,31 @@ export function Footer() {
 
             <div className="flex items-center gap-3">
               <a 
-                href={`https://pump.fun/${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
+                href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-primary border border-primary/20 flex items-center justify-center text-black hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(34,197,94,0.3)]"
-                title="Buy PUMP"
+                className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center"
+                title="Trade on Pump.fun"
               >
-                <ShoppingCart className="w-4.5 h-4.5" />
+                <img src="https://pump.fun/favicon.ico" className="w-6 h-6 object-contain" alt="Pump.fun" />
+              </a>
+              <a 
+                href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center"
+                title="Chart on Dexscreener"
+              >
+                <img src="https://dexscreener.com/favicon.png" className="w-6 h-6 object-contain" alt="Dexscreener" />
               </a>
               <a 
                 href="#" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-white hover:text-primary hover:border-primary/50 transition-all"
+                className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center text-white hover:text-primary transition-all"
                 title="Follow on X"
               >
-                <Twitter className="w-4 h-4 fill-current" />
+                <Twitter className="w-5 h-5 fill-current" />
               </a>
             </div>
           </div>
@@ -58,9 +70,6 @@ export function Footer() {
             © 2026 PUMP BINGO. ALL RIGHTS RESERVED.
           </p>
           <div className="flex items-center gap-6">
-            <Link href="/verify" className="text-[10px] uppercase font-black tracking-[0.2em] text-white/60 hover:text-primary transition-colors">
-              Security
-            </Link>
             <span className="text-[10px] uppercase font-black tracking-[0.2em] text-white/60">
               Mainnet Beta
             </span>
