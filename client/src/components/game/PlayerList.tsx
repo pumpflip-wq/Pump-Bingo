@@ -23,6 +23,9 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
         <AnimatePresence mode="popLayout">
           {participants.map((p: any) => {
             const isMe = p.username === walletAddress;
+            const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
+            const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && (isMe || participants.some(participant => participant.username === walletAddress));
+            
             return (
               <motion.div 
                 key={p.id}
@@ -40,9 +43,23 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                       {formatAddress(p.username)}
                       {isMe && <span className="text-[10px] text-primary font-black ml-1">(YOU)</span>}
                     </span>
+                    {showStats && (
+                      <span className="text-sm font-black text-primary min-w-[3ch] text-right">
+                        {Math.round(p.prob)}%
+                      </span>
+                    )}
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
                     <span className="text-[12px] text-primary font-black font-mono">+{formatCurrency(roundData?.round?.price || 100000, false)} {PROTOCOL_CONFIG.SYMBOL}</span>
+                    {showStats && roundStatus === 'IN_GAME' && (
+                      <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${p.prob}%` }}
+                          className="h-full bg-primary"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
                 <ShieldCheck className={cn(

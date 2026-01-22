@@ -340,16 +340,16 @@ export default function Home() {
                                 <h2 className="text-5xl md:text-7xl font-black font-display italic text-white tracking-tighter uppercase">
                                   {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? (
                                     <div className="flex flex-col items-center gap-6">
-                                      <span className="text-primary animate-pulse text-6xl md:text-8xl">BINGO! ROUND WON</span>
+                                      <span className="text-primary animate-pulse text-5xl md:text-7xl">BINGO! ROUND WON</span>
                                       <div className="bg-primary/10 border border-primary/30 rounded-[2rem] p-10 w-full max-w-3xl shadow-[0_0_50px_rgba(34,197,94,0.1)]">
-                                        <p className="text-xs text-white/40 uppercase font-black tracking-[0.4em] mb-6 text-center">Winner Summary</p>
+                                        <p className="text-sm text-white uppercase font-black tracking-[0.4em] mb-6 text-center">WINNER SUMMARY</p>
                                         <div className="flex flex-col gap-6">
                                           <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                                            <span className="text-sm text-white/60 uppercase font-black">Winner:</span>
+                                            <span className="text-sm text-white/60 uppercase font-black">WINNER:</span>
                                             <span className="text-4xl font-black text-white italic">{formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}</span>
                                           </div>
                                           <div className="flex items-center justify-between">
-                                            <span className="text-sm text-white/60 uppercase font-black">Prize:</span>
+                                            <span className="text-sm text-white/60 uppercase font-black">PRIZE:</span>
                                             <span className="text-6xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.5)]">{formatCurrency(roundData.round.prizePool || 0)} PBINGO</span>
                                           </div>
                                         </div>
