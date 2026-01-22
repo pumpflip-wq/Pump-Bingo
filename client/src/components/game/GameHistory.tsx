@@ -25,7 +25,7 @@ export function GameHistory({ historyRounds, historyLoading, formatAddress }: Ga
               <Loader2 className="w-6 h-6 text-primary animate-spin" />
             </div>
           ) : historyRounds?.rounds?.length ? (
-            historyRounds.rounds.slice(0, 5).map((hr: any) => (
+            historyRounds.rounds.slice(0, 10).map((hr: any) => (
               <HistoryItem 
                 key={hr.id}
                 id={hr.id} 

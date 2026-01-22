@@ -62,8 +62,10 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     if (isMuted) return;
     
     try {
+      // Use a consistent audio object per path if possible, or new one
       const audio = new Audio(soundPath);
       audio.volume = volume;
+      audio.preload = 'auto';
       
       const play = () => {
         audio.play().catch(err => {
@@ -71,19 +73,20 @@ export function SoundProvider({ children }: { children: ReactNode }) {
         });
       };
 
+      // Try to play immediately, if blocked it will be handled by the interaction listeners
       if (hasInteracted) {
         play();
       } else {
-        // If not interacted, wait for it
-        const playOnce = () => {
+        const unlockAndPlay = () => {
+          setHasInteracted(true);
           play();
-          window.removeEventListener('click', playOnce);
-          window.removeEventListener('keydown', playOnce);
-          window.removeEventListener('touchstart', playOnce);
+          window.removeEventListener('click', unlockAndPlay);
+          window.removeEventListener('keydown', unlockAndPlay);
+          window.removeEventListener('touchstart', unlockAndPlay);
         };
-        window.addEventListener('click', playOnce);
-        window.addEventListener('keydown', playOnce);
-        window.addEventListener('touchstart', playOnce);
+        window.addEventListener('click', unlockAndPlay);
+        window.addEventListener('keydown', unlockAndPlay);
+        window.addEventListener('touchstart', unlockAndPlay);
       }
     } catch (e) {
       console.warn("Sound play error:", e);

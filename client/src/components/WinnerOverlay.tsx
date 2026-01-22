@@ -98,11 +98,11 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
               {isWinner ? (
                 <div className="space-y-6">
                   <div>
-                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">WINNER ADDRESS</p>
-                    <p className="text-2xl font-bold text-white italic truncate">@{formatAddress(username)}</p>
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2 text-center">WINNER ADDRESS</p>
+                    <p className="text-2xl font-bold text-white italic truncate text-center">@{formatAddress(username)}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">TOTAL REWARD</p>
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2 text-center">TOTAL REWARD</p>
                     <div className="flex flex-col items-center gap-1">
                       <p className="text-6xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
                         {prize.toLocaleString()}
