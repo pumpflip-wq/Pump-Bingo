@@ -332,7 +332,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <div className="space-y-4 flex-1 overflow-hidden h-full flex flex-col">
-                    <div className="glass-card neon-border rounded-xl p-4 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
+                    <div className="glass-card neon-border rounded-xl p-4 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0 w-full max-w-[620px]">
                       <div className="flex flex-col">
                         <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Prize Pool</p>
                         <div className="flex items-baseline gap-2">
@@ -341,12 +341,12 @@ export default function Home() {
                       </div>
                       <div className="flex gap-12">
                         <div className="text-right">
-                          <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Players</p>
-                          <p className="text-3xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                          <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Room</p>
+                          <p className="text-3xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Entry</p>
-                          <p className="text-3xl font-black text-white font-display italic leading-none">{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}</p>
+                          <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Players</p>
+                          <p className="text-3xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                         </div>
                       </div>
                     </div>
@@ -356,10 +356,10 @@ export default function Home() {
                           <BingoCard 
                           card={currentCard} 
                           drawnNumbers={roundData.round.drawnNumbers || []} 
-                          className="w-full max-w-[580px] scale-100"
+                          className="w-full max-w-[620px] scale-100"
                         />
                         
-                        <div className="flex justify-center w-full max-w-[580px] shrink-0">
+                        <div className="flex justify-center w-full max-w-[620px] shrink-0">
                           <BingoClaimButton 
                             roundId={roundData.round.id} 
                             userId={user?.id || 0} 
@@ -367,7 +367,7 @@ export default function Home() {
                             drawnNumbers={roundData.round.drawnNumbers || []}
                             status={roundData.round.status}
                             isBingoed={participant?.hasBingo || false}
-                            className="w-full h-16 text-2xl font-black italic tracking-tighter"
+                            className="w-full h-16 text-3xl font-black italic tracking-tighter"
                           />
                         </div>
                       </div>
