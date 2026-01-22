@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ROUND_STATUS } from "@shared/schema";
+import { useSound } from "@/contexts/SoundContext";
 
 interface CountdownTimerProps {
   targetDate: string | null;
@@ -9,6 +10,8 @@ interface CountdownTimerProps {
 
 export function CountdownTimer({ targetDate, status, participantCount }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState({ minutes: 0, seconds: 0 });
+  const { playSound } = useSound();
+  const [lastTick, setLastTick] = useState(0);
 
   useEffect(() => {
     if (!targetDate || participantCount < 2) {
@@ -35,24 +38,19 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
 
   useEffect(() => {
     if (timeLeft.minutes === 0 && timeLeft.seconds > 0 && participantCount >= 2) {
-      if (timeLeft.seconds <= 3) {
-        const tensionSound = new Audio("/sounds/join.mp3"); // Reusing for tension
-        tensionSound.volume = 0.5;
-        tensionSound.play().catch(() => {});
+      if (timeLeft.seconds <= 3 && timeLeft.seconds !== lastTick) {
+        playSound("/sounds/join.mp3", 0.5);
+        setLastTick(timeLeft.seconds);
       }
     }
     if (timeLeft.minutes === 0 && timeLeft.seconds === 1 && participantCount >= 2) {
-      const transitionSound = new Audio("/sounds/transition.mp3");
-      transitionSound.volume = 0.4;
-      transitionSound.play().catch(() => {});
+      playSound("/sounds/transition.mp3", 0.4);
     }
     // Sound when timer first starts (at 60s)
     if (timeLeft.minutes === 1 && timeLeft.seconds === 0 && participantCount >= 2) {
-      const startSound = new Audio("/sounds/start.mp3");
-      startSound.volume = 0.5;
-      startSound.play().catch(() => {});
+      playSound("/sounds/start.mp3", 0.5);
     }
-  }, [timeLeft.seconds, timeLeft.minutes, participantCount]);
+  }, [timeLeft.seconds, timeLeft.minutes, participantCount, playSound, lastTick]);
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 

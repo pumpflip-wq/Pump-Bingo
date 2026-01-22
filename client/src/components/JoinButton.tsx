@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
 import { PROTOCOL_CONFIG } from "@shared/config";
+import { useSound } from "@/contexts/SoundContext";
 
 interface JoinButtonProps {
   roundId: number;
@@ -17,6 +18,7 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
   const { toast } = useToast();
   const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
+  const { playSound } = useSound();
 
   const handleJoin = async () => {
     if (!publicKey || !userId) {
@@ -59,9 +61,8 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
               title: "Successfully Joined",
               description: "Transaction confirmed and you've entered the round!",
             });
-            // Play sound - Correct path
-            const joinSound = new Audio("/sounds/join.mp3");
-            joinSound.play().catch((err) => console.error("Sound play error:", err));
+            // Play sound - Use SoundContext
+            playSound("/sounds/join.mp3", 0.5);
           },
           onError: (error: Error) => {
             toast({

@@ -55,16 +55,17 @@ export default function VerifyPage() {
       const trimmedSeed = seed.trim();
       const trimmedHash = expectedHash.trim();
       
-      // Use crypto-browserify compatible way if needed, but 'crypto' usually works in modern environments
+      // Fixed verification logic to use consistent hashing
       const hash = crypto.createHash('sha256').update(trimmedSeed).digest('hex');
       
-      console.log("Verifying Logic:", { 
-        inputSeed: trimmedSeed, 
+      console.log("Verification Logic Debug:", { 
+        rawSeed: seed,
+        trimmedSeed,
         computedHash: hash, 
         expectedHash: trimmedHash 
       });
       
-      return hash.toLowerCase() === trimmedHash.toLowerCase();
+      return hash === trimmedHash; // Exact match on lowercase hash
     } catch (e) {
       console.error("Verification Error:", e);
       return false;
