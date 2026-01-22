@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useJoinRound } from "@/hooks/use-game";
 import { useGameState } from "@/hooks/useGameState";
 import { CyberButton } from "@/components/ui/CyberButton";
