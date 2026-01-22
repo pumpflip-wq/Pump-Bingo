@@ -340,22 +340,31 @@ export default function Home() {
                                 <h2 className="text-5xl md:text-7xl font-black font-display italic text-white tracking-tighter uppercase">
                                   {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? (
                                     <div className="flex flex-col items-center gap-6">
-                                      <span className="text-primary animate-pulse">BINGO! ROUND WON</span>
-                                      <div className="bg-primary/10 border border-primary/30 rounded-[2rem] p-8 w-full max-w-2xl">
-                                        <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.4em] mb-4">Winner Summary</p>
-                                        <div className="flex flex-col gap-4">
-                                          <div className="flex items-center justify-between">
-                                            <span className="text-xs text-white/60 uppercase font-black">Winner:</span>
-                                            <span className="text-2xl font-black text-white italic">{formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}</span>
+                                      <span className="text-primary animate-pulse text-6xl md:text-8xl">BINGO! ROUND WON</span>
+                                      <div className="bg-primary/10 border border-primary/30 rounded-[2rem] p-10 w-full max-w-3xl shadow-[0_0_50px_rgba(34,197,94,0.1)]">
+                                        <p className="text-xs text-white/40 uppercase font-black tracking-[0.4em] mb-6 text-center">Winner Summary</p>
+                                        <div className="flex flex-col gap-6">
+                                          <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                                            <span className="text-sm text-white/60 uppercase font-black">Winner:</span>
+                                            <span className="text-4xl font-black text-white italic">{formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}</span>
                                           </div>
                                           <div className="flex items-center justify-between">
-                                            <span className="text-xs text-white/60 uppercase font-black">Prize:</span>
-                                            <span className="text-4xl font-black text-primary italic leading-none">{formatCurrency(roundData.round.prizePool || 0)} PBINGO</span>
+                                            <span className="text-sm text-white/60 uppercase font-black">Prize:</span>
+                                            <span className="text-6xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.5)]">{formatCurrency(roundData.round.prizePool || 0)} PBINGO</span>
                                           </div>
                                         </div>
                                       </div>
                                       {roundData.round.completedAt && (
-                                        <span className="text-white/60 text-xl uppercase font-black tracking-[0.3em] mt-2">NEXT ROUND IN {nextRoundTimer}S</span>
+                                        <div className="flex flex-col items-center gap-2">
+                                          <span className="text-white font-black text-2xl uppercase tracking-[0.4em] animate-pulse">NEXT ROUND IN {nextRoundTimer}S</span>
+                                          <div className="w-64 h-1 bg-white/10 rounded-full overflow-hidden">
+                                            <motion.div 
+                                              initial={{ width: "100%" }}
+                                              animate={{ width: `${(nextRoundTimer / 10) * 100}%` }}
+                                              className="h-full bg-primary"
+                                            />
+                                          </div>
+                                        </div>
                                       )}
                                     </div>
                                   ) : 'WATCHING LIVE'}
@@ -387,23 +396,21 @@ export default function Home() {
                                                   idx === 0 && roundData.round.winnerId ? "text-primary font-black" : "text-white/90"
                                                 )}>{formatAddress(p.username)}</span>
                                               </div>
-                                              <div className="flex items-center gap-4 shrink-0">
-                                                {!isSpectator ? (
-                                                  <>
-                                                    <div className="w-32 h-1.5 bg-white/5 rounded-full overflow-hidden hidden sm:block">
-                                                      <motion.div 
-                                                        initial={{ width: 0 }}
-                                                        animate={{ width: `${p.prob}%` }}
-                                                        className="h-full bg-primary shadow-[0_0_100px_rgba(34,197,94,0.5)]"
-                                                      />
-                                                    </div>
-                                                    <span className="text-primary font-black text-xs min-w-[40px] text-right">{p.prob}%</span>
-                                                  </>
-                                                ) : (
-                                                  <div className="text-[10px] text-white/40 uppercase font-black tracking-widest">
-                                                    IN GAME
-                                                  </div>
-                                                )}
+                                              <div className="flex items-center gap-6 shrink-0">
+                                                <div className="w-64 h-3 bg-white/5 rounded-full overflow-hidden hidden sm:block border border-white/5">
+                                                  <motion.div 
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${p.prob}%` }}
+                                                    className={cn(
+                                                      "h-full shadow-[0_0_20px_rgba(34,197,94,0.6)]",
+                                                      idx === 0 && roundData.round.winnerId ? "bg-primary" : "bg-primary/80"
+                                                    )}
+                                                  />
+                                                </div>
+                                                <span className={cn(
+                                                  "font-black text-lg min-w-[60px] text-right font-mono",
+                                                  idx === 0 && roundData.round.winnerId ? "text-primary drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]" : "text-primary/80"
+                                                )}>{Math.round(p.prob)}%</span>
                                               </div>
                                             </div>
                                           );

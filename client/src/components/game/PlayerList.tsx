@@ -8,9 +8,10 @@ interface PlayerListProps {
   walletAddress?: string;
   formatAddress: (address: string) => string;
   roundStatus: string;
+  roundData?: any;
 }
 
-export function PlayerList({ participants, walletAddress, formatAddress, roundStatus, roundData }: any) {
+export function PlayerList({ participants, walletAddress, formatAddress, roundStatus, roundData }: PlayerListProps) {
   return (
     <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
       <div className="flex items-center justify-between mb-6">
@@ -39,21 +40,9 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                       {formatAddress(p.username)}
                       {isMe && <span className="text-[10px] text-primary font-black ml-1">(YOU)</span>}
                     </span>
-                    <span className="text-sm font-black text-primary min-w-[3ch] text-right">
-                      {roundStatus === 'IN_GAME' || roundStatus === 'FINISHED' ? `${Math.round(p.prob)}%` : ""}
-                    </span>
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
-                    <span className="text-[12px] text-primary font-black font-mono">+{formatCurrency(roundData.round.price, false)} {PROTOCOL_CONFIG.SYMBOL}</span>
-                    {roundStatus === 'IN_GAME' && (
-                      <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${p.prob}%` }}
-                          className="h-full bg-primary"
-                        />
-                      </div>
-                    )}
+                    <span className="text-[12px] text-primary font-black font-mono">+{formatCurrency(roundData?.round?.price || 100000, false)} {PROTOCOL_CONFIG.SYMBOL}</span>
                   </div>
                 </div>
                 <ShieldCheck className={cn(
