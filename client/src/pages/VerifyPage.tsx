@@ -65,9 +65,25 @@ export default function VerifyPage() {
         expectedHash: trimmedHash 
       });
       
+      // The issue is that the manual verification comparison might be case-sensitive or have whitespace issues
+      // but here we already trim and lowercase. 
+      // Checking server/game.ts, it uses:
+      // const hash = crypto.createHash('sha256').update(seed).digest('hex').toLowerCase();
+      // where seed is hex.
+      
       return hash === trimmedHash;
     } catch (e) {
       console.error("Verification Error:", e);
+      return false;
+    }
+  };
+
+  const verifyPublicHash = (seed: string, expectedHash: string) => {
+    if (!seed || !expectedHash) return false;
+    try {
+      const hash = crypto.createHash('sha256').update(seed).digest('hex');
+      return hash === expectedHash;
+    } catch (e) {
       return false;
     }
   };
