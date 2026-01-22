@@ -366,16 +366,16 @@ export default function Home() {
                                     <div className="flex flex-col items-center gap-6">
                                       <span className="text-primary animate-pulse text-5xl md:text-7xl">BINGO! ROUND WON</span>
                                       <div className="bg-primary/10 border border-primary/30 rounded-[2rem] p-8 w-full max-w-3xl shadow-[0_0_50px_rgba(34,197,94,0.1)]">
-                                        <p className="text-xs text-white/40 uppercase font-black tracking-[0.4em] mb-8 text-center border-b border-white/5 pb-4">ROUND STATISTICS</p>
+                                        <p className="text-sm text-white uppercase font-black tracking-[0.4em] mb-8 text-center border-b border-white/10 pb-4">ROUND STATISTICS</p>
                                         <div className="space-y-10">
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-[10px] text-white/40 uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
-                                            <span className="text-2xl md:text-5xl font-black text-white italic tracking-tighter truncate max-w-full px-4">
+                                            <span className="text-xs text-white/60 uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
+                                            <span className="text-2xl md:text-5xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                                               {formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}
                                             </span>
                                           </div>
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-[10px] text-white/40 uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
+                                            <span className="text-xs text-white/60 uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
                                             <span className="text-4xl md:text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
                                               {formatCurrency(roundData.round.prizePool || 0)} <span className="text-2xl">PBINGO</span>
                                             </span>
