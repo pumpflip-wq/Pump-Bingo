@@ -10,7 +10,7 @@ interface PlayerListProps {
   roundStatus: string;
 }
 
-export function PlayerList({ participants, walletAddress, formatAddress, roundStatus }: PlayerListProps) {
+export function PlayerList({ participants, walletAddress, formatAddress, roundStatus, roundData }: any) {
   return (
     <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
       <div className="flex items-center justify-between mb-6">
@@ -44,7 +44,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                     </span>
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
-                    <span className="text-[11px] text-primary font-black font-mono">+{formatCurrency(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE, false)} {PROTOCOL_CONFIG.SYMBOL}</span>
+                    <span className="text-[12px] text-primary font-black font-mono">+{formatCurrency(roundData.round.price, false)} {PROTOCOL_CONFIG.SYMBOL}</span>
                     {roundStatus === 'IN_GAME' && (
                       <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
                         <motion.div 

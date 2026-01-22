@@ -130,9 +130,10 @@ export default function Home() {
 
     if (hasWinner && winnerDeclaredAt) {
       const elapsed = currentTime - winnerDeclaredAt;
-      const remaining = Math.max(0, Math.ceil((10000 - elapsed) / 1000));
+      const totalDisplayTime = 10000;
+      const remaining = Math.max(0, Math.ceil((totalDisplayTime - elapsed) / 1000));
       
-      // Sync overlay and lobby transition
+      // Sync overlay and lobby transition - ensure it only happens once per winKey
       if (remaining <= 0 && !hasManuallyClosed) {
         setHasManuallyClosed(true);
       }
@@ -156,6 +157,15 @@ export default function Home() {
 
     return null;
   }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime, lastWinKey]);
+
+  const nextRoundTimer = useMemo(() => {
+    if (roundData?.round.status === 'FINISHED' && roundData.round.completedAt) {
+      const completedAt = new Date(roundData.round.completedAt).getTime();
+      const elapsed = currentTime - completedAt;
+      return Math.max(0, Math.ceil((10000 - elapsed) / 1000));
+    }
+    return 0;
+  }, [roundData?.round.status, roundData?.round.completedAt, currentTime]);
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
     ...p,
@@ -185,6 +195,7 @@ export default function Home() {
                 walletAddress={walletAddress}
                 formatAddress={formatAddress}
                 roundStatus={roundData.round.status}
+                roundData={roundData}
               />
             </aside>
 
@@ -311,7 +322,7 @@ export default function Home() {
                                     <div className="flex flex-col items-center">
                                       <span>WAITING FOR NEXT ROUND</span>
                                       {roundData.round.completedAt && (
-                                        <span className="text-primary text-xl mt-4 uppercase font-black tracking-widest">NEXT ROUND IN {Math.max(0, Math.ceil((10000 - (currentTime - new Date(roundData.round.completedAt).getTime())) / 1000))}S</span>
+                                        <span className="text-primary text-xl mt-4 uppercase font-black tracking-widest">NEXT ROUND IN {nextRoundTimer}S</span>
                                       )}
                                     </div>
                                   ) : 'WATCHING LIVE'}
