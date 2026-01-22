@@ -49,13 +49,13 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
             
             <div className="mb-8 relative inline-block">
               <div 
-                className="w-32 h-32 rounded-full overflow-hidden"
+                className="w-48 h-48 rounded-none overflow-visible flex items-center justify-center"
               >
                 {isWinner && (
                   <img 
                     src="https://i.ibb.co/F4JdGb1q/20260122-1554-Image-Generation-remix-01kfjzkjq3ebzbpy2j9dhghe0s.png" 
                     alt="Victory" 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 )}
               </div>

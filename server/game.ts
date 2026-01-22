@@ -79,7 +79,7 @@ export class GameManager {
     
     // Default wait time is 60 seconds
     const now = Date.now();
-    const startTime = new Date(now + 60000); // Exactly 60 seconds from creation
+    const startTime = new Date(now + 61000); // Add 1s buffer to ensure it starts at 60s on client
 
     console.log(`Creating new round #${nextId} with seed: ${seed} and hash: ${hash}`);
 
@@ -126,7 +126,7 @@ export class GameManager {
         }
       } else {
         // Not enough players: strictly freeze the start time at 60s in the future
-        const sixtySecondsFromNow = new Date(now.getTime() + 60000);
+        const sixtySecondsFromNow = new Date(now.getTime() + 61000);
         
         // Always ensure it's at least 60s away if under capacity
         const currentStartTime = round.startTime ? new Date(round.startTime) : null;

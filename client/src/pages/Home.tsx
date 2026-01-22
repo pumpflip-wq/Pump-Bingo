@@ -122,10 +122,22 @@ export default function Home() {
     }
 
     const winKey = hasWinner ? `${currentRoundId}_win` : null;
-    // Check winKey but ensure it's not already closed manually for THIS win
+    
+    // Logic to ensure overlay state is clean
+    if (currentRoundId && currentRoundId !== lastOverlayRoundId) {
+      setLastOverlayRoundId(currentRoundId);
+      setHasManuallyClosed(false);
+      setLastWinKey(null);
+    }
+
     if (winKey && winKey !== lastWinKey) {
       setLastWinKey(winKey);
       setHasManuallyClosed(false);
+    }
+
+    // Immediately stop if manually closed or timer expired
+    if (hasManuallyClosed) {
+      return null;
     }
 
     if (hasWinner && winnerDeclaredAt) {
@@ -133,12 +145,7 @@ export default function Home() {
       const totalDisplayTime = 10000;
       const remaining = Math.max(0, Math.ceil((totalDisplayTime - elapsed) / 1000));
       
-      // Stop showing if timer expired
-      if (remaining <= 0) {
-        return null;
-      }
-
-      if (!hasManuallyClosed) {
+      if (remaining > 0) {
         const isMe = roundData.round.winnerId === user?.id;
         // Search in participants for the winner
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
@@ -233,7 +240,7 @@ export default function Home() {
                               <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
                               <div className="flex flex-col items-center">
                                 <span className="text-5xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{formatCurrency(roundData.round.prizePool || 0)}</span>
-                                <span className="text-sm text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
+                                <span className="text-xl text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
                               </div>
                             </div>
                             <div className="flex flex-col items-center">
@@ -244,7 +251,9 @@ export default function Home() {
                         </div>
                         <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto">
                           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-                          <p className="text-white/60 text-xs uppercase font-black tracking-[0.2em] mb-6 font-mono">Game Starting In</p>
+                          <p className="text-white/60 text-xs uppercase font-black tracking-[0.2em] mb-6 font-mono">
+                            {roundData.round.status === 'STARTING' ? 'Securing Game Chain...' : 'Game Starting In'}
+                          </p>
                           <CountdownTimer 
                             targetDate={roundData.round.startTime?.toString() || null} 
                             status={roundData.round.status}
