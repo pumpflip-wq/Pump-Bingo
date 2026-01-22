@@ -254,12 +254,12 @@ export default function Home() {
                                 </div>
                               )}
                               <div className="flex flex-col">
-                                <span className="text-lg font-black text-white italic tracking-tight flex items-center gap-1">
+                                <span className="text-xl font-black text-white italic tracking-tight flex items-center gap-1">
                                   @{formatAddress(p.username)}
-                                  {isMe && <span className="text-xs text-primary font-black ml-1">(YOU)</span>}
+                                  {isMe && <span className="text-sm text-primary font-black ml-1">(YOU)</span>}
                                 </span>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs text-primary font-black font-mono">100 {PROTOCOL_CONFIG.SYMBOL}</span>
+                                  <span className="text-sm text-primary font-black font-mono">100 {PROTOCOL_CONFIG.SYMBOL}</span>
                                 </div>
                               </div>
                             </div>
@@ -294,7 +294,13 @@ export default function Home() {
 
                   <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden relative">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
-                  <div className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-between min-h-0 h-full relative overflow-hidden shrink-0">
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.05 }}
+                    transition={{ duration: 0.5 }}
+                    className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-between min-h-0 h-full relative overflow-hidden shrink-0"
+                  >
                     <div className="flex-1 flex flex-col items-center justify-between py-4 w-full h-full">
                       <div className="w-full space-y-8">
                         {/* Integrated Stats Header - Outside black box, inside green border, with its own glass-card style */}
@@ -351,7 +357,7 @@ export default function Home() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ) : (
                   <div className="space-y-4 flex-1 overflow-hidden h-full flex flex-col">
                     <div className="glass-card neon-border rounded-xl p-4 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">

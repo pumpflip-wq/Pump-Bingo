@@ -33,6 +33,19 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
     return () => clearInterval(interval);
   }, [targetDate, participantCount]);
 
+  useEffect(() => {
+    if (timeLeft.minutes === 0 && timeLeft.seconds <= 5 && timeLeft.seconds > 0 && participantCount >= 2) {
+      const tickSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73456.mp3");
+      tickSound.volume = 0.2;
+      tickSound.play().catch(() => {});
+    }
+    if (timeLeft.minutes === 0 && timeLeft.seconds === 1 && participantCount >= 2) {
+      const transitionSound = new Audio("https://cdn.pixabay.com/audio/2022/03/10/audio_c3527058c0.mp3");
+      transitionSound.volume = 0.4;
+      transitionSound.play().catch(() => {});
+    }
+  }, [timeLeft.seconds, timeLeft.minutes, participantCount]);
+
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 
   if (status === ROUND_STATUS.IN_GAME || status === ROUND_STATUS.FINISHED) {
