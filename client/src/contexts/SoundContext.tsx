@@ -20,34 +20,39 @@ export function SoundProvider({ children }: { children: ReactNode }) {
 
   const toggleMute = () => setIsMuted(!isMuted);
 
+  const [isUnlocked, setIsUnlocked] = useState(false);
+
+  useEffect(() => {
+    const unlock = () => {
+      const audio = new Audio();
+      audio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhAAQACABAAAABkYXRhAgAAAAEA'; // Tiny silent wav
+      audio.play().then(() => {
+        setIsUnlocked(true);
+        console.log("[Sound] Audio context unlocked globally");
+        window.removeEventListener('click', unlock);
+        window.removeEventListener('touchstart', unlock);
+      }).catch(() => {});
+    };
+    window.addEventListener('click', unlock);
+    window.addEventListener('touchstart', unlock);
+    return () => {
+      window.removeEventListener('click', unlock);
+      window.removeEventListener('touchstart', unlock);
+    };
+  }, []);
+
   const playSound = (soundPath: string, volume = 0.5) => {
     if (isMuted) return;
     
-    // Hard refresh path to bypass cache if needed
-    const normalizedPath = `${soundPath.startsWith('/') ? soundPath : `/${soundPath}`}?v=${Date.now()}`;
+    const normalizedPath = soundPath.startsWith('/') ? soundPath : `/${soundPath}`;
     
-    console.log(`[Sound] Playing: ${normalizedPath}`);
     try {
       const audio = new Audio(normalizedPath);
       audio.volume = volume;
-      
-      const playPromise = audio.play();
-      
-      if (playPromise !== undefined) {
-        playPromise.catch(err => {
-          console.warn(`[Sound] Blocked, adding click listener to unlock`, err);
-          const unlock = () => {
-            const retry = new Audio(normalizedPath);
-            retry.volume = volume;
-            retry.play().catch(() => {});
-            window.removeEventListener('click', unlock);
-          };
-          window.addEventListener('click', unlock, { once: true });
-        });
-      }
-    } catch (e) {
-      console.error(`[Sound] error: ${normalizedPath}`, e);
-    }
+      audio.play().catch(err => {
+        console.warn(`[Sound] Playback deferred for: ${normalizedPath}`);
+      });
+    } catch (e) {}
   };
 
   return (

@@ -25,9 +25,7 @@ export function TermsModal({ onAccept, show = false }: TermsModalProps) {
   }, [show]);
 
   const handleAccept = () => {
-    console.log("[TermsModal] Accepting terms and unlocking audio");
-    localStorage.setItem("pumbp_bingo_terms_accepted", "true");
-    playSound("/sounds/tick.mp3", 0.5);
+    console.log("[TermsModal] Accepting terms");
     onAccept();
   };
 

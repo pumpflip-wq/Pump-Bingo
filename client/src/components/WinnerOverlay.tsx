@@ -20,9 +20,15 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
   const [timeLeft, setLeft] = useState(10);
   const { playSound } = useSound();
 
+  // Reset timer in a safe way
   useEffect(() => {
     if (show) {
       setLeft(10);
+    }
+  }, [show]);
+
+  useEffect(() => {
+    if (show) {
       if (isWinner) {
         playSound("/sounds/start.mp3", 0.6);
         const timer = setTimeout(() => {
@@ -36,7 +42,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
         return () => clearTimeout(timer);
       }
     }
-  }, [show, isWinner, playSound]);
+  }, [show, isWinner]); // Removed playSound from deps to avoid re-triggering issues if it changes
 
   useEffect(() => {
     if (!show) return;

@@ -77,17 +77,11 @@ function AppContent() {
       acceptedWallets[walletAddr] = true;
       localStorage.setItem("pumbp_bingo_accepted_wallets", JSON.stringify(acceptedWallets));
       setTermsAccepted(true);
-      console.log(`[Terms] Accepted for wallet: ${walletAddr}`);
       
-      // Explicit unlock - play multiple times to ensure context is warmed
-      const unlock = () => {
-        const audio = new Audio("/sounds/tick.mp3");
-        audio.volume = 0.5;
-        audio.play().catch(() => {});
-      };
-      unlock();
-      setTimeout(unlock, 100);
-      setTimeout(unlock, 200);
+      // Explicit play to force context unlock during user interaction
+      const audio = new Audio("/sounds/join.mp3");
+      audio.volume = 0.1;
+      audio.play().catch(() => {});
     }
   };
 
