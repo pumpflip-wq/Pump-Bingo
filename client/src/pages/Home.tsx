@@ -168,8 +168,7 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col w-full">
-
-          <div className="flex-1 flex flex-col space-y-4">
+        <div className="flex-1 flex flex-col space-y-4">
             <section className="text-center pt-2 pb-2 space-y-4 flex flex-col items-center hidden">
               <div className="relative inline-block">
                 <motion.h1 
