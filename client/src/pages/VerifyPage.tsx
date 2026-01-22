@@ -22,12 +22,20 @@ export default function VerifyPage() {
   const { data: roundData } = useRound(targetId);
 
   useEffect(() => {
+    const seed = searchParams.get('seed');
+    const hash = searchParams.get('hash');
+    
+    if (seed) setManualSeed(seed);
+    if (hash) setManualHash(hash);
+    
     if (roundData?.round) {
-      setManualHash(roundData.round.publicHash);
-      if (roundData.round.status === 'FINISHED' && roundData.round.serverSeed) {
-        setManualSeed(roundData.round.serverSeed);
-      } else {
-        setManualSeed("");
+      if (!hash) setManualHash(roundData.round.publicHash);
+      if (!seed) {
+        if (roundData.round.status === 'FINISHED' && roundData.round.serverSeed) {
+          setManualSeed(roundData.round.serverSeed);
+        } else {
+          setManualSeed("");
+        }
       }
     } else if (rId && rounds) {
       // Fallback for immediate population if rounds are already loaded

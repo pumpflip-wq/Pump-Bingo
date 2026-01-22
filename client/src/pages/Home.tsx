@@ -142,6 +142,7 @@ export default function Home() {
 
   const calculateWinProb = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);
+    if (drawnSet.size === 0) return 0;
     let minMissing = 5;
 
     // Rows
@@ -167,7 +168,16 @@ export default function Home() {
     minMissing = Math.min(minMissing, d1, d2);
 
     if (minMissing === 0) return 100;
-    return Math.max(5, 100 - (minMissing * 20));
+    // Realistically mapping: 5 missing -> 0%, 4 missing -> 15%, 3 missing -> 40%, 2 missing -> 70%, 1 missing -> 90%
+    const probMap: Record<number, number> = {
+      5: 0,
+      4: 15,
+      3: 40,
+      2: 70,
+      1: 90,
+      0: 100
+    };
+    return probMap[minMissing] || 0;
   };
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
@@ -251,12 +261,13 @@ export default function Home() {
                                   {roundData.round.status === 'IN_GAME' && (
                                     <div className="flex items-center gap-1">
                                       <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
-                                        <div 
-                                          style={{ width: `${p.prob}%` }}
+                                        <motion.div 
+                                          initial={{ width: 0 }}
+                                          animate={{ width: `${p.prob}%` }}
                                           className="h-full bg-primary"
                                         />
                                       </div>
-                                      <span className="text-[8px] font-black text-primary">{p.prob}%</span>
+                                      <span className="text-[8px] font-black text-primary">{Math.round(p.prob)}%</span>
                                     </div>
                                   )}
                                 </div>
