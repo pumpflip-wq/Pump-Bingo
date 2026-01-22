@@ -273,49 +273,41 @@ export default function Home() {
                           </div>
                         </div>
                       </div>
-                      {isParticipant && currentCard ? (
-                        <div className="relative space-y-4 flex flex-col items-center flex-1 min-h-0 justify-center w-full">
-                            <BingoCard 
-                            card={currentCard} 
-                            drawnNumbers={roundData.round.drawnNumbers || []} 
-                            className="w-full max-w-[520px] scale-100"
-                          />
-                          <div className="flex justify-center w-full max-w-[520px] shrink-0">
-                            <BingoClaimButton 
-                              roundId={roundData.round.id} 
-                              userId={user?.id || 0} 
-                              card={currentCard}
-                              drawnNumbers={roundData.round.drawnNumbers || []}
-                              status={roundData.round.status}
-                              isBingoed={participant?.hasBingo || false}
-                              className="w-full h-16 text-3xl font-black italic tracking-tighter"
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-center space-y-8 relative overflow-hidden flex-1">
-                          <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-                          <div className="text-center space-y-4 relative z-10">
-                            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
-                              <Globe className="w-3 h-3 animate-spin-slow" /> Live Feed Active
-                            </div>
-                            <h2 className="text-4xl md:text-6xl font-black font-display italic text-white tracking-tighter uppercase">
-                              WATCHING <span className="text-primary">LIVE</span>
-                            </h2>
-                          </div>
-                          <div className="w-full max-w-md space-y-6 relative z-10">
-                            <div className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/5 p-6 space-y-4">
-                              <p className="text-[10px] text-white/40 uppercase font-black tracking-widest text-center">Live Probability Feed</p>
-                              <ProbabilityFeed 
-                                participants={sortedParticipants}
-                                formatAddress={formatAddress}
-                                roundStatus={roundData.round.status}
-                                winnerId={roundData.round.winnerId || undefined}
+                          {isParticipant && currentCard && roundData.round.status !== 'FINISHED' ? (
+                            <div className="relative space-y-4 flex flex-col items-center flex-1 min-h-0 justify-center w-full">
+                                <BingoCard 
+                                card={currentCard} 
+                                drawnNumbers={roundData.round.drawnNumbers || []} 
+                                className="w-full max-w-[520px] scale-100"
                               />
+                              <div className="flex justify-center w-full max-w-[520px] shrink-0">
+                                <BingoClaimButton 
+                                  roundId={roundData.round.id} 
+                                  userId={user?.id || 0} 
+                                  card={currentCard}
+                                  drawnNumbers={roundData.round.drawnNumbers || []}
+                                  status={roundData.round.status}
+                                  isBingoed={participant?.hasBingo || false}
+                                  className="w-full h-16 text-3xl font-black italic tracking-tighter"
+                                />
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                      )}
+                          ) : (
+                            <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-center space-y-8 relative overflow-hidden flex-1 w-full">
+                              <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
+                              <div className="text-center space-y-4 relative z-10">
+                                <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
+                                  <Globe className="w-3 h-3 animate-spin-slow" /> {roundData.round.status === 'FINISHED' ? 'ROUND COMPLETED' : 'Live Feed Active'}
+                                </div>
+                                <h2 className="text-4xl md:text-6xl font-black font-display italic text-white tracking-tighter uppercase">
+                                  {roundData.round.status === 'FINISHED' ? 'WAITING FOR' : 'WATCHING'} <span className="text-primary">{roundData.round.status === 'FINISHED' ? 'NEXT ROUND' : 'LIVE'}</span>
+                                </h2>
+                              </div>
+                              <div className="w-full max-w-md mx-auto mb-2">
+                                <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                              </div>
+                            </div>
+                          )}
                     </motion.div>
                   )}
                 </AnimatePresence>
