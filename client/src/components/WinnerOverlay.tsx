@@ -54,15 +54,18 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
       setLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          handleClose();
+          // Wait a tiny bit then close to ensure UI sync
+          setTimeout(onClose, 100);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [show]);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [show, onClose]);
 
   const handleClose = () => {
     onClose();

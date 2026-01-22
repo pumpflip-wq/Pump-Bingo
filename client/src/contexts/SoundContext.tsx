@@ -55,15 +55,22 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     
     const normalizedPath = soundPath.startsWith('/') ? soundPath : `/${soundPath}`;
     
-    try {
-      const audio = new Audio(normalizedPath);
-      audio.volume = volume;
-      
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {});
-      }
-    } catch (e) {}
+    // Create audio once and reuse or ensure cleanup
+    const audio = new Audio(normalizedPath);
+    audio.volume = volume;
+    
+    // Standard web audio hack: resume context on every play attempt
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    audio.play().catch(err => {
+      // If deferred, we'll try one more time on the very next click
+      const oneTimeRetry = () => {
+        audio.play().catch(() => {});
+        window.removeEventListener('click', oneTimeRetry);
+      };
+      window.addEventListener('click', oneTimeRetry);
+    });
   };
 
   return (

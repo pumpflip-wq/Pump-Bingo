@@ -128,11 +128,13 @@ export default function Home() {
     
     // Show overlay ONLY for participants (players) during victory state
     if (isParticipant && hasWinner && (isFinished || roundData?.round.status === 'IN_GAME')) {
+      // Logic to prevent re-opening: only set if not already showing OR if it's a completely new round
       if (!overlayData || overlayData.roundId !== currentRoundId) {
         const isMe = roundData.round.winnerId === user?.id;
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
         const displayUsername = (winner as any)?.username || (isMe ? walletAddress : roundData.round.winnerId.toString());
         
+        console.log(`[Overlay] Triggering for round ${currentRoundId}`);
         setOverlayData({
           show: true,
           username: displayUsername,
@@ -142,13 +144,14 @@ export default function Home() {
           roundId: currentRoundId
         });
       }
-    } else if (isOpen || isStarting) {
-      // CLEAR overlay when a new round starts or is waiting
+    } else if (isOpen || isStarting || !hasWinner) {
+      // CLEAR overlay when a new round starts, is waiting, or no winner yet
       if (overlayData) {
+        console.log(`[Overlay] Clearing for status ${roundData?.round.status}`);
         setOverlayData(null);
       }
     }
-  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.id, isParticipant, user?.id, walletAddress, roundData?.participants, overlayData?.roundId]);
+  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.id, isParticipant, user?.id, walletAddress, roundData?.participants]);
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
     ...p,
