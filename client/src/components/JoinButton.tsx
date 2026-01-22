@@ -1,4 +1,5 @@
 import { useJoinRound } from "@/hooks/use-game";
+import { useGameState } from "@/hooks/useGameState";
 import { CyberButton } from "@/components/ui/CyberButton";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -20,7 +21,11 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
   const { publicKey, sendTransaction } = useWallet();
   const { playSound } = useSound();
 
+  const { roundData } = useGameState();
+  const isWinnerDeclared = !!roundData?.round.winnerId;
+
   const handleJoin = async () => {
+    if (isWinnerDeclared) return;
     if (!publicKey || !userId) {
       toast({
         title: "Authentication Required",
@@ -81,6 +86,15 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
       });
     }
   };
+
+  if (isWinnerDeclared) {
+    return (
+      <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl w-full">
+        <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">GAME OVER!</p>
+        <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">Winner declared - Waiting for next round</p>
+      </div>
+    );
+  }
 
   return (
     <CyberButton

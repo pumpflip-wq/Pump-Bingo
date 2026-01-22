@@ -21,11 +21,14 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
   const { playSound } = useSound();
   const [hasPlayedSound, setHasPlayedSound] = useState(false);
 
+  const [isClosing, setIsClosing] = useState(false);
+
   // Reset timer and sound state in a safe way
   useEffect(() => {
     if (show) {
       setLeft(10);
       setHasPlayedSound(false);
+      setIsClosing(false);
     }
   }, [show]);
 
@@ -48,14 +51,13 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
   }, [show, isWinner, hasPlayedSound]);
 
   useEffect(() => {
-    if (!show) return;
+    if (!show || isClosing) return;
 
     const interval = setInterval(() => {
       setLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          // Wait a tiny bit then close to ensure UI sync
-          setTimeout(onClose, 100);
+          handleClose();
           return 0;
         }
         return prev - 1;
@@ -65,9 +67,11 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
     return () => {
       clearInterval(interval);
     };
-  }, [show, onClose]);
+  }, [show, isClosing, onClose]);
 
   const handleClose = () => {
+    if (isClosing) return;
+    setIsClosing(true);
     onClose();
   };
 
