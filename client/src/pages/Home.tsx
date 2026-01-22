@@ -156,7 +156,8 @@ export default function Home() {
         prize: roundData.round.prizePool || 0,
         isWinner: isMe,
         txHash: (roundData.round as any).txHash,
-        timeLeft: remaining
+        timeLeft: remaining,
+        currentRoundId: currentRoundId // Added to help track state changes
       };
     }
 

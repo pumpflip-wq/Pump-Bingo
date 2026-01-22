@@ -80,7 +80,7 @@ export class GameManager {
     
     // Default wait time is 60 seconds
     const now = Date.now();
-    const startTime = new Date(now + 61000); // Add 1s buffer to ensure it starts at 60s on client
+    const startTime = new Date(now + 65000); // Increased buffer to 5s (65000ms) to ensure sync with client countdown
 
     console.log(`Creating new round #${nextId} with seed: ${seed} and hash: ${hash}`);
 
