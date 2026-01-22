@@ -35,7 +35,7 @@ export default function GameHistory() {
   return (
     <div className="flex flex-col bg-background text-foreground min-h-screen">
       <div className="w-full flex-1 flex flex-col space-y-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <header className="flex flex-col md:flex-row items-center justify-between py-4 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 rounded-b-[2rem]">
+        <header className="flex flex-col md:flex-row items-center justify-between pb-4 pt-0 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 rounded-b-[2rem] mb-6 px-6">
           <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
             <motion.div
               whileHover={{ rotate: 15, scale: 1.1 }}
@@ -97,44 +97,44 @@ export default function GameHistory() {
                     <Table>
                       <TableHeader className="bg-white/5">
                         <TableRow>
-                          <TableHead className="font-black uppercase tracking-widest text-white/60">Round</TableHead>
-                          <TableHead className="font-black uppercase tracking-widest text-white/60">Winner</TableHead>
-                          <TableHead className="font-black uppercase tracking-widest text-white/60">Prize Pool</TableHead>
-                          <TableHead className="font-black uppercase tracking-widest text-white/60">Verification Info</TableHead>
-                          <TableHead className="font-black uppercase tracking-widest text-white/60">Date</TableHead>
-                          <TableHead className="text-right font-black uppercase tracking-widest text-white/60">Verify</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white/60 text-sm">Round</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white/60 text-sm">Winner</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white/60 text-sm">Prize Pool</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white/60 text-sm">Verification Info</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white/60 text-sm">Date</TableHead>
+                          <TableHead className="text-right font-black uppercase tracking-widest text-white/60 text-sm">Verify</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {data?.rounds.map((round) => (
                           <TableRow key={round.id} className="hover:bg-white/5 transition-colors border-white/5">
-                            <TableCell className="font-mono font-bold text-primary">#{round.id}</TableCell>
-                            <TableCell className="font-bold italic">
+                            <TableCell className="font-mono font-bold text-primary text-base">#{round.id}</TableCell>
+                            <TableCell className="font-bold italic text-base">
                               {round.winnerUsername ? (
                                 <span className="flex items-center gap-2">
-                                  <Trophy className="w-3 h-3 text-primary" />
+                                  <Trophy className="w-4 h-4 text-primary" />
                                   {formatAddress(round.winnerUsername)}
                                 </span>
                               ) : "No Winner"}
                             </TableCell>
-                            <TableCell className="font-black text-primary">
+                            <TableCell className="font-black text-primary text-lg">
                               {round.prizePool.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}
                             </TableCell>
                             <TableCell>
-                              <div className="flex flex-col gap-1 min-w-[200px]">
+                              <div className="flex flex-col gap-1 min-w-[240px]">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-[10px] text-white/40 uppercase font-bold">Hash:</span>
-                                  <span className="text-[10px] font-mono text-white truncate max-w-[120px]">{round.publicHash}</span>
-                                  <Copy className="w-3 h-3 text-white/20 cursor-pointer hover:text-primary transition-colors" onClick={() => {
+                                  <span className="text-xs text-white/40 uppercase font-bold">Hash:</span>
+                                  <span className="text-xs font-mono text-white truncate max-w-[150px]">{round.publicHash}</span>
+                                  <Copy className="w-4 h-4 text-white/20 cursor-pointer hover:text-primary transition-colors" onClick={() => {
                                     navigator.clipboard.writeText(round.publicHash);
                                     toast({ title: "Hash Copied" });
                                   }} />
                                 </div>
                                 {round.serverSeed && (
                                   <div className="flex items-center gap-2">
-                                    <span className="text-[10px] text-primary/40 uppercase font-bold">Seed:</span>
-                                    <span className="text-[10px] font-mono text-primary truncate max-w-[120px]">{round.serverSeed}</span>
-                                    <Copy className="w-3 h-3 text-primary/20 cursor-pointer hover:text-primary transition-colors" onClick={() => {
+                                    <span className="text-xs text-primary/40 uppercase font-bold">Seed:</span>
+                                    <span className="text-xs font-mono text-primary truncate max-w-[150px]">{round.serverSeed}</span>
+                                    <Copy className="w-4 h-4 text-primary/20 cursor-pointer hover:text-primary transition-colors" onClick={() => {
                                       navigator.clipboard.writeText(round.serverSeed);
                                       toast({ title: "Seed Copied" });
                                     }} />
@@ -142,7 +142,7 @@ export default function GameHistory() {
                                 )}
                               </div>
                             </TableCell>
-                            <TableCell className="text-white/60 text-sm whitespace-nowrap">
+                            <TableCell className="text-white/60 text-base whitespace-nowrap">
                               {round.completedAt ? format(new Date(round.completedAt), "MMM d, HH:mm") : "-"}
                             </TableCell>
                             <TableCell className="text-right">

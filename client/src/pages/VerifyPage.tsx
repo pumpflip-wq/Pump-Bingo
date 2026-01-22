@@ -15,11 +15,10 @@ export default function VerifyPage() {
   const [location] = useLocation();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const roundId = params.get('roundId');
+    const searchParams = new URLSearchParams(window.location.search);
+    const roundId = searchParams.get('roundId');
     
-    // Fallback: Check if we have rounds and the roundId is set
-    if (roundId && rounds) {
+    if (roundId && rounds && rounds.length > 0) {
       const round = rounds.find(r => r.id === Number(roundId));
       if (round) {
         setManualHash(round.publicHash);
@@ -30,7 +29,7 @@ export default function VerifyPage() {
         }
       }
     }
-  }, [rounds, location]);
+  }, [rounds, window.location.search]);
 
   const verifySeed = (seed: string, expectedHash: string) => {
     try {
@@ -44,7 +43,7 @@ export default function VerifyPage() {
   return (
     <div className="flex flex-col bg-background text-foreground min-h-screen">
       <div className="w-full flex-1 flex flex-col space-y-4 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <header className="flex flex-col md:flex-row items-center justify-between py-4 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 rounded-b-[2rem]">
+        <header className="flex flex-col md:flex-row items-center justify-between pb-4 pt-0 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 rounded-b-[2rem] mb-6 px-6">
           <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
             <motion.div
               whileHover={{ rotate: 15, scale: 1.1 }}
@@ -101,40 +100,40 @@ export default function VerifyPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-white/10">
-                    <th className="py-3 px-4 text-[11px] font-black uppercase tracking-widest text-white">Round ID</th>
-                    <th className="py-3 px-4 text-[11px] font-black uppercase tracking-widest text-white">Public Hash</th>
-                    <th className="py-3 px-4 text-[11px] font-black uppercase tracking-widest text-white">Server Seed</th>
-                    <th className="py-3 px-4 text-[11px] font-black uppercase tracking-widest text-white">Status</th>
+                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white">Round ID</th>
+                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white">Public Hash</th>
+                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white">Server Seed</th>
+                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {rounds?.slice(0, 10).map((round) => (
                     <tr key={round.id} className="group hover:bg-white/[0.02] transition-colors">
-                      <td className="py-3 px-4 font-mono text-sm text-white font-bold">#{round.id}</td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2 max-w-[200px]">
-                          <span className="font-mono text-[11px] text-white font-bold truncate">{round.publicHash}</span>
-                          <Copy className="w-3.5 h-3.5 text-white/40 cursor-pointer hover:text-primary transition-colors" onClick={() => {
+                      <td className="py-4 px-6 font-mono text-base text-white font-bold">#{round.id}</td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-2 max-w-[250px]">
+                          <span className="font-mono text-xs text-white font-bold truncate">{round.publicHash}</span>
+                          <Copy className="w-4 h-4 text-white/40 cursor-pointer hover:text-primary transition-colors" onClick={() => {
                             navigator.clipboard.writeText(round.publicHash);
                             toast({ title: "Hash Copied" });
                           }} />
                         </div>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-4 px-6">
                         {round.status === 'FINISHED' ? (
-                          <div className="flex items-center gap-2 max-w-[200px]">
-                            <span className="font-mono text-[11px] text-primary font-bold truncate">{round.serverSeed}</span>
-                            <Copy className="w-3.5 h-3.5 text-primary/60 cursor-pointer hover:text-primary transition-colors" onClick={() => {
+                          <div className="flex items-center gap-2 max-w-[250px]">
+                            <span className="font-mono text-xs text-primary font-bold truncate">{round.serverSeed}</span>
+                            <Copy className="w-4 h-4 text-primary/60 cursor-pointer hover:text-primary transition-colors" onClick={() => {
                               navigator.clipboard.writeText(round.serverSeed || "");
                               toast({ title: "Seed Copied" });
                             }} />
                           </div>
                         ) : (
-                          <span className="text-[11px] font-black uppercase tracking-widest text-white/40">Hidden</span>
+                          <span className="text-xs font-black uppercase tracking-widest text-white/40">Hidden</span>
                         )}
                       </td>
-                      <td className="py-3 px-4">
-                        <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md ${
+                      <td className="py-4 px-6">
+                        <span className={`text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-md ${
                           round.status === 'FINISHED' ? 'bg-primary/20 text-primary border border-primary/20' : 'bg-white/10 text-white border border-white/10'
                         }`}>
                           {round.status}
@@ -153,21 +152,21 @@ export default function VerifyPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-[0.2em] text-white ml-2">Server Seed</label>
+                <label className="text-sm font-black uppercase tracking-[0.2em] text-white ml-2">Server Seed</label>
                 <input 
                   value={manualSeed}
                   onChange={(e) => setManualSeed(e.target.value)}
                   placeholder="Enter server seed..."
-                  className="w-full bg-black/60 border border-white/20 rounded-xl px-4 py-3 font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-white/20"
+                  className="w-full bg-black/60 border border-white/20 rounded-xl px-6 py-4 font-mono text-base text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-white/20"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-[0.2em] text-white ml-2">Expected Public Hash</label>
+                <label className="text-sm font-black uppercase tracking-[0.2em] text-white ml-2">Expected Public Hash</label>
                 <input 
                   value={manualHash}
                   onChange={(e) => setManualHash(e.target.value)}
                   placeholder="Enter public hash..."
-                  className="w-full bg-black/60 border border-white/20 rounded-xl px-4 py-3 font-mono text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-white/20"
+                  className="w-full bg-black/60 border border-white/20 rounded-xl px-6 py-4 font-mono text-base text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-white/20"
                 />
               </div>
             </div>
