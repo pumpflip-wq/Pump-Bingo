@@ -208,7 +208,9 @@ export default function Home() {
                             </div>
                             <div className="flex flex-col text-center">
                               <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Players</p>
-                              <p className="text-3xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                              <div className="flex justify-center">
+                                <p className="text-3xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                              </div>
                             </div>
                           </div>
                         </div>

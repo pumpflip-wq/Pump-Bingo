@@ -39,9 +39,9 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                       @{formatAddress(p.username)}
                       {isMe && <span className="text-[10px] text-primary font-black ml-1">(YOU)</span>}
                     </span>
-                    {roundStatus === 'IN_GAME' && (
-                      <span className="text-xs font-black text-primary">{Math.round(p.prob)}%</span>
-                    )}
+                    <span className="text-sm font-black text-primary">
+                      {roundStatus === 'IN_GAME' ? `${Math.round(p.prob)}%` : "0%"}
+                    </span>
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
                     <span className="text-[10px] text-primary font-black font-mono">+{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} {PROTOCOL_CONFIG.SYMBOL}</span>

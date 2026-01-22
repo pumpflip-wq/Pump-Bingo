@@ -54,7 +54,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
       setLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          // Don't call handleClose here to avoid loop, let parent manage
+          handleClose();
           return 0;
         }
         return prev - 1;
