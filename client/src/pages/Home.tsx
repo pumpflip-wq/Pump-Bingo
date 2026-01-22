@@ -121,11 +121,13 @@ export default function Home() {
 
   useEffect(() => {
     const isFinished = roundData?.round.status === 'FINISHED';
+    const isStarting = roundData?.round.status === 'STARTING';
+    const isOpen = roundData?.round.status === 'OPEN';
     const hasWinner = !!roundData?.round.winnerId;
     const currentRoundId = roundData?.round.id;
     
-    // Show overlay ONLY for participants (players)
-    if (isParticipant && (isFinished || (roundData?.round.status === 'IN_GAME' && hasWinner)) && hasWinner) {
+    // Show overlay ONLY for participants (players) during victory state
+    if (isParticipant && hasWinner && (isFinished || roundData?.round.status === 'IN_GAME')) {
       if (!overlayData || overlayData.roundId !== currentRoundId) {
         const isMe = roundData.round.winnerId === user?.id;
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
@@ -140,11 +142,13 @@ export default function Home() {
           roundId: currentRoundId
         });
       }
-    } else if (roundData?.round.status === 'OPEN' || roundData?.round.status === 'STARTING') {
-      // Auto-clear overlay when moving to a new round
-      if (overlayData) setOverlayData(null);
+    } else if (isOpen || isStarting) {
+      // CLEAR overlay when a new round starts or is waiting
+      if (overlayData) {
+        setOverlayData(null);
+      }
     }
-  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.id, isParticipant, user?.id, walletAddress, roundData?.participants]);
+  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.id, isParticipant, user?.id, walletAddress, roundData?.participants, overlayData?.roundId]);
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
     ...p,

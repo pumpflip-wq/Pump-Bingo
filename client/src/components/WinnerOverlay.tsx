@@ -33,16 +33,13 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
     if (show && !hasPlayedSound) {
       if (isWinner) {
         playSound("/sounds/start.mp3", 0.6);
-        const timer = setTimeout(() => {
-          confetti({
-            particleCount: 200,
-            spread: 80,
-            origin: { y: 0.5 },
-            colors: ['#39FF14', '#ffffff', '#9945FF']
-          });
-        }, 200);
         setHasPlayedSound(true);
-        return () => clearTimeout(timer);
+        confetti({
+          particleCount: 200,
+          spread: 80,
+          origin: { y: 0.5 },
+          colors: ['#39FF14', '#ffffff', '#9945FF']
+        });
       } else {
         playSound("/sounds/transition.mp3", 0.5);
         setHasPlayedSound(true);
@@ -51,16 +48,13 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
   }, [show, isWinner, hasPlayedSound, playSound]);
 
   useEffect(() => {
-    if (!show) {
-      if (timeLeft !== 10) setLeft(10);
-      return;
-    }
+    if (!show) return;
 
     const interval = setInterval(() => {
       setLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          handleClose();
+          // Don't call handleClose here to avoid loop, let parent manage
           return 0;
         }
         return prev - 1;
@@ -68,12 +62,10 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [show, timeLeft]);
+  }, [show]);
 
   const handleClose = () => {
     onClose();
-    setLeft(10);
-    setHasPlayedSound(false);
   };
 
   const explorerUrl = txHash ? `https://explorer.solana.com/tx/${txHash}?cluster=${PROTOCOL_CONFIG.NETWORK}` : null;

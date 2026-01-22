@@ -51,32 +51,21 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const playSound = (soundPath: string, volume = 0.5) => {
-    if (isMuted) return;
+    if (isMuted || !isUnlocked) return;
     
     const normalizedPath = soundPath.startsWith('/') ? soundPath : `/${soundPath}`;
     
     try {
       const audio = new Audio(normalizedPath);
       audio.volume = volume;
-      audio.preservesPitch = false; // Slight performance optimization
       
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.catch(err => {
-          console.warn(`[Sound] Playback deferred for: ${normalizedPath}. Retrying on next interaction.`);
-          
-          const retryOnInteraction = () => {
-            audio.play().catch(() => {});
-            window.removeEventListener('click', retryOnInteraction);
-            window.removeEventListener('touchstart', retryOnInteraction);
-          };
-          window.addEventListener('click', retryOnInteraction);
-          window.addEventListener('touchstart', retryOnInteraction);
+          // Silent catch for autoplay issues
         });
       }
-    } catch (e) {
-      console.error("[Sound] Error playing sound:", e);
-    }
+    } catch (e) {}
   };
 
   return (
