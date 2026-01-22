@@ -290,7 +290,8 @@ export default function Home() {
                   <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden relative">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <motion.div 
-                    initial={{ opacity: 0, rotateY: -90 }}
+                    key="waiting"
+                    initial={false}
                     animate={{ opacity: 1, rotateY: 0 }}
                     exit={{ opacity: 0, rotateY: 90 }}
                     transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -544,20 +545,19 @@ function HistoryItem({ id, winner, prize, formatAddress, completedAt }: { id: nu
     <a href={explorerUrl} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:border-primary/50 hover:bg-white/10 group relative">
       <div className="flex justify-between items-start mb-2">
         <div className="flex flex-col">
-          <span className="font-mono text-[10px] text-white tracking-tighter">ROUND #{id}</span>
+          <span className="font-mono text-xs font-black text-white tracking-tighter">ROUND #{id}</span>
           {completedAt && (
-            <span className="text-[9px] text-white/40 font-bold">
-              {format(new Date(completedAt), "HH:mm:ss")}
+            <span className="text-[10px] text-white/40 font-bold mt-0.5">
+              {format(new Date(completedAt), "MMM d, HH:mm:ss")}
             </span>
           )}
         </div>
-        <span className="text-primary font-black font-display italic text-base">+{prize.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}</span>
+        <span className="text-primary font-black font-display italic text-lg">+{prize.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}</span>
       </div>
       <div className="flex justify-between items-center">
         <span className="text-sm font-black text-white italic">@{formatAddress(winner)}</span>
         <div className="flex items-center gap-2">
-          <ShieldCheck className="w-3.5 h-3.5 text-primary/40 group-hover:text-primary transition-colors" />
-          <span className="text-[10px] text-white uppercase font-black group-hover:text-white transition-colors">BLOCKCHAIN PROOF</span>
+          <ExternalLink className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
         </div>
       </div>
     </a>

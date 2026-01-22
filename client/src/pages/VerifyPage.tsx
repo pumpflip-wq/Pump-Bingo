@@ -52,8 +52,11 @@ export default function VerifyPage() {
   const verifySeed = (seed: string, expectedHash: string) => {
     if (!seed || !expectedHash) return false;
     try {
-      const hash = crypto.createHash('sha256').update(seed.trim()).digest('hex');
-      return hash.toLowerCase() === expectedHash.trim().toLowerCase();
+      const trimmedSeed = seed.trim();
+      const trimmedHash = expectedHash.trim();
+      const hash = crypto.createHash('sha256').update(trimmedSeed).digest('hex');
+      console.log("Verifying:", { seed: trimmedSeed, hash, expected: trimmedHash });
+      return hash.toLowerCase() === trimmedHash.toLowerCase();
     } catch (e) {
       return false;
     }
