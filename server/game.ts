@@ -58,7 +58,8 @@ export class GameManager {
     const hash = crypto.createHash('sha256').update(seed).digest('hex');
     
     // Default wait time is 60 seconds
-    const startTime = new Date(Date.now() + 60 * 1000); 
+    const now = Date.now();
+    const startTime = new Date(now + 60 * 1000); 
 
     await storage.createRound({
       status: ROUND_STATUS.OPEN,

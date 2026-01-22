@@ -115,6 +115,20 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Already joined this round" });
       }
 
+      // Check if user has enough balance
+      if (user.balance < round.price) {
+        return res.status(400).json({ message: "Insufficient balance" });
+      }
+
+      // Deduct from balance
+      await storage.updateUserBalance(userId, -round.price);
+      await storage.createTransaction({
+        userId,
+        amount: -round.price,
+        type: "BUY_IN",
+        roundId
+      });
+
       // Add to prize pool
       await storage.updateRound(roundId, { prizePool: round.prizePool + round.price });
 

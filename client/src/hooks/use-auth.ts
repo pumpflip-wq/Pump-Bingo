@@ -45,7 +45,8 @@ export function useAuth() {
   const logout = () => {
     localStorage.removeItem(USER_ID_KEY);
     queryClient.setQueryData([api.auth.me.path, storedId], null);
-    window.location.reload();
+    queryClient.invalidateQueries({ queryKey: [api.auth.me.path] });
+    // Instead of reload, we just clear the user state which triggers UI updates
   };
 
   return {
