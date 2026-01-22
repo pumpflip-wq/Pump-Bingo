@@ -136,12 +136,12 @@ export default function Home() {
 
     if (hasWinner && winnerDeclaredAt) {
       const elapsed = currentTime - winnerDeclaredAt;
-      const totalDisplayTime = 10000; // Total display time for the overlay
+      const totalDisplayTime = 10000; 
       const remaining = Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000));
       
       // Stop showing if timer expired - ensure clean exit
-      if (remaining < 0 || elapsed > 10500) {
-        // Do not update state in useMemo
+      // Using a slightly more strict check to avoid re-triggering
+      if (elapsed >= totalDisplayTime) {
         return null;
       }
 
@@ -175,9 +175,8 @@ export default function Home() {
         // The overlay should stay up for exactly 10s. 
         // Once elapsed hits 10s, we mark it as closed to prevent double triggers
         // We use a small buffer to ensure we only trigger once
-        if (elapsed >= 10000 && !hasManuallyClosed && lastOverlayRoundId !== roundData.round.id) {
+        if (elapsed >= 10000 && !hasManuallyClosed && lastOverlayRoundId === roundData.round.id) {
           setHasManuallyClosed(true);
-          setLastOverlayRoundId(roundData.round.id);
         }
       }
     } else {

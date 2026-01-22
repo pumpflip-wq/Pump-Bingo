@@ -19,11 +19,15 @@ function checkBingo(card: number[][], drawnNumbers: number[]): boolean {
   if (!drawnNumbers || drawnNumbers.length < 4) return false;
   const drawn = new Set(drawnNumbers);
   
+  // A standard Bingo win requires 5 marks in a row/column/diagonal.
+  // The center space (card[2][2]) is often a free space (value 0).
+  const isMarked = (n: number) => n === 0 || drawn.has(n);
+
+  // Rows
   for (let row = 0; row < 5; row++) {
     let rowComplete = true;
     for (let col = 0; col < 5; col++) {
-      const num = card[row][col];
-      if (num !== 0 && !drawn.has(num)) {
+      if (!isMarked(card[row][col])) {
         rowComplete = false;
         break;
       }
@@ -31,11 +35,11 @@ function checkBingo(card: number[][], drawnNumbers: number[]): boolean {
     if (rowComplete) return true;
   }
 
+  // Columns
   for (let col = 0; col < 5; col++) {
     let colComplete = true;
     for (let row = 0; row < 5; row++) {
-      const num = card[row][col];
-      if (num !== 0 && !drawn.has(num)) {
+      if (!isMarked(card[row][col])) {
         colComplete = false;
         break;
       }
@@ -43,20 +47,20 @@ function checkBingo(card: number[][], drawnNumbers: number[]): boolean {
     if (colComplete) return true;
   }
 
+  // Diagonal 1 (top-left to bottom-right)
   let diag1Complete = true;
   for (let i = 0; i < 5; i++) {
-    const num = card[i][i];
-    if (num !== 0 && !drawn.has(num)) {
+    if (!isMarked(card[i][i])) {
       diag1Complete = false;
       break;
     }
   }
   if (diag1Complete) return true;
 
+  // Diagonal 2 (top-right to bottom-left)
   let diag2Complete = true;
   for (let i = 0; i < 5; i++) {
-    const num = card[i][4 - i];
-    if (num !== 0 && !drawn.has(num)) {
+    if (!isMarked(card[i][4 - i])) {
       diag2Complete = false;
       break;
     }
