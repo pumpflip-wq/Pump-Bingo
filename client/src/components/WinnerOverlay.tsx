@@ -51,6 +51,11 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
               <div 
                 className="w-48 h-48 rounded-none overflow-visible flex items-center justify-center"
               >
+                {!isWinner && (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                    <Frown className="w-32 h-32 text-red-500 animate-bounce" />
+                  </div>
+                )}
                 {isWinner && (
                   <img 
                     src="https://i.ibb.co/F4JdGb1q/20260122-1554-Image-Generation-remix-01kfjzkjq3ebzbpy2j9dhghe0s.png" 

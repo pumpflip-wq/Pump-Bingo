@@ -28,11 +28,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
             const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && amIParticipating;
             
             return (
-              <motion.div 
+              <div 
                 key={p.id}
-                layout
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
                 className={cn(
                   "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
                   isMe ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5"
@@ -67,7 +64,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                   "w-4 h-4 transition-colors shrink-0 ml-2",
                   isMe ? "text-primary" : "text-primary/40 group-hover:text-primary"
                 )} />
-              </motion.div>
+              </div>
             );
           })}
         </AnimatePresence>

@@ -88,17 +88,14 @@ export default function Home() {
 
     if (maxProgress === 100) return 100;
     
-    // Calculate a more granular probability based on proximity to win
-    // Using a base from max progress and adding weighted bonuses for multiple potential lines
-    const baseProb = maxProgress * 0.8;
-    const proximityBonus = (potentialLines * 10);
-    const tensionFactor = (totalProgress / (12 * 100)) * 15; // Weighted by overall card coverage
-    
-    // Add jitter to make numbers move in small increments
-    const jitter = (Math.sin(drawn.length * 10) + 1) * 2;
-    
-    const finalProb = Math.min(99, Math.floor(baseProb + proximityBonus + tensionFactor + jitter));
+    // Improved calculation: 0% at start, moves with drawn numbers
+    if (drawn.length === 0) return 0;
 
+    const baseProb = maxProgress * 0.7;
+    const proximityBonus = (potentialLines * 8);
+    const densityFactor = (drawn.length / 75) * 15;
+    
+    const finalProb = Math.min(99, Math.floor(baseProb + proximityBonus + densityFactor));
     return Math.max(0, finalProb);
   };
 
@@ -118,7 +115,7 @@ export default function Home() {
     const isMe = roundData?.round.winnerId === user?.id;
     const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
     
-    if (hasManuallyClosed || !isMe || !winnerDeclaredAt || isFinished) {
+    if (hasManuallyClosed || !winnerDeclaredAt || isFinished) {
       return null;
     }
 
@@ -129,7 +126,6 @@ export default function Home() {
       return null;
     }
 
-    const remaining = Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000));
     const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
     const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
     
@@ -139,7 +135,7 @@ export default function Home() {
       prize: roundData.round.prizePool || 0,
       isWinner: isMe,
       txHash: (roundData.round as any).txHash,
-      timeLeft: remaining,
+      timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
       currentRoundId: currentRoundId
     };
   }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime]);
