@@ -4,7 +4,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Trophy, History, ShieldCheck, ChevronLeft, ChevronRight, ExternalLink, Copy, Search } from "lucide-react";
-import { useState, motion } from "react";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { format } from "date-fns";
 import { Link } from "wouter";
