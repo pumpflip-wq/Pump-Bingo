@@ -275,7 +275,8 @@ export default function Home() {
                         <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto">
                           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
                           <p className="text-white text-xl uppercase font-black tracking-[0.2em] mb-6 font-mono">
-                            {roundData.round.status === 'STARTING' ? 'Securing Game Chain...' : 'Game Starting In'}
+                            {roundData.round.status === 'STARTING' ? 'SECURING GAME PROTOCOL...' : 
+                             roundData.participantsCount < 2 ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
                           </p>
                           <CountdownTimer 
                             targetDate={roundData.round.startTime?.toString() || null} 
@@ -283,9 +284,14 @@ export default function Home() {
                             participantCount={roundData.participantsCount}
                           />
                           {roundData.participantsCount < 2 && (
-                            <p className="text-primary text-lg uppercase font-black mt-6 animate-pulse tracking-widest font-display">
-                              Waiting for players...
-                            </p>
+                            <div className="space-y-2 mt-6">
+                              <p className="text-primary text-lg uppercase font-black animate-pulse tracking-widest font-display">
+                                Waiting for Players...
+                              </p>
+                              <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.3em]">
+                                Minimum 2 participants required to launch the round
+                              </p>
+                            </div>
                           )}
                         </div>
                         <div className="w-full max-w-md mx-auto mb-2">
@@ -295,9 +301,12 @@ export default function Home() {
                               <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-16 !px-10 !text-xl !rounded-2xl !w-full !font-black !italic !tracking-tighter !text-black shadow-lg" />
                             </div>
                           ) : participant || foundParticipant ? (
-                            <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl">
-                              <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">YOU'RE IN THE GAME!</p>
-                              <p className="text-sm text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">Wait for Next Game - Next round starts automatically</p>
+                            <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl shadow-[0_0_30px_rgba(34,197,94,0.1)]">
+                              <p className="text-primary font-black text-3xl italic tracking-tighter mb-2 uppercase text-center">YOU'RE IN THE GAME!</p>
+                              <div className="space-y-1">
+                                <p className="text-sm text-primary/90 uppercase font-black tracking-widest text-center whitespace-nowrap">CARD SECURED • ENTRY PAID</p>
+                                <p className="text-[10px] text-white/40 uppercase font-black tracking-widest text-center">Your card will automatically activate when the round begins</p>
+                              </div>
                             </div>
                           ) : (
                             <div className="space-y-4">
