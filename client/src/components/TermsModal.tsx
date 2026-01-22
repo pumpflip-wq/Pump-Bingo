@@ -69,35 +69,45 @@ export function TermsModal({ onAccept, show = false }: TermsModalProps) {
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-white font-black uppercase tracking-widest text-xs">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>1. Age Requirement</span>
+                  <span>1. Age Requirement & Identity</span>
                 </div>
                 <p>
-                  By entering PUMP BINGO, you certify that you are at least 18 years of age (or the legal age for gambling in your jurisdiction). This platform involves real-time gaming with digital assets.
+                  By accessing PUMP BINGO, you represent and warrant that you are at least 18 years of age (or the minimum legal age for participation in your jurisdiction, whichever is higher). This platform uses Solana blockchain technology and involves real-time gaming with digital assets (SPL tokens).
                 </p>
               </section>
 
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-white font-black uppercase tracking-widest text-xs">
                   <Scale className="w-4 h-4 text-primary" />
-                  <span>2. Legal Disclaimer</span>
+                  <span>2. Risk Disclosure & Legal Disclaimer</span>
                 </div>
                 <p>
-                  The services provided are on an "as-is" basis. We do not guarantee winnings. Participation in bingo rounds is voluntary. You agree that PUMP BINGO and its affiliates are not liable for any financial losses incurred through the use of this platform.
+                  Participation in bingo rounds involves financial risk. The value of digital assets can be highly volatile. PUMP BINGO is provided on an "as-is" and "as-available" basis. We do not guarantee winnings, financial gain, or technical uptime. You are solely responsible for compliance with local laws. By participating, you agree that PUMP BINGO and its affiliates are not liable for any financial losses, technical errors, or asset forfeiture.
                 </p>
               </section>
 
               <section className="space-y-4">
                 <div className="flex items-center gap-2 text-white font-black uppercase tracking-widest text-xs">
                   <Info className="w-4 h-4 text-primary" />
-                  <span>3. Provably Fair System</span>
+                  <span>3. Fair Play & Security</span>
                 </div>
                 <p>
-                  All games are governed by our Provably Fair cryptographic system. You can verify the integrity of every round using the provided hashes and server seeds. Manipulation or abuse of the system will result in permanent ban and forfeiture of assets.
+                  All games are governed by our Provably Fair cryptographic system using SHA-256 hashing. You can verify every round's integrity. Any attempt at manipulation, exploitation of bugs, or use of automated bots is strictly prohibited and will result in a permanent ban, blacklisting of your wallet address, and forfeiture of all platform-related assets.
+                </p>
+              </section>
+
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 text-white font-black uppercase tracking-widest text-xs">
+                  <ShieldAlert className="w-4 h-4 text-primary" />
+                  <span>4. Wallet Responsibility</span>
+                </div>
+                <p>
+                  You are solely responsible for the security of your private keys and Solana wallet. PUMP BINGO never stores your private keys. All transactions on the blockchain are final and irreversible.
                 </p>
               </section>
 
               <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 text-[10px] uppercase font-black tracking-widest text-primary leading-loose">
-                NOTICE: CONTINUING BEYOND THIS POINT CONSTITUTES FULL AGREEMENT TO THE TERMS LISTED ABOVE AND UNLOCKS ALL SYSTEM CAPABILITIES.
+                NOTICE: CONTINUING BEYOND THIS POINT CONSTITUTES A LEGALLY BINDING AGREEMENT TO ALL TERMS LISTED ABOVE. YOU ACKNOWLEDGE THE RISKS AND UNLOCK FULL SYSTEM CAPABILITIES.
               </div>
             </div>
 

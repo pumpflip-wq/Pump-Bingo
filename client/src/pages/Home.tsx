@@ -51,54 +51,39 @@ export default function Home() {
 
   const calculateWinProb = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);
-    if (drawnSet.size === 0) return 0;
+    // Include free space (0)
+    drawnSet.add(0);
     
-    let minMissing = 5;
+    if (drawnSet.size <= 1) return 0;
+    
+    const lines = [
+      // Rows
+      ...Array(5).fill(0).map((_, r) => card[r]),
+      // Columns
+      ...Array(5).fill(0).map((_, c) => card.map(r => r[c])),
+      // Diagonals
+      Array(5).fill(0).map((_, i) => card[i][i]),
+      Array(5).fill(0).map((_, i) => card[i][4 - i])
+    ];
 
-    for (let r = 0; r < 5; r++) {
-      const rowNumbers = card[r].filter(n => n !== 0);
-      const missing = rowNumbers.filter(n => !drawnSet.has(n)).length;
-      minMissing = Math.min(minMissing, missing);
-    }
-    for (let c = 0; c < 5; c++) {
-      let missing = 0;
-      let totalInCol = 0;
-      for (let r = 0; r < 5; r++) {
-        const n = card[r][c];
-        if (n !== 0) {
-          totalInCol++;
-          if (!drawnSet.has(n)) missing++;
-        }
-      }
-      if (totalInCol > 0) minMissing = Math.min(minMissing, missing);
-    }
-    let d1Missing = 0, d1Total = 0;
-    let d2Missing = 0, d2Total = 0;
-    for (let i = 0; i < 5; i++) {
-      if (card[i][i] !== 0) {
-        d1Total++;
-        if (!drawnSet.has(card[i][i])) d1Missing++;
-      }
-      if (card[i][4-i] !== 0) {
-        d2Total++;
-        if (!drawnSet.has(card[i][4-i])) d2Missing++;
-      }
-    }
-    if (d1Total > 0) minMissing = Math.min(minMissing, d1Missing);
-    if (d2Total > 0) minMissing = Math.min(minMissing, d2Missing);
+    let maxProgress = 0;
+    let potentialLines = 0;
 
-    if (minMissing === 0) return 100;
+    lines.forEach(line => {
+      const missing = line.filter(n => !drawnSet.has(n)).length;
+      const progress = ((5 - missing) / 5) * 100;
+      if (progress > maxProgress) maxProgress = progress;
+      if (missing === 1) potentialLines++;
+    });
+
+    if (maxProgress === 100) return 100;
     
-    const drawnCount = drawn.length;
-    const baseProgress: Record<number, number> = {
-      5: Math.min(10, (drawnCount / 75) * 20),
-      4: 10 + Math.min(20, (drawnCount / 75) * 40),
-      3: 30 + Math.min(30, (drawnCount / 75) * 60),
-      2: 60 + Math.min(25, (drawnCount / 75) * 50),
-      1: 85 + Math.min(14, (drawnCount / 75) * 30)
-    };
-    
-    return Math.floor(baseProgress[minMissing] ?? 0);
+    // Add a small bonus for having multiple lines that are close (e.g. 4/5)
+    // This makes the percentage "smarter" as requested
+    const bonus = Math.min(10, potentialLines * 2);
+    const finalProb = Math.floor(Math.min(99, maxProgress + bonus));
+
+    return finalProb;
   };
 
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -123,14 +108,17 @@ export default function Home() {
 
     const winKey = hasWinner ? `${currentRoundId}_win` : null;
     
+    // Use the round's finished status as the ultimate source of truth for transition
+    const isRoundFullyFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
+
     // Check winKey but ensure it's not already closed manually for THIS win
     if (winKey && winKey !== lastWinKey) {
       setLastWinKey(winKey);
       setHasManuallyClosed(false);
     }
 
-    // Don't show if manually closed
-    if (hasManuallyClosed) {
+    // Don't show if manually closed OR if the round is actually already marked as finished on server
+    if (hasManuallyClosed || isRoundFullyFinished) {
       return null;
     }
 
@@ -306,7 +294,7 @@ export default function Home() {
                             </div>
                           ) : (
                             <div className="space-y-4">
-                              <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} className="w-full h-14 text-xl font-black italic tracking-tighter" />
+                              <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
                               <p className="text-[12px] text-white uppercase font-black tracking-[0.2em] text-center opacity-80">JOIN BEFORE GAME STARTS</p>
                             </div>
                           )}
@@ -322,21 +310,21 @@ export default function Home() {
                       transition={{ duration: 0.8, ease: "easeInOut" }}
                       className="space-y-4 flex-1 overflow-hidden h-full flex flex-col"
                     >
-                      <div className="glass-card neon-border rounded-xl p-6 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
+                      <div className="glass-card neon-border rounded-xl p-4 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
                         <div className="flex flex-col">
-                          <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
+                          <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1 opacity-70">Prize Pool</p>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-6xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{formatCurrency(roundData.round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}</span>
+                            <span className="text-3xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{formatCurrency(roundData.round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}</span>
                           </div>
                         </div>
-                        <div className="flex gap-16">
+                        <div className="flex gap-8">
                           <div className="text-center">
-                            <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-1">Room</p>
-                            <p className="text-5xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
+                            <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1 opacity-70">Room</p>
+                            <p className="text-2xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
                           </div>
                           <div className="text-center">
-                            <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
-                            <p className="text-5xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                            <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1 opacity-70">Players</p>
+                            <p className="text-2xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                           </div>
                         </div>
                       </div>
