@@ -165,17 +165,21 @@ export default function Home() {
   }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime, lastWinKey]);
 
   useEffect(() => {
-    if (roundData?.round.status === 'FINISHED') {
+    const isRoundFinished = roundData?.round.status === 'FINISHED';
+    const hasWinner = !!roundData?.round.winnerId;
+    
+    if (isRoundFinished || hasWinner) {
       const winnerDeclaredAt = roundData.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
       if (winnerDeclaredAt) {
         const elapsed = currentTime - winnerDeclaredAt;
-        // Increase threshold to match server transition (11s)
-        if (elapsed >= 10500 && !hasManuallyClosed) {
+        // The overlay should stay up for exactly 10s. 
+        // Once elapsed hits 10s, we mark it as closed to prevent double triggers
+        if (elapsed >= 10000 && !hasManuallyClosed) {
           setHasManuallyClosed(true);
         }
       }
     }
-  }, [roundData?.round.status, roundData?.round.completedAt, currentTime, hasManuallyClosed]);
+  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.completedAt, currentTime, hasManuallyClosed]);
 
   const nextRoundTimer = useMemo(() => {
     if ((roundData?.round.status === 'FINISHED' || roundData?.round.winnerId) && roundData.round.completedAt) {
@@ -186,10 +190,22 @@ export default function Home() {
     return 0;
   }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.completedAt, currentTime]);
 
-  const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
-    ...p,
-    prob: calculateWinProb(p.card, roundData.round.drawnNumbers || [])
-  })).sort((a, b) => b.prob - a.prob) : [];
+  const sortedParticipants = useMemo(() => {
+    if (!roundData?.participants) return [];
+    
+    const withProb = roundData.participants.map(p => ({
+      ...p,
+      prob: calculateWinProb(p.card, roundData.round.drawnNumbers || [])
+    }));
+
+    // If I'm not a participant, don't sort the list by probability for the sidebar
+    // This keeps the sidebar stable for spectators while they see the dynamic ranking in the center
+    if (!isParticipant) {
+      return withProb;
+    }
+
+    return withProb.sort((a, b) => b.prob - a.prob);
+  }, [roundData?.participants, roundData?.round.drawnNumbers, isParticipant]);
 
   return (
     <>

@@ -43,8 +43,8 @@ export class GameManager {
         // Wait exactly 10 seconds after round finished before starting a new one
         if (latestRound && latestRound.completedAt) {
           const finishedAt = new Date(latestRound.completedAt).getTime();
-          // Increase threshold slightly to 11s to allow client UI to complete its 10s animation
-          if (Date.now() - finishedAt < 11000) {
+          // Increase threshold to 12s to be absolutely sure client timers (10s) and animations finish
+          if (Date.now() - finishedAt < 12000) {
             return;
           }
         }

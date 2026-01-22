@@ -24,7 +24,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
           {participants.map((p: any) => {
             const isMe = p.username === walletAddress;
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
-            const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && (isMe || participants.some(participant => participant.username === walletAddress));
+            const amIParticipating = participants.some(participant => participant.username === walletAddress);
+            const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && amIParticipating;
             
             return (
               <motion.div 
