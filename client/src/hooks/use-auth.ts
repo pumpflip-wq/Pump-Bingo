@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type User } from "@shared/routes";
+import { api, buildUrl } from "@shared/routes";
+import { type User } from "@shared/schema";
 
 const USER_ID_KEY = "pump_bingo_user_id";
 
