@@ -189,7 +189,13 @@ export async function registerRoutes(
       const hasBingo = gameManager.validateBingo(participant.card as number[][], round.drawnNumbers || []);
       
       if (hasBingo) {
+          // Payout based on feePercentage
+          const fee = Math.max(0, Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 10));
+          const payoutMultiplier = (100 - fee) / 100;
+          const payout = Math.floor(round.prizePool * payoutMultiplier);
+
           // WINNER!
+          // Important: payout variable must be defined before calling solanaManager
           const txSignature = await solanaManager.sendReward(participant.username, payout);
 
           await storage.updateRound(roundId, { 
@@ -198,11 +204,6 @@ export async function registerRoutes(
               completedAt: new Date(), // Use this as "winnerDeclaredAt" effectively
               txHash: txSignature || undefined
           });
-          
-          // Payout based on feePercentage
-          const fee = Math.max(0, Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 10));
-          const payoutMultiplier = (100 - fee) / 100;
-          const payout = Math.floor(round.prizePool * payoutMultiplier);
           
           await storage.updateUserBalance(userId, payout);
           await storage.createTransaction({

@@ -86,22 +86,25 @@ export default function Home() {
 
     if (maxMarked === 5) return 100;
     
-    // Very conservative growth: 0% for only 1 hit, very low for 2 hits
-    if (maxMarked < 2) return 0;
+    // Always show at least 1-2% if we have at least one hit (besides free space)
+    // drawn.length > 0 ensures we have started. 
+    if (maxMarked >= 1 && drawn.length > 0) {
+      // Linear growth based on marks: 1 mark -> 2%, 2 marks -> 4%, 3 marks -> 15% (threshold)
+      const baseHitsProb = maxMarked * 2; 
+      
+      // Calculate threshold based probability
+      // 3 marks -> ~15-20%
+      // 4 marks -> ~40-60%
+      const thresholdProb = (maxMarked === 3) ? 15 : (maxMarked === 4 ? 45 : 0);
+      
+      const proximityBonus = potentialLines * 8; // 8% for each line that is 4/5
+      const gameProgress = (drawn.length / 75) * 10; // Max 10% from game length
+      
+      const finalProb = Math.min(99, Math.floor(Math.max(baseHitsProb, thresholdProb) + proximityBonus + gameProgress));
+      return Math.max(1, finalProb);
+    }
     
-    // If we have 2 hits, start with a very low percentage (1-3%)
-    if (maxMarked === 2) return Math.min(3, drawn.length);
-    
-    // Calculate base probability based on max marks
-    // 3 marks -> ~15-20%
-    // 4 marks -> ~40-60%
-    const baseProb = (maxMarked === 3) ? 15 : (maxMarked === 4 ? 45 : 0);
-    
-    const proximityBonus = potentialLines * 8; // 8% for each line that is 4/5
-    const gameProgress = (drawn.length / 75) * 10; // Max 10% from game length
-    
-    const finalProb = Math.min(99, Math.floor(baseProb + proximityBonus + gameProgress));
-    return Math.max(0, finalProb);
+    return 0;
   };
 
   const [currentTime, setCurrentTime] = useState(Date.now());
