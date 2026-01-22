@@ -76,7 +76,10 @@ export class DatabaseStorage implements IStorage {
 
   async updateRound(id: number, updates: Partial<Round>): Promise<Round> {
     const [updated] = await db.update(rounds)
-      .set(updates)
+      .set({
+        ...updates,
+        completedAt: updates.status === ROUND_STATUS.FINISHED ? new Date() : updates.completedAt
+      })
       .where(eq(rounds.id, id))
       .returning();
     return updated;

@@ -22,6 +22,7 @@ export const rounds = pgTable("rounds", {
   serverSeed: text("server_seed").notNull(), // Secret seed for fairness
   publicHash: text("public_hash").notNull(), // SHA256(seed) shown before game
   drawnNumbers: integer("drawn_numbers").array().default([]), // List of numbers drawn so far
+  completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
   splMint: text("spl_mint"), // Added for future SPL token integration
   feePercentage: integer("fee_percentage").default(10), // House fee

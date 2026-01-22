@@ -244,21 +244,23 @@ export default function Home() {
                           >
                             <div className="flex items-center gap-3">
                               <div className={cn(
-                                "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black border transition-colors",
+                                "w-10 h-10 rounded-lg flex items-center justify-center text-sm font-black border transition-colors",
                                 isMe 
                                   ? "bg-primary text-black border-primary" 
                                   : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-black"
                               )}>
-                                {Math.round(p.prob)}%
+                                {roundData.round.status === 'IN_GAME' ? `${Math.round(p.prob)}%` : <Users className="w-5 h-5" />}
                               </div>
                               <div className="flex flex-col">
-                                <span className="text-sm font-bold text-white italic tracking-tight flex items-center gap-1">
+                                <span className="text-lg font-black text-white italic tracking-tight flex items-center gap-1">
                                   @{formatAddress(p.username)}
-                                  {isMe && <span className="text-[10px] text-primary font-black">(YOU)</span>}
+                                  {isMe && <span className="text-xs text-primary font-black ml-1">(YOU)</span>}
                                 </span>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-[10px] text-primary/60 font-black font-mono">100 {PROTOCOL_CONFIG.SYMBOL}</span>
-                                </div>
+                                {roundData.round.status === 'IN_GAME' && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm text-primary font-black font-mono">100 {PROTOCOL_CONFIG.SYMBOL}</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -272,7 +274,7 @@ export default function Home() {
                                 </div>
                               )}
                               <ShieldCheck className={cn(
-                                "w-4 h-4 transition-colors",
+                                "w-5 h-5 transition-colors",
                                 isMe ? "text-primary" : "text-primary/40 group-hover:text-primary"
                               )} />
                             </div>
@@ -467,14 +469,15 @@ export default function Home() {
                         <div className="flex justify-center py-10">
                           <Loader2 className="w-6 h-6 text-primary animate-spin" />
                         </div>
-                      ) : historyRounds?.length ? (
-                        historyRounds.slice(0, 10).map((hr) => (
+                      ) : historyRounds?.rounds?.length ? (
+                        historyRounds.rounds.slice(0, 5).map((hr) => (
                           <HistoryItem 
                             key={hr.id}
                             id={hr.id} 
                             winner={hr.winnerUsername || "No Winner"} 
                             prize={hr.prizePool} 
                             formatAddress={formatAddress}
+                            completedAt={hr.completedAt}
                           />
                         ))
                       ) : (
@@ -533,27 +536,31 @@ export default function Home() {
   );
 }
 
-function HistoryItem({ id, winner, prize, formatAddress }: { id: number, winner: string, prize: number, formatAddress: (addr: string) => string }) {
+function HistoryItem({ id, winner, prize, formatAddress, completedAt }: { id: number, winner: string, prize: number, formatAddress: (addr: string) => string, completedAt?: string | null }) {
   const explorerUrl = `https://explorer.solana.com/address/${PROTOCOL_CONFIG.MINT_ADDRESS}?cluster=${PROTOCOL_CONFIG.NETWORK}`;
   
   return (
-    <a 
-      href={explorerUrl} 
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="block p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:border-primary/50 hover:bg-white/10 group"
-    >
+    <div className="block p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:border-primary/50 hover:bg-white/10 group relative">
       <div className="flex justify-between items-start mb-2">
-        <span className="font-mono text-[10px] text-white tracking-tighter">ROUND #{id}</span>
-        <span className="text-primary font-black font-display italic text-sm">+{prize.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}</span>
+        <div className="flex flex-col">
+          <span className="font-mono text-[10px] text-white tracking-tighter">ROUND #{id}</span>
+          <span className="text-[9px] text-white/40 font-bold">
+            {completedAt ? format(new Date(completedAt), "HH:mm:ss") : "-"}
+          </span>
+        </div>
+        <span className="text-primary font-black font-display italic text-base">+{prize.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}</span>
       </div>
       <div className="flex justify-between items-center">
-        <span className="text-xs font-black text-white italic">@{formatAddress(winner)}</span>
-        <div className="flex items-center gap-1">
-          <ShieldCheck className="w-3 h-3 text-primary/40 group-hover:text-primary transition-colors" />
-          <span className="text-[10px] text-white uppercase font-black group-hover:text-white transition-colors">VERIFIED</span>
+        <span className="text-sm font-black text-white italic">@{formatAddress(winner)}</span>
+        <div className="flex items-center gap-2">
+          <Link href={`/verify?roundId=${id}`}>
+            <button className="text-[10px] text-primary/60 hover:text-primary uppercase font-black transition-colors underline">VERIFY</button>
+          </Link>
+          <a href={explorerUrl} target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-white">
+            <ExternalLink className="w-3 h-3" />
+          </a>
         </div>
       </div>
-    </a>
+    </div>
   );
 }
