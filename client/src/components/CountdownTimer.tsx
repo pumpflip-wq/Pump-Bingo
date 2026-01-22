@@ -10,8 +10,6 @@ interface CountdownTimerProps {
 
 export function CountdownTimer({ targetDate, status, participantCount }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState({ minutes: 0, seconds: 0 });
-  const { playSound } = useSound();
-  const [lastTick, setLastTick] = useState(0);
 
   useEffect(() => {
     if (!targetDate || participantCount < 2) {
@@ -31,22 +29,7 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
     };
 
     calculateTimeLeft();
-    const interval = setInterval(() => {
-      calculateTimeLeft();
-      const left = {
-        minutes: Math.floor(((new Date(targetDate!).getTime() - Date.now()) % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor(((new Date(targetDate!).getTime() - Date.now()) % (1000 * 60)) / 1000)
-      };
-
-      if (left.minutes === 0 && left.seconds > 0 && left.seconds <= 5 && left.seconds !== lastTick) {
-        playSound("/sounds/tick.mp3", 0.3);
-        setLastTick(left.seconds);
-      }
-      if (left.minutes === 0 && left.seconds === 0 && lastTick !== 0) {
-        playSound("/sounds/start.mp3", 0.5);
-        setLastTick(0);
-      }
-    }, 100);
+    const interval = setInterval(calculateTimeLeft, 100);
 
     return () => clearInterval(interval);
   }, [targetDate, participantCount]);
