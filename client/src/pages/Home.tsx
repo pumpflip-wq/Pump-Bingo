@@ -50,6 +50,7 @@ export default function Home() {
     prize: number;
     isWinner: boolean;
     txHash?: string;
+    roundId?: number;
   } | null>(null);
 
   const isParticipant = !!participant || !!foundParticipant;
@@ -121,9 +122,10 @@ export default function Home() {
   useEffect(() => {
     const isFinished = roundData?.round.status === 'FINISHED';
     const hasWinner = !!roundData?.round.winnerId;
+    const currentRoundId = roundData?.round.id;
     
     if ((isFinished || (roundData?.round.status === 'IN_GAME' && hasWinner)) && hasWinner) {
-      if (isParticipant && !overlayData) {
+      if (isParticipant && (!overlayData || overlayData.roundId !== currentRoundId)) {
         const isMe = roundData.round.winnerId === user?.id;
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
         // Correctly use the wallet address (username) instead of numeric ID if available
@@ -134,13 +136,14 @@ export default function Home() {
           username: displayUsername,
           prize: roundData.round.prizePool || 0,
           isWinner: isMe,
-          txHash: (roundData.round as any).txHash
+          txHash: (roundData.round as any).txHash,
+          roundId: currentRoundId
         });
       }
     } else if (roundData?.round.status !== 'FINISHED' && !hasWinner) {
-      setOverlayData(null);
+      if (overlayData) setOverlayData(null);
     }
-  }, [roundData?.round.status, roundData?.round.winnerId, isParticipant, user?.id, walletAddress, overlayData, roundData?.participants]);
+  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.id, isParticipant, user?.id, walletAddress, overlayData, roundData?.participants]);
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
     ...p,
