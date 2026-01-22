@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { formatAddress, formatCurrency } from "@/lib/utils";
+import { cn, formatAddress, formatCurrency } from "@/lib/utils";
 import { useJoinRound } from "@/hooks/use-game";
 import { useGameState } from "@/hooks/useGameState";
 import { CyberButton } from "@/components/ui/CyberButton";
@@ -13,9 +13,10 @@ interface JoinButtonProps {
   roundId: number;
   price: number;
   userId: number;
+  className?: string;
 }
 
-export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
+export function JoinButton({ roundId, price, userId, className }: JoinButtonProps) {
   const { mutate: joinRound, isPending } = useJoinRound();
   const { toast } = useToast();
   const { connection } = useConnection();
@@ -119,7 +120,7 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
     <CyberButton
       onClick={handleJoin}
       disabled={isPending || !userId}
-      className="w-full h-16 text-3xl font-black italic tracking-tighter uppercase"
+      className={cn("w-full h-16 text-3xl font-black italic tracking-tighter uppercase", className)}
       data-testid="button-join-round"
     >
       {isPending ? (

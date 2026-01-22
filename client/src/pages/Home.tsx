@@ -45,7 +45,7 @@ export default function Home() {
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
 
   const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
-  const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
+  const [lastOverlayTimestamp, setLastOverlayTimestamp] = useState<string | null>(null);
 
   const isParticipant = !!participant || !!foundParticipant;
 
@@ -96,29 +96,18 @@ export default function Home() {
 
   const overlayState = useMemo(() => {
     const hasWinner = !!roundData?.round.winnerId;
+    const completedAtRaw = roundData?.round.completedAt;
+    const completedAt = completedAtRaw ? new Date(completedAtRaw).toISOString() : null;
     const currentRoundId = roundData?.round.id;
-    const winnerDeclaredAt = roundData?.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
+    const winnerDeclaredAt = completedAt ? new Date(completedAt).getTime() : null;
 
-    // Reset manual close state only when a NEW round starts (Lobby transition)
-    if (currentRoundId && currentRoundId !== lastOverlayRoundId) {
-      setLastOverlayRoundId(currentRoundId);
-      setHasManuallyClosed(false);
-      setLastWinKey(null);
-    }
-
-    const winKey = hasWinner ? `${currentRoundId}_win` : null;
-    
-    // Use the round's finished status as the ultimate source of truth for transition
-    const isRoundFullyFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
-
-    // Check winKey but ensure it's not already closed manually for THIS win
-    if (winKey && winKey !== lastWinKey) {
-      setLastWinKey(winKey);
+    // Reset manual close state only when a NEW winner/completedAt event occurs
+    if (completedAt && completedAt !== lastOverlayTimestamp) {
+      setLastOverlayTimestamp(completedAt);
       setHasManuallyClosed(false);
     }
 
-    // Don't show if manually closed OR if the round is actually already marked as finished on server
-    if (hasManuallyClosed || isRoundFullyFinished) {
+    if (hasManuallyClosed) {
       return null;
     }
 
@@ -127,14 +116,11 @@ export default function Home() {
       const totalDisplayTime = 10000; 
       const remaining = Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000));
       
-      // Stop showing if timer expired - ensure clean exit
-      // Using a slightly more strict check to avoid re-triggering
-      if (elapsed >= totalDisplayTime || isRoundFullyFinished) {
+      if (elapsed >= totalDisplayTime) {
         return null;
       }
 
       const isMe = roundData.round.winnerId === user?.id;
-      // Search in participants for the winner
       const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
       const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
       
@@ -145,36 +131,23 @@ export default function Home() {
         isWinner: isMe,
         txHash: (roundData.round as any).txHash,
         timeLeft: remaining,
-        currentRoundId: currentRoundId // Added to help track state changes
+        currentRoundId: currentRoundId
       };
     }
 
     return null;
-  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime, lastWinKey]);
+  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayTimestamp, currentTime]);
 
   useEffect(() => {
-    const isRoundFinished = roundData?.round.status === 'FINISHED';
-    const hasWinner = !!roundData?.round.winnerId;
-    const currentRound = roundData?.round;
-    
-    if (isRoundFinished || hasWinner) {
-      const winnerDeclaredAt = currentRound?.completedAt ? new Date(currentRound.completedAt).getTime() : null;
-      if (winnerDeclaredAt) {
-        const elapsed = currentTime - winnerDeclaredAt;
-        // The overlay should stay up for exactly 10s. 
-        // Once elapsed hits 10s, we mark it as closed to prevent double triggers
-        if (elapsed >= 10000 && !hasManuallyClosed && currentRound?.id === lastOverlayRoundId) {
-          setHasManuallyClosed(true);
-        }
-      }
-    } else if (currentRound) {
-      // Reset manual close and overlay round ID when a new round starts
-      if (lastOverlayRoundId === null || currentRound.id !== lastOverlayRoundId) {
-        setHasManuallyClosed(false);
-        setLastOverlayRoundId(currentRound.id);
+    const completedAtRaw = roundData?.round.completedAt;
+    if (completedAtRaw) {
+      const winnerDeclaredAt = new Date(completedAtRaw).getTime();
+      const elapsed = currentTime - winnerDeclaredAt;
+      if (elapsed >= 10000 && !hasManuallyClosed) {
+        setHasManuallyClosed(true);
       }
     }
-  }, [roundData?.round, currentTime, hasManuallyClosed, lastOverlayRoundId]);
+  }, [roundData?.round.completedAt, currentTime, hasManuallyClosed]);
 
   const nextRoundTimer = useMemo(() => {
     if ((roundData?.round.status === 'FINISHED' || roundData?.round.winnerId) && roundData.round.completedAt) {
@@ -358,15 +331,15 @@ export default function Home() {
                                         <p className="text-lg text-white uppercase font-black tracking-[0.4em] mb-8 text-center border-b border-white/10 pb-4">ROUND STATISTICS</p>
                                         <div className="space-y-10">
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-lg text-white uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
-                                            <span className="text-4xl md:text-7xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                                            <span className="text-xl text-white uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
+                                            <span className="text-5xl md:text-8xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                                               {formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}
                                             </span>
                                           </div>
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-lg text-white uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
-                                            <span className="text-5xl md:text-8xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
-                                              {formatCurrency(roundData.round.prizePool || 0)} <span className="text-3xl">PBINGO</span>
+                                            <span className="text-xl text-white uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
+                                            <span className="text-6xl md:text-9xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
+                                              {formatCurrency(roundData.round.prizePool || 0)} <span className="text-4xl">PBINGO</span>
                                             </span>
                                           </div>
                                         </div>

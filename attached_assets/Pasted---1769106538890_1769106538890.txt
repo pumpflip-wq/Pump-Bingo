@@ -1,0 +1,120 @@
+אני אסביר בקצרה אבל מדויק, ואז אתן לך פתרון נקי ומקצועי.
+
+🧠 מה הבעיה האמיתית (שורש העניין)
+
+כרגע יש לך שני “שעונים” שונים שמחליטים מתי הרואונד נגמר:
+
+1️⃣ בצד השרת
+
+ב־game.ts:
+
+אחרי winnerId אתה מחכה ~11 שניות
+
+ואז משנה סטטוס ל־FINISHED
+
+ואז בטיק הבא נוצר רואונד חדש
+
+2️⃣ בצד הקליינט (Home.tsx)
+
+אתה מחשב טיימר לפי completedAt
+
+סוגר Overlay אחרי 10 שניות
+
+אבל:
+
+ה־useMemo + useEffect שלך מגיבים גם ל־winnerId
+
+וגם ל־status === FINISHED
+
+וגם ל־lastOverlayRoundId
+
+➡️ התוצאה:
+ה־overlay “נולד מחדש” פעם אחת, כי ה־round עדיין אותו ID אבל ה־state משתנה (winner → finished).
+
+לכן:
+
+🔁 ספירה של 10 שניות
+🔁 ואז עוד פעם 10 שניות
+✅ ורק אז מעבר לחדר הבא
+
+✅ העיקרון הנכון (איך זה כן אמור לעבוד)
+
+💡 רק השרת מחליט מתי נגמר הרואונד
+💡 לכל העולם יש timestamp אחד מוחלט
+💡 אין reset של טיימר בגלל state מקומי
+
+כלומר:
+
+completedAt = רגע אחד יחיד, סופי, שלא משתנה
+
+הקליינט:
+
+רק מציג
+
+לא מפעיל לוגיקה חדשה לפי status
+
+🛠️ הפתרון הנכון (בלי לשבור לך הכול)
+🔴 כלל זהב
+
+Overlay + מעבר לרואונד הבא
+❌ לא תלויים ב־status
+✅ רק ב־completedAt
+
+🔧 תיקון מרכזי ב־Home.tsx
+1️⃣ אל תסתמך על ROUND_STATUS.FINISHED בכלל ל־Overlay
+❌ להסיר:
+const isRoundFullyFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
+
+
+וגם כל מקום שמשתמש בזה:
+
+if (hasManuallyClosed || isRoundFullyFinished)s
+
+2️⃣ Overlay מוצג פעם אחת בלבד לכל completedAt
+
+החלף את הלוגיקה הזו:
+
+if (winKey && winKey !== lastWinKey) {
+  setLastWinKey(winKey);
+  setHasManuallyClosed(false);
+}
+
+
+ב־לוגיקה מבוססת timestamp:
+
+const completedAt = roundData?.round.completedAt;
+
+if (completedAt && completedAt !== lastOverlayRoundId) {
+  setLastOverlayRoundId(completedAt);
+  setHasManuallyClosed(false);
+}
+
+
+ותשנה את ה־state:
+
+const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
+
+
+⬅️ עכשיו ה־Overlay קשור לאירוע אחד בלבד.
+
+3️⃣ Overlay נסגר רק לפי זמן – לא לפי state
+if (elapsed >= 10000) {
+  return null;
+}
+
+
+לא:
+
+לא FINISHED
+
+לא winnerId
+
+לא useEffect שמנסה “לעזור”
+
+🎯 מה זה פותר בפועל
+
+✅ אין ספירה כפולה
+✅ כולם מסונכרנים (צופים / מחוברים / סגרו ידנית)
+✅ סגירת Overlay לא משפיעה על מעבר הרואונד
+✅ השרת הוא ה־source of truth
+✅ UX מקצועי כמו Casino / GameFi אמיתי
