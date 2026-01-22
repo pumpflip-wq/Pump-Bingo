@@ -24,20 +24,29 @@ export function SoundProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unlock = () => {
+      // Create and resume context immediately
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
       const audio = new Audio();
-      audio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhAAQACABAAAABkYXRhAgAAAAEA'; // Tiny silent wav
+      audio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhAAQACABAAAABkYXRhAgAAAAEA'; 
       audio.play().then(() => {
         setIsUnlocked(true);
-        console.log("[Sound] Audio context unlocked globally");
+        console.log("[Sound] Audio context unlocked and resumed globally");
         window.removeEventListener('click', unlock);
         window.removeEventListener('touchstart', unlock);
+        window.removeEventListener('keydown', unlock);
       }).catch(() => {});
     };
     window.addEventListener('click', unlock);
     window.addEventListener('touchstart', unlock);
+    window.addEventListener('keydown', unlock);
     return () => {
       window.removeEventListener('click', unlock);
       window.removeEventListener('touchstart', unlock);
+      window.removeEventListener('keydown', unlock);
     };
   }, []);
 
@@ -49,18 +58,25 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     try {
       const audio = new Audio(normalizedPath);
       audio.volume = volume;
-      // Preload the audio to help with the "deferred" issues
-      audio.load();
-      audio.play().catch(err => {
-        console.warn(`[Sound] Playback deferred for: ${normalizedPath}`, err);
-        // Retry play on next user interaction if it failed due to context
-        const resumePlay = () => {
-          audio.play().catch(() => {});
-          window.removeEventListener('click', resumePlay);
-        };
-        window.addEventListener('click', resumePlay);
-      });
-    } catch (e) {}
+      audio.preservesPitch = false; // Slight performance optimization
+      
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.warn(`[Sound] Playback deferred for: ${normalizedPath}. Retrying on next interaction.`);
+          
+          const retryOnInteraction = () => {
+            audio.play().catch(() => {});
+            window.removeEventListener('click', retryOnInteraction);
+            window.removeEventListener('touchstart', retryOnInteraction);
+          };
+          window.addEventListener('click', retryOnInteraction);
+          window.addEventListener('touchstart', retryOnInteraction);
+        });
+      }
+    } catch (e) {
+      console.error("[Sound] Error playing sound:", e);
+    }
   };
 
   return (

@@ -177,20 +177,21 @@ export class GameManager {
             return;
         }
 
-        // Draw one number every 2.5 seconds for balanced gameplay
+        // Draw one number every 3 seconds for balanced gameplay (increased from 2.5s for stability)
         const startTime = new Date(round.startTime!).getTime() + 5000;
         const elapsed = now.getTime() - startTime;
-        const expectedNumbersCount = Math.min(75, Math.floor(elapsed / 2500));
+        const expectedNumbersCount = Math.max(0, Math.min(75, Math.floor(elapsed / 3000)));
 
         if (round.drawnNumbers.length < expectedNumbersCount) {
             const available = Array.from({length: 75}, (_, i) => i + 1)
                 .filter(n => !round.drawnNumbers!.includes(n));
             
             if (available.length > 0) {
+                // Ensure deterministic drawing from the seed would be better, but for now random is fine as long as we check availability
                 const nextNum = available[Math.floor(Math.random() * available.length)];
                 const newNumbers = [...round.drawnNumbers, nextNum];
                 await storage.updateRound(round.id, { drawnNumbers: newNumbers });
-                console.log(`Round ${round.id} drew number ${nextNum}`);
+                console.log(`Round ${round.id} drew number ${nextNum} (Total: ${newNumbers.length})`);
             }
         }
     }
