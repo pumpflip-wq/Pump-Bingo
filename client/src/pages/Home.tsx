@@ -133,12 +133,12 @@ export default function Home() {
       const totalDisplayTime = 10000;
       const remaining = Math.max(0, Math.ceil((totalDisplayTime - elapsed) / 1000));
       
-      // Sync overlay and lobby transition - ensure it only happens once per winKey
-      if (remaining <= 0 && !hasManuallyClosed) {
-        setHasManuallyClosed(true);
+      // Stop showing if timer expired
+      if (remaining <= 0) {
+        return null;
       }
-      
-      if (remaining > 0 && !hasManuallyClosed) {
+
+      if (!hasManuallyClosed) {
         const isMe = roundData.round.winnerId === user?.id;
         // Search in participants for the winner
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
@@ -157,6 +157,18 @@ export default function Home() {
 
     return null;
   }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime, lastWinKey]);
+
+  useEffect(() => {
+    if (roundData?.round.status === 'FINISHED') {
+      const winnerDeclaredAt = roundData.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
+      if (winnerDeclaredAt) {
+        const elapsed = currentTime - winnerDeclaredAt;
+        if (elapsed >= 10000 && !hasManuallyClosed) {
+          setHasManuallyClosed(true);
+        }
+      }
+    }
+  }, [roundData?.round.status, roundData?.round.completedAt, currentTime, hasManuallyClosed]);
 
   const nextRoundTimer = useMemo(() => {
     if (roundData?.round.status === 'FINISHED' && roundData.round.completedAt) {
