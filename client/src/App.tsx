@@ -45,9 +45,10 @@ function App() {
             <div className="flex flex-col flex-1">
               <main 
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto flex flex-col"
+                className="flex-1 overflow-y-auto flex flex-col relative"
               >
-                <div className="flex-1 px-4 sm:px-6 lg:px-8 py-8">
+                <div className="absolute inset-0 bg-[#050505] z-[-1]" />
+                <div className="flex-1 py-8">
                   <Router />
                 </div>
                 <Footer />

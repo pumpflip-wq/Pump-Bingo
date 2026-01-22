@@ -1,10 +1,10 @@
 import { useRounds } from "@/hooks/use-game";
 import { ShieldCheck, Search, Copy, Check, ExternalLink } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import crypto from "crypto";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 export default function VerifyPage() {
@@ -12,6 +12,19 @@ export default function VerifyPage() {
   const [manualSeed, setManualSeed] = useState("");
   const [manualHash, setManualHash] = useState("");
   const { toast } = useToast();
+  const [location] = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const roundId = params.get('roundId');
+    if (roundId && rounds) {
+      const round = rounds.find(r => r.id === Number(roundId));
+      if (round) {
+        setManualHash(round.publicHash);
+        if (round.serverSeed) setManualSeed(round.serverSeed);
+      }
+    }
+  }, [rounds]);
 
   const verifySeed = (seed: string, expectedHash: string) => {
     try {
