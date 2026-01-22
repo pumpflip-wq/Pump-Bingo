@@ -195,7 +195,7 @@ export default function Home() {
           ) : latestRound && roundData ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
-            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
+            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[650px]">
                 <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
@@ -271,7 +271,7 @@ export default function Home() {
                 </div>
               </aside>
 
-                  <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden relative">
+                  <main className="lg:col-span-6 space-y-4 h-[650px] flex flex-col overflow-hidden relative">
                 {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
                   <div className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-between min-h-0 h-full relative overflow-hidden shrink-0">
                     <div className="flex-1 flex flex-col items-center justify-between py-4 w-full h-full">
