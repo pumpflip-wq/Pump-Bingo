@@ -72,6 +72,8 @@ export class GameManager {
     const now = Date.now();
     const startTime = new Date(now + 60 * 1000); 
 
+    console.log(`Creating new round with seed: ${seed} and hash: ${hash}`);
+
     await storage.createRound({
       status: ROUND_STATUS.OPEN,
       serverSeed: seed,

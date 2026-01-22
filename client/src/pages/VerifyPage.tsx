@@ -118,11 +118,22 @@ export default function VerifyPage() {
                         )}
                       </td>
                       <td className="py-4 px-6">
-                        <span className={`text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-md ${
-                          round.status === 'FINISHED' ? 'bg-primary/20 text-primary border border-primary/20' : 'bg-white/10 text-white border border-white/10'
-                        }`}>
-                          {round.status}
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className={`text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-md ${
+                            round.status === 'FINISHED' ? 'bg-primary/20 text-primary border border-primary/20' : 'bg-white/10 text-white border border-white/10'
+                          }`}>
+                            {round.status}
+                          </span>
+                          <button 
+                            onClick={() => {
+                              setManualHash(round.publicHash);
+                              setManualSeed(round.status === 'FINISHED' ? (round.serverSeed || "") : "");
+                            }}
+                            className="text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors underline"
+                          >
+                            Use for manual
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
