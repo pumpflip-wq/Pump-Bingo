@@ -24,37 +24,23 @@ import { JoinButton } from "@/components/JoinButton";
 import { BingoClaimButton } from "@/components/BingoClaimButton";
 import { BingoCard } from "@/components/BingoCard";
 
+import { useGameState } from "@/hooks/useGameState";
+
 export default function Home() {
-  const { publicKey, connected } = useWallet();
-  const walletAddress = publicKey?.toBase58();
+  const { 
+    user, 
+    walletAddress, 
+    connected, 
+    roundData, 
+    latestRound, 
+    participant, 
+    foundParticipant, 
+    isLoading,
+    historyRounds,
+    historyLoading 
+  } = useGameState();
   const { toast } = useToast();
 
-  const { data: rounds, isLoading: roundsLoading } = useRounds();
-  const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
-  const { data: roundData, isLoading: roundLoading } = useRound(latestRound?.id || 0);
-
-  const { mutate: login } = useMutation({
-    mutationFn: (address: string) => apiRequest("POST", "/api/auth/login", { username: address }).then(res => res.json()),
-    onSuccess: (data) => {
-      queryClient.setQueryData(["/api/auth/me"], data);
-    }
-  });
-
-  useEffect(() => {
-    if (connected && walletAddress) {
-      login(walletAddress);
-    }
-  }, [connected, walletAddress, login]);
-
-  const { data: user } = useQuery<User>({ 
-    queryKey: ["/api/auth/me"]
-  });
-  
-  const { data: participant } = useParticipant(latestRound?.id || 0, user?.id);
-  
-  const isLoading = roundsLoading || (latestRound && roundLoading);
-
-  const foundParticipant = roundData?.participants?.find((p: any) => p.username === walletAddress);
   const isParticipant = !!participant || !!foundParticipant;
   
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
@@ -66,36 +52,6 @@ export default function Home() {
     isWinner: boolean;
     txHash?: string;
   } | null>(null);
-  
-  useEffect(() => {
-    if (roundData?.round.status === 'FINISHED' && roundData?.round.winnerId) {
-      if (isParticipant && !overlayData) {
-        const isMe = roundData.round.winnerId === user?.id;
-        const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId);
-        setOverlayData({
-          show: true,
-          username: (winner as any)?.username || roundData.round.winnerId.toString(),
-          prize: roundData.round.prizePool || 0,
-          isWinner: isMe,
-          txHash: (roundData.round as any).txHash
-        });
-      }
-    } else if (roundData?.round.status !== 'FINISHED') {
-      setOverlayData(null);
-    }
-  }, [roundData?.round.status, roundData?.round.winnerId, isParticipant, user?.id, overlayData, roundData?.participants]);
-
-  const { data: historyRounds, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
-    queryKey: ["/api/rounds/history", 1],
-    queryFn: () => fetch("/api/rounds/history?page=1&limit=5").then(res => res.json()),
-    refetchInterval: 10000
-  });
-
-  const { data: userTransactions } = useQuery<Transaction[]>({
-    queryKey: ["/api/auth/me/transactions", user?.id],
-    enabled: !!user?.id,
-    refetchInterval: 5000
-  });
 
   const formatAddress = (address: string) => {
     if (!address || address === "No Winner") return address;
@@ -144,6 +100,24 @@ export default function Home() {
     const probMap: Record<number, number> = { 5: 0, 4: 15, 3: 40, 2: 70, 1: 90, 0: 100 };
     return probMap[minMissing] ?? 0;
   };
+
+  useEffect(() => {
+    if (roundData?.round.status === 'FINISHED' && roundData?.round.winnerId) {
+      if (isParticipant && !overlayData) {
+        const isMe = roundData.round.winnerId === user?.id;
+        const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId);
+        setOverlayData({
+          show: true,
+          username: (winner as any)?.username || roundData.round.winnerId.toString(),
+          prize: roundData.round.prizePool || 0,
+          isWinner: isMe,
+          txHash: (roundData.round as any).txHash
+        });
+      }
+    } else if (roundData?.round.status !== 'FINISHED') {
+      setOverlayData(null);
+    }
+  }, [roundData?.round.status, roundData?.round.winnerId, isParticipant, user?.id, overlayData, roundData?.participants]);
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
     ...p,
@@ -302,7 +276,7 @@ export default function Home() {
                                 participants={sortedParticipants}
                                 formatAddress={formatAddress}
                                 roundStatus={roundData.round.status}
-                                winnerId={roundData.round.winnerId}
+                                winnerId={roundData.round.winnerId || undefined}
                               />
                             </div>
                           </div>

@@ -1,0 +1,62 @@
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useRounds, useRound, useParticipant } from './use-game';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import { type User, type Round, type Transaction } from '@shared/schema';
+
+export function useGameState() {
+  const { publicKey, connected } = useWallet();
+  const walletAddress = publicKey?.toBase58();
+
+  const { data: rounds, isLoading: roundsLoading } = useRounds();
+  const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
+  const { data: roundData, isLoading: roundLoading } = useRound(latestRound?.id || 0);
+
+  const { mutate: login } = useMutation({
+    mutationFn: (address: string) => apiRequest("POST", "/api/auth/login", { username: address }).then(res => res.json()),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["/api/auth/me"], data);
+    }
+  });
+
+  useEffect(() => {
+    if (connected && walletAddress) {
+      login(walletAddress);
+    }
+  }, [connected, walletAddress, login]);
+
+  const { data: user } = useQuery<User>({ 
+    queryKey: ["/api/auth/me"]
+  });
+  
+  const { data: participant } = useParticipant(latestRound?.id || 0, user?.id);
+
+  const { data: historyRounds, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
+    queryKey: ["/api/rounds/history", 1],
+    queryFn: () => fetch("/api/rounds/history?page=1&limit=5").then(res => res.json()),
+    refetchInterval: 10000
+  });
+
+  const { data: userTransactions } = useQuery<Transaction[]>({
+    queryKey: ["/api/auth/me/transactions", user?.id],
+    enabled: !!user?.id,
+    refetchInterval: 5000
+  });
+
+  const foundParticipant = roundData?.participants?.find((p: any) => p.username === walletAddress);
+  
+  return {
+    user,
+    walletAddress,
+    connected,
+    roundData,
+    latestRound,
+    participant,
+    foundParticipant,
+    isLoading: roundsLoading || (latestRound && roundLoading),
+    historyRounds,
+    historyLoading,
+    userTransactions
+  };
+}
