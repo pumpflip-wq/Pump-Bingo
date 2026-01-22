@@ -77,6 +77,7 @@ export default function Home() {
 
     let maxMarked = 0;
     let potentialLines = 0;
+    let totalMarked = 0;
 
     lines.forEach(line => {
       const marked = line.filter(n => drawnSet.has(n)).length;
@@ -84,23 +85,31 @@ export default function Home() {
       if (marked === 4) potentialLines++;
     });
 
+    // Count unique marked numbers (excluding free space 0)
+    card.flat().forEach(num => {
+      if (num !== 0 && drawnSet.has(num)) totalMarked++;
+    });
+
     if (maxMarked === 5) return 100;
     
-    // Always show at least 1-2% if we have at least one hit (besides free space)
-    // drawn.length > 0 ensures we have started. 
-    if (maxMarked >= 1 && drawn.length > 0) {
-      // Linear growth based on marks: 1 mark -> 2%, 2 marks -> 4%, 3 marks -> 15% (threshold)
-      const baseHitsProb = maxMarked * 2; 
+    // Start showing percentage immediately when first number is hit
+    if (totalMarked >= 1 && drawn.length > 0) {
+      // Base probability from total hits (creates differentiation between boards with same max line)
+      const hitDensity = (totalMarked / 24) * 15; 
       
-      // Calculate threshold based probability
-      // 3 marks -> ~15-20%
-      // 4 marks -> ~40-60%
-      const thresholdProb = (maxMarked === 3) ? 15 : (maxMarked === 4 ? 45 : 0);
+      // Threshold based probability for lines
+      // 2 marks -> 5-8%
+      // 3 marks -> 15-25%
+      // 4 marks -> 45-75%
+      let baseLineProb = 0;
+      if (maxMarked === 2) baseLineProb = 5;
+      else if (maxMarked === 3) baseLineProb = 20;
+      else if (maxMarked === 4) baseLineProb = 50;
+
+      const proximityBonus = potentialLines * 12; // High weight for 4/5 lines
+      const gameProgress = (drawn.length / 75) * 10;
       
-      const proximityBonus = potentialLines * 8; // 8% for each line that is 4/5
-      const gameProgress = (drawn.length / 75) * 10; // Max 10% from game length
-      
-      const finalProb = Math.min(99, Math.floor(Math.max(baseHitsProb, thresholdProb) + proximityBonus + gameProgress));
+      const finalProb = Math.min(99, Math.floor(baseLineProb + hitDensity + proximityBonus + gameProgress));
       return Math.max(1, finalProb);
     }
     
