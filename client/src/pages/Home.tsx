@@ -272,9 +272,9 @@ export default function Home() {
                             </div>
                           </div>
                         </div>
-                        <div className="p-8 bg-black/60 rounded-[2.5rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto min-h-[220px] flex flex-col justify-center">
+                        <div className="py-6 px-10 bg-black/60 rounded-[2.5rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto min-h-[190px] flex flex-col justify-center">
                           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-                          <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-4 font-mono">
+                          <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-3 font-mono">
                             {roundData.round.status === 'STARTING' ? 'SECURING GAME PROTOCOL...' : 
                              roundData.participantsCount < 2 ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
                           </p>
@@ -284,7 +284,7 @@ export default function Home() {
                             participantCount={roundData.participantsCount}
                           />
                           {roundData.participantsCount < 2 && (
-                            <div className="space-y-2 mt-6">
+                            <div className="space-y-1 mt-4">
                               <p className="text-primary text-lg uppercase font-black animate-pulse tracking-[0.15em] font-display">
                                 Waiting for Players...
                               </p>
@@ -302,18 +302,13 @@ export default function Home() {
                             </div>
                           ) : participant || foundParticipant ? (
                             <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-[2rem] shadow-[0_0_30px_rgba(34,197,94,0.1)] w-full">
-                              <p className="text-primary font-black text-2xl italic tracking-tighter mb-1 uppercase text-center">YOU'RE IN THE GAME!</p>
-                              <div className="space-y-1">
-                              <p className="text-base text-primary font-black tracking-widest text-center whitespace-nowrap">CARD SECURED • ENTRY PAID</p>
-                              <div className="space-y-1">
-                                <p className="text-[13px] text-white uppercase font-black tracking-widest text-center opacity-90">CARD ACTIVATES AUTOMATICALLY ON START</p>
-                              </div>
-                              </div>
+                              <p className="text-primary font-black text-3xl italic tracking-tighter mb-3 uppercase text-center">YOU'RE IN THE GAME!</p>
+                              <p className="text-sm text-white uppercase font-black tracking-widest text-center opacity-90">CARD ACTIVATES AUTOMATICALLY ON START</p>
                             </div>
                           ) : (
-                            <div className="space-y-5">
+                            <div className="space-y-4">
                               <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} className="w-full h-14 text-xl font-black italic tracking-tighter" />
-                              <p className="text-[13px] text-white uppercase font-black tracking-[0.2em] text-center opacity-90">JOIN BEFORE GAME STARTS</p>
+                              <p className="text-[12px] text-white uppercase font-black tracking-[0.2em] text-center opacity-80">JOIN BEFORE GAME STARTS</p>
                             </div>
                           )}
                         </div>
