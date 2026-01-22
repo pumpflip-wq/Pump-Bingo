@@ -42,27 +42,30 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   const playSound = (soundPath: string, volume = 0.5) => {
     if (isMuted) return;
     
-    const audio = new Audio(soundPath);
-    audio.volume = volume;
-    
-    const play = () => {
-      audio.play().catch(err => {
-        console.warn("Playback failed:", soundPath, err);
-      });
-    };
-
-    if (hasInteracted) {
-      play();
-    } else {
-      const playOnInteraction = () => {
-        play();
-        window.removeEventListener('mousedown', playOnInteraction);
-        window.removeEventListener('keydown', playOnInteraction);
-        window.removeEventListener('touchstart', playOnInteraction);
+    try {
+      const audio = new Audio(soundPath);
+      audio.volume = volume;
+      
+      const play = () => {
+        audio.play().catch(err => {
+          console.warn("Playback failed:", soundPath, err);
+          // If playback fails, it's likely due to lack of interaction.
+          // We'll retry on the next user interaction
+          const retryOnInteraction = () => {
+            audio.play().catch(() => {});
+            window.removeEventListener('click', retryOnInteraction);
+            window.removeEventListener('keydown', retryOnInteraction);
+            window.removeEventListener('touchstart', retryOnInteraction);
+          };
+          window.addEventListener('click', retryOnInteraction);
+          window.addEventListener('keydown', retryOnInteraction);
+          window.addEventListener('touchstart', retryOnInteraction);
+        });
       };
-      window.addEventListener('mousedown', playOnInteraction);
-      window.addEventListener('keydown', playOnInteraction);
-      window.addEventListener('touchstart', playOnInteraction);
+
+      play();
+    } catch (e) {
+      console.warn("Sound play error:", e);
     }
   };
 

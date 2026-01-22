@@ -57,6 +57,12 @@ export default function Home() {
   const calculateWinProb = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);
     if (drawnSet.size === 0) return 0;
+    
+    // Improved probability calculation:
+    // We look at how many numbers are missing for each possible bingo line.
+    // Progress starts at 0% and increases as numbers are drawn.
+    // 90%+ means they are "Waiting for 1 number".
+    
     let minMissing = 5;
 
     for (let r = 0; r < 5; r++) {
@@ -92,8 +98,24 @@ export default function Home() {
     if (d2Total > 0) minMissing = Math.min(minMissing, d2Missing);
 
     if (minMissing === 0) return 100;
-    const probMap: Record<number, number> = { 5: 0, 4: 15, 3: 40, 2: 70, 1: 90, 0: 100 };
-    return probMap[minMissing] ?? 0;
+    
+    // More professional scaling:
+    // 5 missing -> 0-10% (based on total drawn)
+    // 4 missing -> 10-30%
+    // 3 missing -> 30-60%
+    // 2 missing -> 60-85%
+    // 1 missing -> 85-99%
+    
+    const drawnCount = drawn.length;
+    const baseProgress: Record<number, number> = {
+      5: Math.min(10, (drawnCount / 75) * 20),
+      4: 10 + Math.min(20, (drawnCount / 75) * 40),
+      3: 30 + Math.min(30, (drawnCount / 75) * 60),
+      2: 60 + Math.min(25, (drawnCount / 75) * 50),
+      1: 85 + Math.min(14, (drawnCount / 75) * 30)
+    };
+    
+    return Math.floor(baseProgress[minMissing] ?? 0);
   };
 
   useEffect(() => {

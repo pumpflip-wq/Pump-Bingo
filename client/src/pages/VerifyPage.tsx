@@ -3,7 +3,7 @@ import { ShieldCheck, Search, Copy, Check, ExternalLink, History } from "lucide-
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import crypto from "crypto";
+import crypto from "crypto-js";
 import { Link, useLocation } from "wouter";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { PROTOCOL_CONFIG } from "@shared/config";
@@ -52,11 +52,11 @@ export default function VerifyPage() {
   const verifySeed = (seed: string, expectedHash: string) => {
     if (!seed || !expectedHash) return false;
     try {
-      const trimmedSeed = seed.trim().toLowerCase();
+      const trimmedSeed = seed.trim();
       const trimmedHash = expectedHash.trim().toLowerCase();
       
-      // Fixed verification logic to use consistent hashing
-      const hash = crypto.createHash('sha256').update(trimmedSeed).digest('hex').toLowerCase();
+      // Use crypto-js for browser-compatible SHA256 hashing
+      const hash = crypto.SHA256(trimmedSeed).toString(crypto.enc.Hex).toLowerCase();
       
       console.log("Verification Logic Debug:", { 
         rawSeed: seed,
@@ -64,12 +64,6 @@ export default function VerifyPage() {
         computedHash: hash, 
         expectedHash: trimmedHash 
       });
-      
-      // The issue is that the manual verification comparison might be case-sensitive or have whitespace issues
-      // but here we already trim and lowercase. 
-      // Checking server/game.ts, it uses:
-      // const hash = crypto.createHash('sha256').update(seed).digest('hex').toLowerCase();
-      // where seed is hex.
       
       return hash === trimmedHash;
     } catch (e) {
@@ -81,8 +75,8 @@ export default function VerifyPage() {
   const verifyPublicHash = (seed: string, expectedHash: string) => {
     if (!seed || !expectedHash) return false;
     try {
-      const hash = crypto.createHash('sha256').update(seed).digest('hex');
-      return hash === expectedHash;
+      const hash = crypto.SHA256(seed).toString(crypto.enc.Hex).toLowerCase();
+      return hash === expectedHash.toLowerCase();
     } catch (e) {
       return false;
     }

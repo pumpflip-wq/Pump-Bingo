@@ -15,37 +15,41 @@ interface WinnerOverlayProps {
 }
 
 export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose }: WinnerOverlayProps) {
-  const [timeLeft, setLeft] = useState(5);
+  const [timeLeft, setLeft] = useState(10);
 
   useEffect(() => {
     if (show) {
-      setLeft(5);
+      setLeft(10);
       if (isWinner) {
-        // Debounce confetti to avoid layout thrashing during animation start
         const timer = setTimeout(() => {
           confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#39FF14', '#ffffff']
+            particleCount: 200,
+            spread: 80,
+            origin: { y: 0.5 },
+            colors: ['#39FF14', '#ffffff', '#9945FF']
           });
-        }, 300);
+        }, 200);
         return () => clearTimeout(timer);
       }
-
-      const timer = setInterval(() => {
-        setLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            onClose();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timer);
     }
-  }, [show, isWinner, onClose]);
+  }, [show, isWinner]);
+
+  useEffect(() => {
+    if (!show) return;
+
+    const interval = setInterval(() => {
+      setLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          onClose();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [show, onClose]);
 
   const explorerUrl = txHash ? `https://explorer.solana.com/tx/${txHash}?cluster=${PROTOCOL_CONFIG.NETWORK}` : null;
 
@@ -56,73 +60,82 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-2xl p-4"
         >
           <motion.div
-            initial={{ scale: 0.9, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.9, y: 20 }}
-            className={`w-full max-w-md bg-card border-2 ${isWinner ? 'border-primary shadow-[0_0_50px_rgba(57,255,20,0.2)]' : 'border-red-500/50 shadow-[0_0_50px_rgba(239,68,68,0.1)]'} rounded-[2.5rem] p-8 text-center relative overflow-hidden`}
+            initial={{ scale: 0.8, y: 40, rotate: -2 }}
+            animate={{ scale: 1, y: 0, rotate: 0 }}
+            exit={{ scale: 0.8, y: 40, rotate: 2 }}
+            className={`w-full max-w-lg bg-card border-4 ${isWinner ? 'border-primary shadow-[0_0_100px_rgba(57,255,20,0.3)]' : 'border-red-500 shadow-[0_0_100px_rgba(239,68,68,0.2)]'} rounded-[3rem] p-10 text-center relative overflow-hidden`}
           >
-            <div className={`absolute top-0 left-0 w-full h-1 ${isWinner ? 'bg-primary' : 'bg-red-500'} opacity-50`} />
+            <div className={`absolute top-0 left-0 w-full h-2 ${isWinner ? 'bg-primary' : 'bg-red-500'} animate-pulse`} />
             
-            <div className="mb-6 relative inline-block">
+            <div className="mb-8 relative inline-block">
               <motion.div 
-                animate={isWinner ? { rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] } : { y: [0, 5, 0] }}
-                transition={{ repeat: Infinity, duration: 3 }}
-                className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${isWinner ? 'bg-primary/20 border-primary/50' : 'bg-red-500/10 border-red-500/30'} border-2`}
+                animate={isWinner ? { 
+                  rotate: [0, -10, 10, -10, 10, 0],
+                  scale: [1, 1.2, 1, 1.2, 1] 
+                } : { 
+                  y: [0, 10, 0],
+                  opacity: [1, 0.7, 1]
+                }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className={`inline-flex items-center justify-center w-24 h-24 rounded-full ${isWinner ? 'bg-primary/20 border-primary' : 'bg-red-500/10 border-red-500'} border-4 shadow-2xl overflow-visible`}
               >
-                {isWinner ? <Trophy className="w-10 h-10 text-primary" /> : <Frown className="w-10 h-10 text-red-500" />}
+                {isWinner ? <Trophy className="w-12 h-12 text-primary" /> : <Frown className="w-12 h-12 text-red-500" />}
               </motion.div>
             </div>
 
-            <h2 className={`text-5xl font-display font-black mb-2 tracking-tighter uppercase italic ${isWinner ? 'text-white' : 'text-red-500'}`}>
-              {isWinner ? 'VICTORY!' : 'DEFEAT'}
+            <h2 className={`text-6xl font-display font-black mb-4 tracking-tighter uppercase italic ${isWinner ? 'text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'text-red-500'}`}>
+              {isWinner ? 'YOU WIN!' : 'GAME OVER'}
             </h2>
             
-            <p className="text-white/40 font-black uppercase tracking-[0.2em] text-[10px] mb-8">
-              {isWinner ? 'Protocol Master Detected' : 'Sequence Terminated'}
+            <p className="text-white/60 font-black uppercase tracking-[0.3em] text-xs mb-10">
+              {isWinner ? 'CONGRATULATIONS CHAMPION' : 'BETTER LUCK NEXT TIME'}
             </p>
 
-            <div className="bg-white/5 rounded-2xl p-6 mb-8 border border-white/10 text-left relative">
+            <div className="bg-black/40 rounded-3xl p-8 mb-10 border border-white/10 text-left relative overflow-hidden">
               {isWinner ? (
-                <>
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1">Champion</p>
-                      <p className="text-xl font-bold text-white italic">@{username}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1">Prize Harvested</p>
-                      <p className="text-4xl font-black text-primary italic">
-                        {prize.toLocaleString()} <span className="text-xs font-black opacity-50">PUMP</span>
-                      </p>
-                    </div>
-                    {explorerUrl && (
-                      <a href={explorerUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[10px] text-primary hover:underline font-black uppercase tracking-widest pt-2 border-t border-white/5">
-                        <ExternalLink className="w-3 h-3" /> Proof of Payout
-                      </a>
-                    )}
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">WINNER ADDRESS</p>
+                    <p className="text-2xl font-bold text-white italic truncate">@{username}</p>
                   </div>
-                </>
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">TOTAL REWARD</p>
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-5xl font-black text-primary italic leading-none">
+                        {prize.toLocaleString()}
+                      </p>
+                      <span className="text-xl font-black text-primary/50 italic uppercase">PUMP</span>
+                    </div>
+                  </div>
+                  {explorerUrl && (
+                    <a href={explorerUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs text-primary hover:text-white transition-colors font-black uppercase tracking-widest pt-4 border-t border-white/10">
+                      <ExternalLink className="w-4 h-4" /> VERIFY TRANSACTION ON-CHAIN
+                    </a>
+                  )}
+                </div>
               ) : (
-                <div className="space-y-4 text-center">
-                  <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-1 text-left">Winner</p>
-                  <p className="text-sm font-bold text-white italic text-left mb-4">@{username} claimed the prize</p>
-                  <div className="h-[1px] w-full bg-white/5 mb-4" />
-                  <p className="text-sm text-white/60 font-medium italic">
-                    The nodes didn't align in your favor this time. 
+                <div className="space-y-6 text-center">
+                  <div className="text-left">
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">ROUND WINNER</p>
+                    <p className="text-lg font-bold text-white italic truncate">@{username}</p>
+                  </div>
+                  <div className="h-[1px] w-full bg-white/10" />
+                  <p className="text-base text-white/80 font-bold italic leading-relaxed">
+                    The nodes were not in your favor. Re-synchronizing for next round...
                   </p>
-                  <p className="text-primary text-xs font-black uppercase tracking-widest animate-pulse">
-                    Next protocol starting soon...
+                  <p className="text-primary text-sm font-black uppercase tracking-[0.2em] animate-pulse">
+                    GET READY FOR THE NEXT DROP
                   </p>
                 </div>
               )}
             </div>
 
-            <div className="space-y-4">
-              <CyberButton onClick={onClose} variant={isWinner ? "primary" : "outline"} className="w-full h-14">
-                LOBBY ({timeLeft}s)
+            <div className="pt-2">
+              <CyberButton onClick={onClose} variant={isWinner ? "primary" : "outline"} className="w-full h-16 text-xl font-black italic tracking-tighter shadow-2xl">
+                RETURN TO LOBBY ({timeLeft}s)
               </CyberButton>
             </div>
           </motion.div>
