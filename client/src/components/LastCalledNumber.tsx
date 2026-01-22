@@ -1,5 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useSound } from "@/contexts/SoundContext";
 
 interface LastCalledNumberProps {
   numbers: number[];
