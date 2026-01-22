@@ -360,10 +360,10 @@ export default function Home() {
                           <BingoCard 
                           card={currentCard} 
                           drawnNumbers={roundData.round.drawnNumbers || []} 
-                          className="w-full max-w-[520px] scale-100"
+                          className="w-full max-w-[580px] scale-100"
                         />
                         
-                        <div className="flex justify-center w-full max-w-[520px] shrink-0">
+                        <div className="flex justify-center w-full max-w-[580px] shrink-0">
                           <BingoClaimButton 
                             roundId={roundData.round.id} 
                             userId={user?.id || 0} 
