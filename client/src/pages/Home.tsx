@@ -124,9 +124,9 @@ export default function Home() {
     const hasWinner = !!roundData?.round.winnerId;
     const currentRoundId = roundData?.round.id;
     
-    if ((isFinished || (roundData?.round.status === 'IN_GAME' && hasWinner)) && hasWinner) {
-      if (isParticipant && (!overlayData || (overlayData.roundId !== currentRoundId))) {
-        // If we have overlay data but for a different round, or no overlay data at all
+    // Show overlay ONLY for participants (players)
+    if (isParticipant && (isFinished || (roundData?.round.status === 'IN_GAME' && hasWinner)) && hasWinner) {
+      if (!overlayData || overlayData.roundId !== currentRoundId) {
         const isMe = roundData.round.winnerId === user?.id;
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
         const displayUsername = (winner as any)?.username || (isMe ? walletAddress : roundData.round.winnerId.toString());
@@ -140,7 +140,8 @@ export default function Home() {
           roundId: currentRoundId
         });
       }
-    } else {
+    } else if (roundData?.round.status === 'OPEN' || roundData?.round.status === 'STARTING') {
+      // Auto-clear overlay when moving to a new round
       if (overlayData) setOverlayData(null);
     }
   }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.id, isParticipant, user?.id, walletAddress, roundData?.participants]);
