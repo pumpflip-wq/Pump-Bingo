@@ -80,7 +80,7 @@ export class GameManager {
     
     // Default wait time is 60 seconds
     const now = Date.now();
-    const startTime = new Date(now + 60 * 1000); 
+    const startTime = new Date(now + 60000); // Exactly 60 seconds from creation
 
     console.log(`Creating new round #${nextId} with seed: ${seed} and hash: ${hash}`);
 
@@ -108,13 +108,14 @@ export class GameManager {
       if (participantCount >= 2) {
         if (!round.startTime) {
             // If we just reached 2 players and have no start time, set it to 60s from now
-            await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60 * 1000) });
+            await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
             return;
         }
 
         const startTime = new Date(round.startTime);
-        // Correctly handle the case where we want to ensure exactly 60 seconds
         const diff = startTime.getTime() - now.getTime();
+        
+        // If the start time is too far in the future (>60s), reset it to exactly 60s
         if (diff > 60000) {
            await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
            return;
@@ -128,9 +129,9 @@ export class GameManager {
         // Not enough players: strictly freeze the start time at 60s in the future
         const sixtySecondsFromNow = new Date(now.getTime() + 60000);
         
-        // We only update if it's not already roughly 60s (to avoid constant DB writes)
+        // Always ensure it's at least 60s away if under capacity
         const currentStartTime = round.startTime ? new Date(round.startTime) : null;
-        if (!currentStartTime || Math.abs(currentStartTime.getTime() - sixtySecondsFromNow.getTime()) > 5000) {
+        if (!currentStartTime || currentStartTime.getTime() < sixtySecondsFromNow.getTime()) {
            await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
         }
       }
