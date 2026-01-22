@@ -375,31 +375,47 @@ export default function Home() {
                                         <Users className="w-4 h-4 text-primary/40" />
                                       </div>
                                       
-                                      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2">
-                                        {sortedParticipants.map((p, idx) => (
-                                          <div key={p.id || idx} className="bg-white/5 border border-white/5 rounded-xl p-4 flex items-center justify-between group transition-all duration-300 hover:border-primary/30">
-                                            <div className="flex items-center gap-4 overflow-hidden">
-                                              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-xs font-black text-primary shrink-0">
-                                                {idx + 1}
+                                      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 relative">
+                                        <AnimatePresence mode="popLayout">
+                                          {sortedParticipants.map((p, idx) => (
+                                            <motion.div 
+                                              layout
+                                              key={p.id || p.username}
+                                              initial={{ opacity: 0, x: -20 }}
+                                              animate={{ opacity: 1, x: 0 }}
+                                              exit={{ opacity: 0, x: 20 }}
+                                              transition={{ 
+                                                type: "spring",
+                                                stiffness: 500,
+                                                damping: 30,
+                                                mass: 1,
+                                                opacity: { duration: 0.2 }
+                                              }}
+                                              className="bg-white/5 border border-white/5 rounded-xl p-4 flex items-center justify-between group transition-all duration-300 hover:border-primary/30"
+                                            >
+                                              <div className="flex items-center gap-4 overflow-hidden">
+                                                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-xs font-black text-primary shrink-0">
+                                                  {idx + 1}
+                                                </div>
+                                                <span className="font-mono text-base text-white font-bold truncate max-w-[150px]">
+                                                  {formatAddress(p.username)}
+                                                </span>
                                               </div>
-                                              <span className="font-mono text-base text-white font-bold truncate max-w-[150px]">
-                                                {formatAddress(p.username)}
-                                              </span>
-                                            </div>
-                                            <div className="flex items-center gap-6 shrink-0">
-                                              <div className="w-32 h-2 bg-white/5 rounded-full overflow-hidden hidden sm:block border border-white/5">
-                                                <motion.div 
-                                                  initial={{ width: 0 }}
-                                                  animate={{ width: `${p.prob}%` }}
-                                                  className="h-full bg-primary shadow-[0_0_15px_rgba(34,197,94,0.4)]"
-                                                />
+                                              <div className="flex items-center gap-6 shrink-0">
+                                                <div className="w-32 h-2 bg-white/5 rounded-full overflow-hidden hidden sm:block border border-white/5">
+                                                  <motion.div 
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${p.prob}%` }}
+                                                    className="h-full bg-primary shadow-[0_0_15px_rgba(34,197,94,0.4)]"
+                                                  />
+                                                </div>
+                                                <span className="font-mono text-lg font-black text-primary w-[4ch] text-right">
+                                                  {Math.round(p.prob)}%
+                                                </span>
                                               </div>
-                                              <span className="font-mono text-lg font-black text-primary w-[4ch] text-right">
-                                                {Math.round(p.prob)}%
-                                              </span>
-                                            </div>
-                                          </div>
-                                        ))}
+                                            </motion.div>
+                                          ))}
+                                        </AnimatePresence>
                                         
                                         {sortedParticipants.length === 0 && (
                                           <div className="flex flex-col items-center justify-center h-full py-12 opacity-20">
