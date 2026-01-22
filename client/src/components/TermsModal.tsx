@@ -6,19 +6,22 @@ import { useSound } from "@/contexts/SoundContext";
 
 interface TermsModalProps {
   onAccept: () => void;
+  show?: boolean;
 }
 
-export function TermsModal({ onAccept }: TermsModalProps) {
+export function TermsModal({ onAccept, show = false }: TermsModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const { playSound } = useSound();
 
   useEffect(() => {
-    const accepted = localStorage.getItem("pumbp_bingo_terms_accepted");
-    if (!accepted) {
-      setIsOpen(true);
+    if (show) {
+      const accepted = localStorage.getItem("pumbp_bingo_terms_accepted");
+      if (!accepted) {
+        setIsOpen(true);
+      }
     }
-  }, []);
+  }, [show]);
 
   const handleAccept = () => {
     playSound("/sounds/tick.mp3", 0.5);

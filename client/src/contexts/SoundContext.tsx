@@ -25,14 +25,17 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   const playSound = (soundPath: string, volume = 0.5) => {
     if (isMuted) return;
     
+    console.log(`[Sound] Playing: ${soundPath}`);
     try {
       const audio = new Audio(soundPath);
       audio.volume = volume;
-      audio.play().catch(err => {
-        console.warn("Playback blocked:", soundPath);
+      audio.play().then(() => {
+        console.log(`[Sound] Success: ${soundPath}`);
+      }).catch(err => {
+        console.error(`[Sound] Blocked: ${soundPath}`, err);
       });
     } catch (e) {
-      console.warn("Sound error:", e);
+      console.error(`[Sound] Error: ${soundPath}`, e);
     }
   };
 

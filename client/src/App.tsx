@@ -20,6 +20,7 @@ import { PROTOCOL_CONFIG } from "@shared/config";
 import { SoundProvider } from "@/contexts/SoundContext";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { TermsModal } from "./components/TermsModal";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const logoPng = "https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png";
 
@@ -39,6 +40,7 @@ function App() {
   const [location] = useLocation();
   const scrollRef = useRef<HTMLElement>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const { connected } = useWallet();
 
   useEffect(() => {
     // Force dark mode globally
@@ -60,7 +62,7 @@ function App() {
           <SoundProvider>
             <AudioInitializer>
               <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
-                <TermsModal onAccept={() => setTermsAccepted(true)} />
+                <TermsModal show={connected && !termsAccepted} onAccept={() => setTermsAccepted(true)} />
                 <header className="sticky top-0 z-[100] w-full bg-background/80 backdrop-blur-xl border-b border-white/5">
                   <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between py-4 gap-6">
                     <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
