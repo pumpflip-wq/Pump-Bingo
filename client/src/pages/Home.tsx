@@ -420,7 +420,7 @@ export default function Home() {
       {overlayState && (
         <WinnerOverlay 
           show={overlayState.show} 
-          username={overlayState.username} 
+          username={overlayState.username || "Unknown"} 
           prize={overlayState.prize}
           isWinner={overlayState.isWinner}
           timeLeft={overlayState.timeLeft}
