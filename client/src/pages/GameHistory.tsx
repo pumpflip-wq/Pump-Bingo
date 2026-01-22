@@ -34,7 +34,7 @@ export default function GameHistory() {
 
   return (
     <div className="flex flex-col bg-background text-foreground">
-      <div className="w-full flex-1 flex flex-col space-y-4 max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+      <div className="w-full flex-1 flex flex-col space-y-4 max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-8 py-8">
           <div className="text-center space-y-4">
             <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter text-white uppercase leading-none flex items-center justify-center gap-4">
