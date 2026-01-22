@@ -61,7 +61,7 @@ export default function Home() {
   
   useEffect(() => {
     if (roundData?.round.status === 'FINISHED' && roundData?.round.winnerId) {
-      if (isParticipant && !hasShownWinner) {
+      if (!hasShownWinner) {
         setShowWinner(true);
         setHasShownWinner(true);
       }
@@ -69,7 +69,7 @@ export default function Home() {
       setShowWinner(false);
       setHasShownWinner(false);
     }
-  }, [roundData?.round.status, roundData?.round.winnerId, isParticipant, hasShownWinner]);
+  }, [roundData?.round.status, roundData?.round.winnerId, hasShownWinner]);
 
   const copyCA = () => {
     navigator.clipboard.writeText(PROTOCOL_CONFIG.MINT_ADDRESS);
@@ -398,7 +398,12 @@ export default function Home() {
                                   >
                                     <div className="flex items-center gap-3">
                                       <span className="text-primary font-black italic w-6">#{idx + 1}</span>
-                                      <span className="text-sm font-bold text-white/80 italic">@{formatAddress(p.username)}</span>
+                                      <span className="text-sm font-bold text-white/80 italic flex items-center gap-2">
+                                        @{formatAddress(p.username)}
+                                        {roundData?.round.status === 'FINISHED' && p.username === roundData?.round.winnerUsername && (
+                                          <Trophy className="w-3 h-3 text-primary animate-bounce" />
+                                        )}
+                                      </span>
                                     </div>
                                     <div className="flex items-center gap-4">
                                       <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
