@@ -58,7 +58,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2 overflow-hidden">
                       {showStats && (
-                        <span className="text-[10px] font-black text-primary/40 font-mono shrink-0">
+                        <span className="text-sm font-black text-primary font-mono shrink-0 drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]">
                           {idx + 1}
                         </span>
                       )}
