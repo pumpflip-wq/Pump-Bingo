@@ -356,14 +356,14 @@ export default function Home() {
                     </div>
 
                     {isParticipant && currentCard ? (
-                      <div className="relative space-y-1 flex flex-col items-center flex-1 min-h-0 justify-center">
+                      <div className="relative space-y-2 flex flex-col items-center flex-1 min-h-0 justify-center w-full">
                           <BingoCard 
                           card={currentCard} 
                           drawnNumbers={roundData.round.drawnNumbers || []} 
-                          className="w-full max-w-[500px] scale-[0.98]"
+                          className="w-full max-w-full scale-100"
                         />
                         
-                        <div className="flex justify-center w-full max-w-[500px] shrink-0 mt-1">
+                        <div className="flex justify-center w-full max-w-full shrink-0">
                           <BingoClaimButton 
                             roundId={roundData.round.id} 
                             userId={user?.id || 0} 
@@ -371,7 +371,7 @@ export default function Home() {
                             drawnNumbers={roundData.round.drawnNumbers || []}
                             status={roundData.round.status}
                             isBingoed={participant?.hasBingo || false}
-                            className="w-full h-12 text-xl font-black italic tracking-tighter"
+                            className="w-full h-16 text-2xl font-black italic tracking-tighter"
                           />
                         </div>
                       </div>
