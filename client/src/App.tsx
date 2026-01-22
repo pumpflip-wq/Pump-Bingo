@@ -74,9 +74,13 @@ function App() {
       localStorage.setItem("pumbp_bingo_accepted_wallets", JSON.stringify(acceptedWallets));
       setTermsAccepted(true);
       
-      // Attempt to play a silent sound to unlock audio context on this click
-      const silentAudio = new Audio();
-      silentAudio.play().catch(() => {});
+      // Critical: Use the playSound from context or direct audio to unlock
+      // This is the user-initiated action that unlocks audio
+      const silentAudio = new Audio("/sounds/tick.mp3");
+      silentAudio.volume = 0.001;
+      silentAudio.play().then(() => {
+        console.log("[Sound] Context unlocked via Terms Acceptance");
+      }).catch(e => console.error("[Sound] Failed to unlock context", e));
     }
   };
 

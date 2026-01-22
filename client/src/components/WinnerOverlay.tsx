@@ -24,7 +24,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
     if (show) {
       setLeft(10);
       if (isWinner) {
-        playSound("/sounds/win.mp3", 0.6);
+        playSound("/sounds/start.mp3", 0.6);
         const timer = setTimeout(() => {
           confetti({
             particleCount: 200,

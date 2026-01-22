@@ -23,29 +23,29 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   const playSound = (soundPath: string, volume = 0.5) => {
     if (isMuted) return;
     
-    console.log(`[Sound] Attempting to play: ${soundPath}`);
+    // Ensure sound path is correct (remove leading slash if it exists for relative resolution)
+    const normalizedPath = soundPath.startsWith('/') ? soundPath : `/${soundPath}`;
+    
+    console.log(`[Sound] Attempting to play: ${normalizedPath}`);
     try {
-      const audio = new Audio(soundPath);
+      const audio = new Audio(normalizedPath);
       audio.volume = volume;
       
-      // Ensure we have an interaction before playing
       const playPromise = audio.play();
       
       if (playPromise !== undefined) {
         playPromise.then(() => {
-          console.log(`[Sound] Success: ${soundPath}`);
+          console.log(`[Sound] Success: ${normalizedPath}`);
         }).catch(err => {
-          console.error(`[Sound] Blocked: ${soundPath}`, err);
-          // Auto-resume logic if possible on next user interaction
-          const resumeAudio = () => {
-            audio.play();
-            window.removeEventListener('click', resumeAudio);
-          };
-          window.addEventListener('click', resumeAudio);
+          if (err.name === 'NotAllowedError') {
+            console.warn(`[Sound] Autoplay blocked for: ${normalizedPath}`);
+          } else {
+            console.error(`[Sound] Playback error for: ${normalizedPath}`, err);
+          }
         });
       }
     } catch (e) {
-      console.error(`[Sound] Error: ${soundPath}`, e);
+      console.error(`[Sound] Creation error: ${normalizedPath}`, e);
     }
   };
 
