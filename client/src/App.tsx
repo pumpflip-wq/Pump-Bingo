@@ -9,7 +9,7 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import VerifyPage from "@/pages/VerifyPage";
 import GameHistory from "@/pages/GameHistory";
 import { Footer } from "./components/Footer";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { SolanaProvider, AudioInitializer } from "./components/SolanaProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
@@ -19,6 +19,7 @@ import { PROTOCOL_CONFIG } from "@shared/config";
 
 import { SoundProvider } from "@/contexts/SoundContext";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { TermsModal } from "./components/TermsModal";
 
 const logoPng = "https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png";
 
@@ -37,6 +38,7 @@ function Router() {
 function App() {
   const [location] = useLocation();
   const scrollRef = useRef<HTMLElement>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     // Force dark mode globally
@@ -46,6 +48,9 @@ function App() {
     if (scrollRef.current) {
       scrollRef.current.scrollTo(0, 0);
     }
+
+    const accepted = localStorage.getItem("pumbp_bingo_terms_accepted");
+    if (accepted) setTermsAccepted(true);
   }, [location]);
 
   return (
@@ -55,6 +60,7 @@ function App() {
           <SoundProvider>
             <AudioInitializer>
               <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
+                <TermsModal onAccept={() => setTermsAccepted(true)} />
                 <header className="sticky top-0 z-[100] w-full bg-background/80 backdrop-blur-xl border-b border-white/5">
                   <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between py-4 gap-6">
                     <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
