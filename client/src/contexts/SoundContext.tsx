@@ -25,9 +25,25 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       console.log("Sound muted, skipping:", soundPath);
       return;
     }
+    
+    // Create audio once to help with browser caching and performance
     const audio = new Audio(soundPath);
     audio.volume = volume;
-    audio.play().catch(err => console.error("Sound play blocked or error:", err));
+    
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(err => {
+        // Fallback for autoplay policy - most browsers allow audio after first interaction
+        console.warn("Autoplay prevented sound. Retrying on next interaction:", soundPath, err);
+        const retryOnInteraction = () => {
+          audio.play().catch(() => {});
+          window.removeEventListener('click', retryOnInteraction);
+          window.removeEventListener('keydown', retryOnInteraction);
+        };
+        window.addEventListener('click', retryOnInteraction, { once: true });
+        window.addEventListener('keydown', retryOnInteraction, { once: true });
+      });
+    }
   };
 
   return (

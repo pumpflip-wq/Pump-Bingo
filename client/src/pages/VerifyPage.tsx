@@ -52,20 +52,12 @@ export default function VerifyPage() {
   const verifySeed = (seed: string, expectedHash: string) => {
     if (!seed || !expectedHash) return false;
     try {
-      const trimmedSeed = seed.trim();
-      const trimmedHash = expectedHash.trim();
+      const trimmedSeed = seed.trim().toLowerCase();
+      const trimmedHash = expectedHash.trim().toLowerCase();
       
-      // Fixed verification logic to use consistent hashing
-      const hash = crypto.createHash('sha256').update(trimmedSeed).digest('hex');
+      const hash = crypto.createHash('sha256').update(trimmedSeed).digest('hex').toLowerCase();
       
-      console.log("Verification Logic Debug:", { 
-        rawSeed: seed,
-        trimmedSeed,
-        computedHash: hash, 
-        expectedHash: trimmedHash 
-      });
-      
-      return hash === trimmedHash; // Exact match on lowercase hash
+      return hash === trimmedHash;
     } catch (e) {
       console.error("Verification Error:", e);
       return false;

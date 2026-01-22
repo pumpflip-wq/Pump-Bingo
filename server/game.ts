@@ -75,8 +75,8 @@ export class GameManager {
     const [latestRound] = await db.select().from(rounds).orderBy(sql`${rounds.id} DESC`).limit(1);
     const nextId = latestRound ? latestRound.id + 1 : 1;
 
-    const seed = crypto.randomBytes(32).toString('hex');
-    const hash = crypto.createHash('sha256').update(seed).digest('hex');
+    const seed = crypto.randomBytes(32).toString('hex').toLowerCase();
+    const hash = crypto.createHash('sha256').update(seed).digest('hex').toLowerCase();
     
     // Default wait time is 60 seconds
     const now = Date.now();
