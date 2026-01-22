@@ -150,7 +150,7 @@ export default function GameHistory() {
                                 <Link href={`/verify?roundId=${round.id}`}>
                                   <Button variant="ghost" size="sm" className="hover:text-primary transition-colors flex items-center gap-2 px-3">
                                     <Search className="w-4 h-4" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">בדיקה</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Verify</span>
                                   </Button>
                                 </Link>
                                 <Button variant="ghost" size="icon" className="hover:text-primary transition-colors" asChild>

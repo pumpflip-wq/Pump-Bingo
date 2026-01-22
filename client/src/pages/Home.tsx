@@ -355,7 +355,7 @@ export default function Home() {
                         ) : participant || foundParticipant ? (
                           <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl">
                             <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">YOU'RE IN THE GAME!</p>
-                            <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">Waiting for players or round start...</p>
+                            <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">Wait for Next Game - Next round starts automatically</p>
                           </div>
                         ) : (
                           <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
