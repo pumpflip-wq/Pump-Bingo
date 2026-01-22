@@ -4,6 +4,8 @@ import confetti from 'canvas-confetti';
 import { CyberButton } from './ui/CyberButton';
 import { Trophy, ExternalLink, Frown } from 'lucide-react';
 import { formatAddress } from "@/lib/utils";
+import { useSound } from "@/contexts/SoundContext";
+import { PROTOCOL_CONFIG } from "@shared/config";
 
 interface WinnerOverlayProps {
   show: boolean;
@@ -16,11 +18,13 @@ interface WinnerOverlayProps {
 
 export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose }: WinnerOverlayProps) {
   const [timeLeft, setLeft] = useState(10);
+  const { playSound } = useSound();
 
   useEffect(() => {
     if (show) {
       setLeft(10);
       if (isWinner) {
+        playSound("/sounds/win.mp3", 0.6);
         const timer = setTimeout(() => {
           confetti({
             particleCount: 200,
@@ -32,7 +36,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
         return () => clearTimeout(timer);
       }
     }
-  }, [show, isWinner]);
+  }, [show, isWinner, playSound]);
 
   useEffect(() => {
     if (!show) return;
@@ -95,42 +99,28 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
             </p>
 
             <div className="bg-black/40 rounded-3xl p-8 mb-10 border border-white/10 text-center relative overflow-hidden">
-              {isWinner ? (
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2 text-center">WINNER ADDRESS</p>
-                    <p className="text-2xl font-bold text-white italic truncate text-center">@{formatAddress(username)}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2 text-center">TOTAL REWARD</p>
-                    <div className="flex flex-col items-center gap-1">
-                      <p className="text-6xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
-                        {prize.toLocaleString()}
-                      </p>
-                      <span className="text-xs font-black text-primary/50 italic uppercase tracking-[0.3em]">PBINGO TOKEN</span>
-                    </div>
-                  </div>
-                  {explorerUrl && (
-                    <a href={explorerUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 text-xs text-primary hover:text-white transition-colors font-black uppercase tracking-widest pt-4 border-t border-white/10">
-                      <ExternalLink className="w-4 h-4" /> VERIFY ON-CHAIN
-                    </a>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="text-left">
-                    <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">ROUND WINNER</p>
-                    <p className="text-lg font-bold text-white italic truncate">@{formatAddress(username)}</p>
-                  </div>
-                  <div className="h-[1px] w-full bg-white/10" />
-                  <p className="text-base text-white/80 font-bold italic leading-relaxed">
-                    The nodes were not in your favor. Re-synchronizing for next round...
-                  </p>
-                  <p className="text-primary text-sm font-black uppercase tracking-[0.2em] animate-pulse">
-                    GET READY FOR THE NEXT DROP
+              <div className="space-y-6">
+                <div>
+                  <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2 text-center">WINNER ADDRESS</p>
+                  <p className="text-2xl font-bold text-white italic truncate text-center">
+                    {username && username.length > 20 ? formatAddress(username) : username}
                   </p>
                 </div>
-              )}
+                <div>
+                  <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2 text-center">TOTAL REWARD</p>
+                  <div className="flex flex-col items-center gap-1">
+                    <p className="text-6xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
+                      {prize.toLocaleString()}
+                    </p>
+                    <span className="text-xs font-black text-primary/50 italic uppercase tracking-[0.3em]">PBINGO TOKEN</span>
+                  </div>
+                </div>
+                {explorerUrl && (
+                  <a href={explorerUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 text-xs text-primary hover:text-white transition-colors font-black uppercase tracking-widest pt-4 border-t border-white/10">
+                    <ExternalLink className="w-4 h-4" /> VERIFY ON-CHAIN
+                  </a>
+                )}
+              </div>
             </div>
 
             <div className="pt-2">

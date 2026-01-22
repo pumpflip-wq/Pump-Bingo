@@ -14,6 +14,12 @@ export function useGameSounds(roundStatus: string, timeLeft: { minutes: number; 
       }
     }
 
+    // Final countdown ticks (3, 2, 1)
+    if (timeLeft.minutes === 0 && timeLeft.seconds > 0 && timeLeft.seconds <= 3 && timeLeft.seconds !== lastTick) {
+      playSound("/sounds/tick.mp3", 0.4);
+      setLastTick(timeLeft.seconds);
+    }
+    
     // Start sound when game begins
     if (roundStatus === 'IN_GAME' && timeLeft.minutes === 0 && timeLeft.seconds === 0 && lastTick !== 0) {
       playSound("/sounds/start.mp3", 0.5);
