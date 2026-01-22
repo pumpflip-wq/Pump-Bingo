@@ -256,19 +256,19 @@ export default function Home() {
                         <div className="w-full space-y-8">
                           <div className="glass-card neon-border rounded-2xl p-8 bg-black/60 border-primary/30 flex flex-row items-center justify-center gap-24 w-full">
                             <div className="flex flex-col text-center">
-                              <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Room</p>
-                              <p className="text-3xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
+                              <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-2">Room</p>
+                              <p className="text-5xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
                             </div>
                             <div className="flex flex-col text-center scale-110">
-                              <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
+                              <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
                               <div className="flex flex-col items-center">
-                                <span className="text-5xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{formatCurrency(roundData.round.prizePool || 0)}</span>
-                                <span className="text-xl text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
+                                <span className="text-7xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{formatCurrency(roundData.round.prizePool || 0)}</span>
+                                <span className="text-3xl text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
                               </div>
                             </div>
                             <div className="flex flex-col items-center">
-                              <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Players</p>
-                              <p className="text-3xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                              <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-2">Players</p>
+                              <p className="text-5xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                             </div>
                           </div>
                         </div>
@@ -317,21 +317,21 @@ export default function Home() {
                       transition={{ duration: 0.8, ease: "easeInOut" }}
                       className="space-y-4 flex-1 overflow-hidden h-full flex flex-col"
                     >
-                      <div className="glass-card neon-border rounded-xl p-4 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
+                      <div className="glass-card neon-border rounded-xl p-6 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
                         <div className="flex flex-col">
-                          <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Prize Pool</p>
+                          <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{formatCurrency(roundData.round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}</span>
+                            <span className="text-6xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{formatCurrency(roundData.round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}</span>
                           </div>
                         </div>
-                        <div className="flex gap-12">
+                        <div className="flex gap-16">
                           <div className="text-center">
-                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Room</p>
-                            <p className="text-3xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
+                            <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-1">Room</p>
+                            <p className="text-5xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
                           </div>
                           <div className="text-center">
-                            <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Players</p>
-                            <p className="text-3xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                            <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-1">Players</p>
+                            <p className="text-5xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                           </div>
                         </div>
                       </div>

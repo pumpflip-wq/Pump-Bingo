@@ -14,8 +14,8 @@ export function GameHistory({ historyRounds, historyLoading, formatAddress }: Ga
   return (
     <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden bg-black/20">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
-          <History className="w-4 h-4 text-primary" /> Game History
+        <h3 className="text-[22px] text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
+          <History className="w-6 h-6 text-primary" /> Game History
         </h3>
         <Link href="/history" className="text-[10px] font-black text-primary/60 hover:text-primary uppercase tracking-widest underline transition-colors">Full View</Link>
       </div>

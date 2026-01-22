@@ -10,7 +10,7 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
   return (
     <div className="flex flex-col items-center justify-center space-y-3">
       <div className="flex items-center gap-3">
-        <span className="text-sm text-white uppercase font-black tracking-widest font-display">Live Feed</span>
+        <span className="text-[22px] text-white uppercase font-black tracking-widest font-display">Live Feed</span>
       </div>
 
       <div className="relative w-32 h-32 flex items-center justify-center">

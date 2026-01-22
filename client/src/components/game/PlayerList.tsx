@@ -15,8 +15,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
   return (
     <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[750px] overflow-hidden bg-black/20">
       <div className="flex items-center justify-between mb-6 shrink-0">
-        <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
-          <Users className="w-4 h-4 text-primary" /> Active Players
+        <h3 className="text-[22px] text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
+          <Users className="w-6 h-6 text-primary" /> Active Players
         </h3>
       </div>
       <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
