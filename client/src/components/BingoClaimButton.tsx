@@ -132,7 +132,7 @@ export function BingoClaimButton({
     <CyberButton
       onClick={handleClaim}
       disabled={!canClaim || isPending}
-      className={cn("px-10 h-14 text-lg", canClaim ? 'animate-pulse' : 'opacity-50', className)}
+      className={cn("px-10 h-14 text-3xl font-black italic tracking-tighter", canClaim ? 'animate-pulse' : 'opacity-50', className)}
       data-testid="button-claim-bingo"
     >
       {isPending ? (
