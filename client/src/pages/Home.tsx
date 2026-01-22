@@ -125,6 +125,7 @@ export default function Home() {
     if (hasWinner && winnerDeclaredAt) {
       const elapsed = currentTime - winnerDeclaredAt;
       const totalDisplayTime = 10000; 
+      const remaining = Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000));
       
       // Stop showing if timer expired - ensure clean exit
       // Using a slightly more strict check to avoid re-triggering
@@ -192,14 +193,9 @@ export default function Home() {
       prob: calculateWinProb(p.card, roundData.round.drawnNumbers || [])
     }));
 
-    // If I'm not a participant, don't sort the list by probability for the sidebar
-    // This keeps the sidebar stable for spectators while they see the dynamic ranking in the center
-    if (!isParticipant) {
-      return withProb;
-    }
-
+    // Always sort by probability descending to ensure correct ranking
     return withProb.sort((a, b) => b.prob - a.prob);
-  }, [roundData?.participants, roundData?.round.drawnNumbers, isParticipant]);
+  }, [roundData?.participants, roundData?.round.drawnNumbers]);
 
   return (
     <>
