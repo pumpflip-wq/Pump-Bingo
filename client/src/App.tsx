@@ -97,7 +97,7 @@ function App() {
               </div>
             </header>
             <main className="flex-1 flex flex-col">
-              <div className="flex-1 pb-8 pt-6 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex-1 pb-6 pt-6 w-full max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8">
                 <Router />
               </div>
               <Footer />
