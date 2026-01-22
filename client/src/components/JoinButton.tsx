@@ -105,9 +105,9 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
 
   if (isWinnerDeclared) {
     return (
-      <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl w-full">
-        <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">GAME OVER!</p>
-        <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">
+      <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl w-full h-[120px] flex flex-col items-center justify-center">
+        <p className="text-primary font-black text-4xl italic tracking-tighter mb-1 uppercase text-center">GAME OVER!</p>
+        <p className="text-xs text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">
           Next Round in {timeRemaining}s
         </p>
       </div>
@@ -118,16 +118,19 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
     <CyberButton
       onClick={handleJoin}
       disabled={isPending || !userId}
-      className="w-full h-16 text-xl"
+      className="w-full h-[120px] text-4xl font-black italic tracking-tighter uppercase"
       data-testid="button-join-round"
     >
       {isPending ? (
-        <>
-          <Loader2 className="w-5 h-5 animate-spin mr-2" />
-          JOINING...
-        </>
+        <div className="flex items-center justify-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin" />
+          <span>JOINING...</span>
+        </div>
       ) : (
-        <>JOIN GAME - {price} PUMP</>
+        <div className="flex flex-col items-center justify-center">
+          <span>JOIN GAME</span>
+          <span className="text-xl text-black/60 font-black mt-1">{price} PUMP</span>
+        </div>
       )}
     </CyberButton>
   );
