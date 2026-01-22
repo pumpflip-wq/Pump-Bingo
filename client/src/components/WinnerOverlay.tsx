@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { CyberButton } from './ui/CyberButton';
 import { Trophy, ExternalLink, Frown } from 'lucide-react';
-import { formatAddress } from "@/lib/utils";
+import { formatAddress, formatCurrency } from "@/lib/utils";
 import { PROTOCOL_CONFIG } from "@shared/config";
 
 interface WinnerOverlayProps {
@@ -48,19 +48,15 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
             <div className={`absolute top-0 left-0 w-full h-2 ${isWinner ? 'bg-primary' : 'bg-red-500'} animate-pulse`} />
             
             <div className="mb-8 relative inline-block">
-              <motion.div 
-                animate={isWinner ? { 
-                  rotate: [0, -10, 10, -10, 10, 0],
-                  scale: [1, 1.2, 1, 1.2, 1] 
-                } : { 
-                  y: [0, 10, 0],
-                  opacity: [1, 0.7, 1]
-                }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                className={`inline-flex items-center justify-center w-24 h-24 rounded-full ${isWinner ? 'bg-primary/20 border-primary' : 'bg-red-500/10 border-red-500'} border-4 shadow-2xl overflow-visible`}
+              <div 
+                className={`inline-flex items-center justify-center w-32 h-32 rounded-full ${isWinner ? 'bg-primary/20 border-primary' : 'bg-red-500/10 border-red-500'} border-4 shadow-2xl overflow-hidden`}
               >
-                {isWinner ? <Trophy className="w-12 h-12 text-primary" /> : <Frown className="w-12 h-12 text-red-500" />}
-              </motion.div>
+                <img 
+                  src="https://i.ibb.co/qY92bM8F/20260122-1554-Image-Generation-remix-01kfjzkjq3ebzbpy2j9dhghe0s.png" 
+                  alt="Victory" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
 
             <h2 className={`text-6xl font-display font-black mb-4 tracking-tighter uppercase italic ${isWinner ? 'text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'text-red-500'}`}>
@@ -83,7 +79,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
                   <p className="text-xs text-white uppercase font-black tracking-widest mb-2 text-center">TOTAL REWARD</p>
                   <div className="flex flex-col items-center gap-1">
                     <p className="text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
-                      {prize.toLocaleString()}
+                      {formatCurrency(prize, false)}
                     </p>
                     <span className="text-sm font-black text-primary/70 italic uppercase tracking-[0.3em]">PBINGO TOKEN</span>
                   </div>

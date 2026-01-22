@@ -132,7 +132,11 @@ export default function Home() {
       const elapsed = currentTime - winnerDeclaredAt;
       const remaining = Math.max(0, Math.ceil((10000 - elapsed) / 1000));
       
-      // Stop showing if timer expired or manually closed
+      // Sync overlay and lobby transition
+      if (remaining <= 0 && !hasManuallyClosed) {
+        setHasManuallyClosed(true);
+      }
+      
       if (remaining > 0 && !hasManuallyClosed) {
         const isMe = roundData.round.winnerId === user?.id;
         // Search in participants for the winner

@@ -5,14 +5,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(amount: number): string {
-  if (amount >= 1000000) {
-    return (amount / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+export function formatCurrency(amount: number, useSmartFormatting: boolean = true): string {
+  if (useSmartFormatting) {
+    if (amount >= 1000000) {
+      return (amount / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+    }
+    if (amount >= 10000) {
+      return (amount / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+    }
   }
-  if (amount >= 10000) {
-    return (amount / 1000).toFixed(1).replace(/\.0$/, "") + "K";
-  }
-  return amount.toLocaleString();
+  return amount.toLocaleString("en-US");
 }
 
 export function formatAddress(address: string) {

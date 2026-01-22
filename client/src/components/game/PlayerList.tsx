@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, ShieldCheck, Globe } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatAddress, formatCurrency } from "@/lib/utils";
 import { PROTOCOL_CONFIG } from "@shared/config";
 
 interface PlayerListProps {
@@ -44,7 +44,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                     </span>
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
-                    <span className="text-[10px] text-primary font-black font-mono">+{PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} {PROTOCOL_CONFIG.SYMBOL}</span>
+                    <span className="text-[11px] text-primary font-black font-mono">+{formatCurrency(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE, false)} {PROTOCOL_CONFIG.SYMBOL}</span>
                     {roundStatus === 'IN_GAME' && (
                       <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
                         <motion.div 
