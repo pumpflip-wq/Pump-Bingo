@@ -15,18 +15,14 @@ export function TermsModal({ onAccept, show = false }: TermsModalProps) {
   const { playSound } = useSound();
 
   useEffect(() => {
-    console.log(`[TermsModal] Trigger show: ${show}`);
-    if (show) {
-      setIsOpen(true);
-    } else {
-      setIsOpen(false);
-    }
+    console.log(`[TermsModal] Visibility Check - Show Prop: ${show}`);
+    setIsOpen(show);
   }, [show]);
 
   const handleAccept = () => {
-    playSound("/sounds/tick.mp3", 0.5);
+    console.log("[TermsModal] Accepting terms and unlocking audio");
     localStorage.setItem("pumbp_bingo_terms_accepted", "true");
-    setIsOpen(false);
+    playSound("/sounds/tick.mp3", 0.5);
     onAccept();
   };
 
