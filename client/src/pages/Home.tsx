@@ -101,20 +101,24 @@ export default function Home() {
     return Math.floor(baseProgress[minMissing] ?? 0);
   };
 
+  const [currentTime, setCurrentTime] = useState(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const overlayState = useMemo(() => {
-    const isFinished = roundData?.round.status === 'FINISHED';
-    const isStarting = roundData?.round.status === 'STARTING';
     const hasWinner = !!roundData?.round.winnerId;
     const currentRoundId = roundData?.round.id;
     const winnerDeclaredAt = roundData?.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
 
-    if (currentRoundId !== lastOverlayRoundId) {
+    if (currentRoundId && currentRoundId !== lastOverlayRoundId) {
       setLastOverlayRoundId(currentRoundId);
       setHasManuallyClosed(false);
     }
 
     if (hasWinner && winnerDeclaredAt) {
-      const elapsed = Date.now() - winnerDeclaredAt;
+      const elapsed = currentTime - winnerDeclaredAt;
       const remaining = Math.max(0, Math.ceil((10000 - elapsed) / 1000));
       
       if (remaining > 0) {
@@ -134,7 +138,7 @@ export default function Home() {
     }
 
     return null;
-  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId]);
+  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime]);
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
     ...p,
@@ -287,7 +291,7 @@ export default function Home() {
                                     <div className="flex flex-col items-center">
                                       <span>WAITING FOR NEXT ROUND</span>
                                       {roundData.round.completedAt && (
-                                        <span className="text-primary text-xl mt-4">NEXT ROUND IN {Math.max(0, Math.ceil((10000 - (Date.now() - new Date(roundData.round.completedAt).getTime())) / 1000))}S</span>
+                                        <span className="text-primary text-xl mt-4">NEXT ROUND IN {Math.max(0, Math.ceil((10000 - (currentTime - new Date(roundData.round.completedAt).getTime())) / 1000))}S</span>
                                       )}
                                     </div>
                                   ) : 'WATCHING LIVE'}

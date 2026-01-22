@@ -14,10 +14,9 @@ import { useEffect, useRef, useState } from "react";
 import { SolanaProvider } from "./components/SolanaProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
-import { History, ShieldCheck } from "lucide-react";
+import { History, ShieldCheck, Twitter } from "lucide-react";
 import { PROTOCOL_CONFIG } from "@shared/config";
 
-import { ThemeToggle } from "./components/ThemeToggle";
 import { TermsModal } from "./components/TermsModal";
 import { useWallet } from "@solana/wallet-adapter-react";
 
@@ -42,8 +41,9 @@ function AppContent() {
   const { connected, publicKey } = useWallet();
 
   useEffect(() => {
-    // Force dark mode globally
+    // Force dark mode globally and remove any light mode references
     document.documentElement.classList.add("dark");
+    document.documentElement.classList.remove("light");
     localStorage.setItem("theme", "dark");
     
     if (scrollRef.current) {
@@ -52,13 +52,9 @@ function AppContent() {
   }, [location]);
 
   useEffect(() => {
-    console.log(`[Terms] Wallet state - Connected: ${connected}, PublicKey: ${publicKey?.toString()}`);
     if (connected && publicKey) {
       const walletAddr = publicKey.toString();
       const acceptedWallets = JSON.parse(localStorage.getItem("pumbp_bingo_accepted_wallets") || "{}");
-      console.log(`[Terms] Checking storage for wallet ${walletAddr}:`, acceptedWallets[walletAddr]);
-      
-      // Delaying the modal state slightly to ensure it's not bypassed by race conditions
       if (acceptedWallets[walletAddr]) {
         setTermsAccepted(true);
       } else {
@@ -113,25 +109,35 @@ function AppContent() {
                   </Link>
                 </nav>
                 <div className="flex items-center gap-4">
-                  <ThemeToggle />
-                  <a 
-                    href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-[52px] h-[44px] rounded-xl bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center hover:scale-105 active:scale-95 border border-white/5"
-                    title="Trade on Pump.fun"
-                  >
-                    <img src="https://pump.fun/favicon.ico" className="w-7 h-7 object-contain" alt="Pump.fun" />
-                  </a>
-                  <a 
-                    href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-[52px] h-[44px] rounded-xl bg-white/5 hover:bg-white/10 transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-white/5"
-                    title="Chart on Dexscreener"
-                  >
-                    <img src="https://dexscreener.com/favicon.png" className="w-7 h-7 object-contain" alt="Dexscreener" />
-                  </a>
+                  <div className="flex items-center gap-3">
+                    <a 
+                      href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-[52px] h-[44px] rounded-xl bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center hover:scale-105 active:scale-95 border border-white/5"
+                      title="Trade on Pump.fun"
+                    >
+                      <img src="https://pump.fun/favicon.ico" className="w-7 h-7 object-contain" alt="Pump.fun" />
+                    </a>
+                    <a 
+                      href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-[52px] h-[44px] rounded-xl bg-white/5 hover:bg-white/10 transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-white/5"
+                      title="Chart on Dexscreener"
+                    >
+                      <img src="https://dexscreener.com/favicon.png" className="w-7 h-7 object-contain" alt="Dexscreener" />
+                    </a>
+                    <a 
+                      href={PROTOCOL_CONFIG.TWITTER_URL} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-[52px] h-[44px] rounded-xl bg-white/5 hover:bg-white/10 transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-white/5 text-white hover:text-primary"
+                      title="Follow on X"
+                    >
+                      <Twitter className="w-6 h-6 fill-current" />
+                    </a>
+                  </div>
                   <WalletMultiButton className="!bg-primary !text-black !h-11 !px-8 !text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
                 </div>
               </div>
