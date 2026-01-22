@@ -167,8 +167,9 @@ export async function registerRoutes(
       if (hasBingo) {
           // WINNER!
           await storage.updateRound(roundId, { 
-              status: ROUND_STATUS.FINISHED, 
-              winnerId: userId 
+              status: ROUND_STATUS.IN_GAME, // Keep in game for the 10s delay
+              winnerId: userId,
+              completedAt: new Date() // Use this as "winnerDeclaredAt" effectively
           });
           
           // Payout based on feePercentage

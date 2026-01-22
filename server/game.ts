@@ -161,16 +161,13 @@ export class GameManager {
         
         // Check if winner was already declared (e.g. via claim route)
         if (round.winnerId) {
-            // Keep the game in IN_GAME state for 10 seconds after winner is declared
-            // so the frontend can show the winner announcement
-            const lastUpdate = round.startTime ? new Date(round.startTime).getTime() : 0;
-            const winnerDeclaredAt = round.drawnNumbers.length > 0 ? Date.now() : lastUpdate; // Approximate
-            
-            // We need a more reliable way to track when the winner was declared.
-            // For now, let's use the status change delay.
             // Wait 10 seconds before moving to FINISHED
-            await new Promise(resolve => setTimeout(resolve, 10000)); 
-            await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
+            const lastUpdate = round.startTime ? new Date(round.startTime).getTime() : 0;
+            const winnerDeclaredAt = (round as any).winnerDeclaredAt ? new Date((round as any).winnerDeclaredAt).getTime() : Date.now();
+            
+            if (Date.now() - winnerDeclaredAt > 10000) {
+                await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
+            }
             return;
         }
 

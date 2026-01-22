@@ -104,7 +104,7 @@ export class DatabaseStorage implements IStorage {
     const [result] = await db.select({ count: sql<number>`count(*)` })
         .from(participants)
         .where(eq(participants.roundId, roundId));
-    return Number(result.count);
+    return Number(result.count || 0);
   }
 
   async getRecentFinishedRounds(): Promise<(Round & { winnerUsername: string | null })[]> {
