@@ -19,6 +19,7 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
 
     // Rows
     for (let r = 0; r < 5; r++) {
+      if (!card[r]) continue;
       const missing = card[r].filter(n => n !== 0 && !drawnSet.has(n)).length;
       minMissing = Math.min(minMissing, missing);
     }
@@ -26,6 +27,7 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
     for (let c = 0; c < 5; c++) {
       let missing = 0;
       for (let r = 0; r < 5; r++) {
+        if (!card[r]) continue;
         const n = card[r][c];
         if (n !== 0 && !drawnSet.has(n)) missing++;
       }
@@ -34,8 +36,8 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
     // Diagonals
     let d1 = 0, d2 = 0;
     for (let i = 0; i < 5; i++) {
-      if (card[i][i] !== 0 && !drawnSet.has(card[i][i])) d1++;
-      if (card[i][4-i] !== 0 && !drawnSet.has(card[i][4-i])) d2++;
+      if (card[i] && card[i][i] !== 0 && !drawnSet.has(card[i][i])) d1++;
+      if (card[i] && card[i][4-i] !== 0 && !drawnSet.has(card[i][4-i])) d2++;
     }
     minMissing = Math.min(minMissing, d1, d2);
     return minMissing === 1;

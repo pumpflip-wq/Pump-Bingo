@@ -45,45 +45,49 @@ export default function Home() {
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
 
   const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
-  const [lastOverlayTimestamp, setLastOverlayTimestamp] = useState<string | null>(null);
+  const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
 
   const isParticipant = !!participant || !!foundParticipant;
 
   const calculateWinProb = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);
-    // Include free space (0)
-    drawnSet.add(0);
+    drawnSet.add(0); // Free space
     
     if (drawnSet.size <= 1) return 0;
     
     const lines = [
-      // Rows
       ...Array(5).fill(0).map((_, r) => card[r]),
-      // Columns
       ...Array(5).fill(0).map((_, c) => card.map(r => r[c])),
-      // Diagonals
       Array(5).fill(0).map((_, i) => card[i][i]),
       Array(5).fill(0).map((_, i) => card[i][4 - i])
     ];
 
     let maxProgress = 0;
     let potentialLines = 0;
+    let totalProgress = 0;
 
     lines.forEach(line => {
-      const missing = line.filter(n => !drawnSet.has(n)).length;
-      const progress = ((5 - missing) / 5) * 100;
+      const marked = line.filter(n => drawnSet.has(n)).length;
+      const progress = (marked / 5) * 100;
       if (progress > maxProgress) maxProgress = progress;
-      if (missing === 1) potentialLines++;
+      if (marked === 4) potentialLines++;
+      totalProgress += progress;
     });
 
     if (maxProgress === 100) return 100;
     
-    // Add a significant bonus for having multiple lines that are close (e.g. 4/5)
-    // This makes the percentage "smarter" as requested
-    const bonus = Math.min(15, potentialLines * 5);
-    const finalProb = Math.floor(Math.min(99, maxProgress + bonus));
+    // Calculate a more granular probability based on proximity to win
+    // Using a base from max progress and adding weighted bonuses for multiple potential lines
+    const baseProb = maxProgress * 0.8;
+    const proximityBonus = (potentialLines * 10);
+    const tensionFactor = (totalProgress / (12 * 100)) * 15; // Weighted by overall card coverage
+    
+    // Add jitter to make numbers move in small increments
+    const jitter = (Math.sin(drawn.length * 10) + 1) * 2;
+    
+    const finalProb = Math.min(99, Math.floor(baseProb + proximityBonus + tensionFactor + jitter));
 
-    return finalProb;
+    return Math.max(0, finalProb);
   };
 
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -101,20 +105,21 @@ export default function Home() {
     const currentRoundId = roundData?.round.id;
     const winnerDeclaredAt = completedAt ? new Date(completedAt).getTime() : null;
 
-    // Reset manual close state only when a NEW winner/completedAt event occurs
-    if (completedAt && completedAt !== lastOverlayTimestamp) {
-      setLastOverlayTimestamp(completedAt);
+    // Reset manual close state ONLY when a NEW round ID with a winner is detected
+    if (hasWinner && currentRoundId && currentRoundId !== lastOverlayRoundId) {
+      setLastOverlayRoundId(currentRoundId);
       setHasManuallyClosed(false);
     }
 
-    // Only show overlay if the user is the winner OR explicitly watching their own game
+    // Only show overlay if the user is the winner
     const isMe = roundData?.round.winnerId === user?.id;
-    if (hasManuallyClosed || !isMe) {
+    const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
+    
+    if (hasManuallyClosed || !isMe || !winnerDeclaredAt || isFinished) {
       return null;
     }
 
-    if (hasWinner && winnerDeclaredAt) {
-      const elapsed = currentTime - winnerDeclaredAt;
+    const elapsed = currentTime - winnerDeclaredAt;
       const totalDisplayTime = 10000; 
       const remaining = Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000));
       
@@ -138,7 +143,7 @@ export default function Home() {
     }
 
     return null;
-  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayTimestamp, currentTime]);
+  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime]);
 
   useEffect(() => {
     const completedAtRaw = roundData?.round.completedAt;

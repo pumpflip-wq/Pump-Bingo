@@ -74,18 +74,18 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
             <div className="bg-black/40 rounded-3xl p-6 mb-6 border border-white/10 text-center relative overflow-hidden">
               <div className="space-y-6">
                 <div>
-                  <p className="text-[10px] text-white/50 uppercase font-black tracking-widest mb-1 text-center">WINNER ADDRESS</p>
+                  <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">WINNER ADDRESS</p>
                   <p className="text-xl font-bold text-white italic truncate text-center drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
                     {username && username.length > 15 ? formatAddress(username) : username}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-white/50 uppercase font-black tracking-widest mb-1 text-center">TOTAL REWARD</p>
+                  <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">TOTAL REWARD</p>
                   <div className="flex flex-col items-center gap-0">
                     <p className="text-5xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
                       {formatCurrency(prize, false)}
                     </p>
-                    <span className="text-[10px] font-black text-primary/70 italic uppercase tracking-[0.3em] mt-2">PBINGO TOKEN</span>
+                    <span className="text-[10px] font-black text-primary italic uppercase tracking-[0.3em] mt-2">PBINGO TOKEN</span>
                   </div>
                 </div>
                 {explorerUrl && (
