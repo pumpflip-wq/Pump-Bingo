@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { CyberButton } from './ui/CyberButton';
 import { Trophy, ExternalLink, Frown } from 'lucide-react';
-import { PROTOCOL_CONFIG } from '@shared/config';
+import { formatAddress } from "@/lib/utils";
 
 interface WinnerOverlayProps {
   show: boolean;
@@ -94,33 +94,33 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
               {isWinner ? 'CONGRATULATIONS CHAMPION' : 'BETTER LUCK NEXT TIME'}
             </p>
 
-            <div className="bg-black/40 rounded-3xl p-8 mb-10 border border-white/10 text-left relative overflow-hidden">
+            <div className="bg-black/40 rounded-3xl p-8 mb-10 border border-white/10 text-center relative overflow-hidden">
               {isWinner ? (
                 <div className="space-y-6">
                   <div>
                     <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">WINNER ADDRESS</p>
-                    <p className="text-2xl font-bold text-white italic truncate">@{username}</p>
+                    <p className="text-2xl font-bold text-white italic truncate">@{formatAddress(username)}</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">TOTAL REWARD</p>
-                    <div className="flex items-baseline gap-2">
-                      <p className="text-5xl font-black text-primary italic leading-none">
+                    <div className="flex flex-col items-center gap-1">
+                      <p className="text-6xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
                         {prize.toLocaleString()}
                       </p>
-                      <span className="text-xl font-black text-primary/50 italic uppercase">PUMP</span>
+                      <span className="text-xs font-black text-primary/50 italic uppercase tracking-[0.3em]">PBINGO TOKEN</span>
                     </div>
                   </div>
                   {explorerUrl && (
-                    <a href={explorerUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs text-primary hover:text-white transition-colors font-black uppercase tracking-widest pt-4 border-t border-white/10">
-                      <ExternalLink className="w-4 h-4" /> VERIFY TRANSACTION ON-CHAIN
+                    <a href={explorerUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 text-xs text-primary hover:text-white transition-colors font-black uppercase tracking-widest pt-4 border-t border-white/10">
+                      <ExternalLink className="w-4 h-4" /> VERIFY ON-CHAIN
                     </a>
                   )}
                 </div>
               ) : (
-                <div className="space-y-6 text-center">
+                <div className="space-y-6">
                   <div className="text-left">
                     <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2">ROUND WINNER</p>
-                    <p className="text-lg font-bold text-white italic truncate">@{username}</p>
+                    <p className="text-lg font-bold text-white italic truncate">@{formatAddress(username)}</p>
                   </div>
                   <div className="h-[1px] w-full bg-white/10" />
                   <p className="text-base text-white/80 font-bold italic leading-relaxed">

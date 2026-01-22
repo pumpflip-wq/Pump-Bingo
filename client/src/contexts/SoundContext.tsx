@@ -39,6 +39,25 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    // Global listener to unlock audio on first interaction
+    const unlockAudio = () => {
+      setHasInteracted(true);
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+    window.addEventListener('click', unlockAudio);
+    window.addEventListener('keydown', unlockAudio);
+    window.addEventListener('touchstart', unlockAudio);
+    
+    return () => {
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+  }, []);
+
   const playSound = (soundPath: string, volume = 0.5) => {
     if (isMuted) return;
     
@@ -49,21 +68,23 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       const play = () => {
         audio.play().catch(err => {
           console.warn("Playback failed:", soundPath, err);
-          // If playback fails, it's likely due to lack of interaction.
-          // We'll retry on the next user interaction
-          const retryOnInteraction = () => {
-            audio.play().catch(() => {});
-            window.removeEventListener('click', retryOnInteraction);
-            window.removeEventListener('keydown', retryOnInteraction);
-            window.removeEventListener('touchstart', retryOnInteraction);
-          };
-          window.addEventListener('click', retryOnInteraction);
-          window.addEventListener('keydown', retryOnInteraction);
-          window.addEventListener('touchstart', retryOnInteraction);
         });
       };
 
-      play();
+      if (hasInteracted) {
+        play();
+      } else {
+        // If not interacted, wait for it
+        const playOnce = () => {
+          play();
+          window.removeEventListener('click', playOnce);
+          window.removeEventListener('keydown', playOnce);
+          window.removeEventListener('touchstart', playOnce);
+        };
+        window.addEventListener('click', playOnce);
+        window.addEventListener('keydown', playOnce);
+        window.addEventListener('touchstart', playOnce);
+      }
     } catch (e) {
       console.warn("Sound play error:", e);
     }

@@ -195,20 +195,49 @@ export default function VerifyPage() {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={`p-4 rounded-xl border-2 flex items-center justify-center gap-3 font-black uppercase tracking-[0.2em] text-sm ${
+                className="space-y-4"
+              >
+                <div className={`p-4 rounded-xl border-2 flex items-center justify-center gap-3 font-black uppercase tracking-[0.2em] text-sm ${
                   verifySeed(manualSeed, manualHash) 
                     ? 'bg-primary/10 border-primary text-primary shadow-[0_0_20px_rgba(34,197,94,0.15)]' 
                     : 'bg-red-500/10 border-red-500 text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.15)]'
-                }`}
-              >
-                {verifySeed(manualSeed, manualHash) ? (
-                  <>
-                    <Check className="w-5 h-5" /> Valid Verification
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="w-5 h-5" /> Invalid Verification
-                  </>
+                }`}>
+                  {verifySeed(manualSeed, manualHash) ? (
+                    <>
+                      <Check className="w-5 h-5" /> Valid Verification
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="w-5 h-5" /> Invalid Verification
+                    </>
+                  )}
+                </div>
+
+                {verifySeed(manualSeed, manualHash) && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4"
+                  >
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.3em] text-center">Cryptographic Proof</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Hash(Seed)</p>
+                        <p className="font-mono text-[10px] text-primary break-all p-3 bg-black/40 rounded border border-primary/20">
+                          {CryptoJS.SHA256(manualSeed).toString(CryptoJS.enc.Hex).toLowerCase()}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Target Hash</p>
+                        <p className="font-mono text-[10px] text-primary break-all p-3 bg-black/40 rounded border border-primary/20">
+                          {manualHash.trim().toLowerCase()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-center p-2 bg-primary/10 rounded-lg border border-primary/20">
+                      <p className="text-[10px] text-primary font-black uppercase tracking-[0.2em]">Matches confirmed - Fair result proven</p>
+                    </div>
+                  </motion.div>
                 )}
               </motion.div>
             )}
