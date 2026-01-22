@@ -24,7 +24,15 @@ export function useRound(id: number) {
       if (!res.ok) throw new Error("Failed to fetch round");
       return api.rounds.get.responses[200].parse(await res.json());
     },
-    refetchInterval: 1000, // Poll active game state frequently
+    refetchInterval: (query) => {
+      const data = query.state.data as any;
+      if (!data) return 1000;
+      // Reduce polling frequency for finished rounds
+      if (data.round.status === 'FINISHED') return 30000;
+      // Standard polling for active games
+      return 1000;
+    },
+    staleTime: 500,
   });
 }
 

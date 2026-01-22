@@ -21,12 +21,16 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
     if (show) {
       setLeft(5);
       if (isWinner) {
-        confetti({
-          particleCount: 150,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ['#39FF14', '#ffffff']
-        });
+        // Debounce confetti to avoid layout thrashing during animation start
+        const timer = setTimeout(() => {
+          confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#39FF14', '#ffffff']
+          });
+        }, 300);
+        return () => clearTimeout(timer);
       }
 
       const timer = setInterval(() => {
