@@ -331,8 +331,8 @@ export default function Home() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-1 flex-1 overflow-hidden h-full flex flex-col">
-                    <div className="glass-card neon-border rounded-xl p-3 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
+                  <div className="space-y-4 flex-1 overflow-hidden h-full flex flex-col">
+                    <div className="glass-card neon-border rounded-xl p-4 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
                       <div className="flex flex-col">
                         <p className="text-[10px] text-white uppercase font-black tracking-widest font-mono">Prize Pool</p>
                         <div className="flex items-baseline gap-2">
@@ -356,14 +356,14 @@ export default function Home() {
                     </div>
 
                     {isParticipant && currentCard ? (
-                      <div className="relative space-y-2 flex flex-col items-center flex-1 min-h-0 justify-center w-full">
+                      <div className="relative space-y-4 flex flex-col items-center flex-1 min-h-0 justify-center w-full">
                           <BingoCard 
                           card={currentCard} 
                           drawnNumbers={roundData.round.drawnNumbers || []} 
-                          className="w-full max-w-full scale-100"
+                          className="w-full max-w-[520px] scale-100"
                         />
                         
-                        <div className="flex justify-center w-full max-w-full shrink-0">
+                        <div className="flex justify-center w-full max-w-[520px] shrink-0">
                           <BingoClaimButton 
                             roundId={roundData.round.id} 
                             userId={user?.id || 0} 
