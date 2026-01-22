@@ -36,19 +36,21 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
   useEffect(() => {
     if (timeLeft.minutes === 0 && timeLeft.seconds > 0 && participantCount >= 2) {
       if (timeLeft.seconds <= 3) {
-        const tensionSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73456.mp3");
+        const tensionSound = new Audio("/sounds/join.mp3"); // Reusing for tension
         tensionSound.volume = 0.5;
         tensionSound.play().catch(() => {});
-      } else {
-        const tickSound = new Audio("https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3");
-        tickSound.volume = 0.1;
-        tickSound.play().catch(() => {});
       }
     }
     if (timeLeft.minutes === 0 && timeLeft.seconds === 1 && participantCount >= 2) {
-      const transitionSound = new Audio("https://cdn.pixabay.com/audio/2022/03/10/audio_c3527058c0.mp3");
+      const transitionSound = new Audio("/sounds/transition.mp3");
       transitionSound.volume = 0.4;
       transitionSound.play().catch(() => {});
+    }
+    // Sound when timer first starts (at 60s)
+    if (timeLeft.minutes === 1 && timeLeft.seconds === 0 && participantCount >= 2) {
+      const startSound = new Audio("/sounds/start.mp3");
+      startSound.volume = 0.5;
+      startSound.play().catch(() => {});
     }
   }, [timeLeft.seconds, timeLeft.minutes, participantCount]);
 

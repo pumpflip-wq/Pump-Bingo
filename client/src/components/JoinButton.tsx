@@ -59,8 +59,9 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
               title: "Successfully Joined",
               description: "Transaction confirmed and you've entered the round!",
             });
-            // Play sound
-            new Audio("/sounds/join.mp3").play().catch(() => {});
+            // Play sound - Correct path
+            const joinSound = new Audio("/sounds/join.mp3");
+            joinSound.play().catch((err) => console.error("Sound play error:", err));
           },
           onError: (error: Error) => {
             toast({
