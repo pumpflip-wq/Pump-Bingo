@@ -13,8 +13,8 @@ interface PlayerListProps {
 
 export function PlayerList({ participants, walletAddress, formatAddress, roundStatus, roundData }: PlayerListProps) {
   return (
-    <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden min-h-0 bg-black/20">
-      <div className="flex items-center justify-between mb-6">
+    <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[600px] overflow-hidden bg-black/20">
+      <div className="flex items-center justify-between mb-6 shrink-0">
         <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
           <Users className="w-4 h-4 text-primary" /> Active Players
         </h3>
