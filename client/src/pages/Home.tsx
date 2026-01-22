@@ -7,7 +7,7 @@ import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
 import { Users, Trophy, Loader2, History, ShieldCheck, Globe, Copy, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -46,6 +46,18 @@ export default function Home() {
 
   const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
   const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
+  const completionTimeRef = useRef<{ roundId: number; time: number } | null>(null);
+
+  // Stabilize completion time to prevent restarts on refetch
+  if (roundData?.round.winnerId && roundData.round.completedAt) {
+    if (completionTimeRef.current?.roundId !== roundData.round.id) {
+      completionTimeRef.current = {
+        roundId: roundData.round.id,
+        time: new Date(roundData.round.completedAt).getTime()
+      };
+      setHasManuallyClosed(false);
+    }
+  }
 
   const isParticipant = !!participant || !!foundParticipant;
 
@@ -100,18 +112,9 @@ export default function Home() {
 
   const overlayState = useMemo(() => {
     const hasWinner = !!roundData?.round.winnerId;
-    const completedAtRaw = roundData?.round.completedAt;
-    const completedAt = completedAtRaw ? new Date(completedAtRaw).toISOString() : null;
+    const winnerDeclaredAt = completionTimeRef.current?.time;
     const currentRoundId = roundData?.round.id;
-    const winnerDeclaredAt = completedAt ? new Date(completedAt).getTime() : null;
-
-    // Reset manual close state ONLY when a NEW round ID with a winner is detected
-    if (hasWinner && currentRoundId && currentRoundId !== lastOverlayRoundId) {
-      setLastOverlayRoundId(currentRoundId);
-      setHasManuallyClosed(false);
-    }
-
-    // Only show overlay if the user is the winner
+    
     const isMe = roundData?.round.winnerId === user?.id;
     const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
     
@@ -120,29 +123,25 @@ export default function Home() {
     }
 
     const elapsed = currentTime - winnerDeclaredAt;
-      const totalDisplayTime = 10000; 
-      const remaining = Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000));
-      
-      if (elapsed >= totalDisplayTime) {
-        return null;
-      }
-
-      const isMe = roundData.round.winnerId === user?.id;
-      const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
-      const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
-      
-      return {
-        show: true,
-        username: winnerUsername,
-        prize: roundData.round.prizePool || 0,
-        isWinner: isMe,
-        txHash: (roundData.round as any).txHash,
-        timeLeft: remaining,
-        currentRoundId: currentRoundId
-      };
+    const totalDisplayTime = 10000; 
+    
+    if (elapsed >= totalDisplayTime) {
+      return null;
     }
 
-    return null;
+    const remaining = Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000));
+    const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
+    const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
+    
+    return {
+      show: true,
+      username: winnerUsername,
+      prize: roundData.round.prizePool || 0,
+      isWinner: isMe,
+      txHash: (roundData.round as any).txHash,
+      timeLeft: remaining,
+      currentRoundId: currentRoundId
+    };
   }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime]);
 
   useEffect(() => {
@@ -157,13 +156,13 @@ export default function Home() {
   }, [roundData?.round.completedAt, currentTime, hasManuallyClosed]);
 
   const nextRoundTimer = useMemo(() => {
-    if ((roundData?.round.status === 'FINISHED' || roundData?.round.winnerId) && roundData.round.completedAt) {
-      const completedAt = new Date(roundData.round.completedAt).getTime();
-      const elapsed = currentTime - completedAt;
+    const completionTime = completionTimeRef.current?.time;
+    if (completionTime) {
+      const elapsed = currentTime - completionTime;
       return Math.max(0, Math.ceil((10000 - elapsed) / 1000));
     }
     return 0;
-  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.completedAt, currentTime]);
+  }, [roundData?.round.id, currentTime]);
 
   const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];
@@ -338,13 +337,13 @@ export default function Home() {
                                         <p className="text-lg text-white uppercase font-black tracking-[0.4em] mb-8 text-center border-b border-white/10 pb-4">ROUND STATISTICS</p>
                                         <div className="space-y-10">
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-sm text-white uppercase font-black tracking-widest opacity-70">🏆 WINNING PLAYER</span>
+                                            <span className="text-sm text-white uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
                                             <span className="text-4xl md:text-6xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                                               {formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}
                                             </span>
                                           </div>
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-sm text-white uppercase font-black tracking-widest opacity-70">💰 TOTAL REWARD</span>
+                                            <span className="text-sm text-white uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
                                             <span className="text-5xl md:text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
                                               {formatCurrency(roundData.round.prizePool || 0)} <span className="text-2xl">PBINGO</span>
                                             </span>
