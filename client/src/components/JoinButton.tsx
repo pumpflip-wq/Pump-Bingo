@@ -118,18 +118,18 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
     <CyberButton
       onClick={handleJoin}
       disabled={isPending || !userId}
-      className="w-full h-16 text-2xl font-black italic tracking-tighter uppercase"
+      className="w-full h-16 text-3xl font-black italic tracking-tighter uppercase"
       data-testid="button-join-round"
     >
       {isPending ? (
         <div className="flex items-center justify-center gap-2">
-          <Loader2 className="w-5 h-5 animate-spin" />
+          <Loader2 className="w-6 h-6 animate-spin" />
           <span>JOINING...</span>
         </div>
       ) : (
         <div className="flex items-center justify-center gap-4">
-          <span>JOIN GAME</span>
-          <span className="text-lg text-black/40 font-black">{price} PUMP</span>
+          <span>JOIN GAME -</span>
+          <span className="text-3xl text-black font-black">{price} {PROTOCOL_CONFIG.SYMBOL.replace('$', '')}</span>
         </div>
       )}
     </CyberButton>

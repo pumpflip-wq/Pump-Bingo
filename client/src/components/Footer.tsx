@@ -38,7 +38,7 @@ export function Footer() {
                 href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-white/[0.08] hover:bg-white/20 transition-all flex items-center justify-center border border-white/10"
+                className="w-10 h-10 rounded-lg bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20 shadow-sm"
                 title="Trade on Pump.fun"
               >
                 <img src="https://pump.fun/favicon.ico" className="w-6 h-6 object-contain" alt="Pump.fun" />
@@ -47,7 +47,7 @@ export function Footer() {
                 href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-white/[0.08] hover:bg-white/20 transition-all flex items-center justify-center border border-white/10"
+                className="w-10 h-10 rounded-lg bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20 shadow-sm"
                 title="Chart on Dexscreener"
               >
                 <img src="https://dexscreener.com/favicon.png" className="w-6 h-6 object-contain" alt="Dexscreener" />
@@ -56,7 +56,7 @@ export function Footer() {
                 href={PROTOCOL_CONFIG.TWITTER_URL} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-white/[0.08] hover:bg-white/20 transition-all flex items-center justify-center border border-white/10 text-white hover:text-primary"
+                className="w-10 h-10 rounded-lg bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20 shadow-sm text-white hover:text-[#1DA1F2]"
                 title="Follow on X"
               >
                 <Twitter className="w-5 h-5 fill-current" />

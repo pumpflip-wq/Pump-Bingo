@@ -112,6 +112,13 @@ export default function Home() {
     const currentRoundId = roundData?.round.id;
     const winnerDeclaredAt = roundData?.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
 
+    // Reset manual close state only when a NEW round gets a winner
+    // We use a combined key of roundId + hasWinner to detect the exact moment a win happens
+    const winKey = hasWinner ? `${currentRoundId}_win` : null;
+    const [lastWinKey, setLastWinKey] = useState<string | null>(null);
+    
+    // Memo hooks cannot call other hooks, so we manage this in a simpler way in Home.tsx if needed
+    // But for now let's just use currentRoundId reset
     if (currentRoundId && currentRoundId !== lastOverlayRoundId) {
       setLastOverlayRoundId(currentRoundId);
       setHasManuallyClosed(false);
@@ -121,13 +128,14 @@ export default function Home() {
       const elapsed = currentTime - winnerDeclaredAt;
       const remaining = Math.max(0, Math.ceil((10000 - elapsed) / 1000));
       
-      if (remaining > 0) {
+      // Stop showing if timer expired or manually closed
+      if (remaining > 0 && !hasManuallyClosed) {
         const isMe = roundData.round.winnerId === user?.id;
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
         const displayUsername = (winner as any)?.username || (isMe ? walletAddress : roundData.round.winnerId.toString());
         
         return {
-          show: !hasManuallyClosed,
+          show: true,
           username: displayUsername,
           prize: roundData.round.prizePool || 0,
           isWinner: isMe,
@@ -193,7 +201,7 @@ export default function Home() {
                               <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
                               <div className="flex flex-col items-center">
                                 <span className="text-5xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{roundData.round.prizePool}</span>
-                                <span className="text-sm text-primary font-black uppercase tracking-widest mt-1">PBINGO</span>
+                                <span className="text-sm text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL.replace('$', '')}</span>
                               </div>
                             </div>
                             <div className="flex flex-col items-center">
@@ -246,7 +254,7 @@ export default function Home() {
                         <div className="flex flex-col">
                           <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Prize Pool</p>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} {PROTOCOL_CONFIG.SYMBOL}</span>
+                            <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} {PROTOCOL_CONFIG.SYMBOL.replace('$', '')}</span>
                           </div>
                         </div>
                         <div className="flex gap-12">
