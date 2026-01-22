@@ -56,6 +56,7 @@ function App() {
     if (connected && publicKey) {
       const walletAddr = publicKey.toString();
       const acceptedWallets = JSON.parse(localStorage.getItem("pumbp_bingo_accepted_wallets") || "{}");
+      console.log(`[Terms] Checking wallet: ${walletAddr}`, acceptedWallets);
       if (acceptedWallets[walletAddr]) {
         setTermsAccepted(true);
       } else {
@@ -73,14 +74,14 @@ function App() {
       acceptedWallets[walletAddr] = true;
       localStorage.setItem("pumbp_bingo_accepted_wallets", JSON.stringify(acceptedWallets));
       setTermsAccepted(true);
+      console.log(`[Terms] Accepted for wallet: ${walletAddr}`);
       
-      // Critical: Use the playSound from context or direct audio to unlock
-      // This is the user-initiated action that unlocks audio
+      // Critical: High-volume silent sound to "warm up" the audio context
       const silentAudio = new Audio("/sounds/tick.mp3");
-      silentAudio.volume = 0.001;
+      silentAudio.volume = 0.5; // High enough to trigger context unlock but it's just a short tick
       silentAudio.play().then(() => {
-        console.log("[Sound] Context unlocked via Terms Acceptance");
-      }).catch(e => console.error("[Sound] Failed to unlock context", e));
+        console.log("[Sound] Audio context unlocked successfully");
+      }).catch(e => console.error("[Sound] Direct unlock failed", e));
     }
   };
 

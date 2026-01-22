@@ -23,7 +23,6 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   const playSound = (soundPath: string, volume = 0.5) => {
     if (isMuted) return;
     
-    // Ensure sound path is correct (remove leading slash if it exists for relative resolution)
     const normalizedPath = soundPath.startsWith('/') ? soundPath : `/${soundPath}`;
     
     console.log(`[Sound] Attempting to play: ${normalizedPath}`);
@@ -31,17 +30,20 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       const audio = new Audio(normalizedPath);
       audio.volume = volume;
       
+      // Attempt immediate play
       const playPromise = audio.play();
       
       if (playPromise !== undefined) {
-        playPromise.then(() => {
-          console.log(`[Sound] Success: ${normalizedPath}`);
-        }).catch(err => {
-          if (err.name === 'NotAllowedError') {
-            console.warn(`[Sound] Autoplay blocked for: ${normalizedPath}`);
-          } else {
-            console.error(`[Sound] Playback error for: ${normalizedPath}`, err);
-          }
+        playPromise.catch(err => {
+          console.warn(`[Sound] Blocked or error for: ${normalizedPath}`, err);
+          // If blocked, we try to unlock on the NEXT global click as a backup
+          const forceUnlock = () => {
+            const retryAudio = new Audio(normalizedPath);
+            retryAudio.volume = volume;
+            retryAudio.play().catch(() => {});
+            window.removeEventListener('click', forceUnlock);
+          };
+          window.addEventListener('click', forceUnlock);
         });
       }
     } catch (e) {

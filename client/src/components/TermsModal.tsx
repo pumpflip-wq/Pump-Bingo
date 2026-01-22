@@ -15,11 +15,11 @@ export function TermsModal({ onAccept, show = false }: TermsModalProps) {
   const { playSound } = useSound();
 
   useEffect(() => {
+    console.log(`[TermsModal] Trigger show: ${show}`);
     if (show) {
-      const accepted = localStorage.getItem("pumbp_bingo_terms_accepted");
-      if (!accepted) {
-        setIsOpen(true);
-      }
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
     }
   }, [show]);
 
