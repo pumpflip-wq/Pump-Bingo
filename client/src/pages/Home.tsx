@@ -167,8 +167,8 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <header className="flex flex-col md:flex-row items-center justify-between pb-4 pt-4 gap-6 sticky top-6 z-50 bg-background/80 backdrop-blur-xl border border-white/5 rounded-[2rem] mb-6 px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col w-full min-h-screen">
+        <header className="w-full flex flex-col md:flex-row items-center justify-between pb-4 pt-4 gap-6 sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 mb-6 px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
             <motion.div
               whileHover={{ rotate: 15, scale: 1.1 }}
