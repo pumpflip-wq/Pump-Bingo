@@ -1,4 +1,4 @@
-import { formatAddress } from "@/lib/utils";
+import { formatAddress, formatCurrency } from "@/lib/utils";
 import { ProbabilityFeed } from "@/components/game/ProbabilityFeed";
 import { PlayerList } from "@/components/game/PlayerList";
 import { GameHistory } from "@/components/game/GameHistory";
@@ -114,7 +114,7 @@ export default function Home() {
     const currentRoundId = roundData?.round.id;
     const winnerDeclaredAt = roundData?.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
 
-    // Reset manual close state only when a NEW round starts
+    // Reset manual close state only when a NEW round starts (Lobby transition)
     if (currentRoundId && currentRoundId !== lastOverlayRoundId) {
       setLastOverlayRoundId(currentRoundId);
       setHasManuallyClosed(false);
@@ -122,6 +122,7 @@ export default function Home() {
     }
 
     const winKey = hasWinner ? `${currentRoundId}_win` : null;
+    // Check winKey but ensure it's not already closed manually for THIS win
     if (winKey && winKey !== lastWinKey) {
       setLastWinKey(winKey);
       setHasManuallyClosed(false);
@@ -204,7 +205,7 @@ export default function Home() {
                             <div className="flex flex-col text-center scale-110">
                               <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
                               <div className="flex flex-col items-center">
-                                <span className="text-5xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{roundData.round.prizePool}</span>
+                                <span className="text-5xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{formatCurrency(roundData.round.prizePool || 0)}</span>
                                 <span className="text-sm text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
                               </div>
                             </div>
@@ -261,15 +262,15 @@ export default function Home() {
                         <div className="flex flex-col">
                           <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Prize Pool</p>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} {PROTOCOL_CONFIG.SYMBOL}</span>
+                            <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{formatCurrency(roundData.round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}</span>
                           </div>
                         </div>
                         <div className="flex gap-12">
-                          <div className="text-right">
+                          <div className="text-center">
                             <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Room</p>
                             <p className="text-3xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
                           </div>
-                          <div className="text-right">
+                          <div className="text-center">
                             <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Players</p>
                             <p className="text-3xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                           </div>

@@ -5,7 +5,7 @@ export const PROTOCOL_CONFIG = {
   DECIMALS: 6,
 
   // Game Settings
-  DEFAULT_ENTRY_PRICE: 100,
+  DEFAULT_ENTRY_PRICE: 10000,
   FEE_PERCENTAGE: 10,
 
   // Links

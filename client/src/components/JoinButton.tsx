@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { formatAddress, formatCurrency } from "@/lib/utils";
 import { useJoinRound } from "@/hooks/use-game";
 import { useGameState } from "@/hooks/useGameState";
 import { CyberButton } from "@/components/ui/CyberButton";
@@ -129,7 +129,7 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
       ) : (
         <div className="flex items-center justify-center gap-4">
           <span>JOIN GAME -</span>
-          <span className="text-3xl text-black font-black">{price} {PROTOCOL_CONFIG.SYMBOL}</span>
+          <span className="text-3xl text-black font-black">{formatCurrency(price)} {PROTOCOL_CONFIG.SYMBOL}</span>
         </div>
       )}
     </CyberButton>

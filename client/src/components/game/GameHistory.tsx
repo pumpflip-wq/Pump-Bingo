@@ -1,4 +1,4 @@
-import { History, Loader2, ExternalLink } from "lucide-react";
+import { formatAddress, formatCurrency } from "@/lib/utils";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import { PROTOCOL_CONFIG } from "@shared/config";
@@ -75,7 +75,7 @@ function HistoryItem({ id, winner, prize, formatAddress, completedAt }: { id: nu
             </span>
           )}
         </div>
-        <span className="text-primary font-black font-display italic text-lg">+{prize.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}</span>
+        <span className="text-primary font-black font-display italic text-lg">+{formatCurrency(prize)} {PROTOCOL_CONFIG.SYMBOL}</span>
       </div>
       <div className="flex justify-between items-center">
         <span className="text-sm font-black text-white italic">@{formatAddress(winner)}</span>
