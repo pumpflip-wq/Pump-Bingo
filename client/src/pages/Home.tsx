@@ -61,7 +61,8 @@ export default function Home() {
   
   useEffect(() => {
     if (roundData?.round.status === 'FINISHED' && roundData?.round.winnerId) {
-      if (!hasShownWinner) {
+      // Only show overlay for active participants who played in this round
+      if (isParticipant && !hasShownWinner) {
         setShowWinner(true);
         setHasShownWinner(true);
       }
@@ -69,7 +70,7 @@ export default function Home() {
       setShowWinner(false);
       setHasShownWinner(false);
     }
-  }, [roundData?.round.status, roundData?.round.winnerId, hasShownWinner]);
+  }, [roundData?.round.status, roundData?.round.winnerId, isParticipant, hasShownWinner]);
 
   const copyCA = () => {
     navigator.clipboard.writeText(PROTOCOL_CONFIG.MINT_ADDRESS);
