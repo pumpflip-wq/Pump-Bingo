@@ -17,4 +17,5 @@ export const PROTOCOL_CONFIG = {
   // Devnet/Mainnet toggle (currently using Devnet)
   NETWORK: "devnet",
   RPC_URL: "https://api.devnet.solana.com",
+  IS_TEST_MODE: true, // Master toggle for free play
 };

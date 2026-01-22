@@ -43,7 +43,7 @@ export async function registerRoutes(
       totalRevenue: Math.abs(Number(totalBuyIns[0]?.value || 0)),
       userCount: Number(userCountResult[0]?.count || 0),
       masterWalletBalance: walletBalance,
-      isTestMode: !process.env.SOLANA_MASTER_WALLET_KEY
+      isTestMode: PROTOCOL_CONFIG.IS_TEST_MODE && !process.env.SOLANA_MASTER_WALLET_KEY
     });
   });
 

@@ -50,10 +50,12 @@ export class GameManager {
       // Recovery: If a round is IN_GAME but hasn't drawn numbers for a while, it might have stalled
       if (latestRound.status === ROUND_STATUS.IN_GAME) {
           const lastUpdate = latestRound.startTime ? new Date(latestRound.startTime).getTime() : 0;
-          const stallThreshold = 10 * 60 * 1000; // Reduce to 10 minutes for faster recovery
+          const stallThreshold = 10 * 60 * 1000; // 10 minutes for recovery
           if (Date.now() - lastUpdate > stallThreshold && !latestRound.winnerId) {
               console.log(`Round ${latestRound.id} seems stalled, resetting...`);
               await storage.updateRound(latestRound.id, { status: ROUND_STATUS.FINISHED, completedAt: new Date() });
+              // IMMEDIATELY create new round to avoid delay
+              await this.createNewRound();
               return;
           }
       }
