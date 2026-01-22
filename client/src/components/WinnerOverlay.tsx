@@ -17,7 +17,7 @@ interface WinnerOverlayProps {
 }
 
 export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose }: WinnerOverlayProps) {
-  const [timeLeft, setLeft] = useState(10);
+  const [timeLeft, setLeft] = useState(15);
   const { playSound } = useSound();
   const [hasPlayedSound, setHasPlayedSound] = useState(false);
 
@@ -26,7 +26,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
   // Reset timer and sound state in a safe way
   useEffect(() => {
     if (show) {
-      setLeft(10);
+      setLeft(15);
       setHasPlayedSound(false);
       setIsClosing(false);
     }
