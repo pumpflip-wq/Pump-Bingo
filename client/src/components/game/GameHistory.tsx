@@ -42,6 +42,22 @@ export function GameHistory({ historyRounds, historyLoading, formatAddress }: Ga
           )}
         </div>
       </div>
+      {/* Current Room Hash Integrated into the same frame */}
+      <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-primary/60">
+            <span>Current Room Hash</span>
+            <Link href="/verify" className="underline hover:text-primary transition-colors">Verify</Link>
+          </div>
+          <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
+            <p className="text-[10px] font-mono text-primary truncate flex-1">
+              {historyRounds?.rounds?.[0]?.publicHash || "..."}
+            </p>
+            {/* We will handle copy logic in the parent or pass a prop if needed, but for now just showing it here as per image */}
+          </div>
+        </div>
+        <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
+      </div>
     </div>
   );
 }

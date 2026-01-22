@@ -49,8 +49,16 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     try {
       const audio = new Audio(normalizedPath);
       audio.volume = volume;
+      // Preload the audio to help with the "deferred" issues
+      audio.load();
       audio.play().catch(err => {
-        console.warn(`[Sound] Playback deferred for: ${normalizedPath}`);
+        console.warn(`[Sound] Playback deferred for: ${normalizedPath}`, err);
+        // Retry play on next user interaction if it failed due to context
+        const resumePlay = () => {
+          audio.play().catch(() => {});
+          window.removeEventListener('click', resumePlay);
+        };
+        window.addEventListener('click', resumePlay);
       });
     } catch (e) {}
   };

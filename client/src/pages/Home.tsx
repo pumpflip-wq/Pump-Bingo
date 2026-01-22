@@ -319,27 +319,6 @@ export default function Home() {
                 historyLoading={historyLoading}
                 formatAddress={formatAddress}
               />
-              <div className="mt-8 pt-6 border-t border-white/10 space-y-4">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-primary/60">
-                    <span>Current Room #{roundData.round.id} Hash</span>
-                    <Link href="/verify" className="underline hover:text-primary transition-colors">Verify</Link>
-                  </div>
-                  <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
-                    <p className="text-[10px] font-mono text-primary truncate flex-1">
-                      {roundData.round.publicHash}
-                    </p>
-                    <Copy 
-                      className="w-3 h-3 text-primary/40 cursor-pointer hover:text-primary transition-colors" 
-                      onClick={() => {
-                        navigator.clipboard.writeText(roundData.round.publicHash);
-                        toast({ title: "Hash Copied" });
-                      }}
-                    />
-                  </div>
-                </div>
-                <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
-              </div>
             </aside>
             </div>
           ) : (

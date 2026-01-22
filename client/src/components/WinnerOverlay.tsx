@@ -19,16 +19,18 @@ interface WinnerOverlayProps {
 export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose }: WinnerOverlayProps) {
   const [timeLeft, setLeft] = useState(10);
   const { playSound } = useSound();
+  const [hasPlayedSound, setHasPlayedSound] = useState(false);
 
-  // Reset timer in a safe way
+  // Reset timer and sound state in a safe way
   useEffect(() => {
     if (show) {
       setLeft(10);
+      setHasPlayedSound(false);
     }
   }, [show]);
 
   useEffect(() => {
-    if (show) {
+    if (show && !hasPlayedSound) {
       if (isWinner) {
         playSound("/sounds/start.mp3", 0.6);
         const timer = setTimeout(() => {
@@ -39,10 +41,14 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
             colors: ['#39FF14', '#ffffff', '#9945FF']
           });
         }, 200);
+        setHasPlayedSound(true);
         return () => clearTimeout(timer);
+      } else {
+        playSound("/sounds/transition.mp3", 0.5);
+        setHasPlayedSound(true);
       }
     }
-  }, [show, isWinner]); // Removed playSound from deps to avoid re-triggering issues if it changes
+  }, [show, isWinner, hasPlayedSound, playSound]);
 
   useEffect(() => {
     if (!show) return;
@@ -107,18 +113,18 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
             <div className="bg-black/40 rounded-3xl p-8 mb-10 border border-white/10 text-center relative overflow-hidden">
               <div className="space-y-6">
                 <div>
-                  <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2 text-center">WINNER ADDRESS</p>
-                  <p className="text-2xl font-bold text-white italic truncate text-center">
+                  <p className="text-xs text-white uppercase font-black tracking-widest mb-2 text-center">WINNER ADDRESS</p>
+                  <p className="text-3xl font-bold text-white italic truncate text-center">
                     {username && username.length > 15 ? formatAddress(username) : username}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2 text-center">TOTAL REWARD</p>
+                  <p className="text-xs text-white uppercase font-black tracking-widest mb-2 text-center">TOTAL REWARD</p>
                   <div className="flex flex-col items-center gap-1">
-                    <p className="text-6xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
+                    <p className="text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
                       {prize.toLocaleString()}
                     </p>
-                    <span className="text-xs font-black text-primary/50 italic uppercase tracking-[0.3em]">PBINGO TOKEN</span>
+                    <span className="text-sm font-black text-primary/70 italic uppercase tracking-[0.3em]">PBINGO TOKEN</span>
                   </div>
                 </div>
                 {explorerUrl && (
