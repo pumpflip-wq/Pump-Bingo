@@ -206,11 +206,9 @@ export default function Home() {
                                 <span className="text-sm text-primary font-black uppercase tracking-widest mt-1">PBINGO</span>
                               </div>
                             </div>
-                            <div className="flex flex-col text-center">
+                            <div className="flex flex-col items-center">
                               <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Players</p>
-                              <div className="flex justify-center">
-                                <p className="text-3xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
-                              </div>
+                              <p className="text-3xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                             </div>
                           </div>
                         </div>

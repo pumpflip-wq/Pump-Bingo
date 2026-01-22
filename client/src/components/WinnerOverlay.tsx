@@ -45,7 +45,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
         setHasPlayedSound(true);
       }
     }
-  }, [show, isWinner, hasPlayedSound, playSound]);
+  }, [show, isWinner, hasPlayedSound]);
 
   useEffect(() => {
     if (!show) return;

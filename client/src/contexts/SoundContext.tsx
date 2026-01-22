@@ -61,20 +61,9 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       
       const playPromise = audio.play();
       if (playPromise !== undefined) {
-        playPromise.catch(err => {
-          console.warn(`[Sound] Playback deferred for: ${normalizedPath}. Retrying on next interaction.`);
-          const retry = () => {
-            audio.play().catch(() => {});
-            window.removeEventListener('click', retry);
-            window.removeEventListener('touchstart', retry);
-          };
-          window.addEventListener('click', retry);
-          window.addEventListener('touchstart', retry);
-        });
+        playPromise.catch(() => {});
       }
-    } catch (e) {
-      console.error("[Sound] Playback error:", e);
-    }
+    } catch (e) {}
   };
 
   return (

@@ -39,8 +39,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                       @{formatAddress(p.username)}
                       {isMe && <span className="text-[10px] text-primary font-black ml-1">(YOU)</span>}
                     </span>
-                    <span className="text-sm font-black text-primary">
-                      {roundStatus === 'IN_GAME' ? `${Math.round(p.prob)}%` : "0%"}
+                    <span className="text-sm font-black text-primary min-w-[3ch] text-right">
+                      {roundStatus === 'IN_GAME' ? `${Math.round(p.prob)}%` : ""}
                     </span>
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
