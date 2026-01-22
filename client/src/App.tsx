@@ -42,10 +42,10 @@ function App() {
       <SolanaProvider>
         <TooltipProvider>
           <div className="flex h-screen w-full bg-background text-foreground overflow-hidden">
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col flex-1 relative overflow-hidden">
               <main 
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto flex flex-col relative"
+                className="flex-1 overflow-y-auto flex flex-col"
               >
                 <div className="flex-1 pb-8 pt-0">
                   <Router />
