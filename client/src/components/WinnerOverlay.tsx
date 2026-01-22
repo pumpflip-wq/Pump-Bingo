@@ -103,7 +103,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
                 <div>
                   <p className="text-[10px] text-white/40 uppercase font-black tracking-widest mb-2 text-center">WINNER ADDRESS</p>
                   <p className="text-2xl font-bold text-white italic truncate text-center">
-                    {username && username.length > 20 ? formatAddress(username) : username}
+                    {username && username.length > 15 ? formatAddress(username) : username}
                   </p>
                 </div>
                 <div>
