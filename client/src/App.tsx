@@ -58,6 +58,8 @@ function AppContent() {
       const walletAddr = publicKey.toString();
       const acceptedWallets = JSON.parse(localStorage.getItem("pumbp_bingo_accepted_wallets") || "{}");
       console.log(`[Terms] Checking storage for wallet ${walletAddr}:`, acceptedWallets[walletAddr]);
+      
+      // Delaying the modal state slightly to ensure it's not bypassed by race conditions
       if (acceptedWallets[walletAddr]) {
         setTermsAccepted(true);
       } else {
@@ -77,12 +79,15 @@ function AppContent() {
       setTermsAccepted(true);
       console.log(`[Terms] Accepted for wallet: ${walletAddr}`);
       
-      // Explicit unlock
-      const unlockAudio = new Audio("/sounds/tick.mp3");
-      unlockAudio.volume = 0.5;
-      unlockAudio.play().then(() => {
-        console.log("[Sound] Context unlocked via Terms Acceptance click");
-      }).catch(e => console.error("[Sound] Direct unlock failed", e));
+      // Explicit unlock - play multiple times to ensure context is warmed
+      const unlock = () => {
+        const audio = new Audio("/sounds/tick.mp3");
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+      };
+      unlock();
+      setTimeout(unlock, 100);
+      setTimeout(unlock, 200);
     }
   };
 

@@ -16,7 +16,12 @@ export function TermsModal({ onAccept, show = false }: TermsModalProps) {
 
   useEffect(() => {
     console.log(`[TermsModal] Visibility Check - Show Prop: ${show}`);
-    setIsOpen(show);
+    if (show) {
+      const timer = setTimeout(() => setIsOpen(true), 100);
+      return () => clearTimeout(timer);
+    } else {
+      setIsOpen(false);
+    }
   }, [show]);
 
   const handleAccept = () => {

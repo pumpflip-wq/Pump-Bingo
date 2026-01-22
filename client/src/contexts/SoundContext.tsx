@@ -23,31 +23,30 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   const playSound = (soundPath: string, volume = 0.5) => {
     if (isMuted) return;
     
-    const normalizedPath = soundPath.startsWith('/') ? soundPath : `/${soundPath}`;
+    // Hard refresh path to bypass cache if needed
+    const normalizedPath = `${soundPath.startsWith('/') ? soundPath : `/${soundPath}`}?v=${Date.now()}`;
     
-    console.log(`[Sound] Attempting to play: ${normalizedPath}`);
+    console.log(`[Sound] Playing: ${normalizedPath}`);
     try {
       const audio = new Audio(normalizedPath);
       audio.volume = volume;
       
-      // Attempt immediate play
       const playPromise = audio.play();
       
       if (playPromise !== undefined) {
         playPromise.catch(err => {
-          console.warn(`[Sound] Blocked or error for: ${normalizedPath}`, err);
-          // If blocked, we try to unlock on the NEXT global click as a backup
-          const forceUnlock = () => {
-            const retryAudio = new Audio(normalizedPath);
-            retryAudio.volume = volume;
-            retryAudio.play().catch(() => {});
-            window.removeEventListener('click', forceUnlock);
+          console.warn(`[Sound] Blocked, adding click listener to unlock`, err);
+          const unlock = () => {
+            const retry = new Audio(normalizedPath);
+            retry.volume = volume;
+            retry.play().catch(() => {});
+            window.removeEventListener('click', unlock);
           };
-          window.addEventListener('click', forceUnlock);
+          window.addEventListener('click', unlock, { once: true });
         });
       }
     } catch (e) {
-      console.error(`[Sound] Creation error: ${normalizedPath}`, e);
+      console.error(`[Sound] error: ${normalizedPath}`, e);
     }
   };
 
