@@ -17,6 +17,8 @@ export default function VerifyPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const roundId = params.get('roundId');
+    
+    // Fallback: Check if we have rounds and the roundId is set
     if (roundId && rounds) {
       const round = rounds.find(r => r.id === Number(roundId));
       if (round) {
@@ -28,7 +30,7 @@ export default function VerifyPage() {
         }
       }
     }
-  }, [rounds, window.location.search]);
+  }, [rounds, location]);
 
   const verifySeed = (seed: string, expectedHash: string) => {
     try {
