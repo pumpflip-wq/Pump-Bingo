@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ROUND_STATUS } from "@shared/schema";
-import { useSound } from "@/contexts/SoundContext";
+import { useGameSounds } from "@/hooks/useGameSounds";
 
 interface CountdownTimerProps {
   targetDate: string | null;
@@ -51,12 +51,7 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
     return () => clearInterval(interval);
   }, [targetDate, participantCount]);
 
-  useEffect(() => {
-    // Sound when timer first starts (at 60s)
-    if (timeLeft.minutes === 1 && timeLeft.seconds === 0 && participantCount >= 2) {
-      playSound("/sounds/start.mp3", 0.5);
-    }
-  }, [timeLeft.seconds, timeLeft.minutes, participantCount, playSound]);
+  useGameSounds(status, timeLeft, participantCount);
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 
