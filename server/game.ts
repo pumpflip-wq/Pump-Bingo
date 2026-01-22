@@ -43,7 +43,8 @@ export class GameManager {
         // Wait exactly 10 seconds after round finished before starting a new one
         if (latestRound && latestRound.completedAt) {
           const finishedAt = new Date(latestRound.completedAt).getTime();
-          if (Date.now() - finishedAt < 10000) {
+          // Increase threshold slightly to 11s to allow client UI to complete its 10s animation
+          if (Date.now() - finishedAt < 11000) {
             return;
           }
         }
@@ -161,11 +162,12 @@ export class GameManager {
         
         // Check if winner was already declared (e.g. via claim route)
         if (round.winnerId) {
-            // Wait exactly 10 seconds before moving to FINISHED
+            // Wait exactly 10.5 seconds post-win before moving to FINISHED
+            // This ensures all clients have enough time to show the full 10s celebration
             const winnerDeclaredAt = round.completedAt ? new Date(round.completedAt).getTime() : Date.now();
             
-            if (Date.now() - winnerDeclaredAt >= 10000) {
-                console.log(`Round ${round.id} reached 10s post-win delay, finishing...`);
+            if (Date.now() - winnerDeclaredAt >= 10500) {
+                console.log(`Round ${round.id} reached 10.5s post-win delay, finishing...`);
                 await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
             }
             return;

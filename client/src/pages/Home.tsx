@@ -137,10 +137,10 @@ export default function Home() {
     if (hasWinner && winnerDeclaredAt) {
       const elapsed = currentTime - winnerDeclaredAt;
       const totalDisplayTime = 10000; // Total display time for the overlay
-      const remaining = Math.max(0, Math.ceil((totalDisplayTime - elapsed) / 1000));
+      const remaining = Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000));
       
       // Stop showing if timer expired - ensure clean exit
-      if (remaining <= 0) {
+      if (remaining < 0 || elapsed > 10500) {
         // Do not update state in useMemo
         return null;
       }
