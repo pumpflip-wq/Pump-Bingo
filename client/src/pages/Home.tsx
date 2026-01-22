@@ -134,12 +134,13 @@ export default function Home() {
       // Stop showing if timer expired or manually closed
       if (remaining > 0 && !hasManuallyClosed) {
         const isMe = roundData.round.winnerId === user?.id;
+        // Search in participants for the winner
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
-        const displayUsername = (winner as any)?.username || (isMe ? walletAddress : roundData.round.winnerId.toString());
+        const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerUsername || roundData.round.winnerId.toString()));
         
         return {
           show: true,
-          username: displayUsername,
+          username: winnerUsername,
           prize: roundData.round.prizePool || 0,
           isWinner: isMe,
           txHash: (roundData.round as any).txHash,
@@ -149,7 +150,7 @@ export default function Home() {
     }
 
     return null;
-  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime]);
+  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime, lastWinKey]);
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
     ...p,
@@ -204,7 +205,7 @@ export default function Home() {
                               <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
                               <div className="flex flex-col items-center">
                                 <span className="text-5xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{roundData.round.prizePool}</span>
-                                <span className="text-sm text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL.replace('$', '')}</span>
+                                <span className="text-sm text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
                               </div>
                             </div>
                             <div className="flex flex-col items-center">
@@ -239,7 +240,10 @@ export default function Home() {
                               <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">Wait for Next Game - Next round starts automatically</p>
                             </div>
                           ) : (
-                            <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                            <div className="space-y-4">
+                              <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                              <p className="text-[10px] text-white/40 uppercase font-black tracking-widest text-center">JOIN BEFORE GAME STARTS</p>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -257,7 +261,7 @@ export default function Home() {
                         <div className="flex flex-col">
                           <p className="text-xs text-white uppercase font-black tracking-widest font-mono">Prize Pool</p>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} {PROTOCOL_CONFIG.SYMBOL.replace('$', '')}</span>
+                            <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} {PROTOCOL_CONFIG.SYMBOL}</span>
                           </div>
                         </div>
                         <div className="flex gap-12">
@@ -302,14 +306,24 @@ export default function Home() {
                                     <div className="flex flex-col items-center">
                                       <span>WAITING FOR NEXT ROUND</span>
                                       {roundData.round.completedAt && (
-                                        <span className="text-primary text-xl mt-4">NEXT ROUND IN {Math.max(0, Math.ceil((10000 - (currentTime - new Date(roundData.round.completedAt).getTime())) / 1000))}S</span>
+                                        <span className="text-primary text-xl mt-4 uppercase font-black tracking-widest">NEXT ROUND IN {Math.max(0, Math.ceil((10000 - (currentTime - new Date(roundData.round.completedAt).getTime())) / 1000))}S</span>
                                       )}
                                     </div>
                                   ) : 'WATCHING LIVE'}
                                 </h2>
+                                {!roundData.round.winnerId && roundData.round.status !== 'FINISHED' && (
+                                  <p className="text-white/60 text-sm uppercase font-black tracking-[0.2em] font-mono">SPECTATOR MODE ACTIVE</p>
+                                )}
                               </div>
                               <div className="w-full max-w-md mx-auto mb-2">
-                                <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                                {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
+                                  <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                                ) : (
+                                  <div className="p-8 bg-white/5 border border-white/10 rounded-3xl text-center">
+                                    <p className="text-white/40 font-black text-xl italic tracking-tighter uppercase">GAME IN PROGRESS</p>
+                                    <p className="text-[10px] text-white/20 uppercase font-black tracking-widest mt-2">Wait for the next round to join</p>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           )}
