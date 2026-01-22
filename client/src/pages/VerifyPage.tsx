@@ -3,7 +3,7 @@ import { ShieldCheck, Search, Copy, Check, ExternalLink, History } from "lucide-
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import crypto from "crypto-js";
+import * as CryptoJS from "crypto-js";
 import { Link, useLocation } from "wouter";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { PROTOCOL_CONFIG } from "@shared/config";
@@ -56,7 +56,7 @@ export default function VerifyPage() {
       const trimmedHash = expectedHash.trim().toLowerCase();
       
       // Use crypto-js for browser-compatible SHA256 hashing
-      const hash = crypto.SHA256(trimmedSeed).toString(crypto.enc.Hex).toLowerCase();
+      const hash = CryptoJS.SHA256(trimmedSeed).toString(CryptoJS.enc.Hex).toLowerCase();
       
       console.log("Verification Logic Debug:", { 
         rawSeed: seed,
@@ -75,7 +75,7 @@ export default function VerifyPage() {
   const verifyPublicHash = (seed: string, expectedHash: string) => {
     if (!seed || !expectedHash) return false;
     try {
-      const hash = crypto.SHA256(seed).toString(crypto.enc.Hex).toLowerCase();
+      const hash = CryptoJS.SHA256(seed).toString(CryptoJS.enc.Hex).toLowerCase();
       return hash === expectedHash.toLowerCase();
     } catch (e) {
       return false;
