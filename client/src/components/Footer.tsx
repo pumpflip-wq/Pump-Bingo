@@ -38,7 +38,7 @@ export function Footer() {
                 href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center border border-white/5"
+                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center border border-white/10"
                 title="Trade on Pump.fun"
               >
                 <img src="https://pump.fun/favicon.ico" className="w-6 h-6 object-contain" alt="Pump.fun" />
@@ -47,7 +47,7 @@ export function Footer() {
                 href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center border border-white/5"
+                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center border border-white/10"
                 title="Chart on Dexscreener"
               >
                 <img src="https://dexscreener.com/favicon.png" className="w-6 h-6 object-contain" alt="Dexscreener" />
@@ -56,7 +56,7 @@ export function Footer() {
                 href={PROTOCOL_CONFIG.TWITTER_URL} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center border border-white/5 text-white hover:text-primary"
+                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center border border-white/10 text-white hover:text-primary"
                 title="Follow on X"
               >
                 <Twitter className="w-5 h-5 fill-current" />
