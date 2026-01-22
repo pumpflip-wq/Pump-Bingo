@@ -1,4 +1,4 @@
-import { useRounds } from "@/hooks/use-game";
+import { useRounds, useRound } from "@/hooks/use-game";
 import { ShieldCheck, Search, Copy, Check, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -14,22 +14,31 @@ export default function VerifyPage() {
   const { toast } = useToast();
   const [location] = useLocation();
 
+  const searchParams = new URLSearchParams(window.location.search);
+  const rId = searchParams.get('roundId');
+  const targetId = rId ? Number(rId) : 0;
+
+  const { data: roundData } = useRound(targetId);
+
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const rId = searchParams.get('roundId');
-    
-    if (rId && rounds && rounds.length > 0) {
-      const targetRound = rounds.find(r => r.id === Number(rId));
-      if (targetRound) {
-        setManualHash(targetRound.publicHash);
-        if (targetRound.status === 'FINISHED' && targetRound.serverSeed) {
-          setManualSeed(targetRound.serverSeed);
-        } else {
-          setManualSeed("");
+    if (roundData?.round) {
+      setManualHash(roundData.round.publicHash);
+      if (roundData.round.status === 'FINISHED' && roundData.round.serverSeed) {
+        setManualSeed(roundData.round.serverSeed);
+      } else {
+        setManualSeed("");
+      }
+    } else if (rId && rounds) {
+      // Fallback for immediate population if rounds are already loaded
+      const round = rounds.find(r => r.id === Number(rId));
+      if (round) {
+        setManualHash(round.publicHash);
+        if (round.status === 'FINISHED' && round.serverSeed) {
+          setManualSeed(round.serverSeed);
         }
       }
     }
-  }, [rounds, location, window.location.search]);
+  }, [roundData, rId, rounds]);
 
   const verifySeed = (seed: string, expectedHash: string) => {
     try {

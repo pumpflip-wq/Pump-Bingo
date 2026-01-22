@@ -79,8 +79,9 @@ export default function Home() {
     });
   };
 
-  const { data: historyRounds, isLoading: historyLoading } = useQuery<(Round & { winnerUsername: string | null })[]>({
-    queryKey: ["/api/rounds/history"],
+  const { data: historyRounds, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
+    queryKey: ["/api/rounds/history", 1],
+    queryFn: () => fetch("/api/rounds/history?page=1&limit=5").then(res => res.json()),
     refetchInterval: 10000
   });
 
@@ -270,7 +271,7 @@ export default function Home() {
                                   {isMe && <span className="text-[10px] text-primary font-black">(YOU)</span>}
                                 </span>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-[10px] text-primary/60 font-black font-mono">100 PUMP</span>
+                                  <span className="text-[10px] text-primary/60 font-black font-mono">100 PBINGO</span>
                                   {roundData.round.status === 'IN_GAME' && (
                                     <div className="flex items-center gap-1">
                                       <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
@@ -319,7 +320,7 @@ export default function Home() {
                             <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
                             <div className="flex flex-col items-center">
                               <span className="text-5xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{roundData.round.prizePool}</span>
-                              <span className="text-sm text-primary font-black uppercase tracking-widest mt-1">PUMP</span>
+                              <span className="text-sm text-primary font-black uppercase tracking-widest mt-1">PBINGO</span>
                             </div>
                           </div>
 
@@ -369,7 +370,7 @@ export default function Home() {
                       <div className="flex flex-col">
                         <p className="text-xs text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
                         <div className="flex items-baseline gap-2">
-                          <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} PUMP</span>
+                          <span className="text-4xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{roundData.round.prizePool} PBINGO</span>
                         </div>
                       </div>
                       <div className="flex gap-12">
