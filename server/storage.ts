@@ -149,10 +149,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRoundTransactions(roundId: number): Promise<Transaction[]> {
+    if (!roundId || isNaN(roundId)) return [];
     return await db.select().from(transactions).where(eq(transactions.roundId, roundId));
   }
 
   async getUserTransactions(userId: number): Promise<Transaction[]> {
+    if (!userId || isNaN(userId)) return [];
     return await db.select().from(transactions).where(eq(transactions.userId, userId)).orderBy(sql`${transactions.id} DESC`);
   }
 

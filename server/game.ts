@@ -82,25 +82,24 @@ export class GameManager {
       
       // Only allow the countdown to progress if we have at least 2 players
       if (participantCount >= 2) {
-        if (!round.startTime || (new Date(round.startTime).getTime() - now.getTime()) > 60000) {
-            // If we just reached 2 players, set the countdown to start from 60s
+        if (!round.startTime) {
+            // If we just reached 2 players and have no start time, set it to 60s from now
             await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60 * 1000) });
             return;
         }
 
-        if (round.startTime && now >= round.startTime) {
+        const startTime = new Date(round.startTime);
+        if (now >= startTime) {
           await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
           console.log(`Round ${round.id} starting...`);
         }
       } else {
-        // Not enough players: strictly freeze the start time at exactly 60s in the future
+        // Not enough players: strictly freeze the start time at 60s in the future
         const sixtySecondsFromNow = new Date(now.getTime() + 60000);
         
         // We only update if it's not already roughly 60s (to avoid constant DB writes)
         const currentStartTime = round.startTime ? new Date(round.startTime) : null;
-        const diff = currentStartTime ? Math.abs(currentStartTime.getTime() - sixtySecondsFromNow.getTime()) : Infinity;
-        
-        if (diff > 2000) { // Update if off by more than 2 seconds
+        if (!currentStartTime || Math.abs(currentStartTime.getTime() - sixtySecondsFromNow.getTime()) > 5000) {
            await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
         }
       }
