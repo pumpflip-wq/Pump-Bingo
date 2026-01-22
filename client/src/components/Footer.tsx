@@ -5,7 +5,7 @@ import { Link } from "wouter";
 export function Footer() {
   return (
     <footer className="w-full pt-10 pb-6 border-t border-white/5 bg-black/40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
