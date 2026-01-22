@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, ShieldCheck, Globe } from "lucide-react";
 import { cn, formatAddress, formatCurrency } from "@/lib/utils";
@@ -12,6 +13,12 @@ interface PlayerListProps {
 }
 
 export function PlayerList({ participants, walletAddress, formatAddress, roundStatus, roundData }: PlayerListProps) {
+  const amIParticipating = useMemo(() => participants.some(participant => participant.username === walletAddress), [participants, walletAddress]);
+
+  const sortedParticipants = useMemo(() => {
+    return [...participants].sort((a, b) => b.prob - a.prob);
+  }, [participants]);
+
   return (
     <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[750px] overflow-hidden bg-black/20">
       <div className="flex items-center justify-between mb-6 shrink-0">
@@ -21,14 +28,14 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
       </div>
       <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
         <AnimatePresence mode="popLayout">
-          {participants.map((p: any) => {
+          {(amIParticipating ? sortedParticipants : participants).map((p: any) => {
             const isMe = p.username === walletAddress;
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
-            const amIParticipating = participants.some(participant => participant.username === walletAddress);
             const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && amIParticipating;
             
             return (
-              <div 
+              <motion.div 
+                layout
                 key={p.id}
                 className={cn(
                   "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
@@ -64,7 +71,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                   "w-4 h-4 transition-colors shrink-0 ml-2",
                   isMe ? "text-primary" : "text-primary/40 group-hover:text-primary"
                 )} />
-              </div>
+              </motion.div>
             );
           })}
         </AnimatePresence>

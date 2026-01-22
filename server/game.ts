@@ -40,13 +40,7 @@ export class GameManager {
       
       // If no round exists OR the latest is FINISHED
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
-        // Reduced to 1 tick delay (1s) to ensure absolute speed while letting state settle
-        if (latestRound && latestRound.completedAt) {
-          const finishedAt = new Date(latestRound.completedAt).getTime();
-          if (Date.now() - finishedAt < 1000) {
-            return;
-          }
-        }
+        // Create new round immediately after the 10s wait in processRound
         await this.createNewRound();
         return;
       }

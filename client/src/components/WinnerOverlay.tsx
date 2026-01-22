@@ -70,9 +70,13 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
               {isWinner ? 'YOU WIN!' : 'GAME OVER'}
             </h2>
             
-            {isWinner && (
+            {isWinner ? (
               <p className="text-white font-black uppercase tracking-[0.3em] text-[10px] mb-6">
                 CONGRATULATIONS CHAMPION
+              </p>
+            ) : (
+              <p className="text-white font-black uppercase tracking-[0.3em] text-[10px] mb-6">
+                DON'T GIVE UP! TRY AGAIN NEXT ROUND
               </p>
             )}
 
@@ -84,16 +88,18 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
                     {username && username.length > 15 ? formatAddress(username) : username}
                   </p>
                 </div>
-                <div>
-                  <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">TOTAL REWARD</p>
-                  <div className="flex flex-col items-center gap-0">
-                    <p className="text-5xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
-                      {formatCurrency(prize, false)}
-                    </p>
-                    <span className="text-[10px] font-black text-primary italic uppercase tracking-[0.3em] mt-2">PBINGO TOKEN</span>
+                {isWinner && (
+                  <div>
+                    <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">TOTAL REWARD</p>
+                    <div className="flex flex-col items-center gap-0">
+                      <p className="text-5xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
+                        {formatCurrency(prize, false)}
+                      </p>
+                      <span className="text-[10px] font-black text-primary italic uppercase tracking-[0.3em] mt-2">PBINGO TOKEN</span>
+                    </div>
                   </div>
-                </div>
-                {explorerUrl && (
+                )}
+                {isWinner && explorerUrl && (
                   <a href={explorerUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 text-xs text-primary hover:text-white transition-colors font-black uppercase tracking-widest pt-4 border-t border-white/10">
                     <ExternalLink className="w-4 h-4" /> VERIFY ON-CHAIN
                   </a>

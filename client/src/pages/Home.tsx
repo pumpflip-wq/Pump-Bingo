@@ -65,7 +65,8 @@ export default function Home() {
     const drawnSet = new Set(drawn);
     drawnSet.add(0); // Free space
     
-    if (drawnSet.size <= 1) return 0;
+    // Improved calculation: 0% at start, moves with drawn numbers
+    if (drawn.length === 0) return 0;
     
     const lines = [
       ...Array(5).fill(0).map((_, r) => card[r]),
@@ -74,28 +75,25 @@ export default function Home() {
       Array(5).fill(0).map((_, i) => card[i][4 - i])
     ];
 
-    let maxProgress = 0;
+    let maxMarked = 0;
     let potentialLines = 0;
-    let totalProgress = 0;
 
     lines.forEach(line => {
       const marked = line.filter(n => drawnSet.has(n)).length;
-      const progress = (marked / 5) * 100;
-      if (progress > maxProgress) maxProgress = progress;
+      if (marked > maxMarked) maxMarked = marked;
       if (marked === 4) potentialLines++;
-      totalProgress += progress;
     });
 
-    if (maxProgress === 100) return 100;
+    if (maxMarked === 5) return 100;
     
-    // Improved calculation: 0% at start, moves with drawn numbers
-    if (drawn.length === 0) return 0;
-
-    const baseProb = maxProgress * 0.7;
-    const proximityBonus = (potentialLines * 8);
-    const densityFactor = (drawn.length / 75) * 15;
+    // Very conservative growth: only starts showing real numbers when 2+ are hit
+    if (maxMarked < 2) return Math.min(5, drawn.length);
     
-    const finalProb = Math.min(99, Math.floor(baseProb + proximityBonus + densityFactor));
+    const baseProb = (maxMarked / 5) * 60; // Max 60% from marking 4/5
+    const proximityBonus = potentialLines * 10; // 10% for each line that is 4/5
+    const gameProgress = (drawn.length / 75) * 10; // Max 10% from game length
+    
+    const finalProb = Math.min(99, Math.floor(baseProb + proximityBonus + gameProgress));
     return Math.max(0, finalProb);
   };
 
@@ -115,6 +113,9 @@ export default function Home() {
     const isMe = roundData?.round.winnerId === user?.id;
     const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
     
+    // Check if I was a participant in this round
+    const amIParticipant = isParticipant;
+
     if (hasManuallyClosed || !winnerDeclaredAt || isFinished) {
       return null;
     }
@@ -123,6 +124,11 @@ export default function Home() {
     const totalDisplayTime = 10000; 
     
     if (elapsed >= totalDisplayTime) {
+      return null;
+    }
+
+    // Only show overlay for active participants
+    if (!amIParticipant) {
       return null;
     }
 
