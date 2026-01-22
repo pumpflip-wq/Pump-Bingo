@@ -11,8 +11,7 @@ import GameHistory from "@/pages/GameHistory";
 import { Footer } from "./components/Footer";
 import { useEffect, useRef, useState } from "react";
 
-import { SolanaProvider, AudioInitializer } from "./components/SolanaProvider";
-import { SoundProvider } from "./contexts/SoundContext";
+import { SolanaProvider } from "./components/SolanaProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import { History, ShieldCheck } from "lucide-react";
@@ -82,9 +81,8 @@ function AppContent() {
 
   return (
     <TooltipProvider>
-      <AudioInitializer>
-        <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
-          <TermsModal show={connected && !termsAccepted} onAccept={handleAcceptTerms} />
+      <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
+        <TermsModal show={connected && !termsAccepted} onAccept={handleAcceptTerms} />
           <header className="sticky top-0 z-[100] w-full bg-background/80 backdrop-blur-xl border-b border-white/5">
             <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between py-4 gap-6">
               <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">
@@ -148,7 +146,6 @@ function AppContent() {
           </main>
         </div>
         <Toaster />
-      </AudioInitializer>
     </TooltipProvider>
   );
 }
@@ -156,11 +153,9 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <SoundProvider>
-        <SolanaProvider>
-          <AppContent />
-        </SolanaProvider>
-      </SoundProvider>
+      <SolanaProvider>
+        <AppContent />
+      </SolanaProvider>
     </QueryClientProvider>
   );
 }

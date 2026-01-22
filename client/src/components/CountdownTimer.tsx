@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { ROUND_STATUS } from "@shared/schema";
-import { useGameSounds } from "@/hooks/useGameSounds";
 
 interface CountdownTimerProps {
   targetDate: string | null;
@@ -33,8 +32,6 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
 
     return () => clearInterval(interval);
   }, [targetDate, participantCount]);
-
-  useGameSounds(status, timeLeft, participantCount);
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 

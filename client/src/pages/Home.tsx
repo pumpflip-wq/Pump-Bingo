@@ -44,25 +44,14 @@ export default function Home() {
 
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
 
-  const [overlayData, setOverlayData] = useState<{
-    show: boolean;
-    username: string;
-    prize: number;
-    isWinner: boolean;
-    txHash?: string;
-    roundId?: number;
-  } | null>(null);
+  const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
+  const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
 
   const isParticipant = !!participant || !!foundParticipant;
 
   const calculateWinProb = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);
     if (drawnSet.size === 0) return 0;
-    
-    // Improved probability calculation:
-    // We look at how many numbers are missing for each possible bingo line.
-    // Progress starts at 0% and increases as numbers are drawn.
-    // 90%+ means they are "Waiting for 1 number".
     
     let minMissing = 5;
 
@@ -100,13 +89,6 @@ export default function Home() {
 
     if (minMissing === 0) return 100;
     
-    // More professional scaling:
-    // 5 missing -> 0-10% (based on total drawn)
-    // 4 missing -> 10-30%
-    // 3 missing -> 30-60%
-    // 2 missing -> 60-85%
-    // 1 missing -> 85-99%
-    
     const drawnCount = drawn.length;
     const baseProgress: Record<number, number> = {
       5: Math.min(10, (drawnCount / 75) * 20),
@@ -119,39 +101,40 @@ export default function Home() {
     return Math.floor(baseProgress[minMissing] ?? 0);
   };
 
-  useEffect(() => {
+  const overlayState = useMemo(() => {
     const isFinished = roundData?.round.status === 'FINISHED';
     const isStarting = roundData?.round.status === 'STARTING';
-    const isOpen = roundData?.round.status === 'OPEN';
     const hasWinner = !!roundData?.round.winnerId;
     const currentRoundId = roundData?.round.id;
-    
-    // Show overlay ONLY for participants (players) during victory state
-    if (isParticipant && hasWinner && (isFinished || roundData?.round.status === 'IN_GAME')) {
-      // Logic to prevent re-opening: only set if not already showing OR if it's a completely new round
-      if (!overlayData || overlayData.roundId !== currentRoundId) {
+    const winnerDeclaredAt = roundData?.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
+
+    if (currentRoundId !== lastOverlayRoundId) {
+      setLastOverlayRoundId(currentRoundId);
+      setHasManuallyClosed(false);
+    }
+
+    if (hasWinner && winnerDeclaredAt) {
+      const elapsed = Date.now() - winnerDeclaredAt;
+      const remaining = Math.max(0, Math.ceil((10000 - elapsed) / 1000));
+      
+      if (remaining > 0) {
         const isMe = roundData.round.winnerId === user?.id;
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
         const displayUsername = (winner as any)?.username || (isMe ? walletAddress : roundData.round.winnerId.toString());
         
-        console.log(`[Overlay] Triggering for round ${currentRoundId}`);
-        setOverlayData({
-          show: true,
+        return {
+          show: !hasManuallyClosed,
           username: displayUsername,
           prize: roundData.round.prizePool || 0,
           isWinner: isMe,
           txHash: (roundData.round as any).txHash,
-          roundId: currentRoundId
-        });
-      }
-    } else if (isOpen || isStarting || !hasWinner) {
-      // CLEAR overlay when a new round starts, is waiting, or no winner yet
-      if (overlayData) {
-        console.log(`[Overlay] Clearing for status ${roundData?.round.status}`);
-        setOverlayData(null);
+          timeLeft: remaining
+        };
       }
     }
-  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.id, isParticipant, user?.id, walletAddress, roundData?.participants]);
+
+    return null;
+  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId]);
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
     ...p,
@@ -300,7 +283,14 @@ export default function Home() {
                                   <Globe className="w-3 h-3 animate-spin-slow" /> {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? 'ROUND COMPLETED' : 'Live Feed Active'}
                                 </div>
                                 <h2 className="text-4xl md:text-6xl font-black font-display italic text-white tracking-tighter uppercase">
-                                  {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? 'WAITING FOR' : 'WATCHING'} <span className="text-primary">{roundData.round.winnerId || roundData.round.status === 'FINISHED' ? 'NEXT ROUND' : 'LIVE'}</span>
+                                  {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? (
+                                    <div className="flex flex-col items-center">
+                                      <span>WAITING FOR NEXT ROUND</span>
+                                      {roundData.round.completedAt && (
+                                        <span className="text-primary text-xl mt-4">NEXT ROUND IN {Math.max(0, Math.ceil((10000 - (Date.now() - new Date(roundData.round.completedAt).getTime())) / 1000))}S</span>
+                                      )}
+                                    </div>
+                                  ) : 'WATCHING LIVE'}
                                 </h2>
                               </div>
                               <div className="w-full max-w-md mx-auto mb-2">
@@ -332,41 +322,17 @@ export default function Home() {
           )}
         </div>
       </div>
-      {overlayData && (
+      {overlayState && (
         <WinnerOverlay 
-          show={overlayData.show} 
-          username={overlayData.username} 
-          prize={overlayData.prize}
-          isWinner={overlayData.isWinner}
-          txHash={overlayData.txHash}
-          onClose={() => setOverlayData(null)}
+          show={overlayState.show} 
+          username={overlayState.username} 
+          prize={overlayState.prize}
+          isWinner={overlayState.isWinner}
+          timeLeft={overlayState.timeLeft}
+          txHash={overlayState.txHash}
+          onClose={() => setHasManuallyClosed(true)}
         />
       )}
     </>
-  );
-}
-
-function HistoryItem({ id, winner, prize, formatAddress, completedAt }: { id: number, winner: string, prize: number, formatAddress: (addr: string) => string, completedAt?: string | null }) {
-  const explorerUrl = `https://explorer.solana.com/address/${PROTOCOL_CONFIG.MINT_ADDRESS}?cluster=${PROTOCOL_CONFIG.NETWORK}`;
-  return (
-    <a href={explorerUrl} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:border-primary/50 hover:bg-white/10 group relative">
-      <div className="flex justify-between items-start mb-2">
-        <div className="flex flex-col">
-          <span className="font-mono text-xs font-black text-white tracking-tighter">ROUND #{id}</span>
-          {completedAt && (
-            <span className="text-[10px] text-white/40 font-bold mt-0.5">
-              {format(new Date(completedAt), "MMM d, HH:mm:ss")}
-            </span>
-          )}
-        </div>
-        <span className="text-primary font-black font-display italic text-lg">+{prize.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}</span>
-      </div>
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-black text-white italic">{formatAddress(winner)}</span>
-        <div className="flex items-center gap-2">
-          <ExternalLink className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
-        </div>
-      </div>
-    </a>
   );
 }

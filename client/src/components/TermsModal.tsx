@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CyberButton } from "./ui/CyberButton";
 import { ShieldAlert, CheckCircle2, Scale, Info } from "lucide-react";
-import { useSound } from "@/contexts/SoundContext";
 
 interface TermsModalProps {
   onAccept: () => void;
@@ -12,7 +11,6 @@ interface TermsModalProps {
 export function TermsModal({ onAccept, show = false }: TermsModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
-  const { playSound } = useSound();
 
   useEffect(() => {
     console.log(`[TermsModal] Visibility Check - Show Prop: ${show}`);
@@ -99,7 +97,7 @@ export function TermsModal({ onAccept, show = false }: TermsModalProps) {
               </section>
 
               <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 text-[10px] uppercase font-black tracking-widest text-primary leading-loose">
-                NOTICE: CONTINUING BEYOND THIS POINT CONSTITUTES FULL AGREEMENT TO THE TERMS LISTED ABOVE AND UNLOCKS ALL SYSTEM CAPABILITIES INCLUDING HIGH-FIDELITY AUDIO EFFECTS.
+                NOTICE: CONTINUING BEYOND THIS POINT CONSTITUTES FULL AGREEMENT TO THE TERMS LISTED ABOVE AND UNLOCKS ALL SYSTEM CAPABILITIES.
               </div>
             </div>
 

@@ -1,4 +1,3 @@
-
 import { storage } from "./storage";
 import { db } from "./db";
 import { type Round, ROUND_STATUS, rounds } from "@shared/schema";
@@ -58,7 +57,7 @@ export class GameManager {
           const stallThreshold = 10 * 60 * 1000; // Reduce to 10 minutes for faster recovery
           if (Date.now() - lastUpdate > stallThreshold && !latestRound.winnerId) {
               console.log(`Round ${latestRound.id} seems stalled, resetting...`);
-              await storage.updateRound(latestRound.id, { status: ROUND_STATUS.FINISHED });
+              await storage.updateRound(latestRound.id, { status: ROUND_STATUS.FINISHED, completedAt: new Date() });
               return;
           }
       }
@@ -162,10 +161,10 @@ export class GameManager {
         
         // Check if winner was already declared (e.g. via claim route)
         if (round.winnerId) {
-            // Wait 10 seconds before moving to FINISHED
+            // Wait exactly 10 seconds before moving to FINISHED
             const winnerDeclaredAt = round.completedAt ? new Date(round.completedAt).getTime() : Date.now();
             
-            if (Date.now() - winnerDeclaredAt > 10000) {
+            if (Date.now() - winnerDeclaredAt >= 10000) {
                 console.log(`Round ${round.id} reached 10s post-win delay, finishing...`);
                 await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
             }
@@ -177,7 +176,7 @@ export class GameManager {
             return;
         }
 
-        // Draw one number every 3 seconds for balanced gameplay (increased from 2.5s for stability)
+        // Draw one number every 3 seconds for balanced gameplay
         const startTime = new Date(round.startTime!).getTime() + 5000;
         const elapsed = now.getTime() - startTime;
         const expectedNumbersCount = Math.max(0, Math.min(75, Math.floor(elapsed / 3000)));
@@ -187,7 +186,6 @@ export class GameManager {
                 .filter(n => !round.drawnNumbers!.includes(n));
             
             if (available.length > 0) {
-                // Ensure deterministic drawing from the seed would be better, but for now random is fine as long as we check availability
                 const nextNum = available[Math.floor(Math.random() * available.length)];
                 const newNumbers = [...round.drawnNumbers, nextNum];
                 await storage.updateRound(round.id, { drawnNumbers: newNumbers });
@@ -242,7 +240,7 @@ export class GameManager {
   }
 
   validateBingo(card: number[][], drawn: number[]): boolean {
-    if (!drawn || drawn.length < 4) return false; // Minimum 4 numbers needed for bingo (including free space)
+    if (!drawn || drawn.length < 4) return false; 
     const isMarked = (n: number) => n === 0 || drawn.includes(n);
 
     // Rows

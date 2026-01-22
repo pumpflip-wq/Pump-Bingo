@@ -11,59 +11,22 @@ interface WinnerOverlayProps {
   username: string;
   prize: number;
   isWinner: boolean;
+  timeLeft: number;
   txHash?: string;
   onClose: () => void;
 }
 
-export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose }: WinnerOverlayProps) {
-  const [timeLeft, setLeft] = useState(10);
-  const [isClosing, setIsClosing] = useState(false);
-
-  // Reset timer in a safe way
+export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHash, onClose }: WinnerOverlayProps) {
   useEffect(() => {
-    if (show) {
-      setLeft(10);
-      setIsClosing(false);
-    }
-  }, [show]);
-
-  useEffect(() => {
-    if (show) {
-      if (isWinner) {
-        confetti({
-          particleCount: 200,
-          spread: 80,
-          origin: { y: 0.5 },
-          colors: ['#39FF14', '#ffffff', '#9945FF']
-        });
-      }
+    if (show && isWinner) {
+      confetti({
+        particleCount: 200,
+        spread: 80,
+        origin: { y: 0.5 },
+        colors: ['#39FF14', '#ffffff', '#9945FF']
+      });
     }
   }, [show, isWinner]);
-
-  useEffect(() => {
-    if (!show || isClosing) return;
-
-    const interval = setInterval(() => {
-      setLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          handleClose();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [show, isClosing, onClose]);
-
-  const handleClose = () => {
-    if (isClosing) return;
-    setIsClosing(true);
-    onClose();
-  };
 
   const explorerUrl = txHash ? `https://explorer.solana.com/tx/${txHash}?cluster=${PROTOCOL_CONFIG.NETWORK}` : null;
 
@@ -134,7 +97,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
             </div>
 
             <div className="pt-2">
-              <CyberButton onClick={handleClose} variant={isWinner ? "primary" : "outline"} className="w-full h-16 text-xl font-black italic tracking-tighter shadow-2xl">
+              <CyberButton onClick={onClose} variant={isWinner ? "primary" : "outline"} className="w-full h-16 text-xl font-black italic tracking-tighter shadow-2xl">
                 RETURN TO LOBBY ({timeLeft}s)
               </CyberButton>
             </div>

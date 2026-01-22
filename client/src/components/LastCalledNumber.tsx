@@ -1,7 +1,4 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useSound } from "@/contexts/SoundContext";
 
 interface LastCalledNumberProps {
   numbers: number[];
@@ -9,15 +6,6 @@ interface LastCalledNumberProps {
 
 export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
   const lastNumber = numbers.length > 0 ? numbers[numbers.length - 1] : null;
-  const { playSound } = useSound();
-  const [prevNumbersCount, setPrevNumbersCount] = useState(numbers.length);
-
-  useEffect(() => {
-    if (numbers.length > prevNumbersCount) {
-      playSound("/sounds/tick.mp3", 0.4);
-      setPrevNumbersCount(numbers.length);
-    }
-  }, [numbers.length, prevNumbersCount, playSound]);
 
   return (
     <div className="flex flex-col items-center justify-center space-y-3">

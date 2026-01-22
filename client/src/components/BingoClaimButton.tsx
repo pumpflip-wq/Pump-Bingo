@@ -4,7 +4,6 @@ import { Loader2, Trophy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ROUND_STATUS } from "@shared/schema";
 import { cn } from "@/lib/utils";
-import { useSound } from "@/contexts/SoundContext";
 
 interface BingoClaimButtonProps {
   roundId: number;
@@ -78,7 +77,6 @@ export function BingoClaimButton({
 }: BingoClaimButtonProps) {
   const { mutate: claimBingo, isPending } = useClaimBingo();
   const { toast } = useToast();
-  const { playSound } = useSound();
 
   const hasBingo = checkBingo(card, drawnNumbers);
   const canClaim = status === ROUND_STATUS.IN_GAME && hasBingo && !isBingoed;
@@ -101,7 +99,6 @@ export function BingoClaimButton({
             title: "BINGO!",
             description: "Congratulations! You won the round!",
           });
-          playSound("/sounds/transition.mp3", 0.6);
         },
         onError: (error: Error) => {
           toast({
