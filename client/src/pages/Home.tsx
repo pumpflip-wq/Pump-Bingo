@@ -78,9 +78,9 @@ export default function Home() {
 
     if (maxProgress === 100) return 100;
     
-    // Add a small bonus for having multiple lines that are close (e.g. 4/5)
+    // Add a significant bonus for having multiple lines that are close (e.g. 4/5)
     // This makes the percentage "smarter" as requested
-    const bonus = Math.min(10, potentialLines * 2);
+    const bonus = Math.min(15, potentialLines * 5);
     const finalProb = Math.floor(Math.min(99, maxProgress + bonus));
 
     return finalProb;
@@ -163,14 +163,16 @@ export default function Home() {
         // The overlay should stay up for exactly 10s. 
         // Once elapsed hits 10s, we mark it as closed to prevent double triggers
         // We use a small buffer to ensure we only trigger once
-        if (elapsed >= 10000 && !hasManuallyClosed && lastOverlayRoundId === roundData.round.id) {
+        if (elapsed >= 10000 && !hasManuallyClosed && lastOverlayRoundId !== roundData.round.id) {
           setHasManuallyClosed(true);
+          setLastOverlayRoundId(roundData.round.id);
         }
       }
     } else {
-      // Reset manual close when a new round starts
+      // Reset manual close and overlay round ID when a new round starts
       if (lastOverlayRoundId !== null && roundData?.round.id !== lastOverlayRoundId) {
         setHasManuallyClosed(false);
+        setLastOverlayRoundId(roundData.round.id);
       }
     }
   }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.completedAt, roundData?.round.id, currentTime, hasManuallyClosed, lastOverlayRoundId]);
@@ -312,18 +314,18 @@ export default function Home() {
                     >
                       <div className="glass-card neon-border rounded-xl p-4 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
                         <div className="flex flex-col">
-                          <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1 opacity-70">Prize Pool</p>
+                          <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
                           <div className="flex items-baseline gap-2">
                             <span className="text-3xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{formatCurrency(roundData.round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}</span>
                           </div>
                         </div>
                         <div className="flex gap-8">
                           <div className="text-center">
-                            <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1 opacity-70">Room</p>
+                            <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1">Room</p>
                             <p className="text-2xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
                           </div>
                           <div className="text-center">
-                            <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1 opacity-70">Players</p>
+                            <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
                             <p className="text-2xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                           </div>
                         </div>
@@ -362,15 +364,15 @@ export default function Home() {
                                         <p className="text-lg text-white uppercase font-black tracking-[0.4em] mb-8 text-center border-b border-white/10 pb-4">ROUND STATISTICS</p>
                                         <div className="space-y-10">
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-sm text-white/80 uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
-                                            <span className="text-2xl md:text-5xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                                            <span className="text-lg text-white uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
+                                            <span className="text-4xl md:text-7xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                                               {formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}
                                             </span>
                                           </div>
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-sm text-white/80 uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
-                                            <span className="text-4xl md:text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
-                                              {formatCurrency(roundData.round.prizePool || 0)} <span className="text-2xl">PBINGO</span>
+                                            <span className="text-lg text-white uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
+                                            <span className="text-5xl md:text-8xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
+                                              {formatCurrency(roundData.round.prizePool || 0)} <span className="text-3xl">PBINGO</span>
                                             </span>
                                           </div>
                                         </div>
