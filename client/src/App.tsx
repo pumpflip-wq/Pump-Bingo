@@ -40,7 +40,7 @@ function App() {
   const [location] = useLocation();
   const scrollRef = useRef<HTMLElement>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const { connected } = useWallet();
+  const { connected, publicKey } = useWallet();
 
   useEffect(() => {
     // Force dark mode globally
@@ -50,10 +50,35 @@ function App() {
     if (scrollRef.current) {
       scrollRef.current.scrollTo(0, 0);
     }
-
-    const accepted = localStorage.getItem("pumbp_bingo_terms_accepted");
-    if (accepted) setTermsAccepted(true);
   }, [location]);
+
+  useEffect(() => {
+    if (connected && publicKey) {
+      const walletAddr = publicKey.toString();
+      const acceptedWallets = JSON.parse(localStorage.getItem("pumbp_bingo_accepted_wallets") || "{}");
+      if (acceptedWallets[walletAddr]) {
+        setTermsAccepted(true);
+      } else {
+        setTermsAccepted(false);
+      }
+    } else {
+      setTermsAccepted(false);
+    }
+  }, [connected, publicKey]);
+
+  const handleAcceptTerms = () => {
+    if (publicKey) {
+      const walletAddr = publicKey.toString();
+      const acceptedWallets = JSON.parse(localStorage.getItem("pumbp_bingo_accepted_wallets") || "{}");
+      acceptedWallets[walletAddr] = true;
+      localStorage.setItem("pumbp_bingo_accepted_wallets", JSON.stringify(acceptedWallets));
+      setTermsAccepted(true);
+      
+      // Attempt to play a silent sound to unlock audio context on this click
+      const silentAudio = new Audio();
+      silentAudio.play().catch(() => {});
+    }
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -62,7 +87,7 @@ function App() {
           <SoundProvider>
             <AudioInitializer>
               <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
-                <TermsModal show={connected && !termsAccepted} onAccept={() => setTermsAccepted(true)} />
+                <TermsModal show={connected && !termsAccepted} onAccept={handleAcceptTerms} />
                 <header className="sticky top-0 z-[100] w-full bg-background/80 backdrop-blur-xl border-b border-white/5">
                   <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between py-4 gap-6">
                     <Link href="/" className="flex items-center gap-4 group cursor-pointer hover:opacity-90 transition-opacity">

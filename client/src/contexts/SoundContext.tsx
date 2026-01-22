@@ -20,20 +20,30 @@ export function SoundProvider({ children }: { children: ReactNode }) {
 
   const toggleMute = () => setIsMuted(!isMuted);
 
-  const [hasInteracted, setHasInteracted] = useState(false);
-
   const playSound = (soundPath: string, volume = 0.5) => {
     if (isMuted) return;
     
-    console.log(`[Sound] Playing: ${soundPath}`);
+    console.log(`[Sound] Attempting to play: ${soundPath}`);
     try {
       const audio = new Audio(soundPath);
       audio.volume = volume;
-      audio.play().then(() => {
-        console.log(`[Sound] Success: ${soundPath}`);
-      }).catch(err => {
-        console.error(`[Sound] Blocked: ${soundPath}`, err);
-      });
+      
+      // Ensure we have an interaction before playing
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          console.log(`[Sound] Success: ${soundPath}`);
+        }).catch(err => {
+          console.error(`[Sound] Blocked: ${soundPath}`, err);
+          // Auto-resume logic if possible on next user interaction
+          const resumeAudio = () => {
+            audio.play();
+            window.removeEventListener('click', resumeAudio);
+          };
+          window.addEventListener('click', resumeAudio);
+        });
+      }
     } catch (e) {
       console.error(`[Sound] Error: ${soundPath}`, e);
     }
