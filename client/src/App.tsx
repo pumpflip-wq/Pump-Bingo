@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import VerifyPage from "@/pages/VerifyPage";
+import GameHistory from "@/pages/GameHistory";
 import { Footer } from "./components/Footer";
 import { useEffect, useRef } from "react";
 
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/verify" component={VerifyPage} />
+      <Route path="/history" component={GameHistory} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -54,8 +54,10 @@ export async function registerRoutes(
     res.json(rounds);
   });
 
-  app.get("/api/rounds/history", async (_req, res) => {
-    const history = await storage.getRecentFinishedRounds();
+  app.get("/api/rounds/history", async (req, res) => {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const history = await storage.getFinishedRoundsPaginated(page, limit);
     res.json(history);
   });
 
