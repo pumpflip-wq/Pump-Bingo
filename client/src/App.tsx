@@ -67,32 +67,32 @@ function App() {
                 </Link>
 
                 <div className="flex flex-wrap items-center justify-center gap-4">
-                  <nav className="hidden md:flex items-center gap-6 mr-4">
-                    <Link href="/history" className="text-xs font-black uppercase tracking-widest text-white hover:text-primary transition-all flex items-center gap-2">
+                  <nav className="hidden md:flex items-center gap-8 mr-6">
+                    <Link href="/history" className="text-sm font-black uppercase tracking-[0.15em] text-white hover:text-primary transition-all flex items-center gap-2">
                       <History className="w-4 h-4" /> History
                     </Link>
-                    <Link href="/verify" className="text-xs font-black uppercase tracking-widest text-white hover:text-primary transition-all flex items-center gap-2">
+                    <Link href="/verify" className="text-sm font-black uppercase tracking-[0.15em] text-white hover:text-primary transition-all flex items-center gap-2">
                       <ShieldCheck className="w-4 h-4" /> Verify
                     </Link>
                   </nav>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     <a 
                       href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="w-11 h-11 rounded-xl bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center hover:scale-105 active:scale-95"
+                      className="w-[52px] h-[44px] rounded-xl bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center hover:scale-105 active:scale-95 border border-white/5"
                       title="Trade on Pump.fun"
                     >
-                      <img src="https://pump.fun/favicon.ico" className="w-6 h-6 object-contain" alt="Pump.fun" />
+                      <img src="https://pump.fun/favicon.ico" className="w-7 h-7 object-contain" alt="Pump.fun" />
                     </a>
                     <a 
                       href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="w-11 h-11 rounded-xl bg-white/5 hover:bg-white/10 transition-all hover:scale-105 active:scale-95 flex items-center justify-center"
+                      className="w-[52px] h-[44px] rounded-xl bg-white/5 hover:bg-white/10 transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-white/5"
                       title="Chart on Dexscreener"
                     >
-                      <img src="https://dexscreener.com/favicon.png" className="w-6 h-6 object-contain" alt="Dexscreener" />
+                      <img src="https://dexscreener.com/favicon.png" className="w-7 h-7 object-contain" alt="Dexscreener" />
                     </a>
                     <WalletMultiButton className="!bg-primary !text-black !h-11 !px-8 !text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
                   </div>

@@ -140,7 +140,7 @@ export default function GameHistory() {
                   </div>
 
                   <div className="flex items-center justify-between pt-4">
-                    <p className="text-sm text-white/40 font-mono">
+                    <p className="text-sm text-white font-mono uppercase font-bold tracking-widest">
                       Showing {data?.rounds.length} of {data?.total} rounds
                     </p>
                     <div className="flex items-center gap-2">
@@ -149,9 +149,9 @@ export default function GameHistory() {
                         size="sm"
                         disabled={page === 1}
                         onClick={() => setPage(p => p - 1)}
-                        className="border-white/10 hover:bg-white/10"
+                        className="border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px]"
                       >
-                        <ChevronLeft className="w-4 h-4" /> Previous
+                        <ChevronLeft className="w-4 h-4 mr-1" /> Previous
                       </Button>
                       <div className="flex items-center gap-1">
                         {[...Array(totalPages)].map((_, i) => (
@@ -160,7 +160,7 @@ export default function GameHistory() {
                             variant={page === i + 1 ? "default" : "outline"}
                             size="sm"
                             onClick={() => setPage(i + 1)}
-                            className={page === i + 1 ? "" : "border-white/10 hover:bg-white/10"}
+                            className={page === i + 1 ? "bg-primary text-black font-black" : "border-white/10 hover:bg-white/20 text-white font-black"}
                           >
                             {i + 1}
                           </Button>
@@ -171,9 +171,9 @@ export default function GameHistory() {
                         size="sm"
                         disabled={page === totalPages}
                         onClick={() => setPage(p => p + 1)}
-                        className="border-white/10 hover:bg-white/10"
+                        className="border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px]"
                       >
-                        Next <ChevronRight className="w-4 h-4" />
+                        Next <ChevronRight className="w-4 h-4 ml-1" />
                       </Button>
                     </div>
                   </div>
