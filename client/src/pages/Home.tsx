@@ -65,8 +65,8 @@ export default function Home() {
     const drawnSet = new Set(drawn);
     drawnSet.add(0); // Free space
     
-    // Improved calculation: 0% at start, moves with drawn numbers
-    if (drawn.length === 0) return 0;
+    // STRICTLY 0% if no numbers drawn or only 1 number drawn (it's impossible to have meaningful prob yet)
+    if (drawn.length <= 1) return 0;
     
     const lines = [
       ...Array(5).fill(0).map((_, r) => card[r]),
@@ -86,8 +86,9 @@ export default function Home() {
 
     if (maxMarked === 5) return 100;
     
-    // Very conservative growth: only starts showing real numbers when 2+ are hit
-    if (maxMarked < 2) return Math.min(5, drawn.length);
+    // Very conservative growth: 0% for only 1 hit, very low for 2 hits
+    if (maxMarked < 2) return 0;
+    if (maxMarked === 2) return Math.min(3, drawn.length);
     
     const baseProb = (maxMarked / 5) * 60; // Max 60% from marking 4/5
     const proximityBonus = potentialLines * 10; // 10% for each line that is 4/5
