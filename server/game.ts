@@ -41,10 +41,10 @@ export class GameManager {
       
       // If no round exists OR the latest is FINISHED
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
-        // Wait at least 15 seconds after round finished before starting a new one
+        // Wait exactly 10 seconds after round finished before starting a new one
         if (latestRound && latestRound.completedAt) {
           const finishedAt = new Date(latestRound.completedAt).getTime();
-          if (Date.now() - finishedAt < 15000) {
+          if (Date.now() - finishedAt < 10000) {
             return;
           }
         }

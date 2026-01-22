@@ -87,11 +87,32 @@ export function JoinButton({ roundId, price, userId }: JoinButtonProps) {
     }
   };
 
+  const [timeRemaining, setTimeRemaining] = useState(10);
+
+  useEffect(() => {
+    if (!isWinnerDeclared) return;
+    
+    // Find when the winner was declared
+    const winnerDeclaredAt = roundData?.round.completedAt ? new Date(roundData.round.completedAt).getTime() : Date.now();
+    
+    const updateTimer = () => {
+      const elapsed = Date.now() - winnerDeclaredAt;
+      const left = Math.max(0, Math.ceil((10000 - elapsed) / 1000));
+      setTimeRemaining(left);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [isWinnerDeclared, roundData?.round.completedAt]);
+
   if (isWinnerDeclared) {
     return (
       <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl w-full">
         <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">GAME OVER!</p>
-        <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">Winner declared - Waiting for next round</p>
+        <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">
+          Next Round in {timeRemaining}s
+        </p>
       </div>
     );
   }
