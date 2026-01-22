@@ -1,3 +1,4 @@
+import { formatAddress } from "@/lib/utils";
 import { ProbabilityFeed } from "@/components/game/ProbabilityFeed";
 import { PlayerList } from "@/components/game/PlayerList";
 import { GameHistory } from "@/components/game/GameHistory";
@@ -41,10 +42,8 @@ export default function Home() {
   } = useGameState();
   const { toast } = useToast();
 
-  const isParticipant = !!participant || !!foundParticipant;
-  
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
-  
+
   const [overlayData, setOverlayData] = useState<{
     show: boolean;
     username: string;
@@ -53,11 +52,7 @@ export default function Home() {
     txHash?: string;
   } | null>(null);
 
-  const formatAddress = (address: string) => {
-    if (!address || address === "No Winner") return address;
-    if (address.length < 10) return address;
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
-  };
+  const isParticipant = !!participant || !!foundParticipant;
 
   const calculateWinProb = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);
