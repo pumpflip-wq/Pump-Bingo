@@ -125,10 +125,10 @@ export default function Home() {
     const currentRoundId = roundData?.round.id;
     
     if ((isFinished || (roundData?.round.status === 'IN_GAME' && hasWinner)) && hasWinner) {
-      if (isParticipant && (!overlayData || (overlayData.roundId !== currentRoundId && overlayData.show === true))) {
+      if (isParticipant && (!overlayData || (overlayData.roundId !== currentRoundId))) {
+        // If we have overlay data but for a different round, or no overlay data at all
         const isMe = roundData.round.winnerId === user?.id;
         const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
-        // Correctly use the wallet address (username) instead of numeric ID if available
         const displayUsername = (winner as any)?.username || (isMe ? walletAddress : roundData.round.winnerId.toString());
         
         setOverlayData({
@@ -143,7 +143,7 @@ export default function Home() {
     } else {
       if (overlayData) setOverlayData(null);
     }
-  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.id, isParticipant, user?.id, walletAddress, overlayData, roundData?.participants]);
+  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.id, isParticipant, user?.id, walletAddress, roundData?.participants]);
 
   const sortedParticipants = roundData?.participants ? [...roundData.participants].map(p => ({
     ...p,

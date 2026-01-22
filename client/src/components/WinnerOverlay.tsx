@@ -73,6 +73,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, txHash, onClose
   const handleClose = () => {
     onClose();
     setLeft(10);
+    setHasPlayedSound(false);
   };
 
   const explorerUrl = txHash ? `https://explorer.solana.com/tx/${txHash}?cluster=${PROTOCOL_CONFIG.NETWORK}` : null;
