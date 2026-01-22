@@ -256,25 +256,25 @@ export default function Home() {
                         <div className="w-full space-y-8">
                           <div className="glass-card neon-border rounded-2xl p-8 bg-black/60 border-primary/30 flex flex-row items-center justify-center gap-24 w-full">
                             <div className="flex flex-col text-center">
-                              <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-2">Room</p>
+                              <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Room</p>
                               <p className="text-5xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
                             </div>
                             <div className="flex flex-col text-center scale-110">
-                              <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
+                              <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
                               <div className="flex flex-col items-center">
                                 <span className="text-7xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{formatCurrency(roundData.round.prizePool || 0)}</span>
                                 <span className="text-3xl text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
                               </div>
                             </div>
                             <div className="flex flex-col items-center">
-                              <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-2">Players</p>
+                              <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Players</p>
                               <p className="text-5xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                             </div>
                           </div>
                         </div>
                         <div className="p-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto">
                           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-                          <p className="text-white/60 text-xs uppercase font-black tracking-[0.2em] mb-6 font-mono">
+                          <p className="text-white text-xl uppercase font-black tracking-[0.2em] mb-6 font-mono">
                             {roundData.round.status === 'STARTING' ? 'Securing Game Chain...' : 'Game Starting In'}
                           </p>
                           <CountdownTimer 
@@ -283,7 +283,7 @@ export default function Home() {
                             participantCount={roundData.participantsCount}
                           />
                           {roundData.participantsCount < 2 && (
-                            <p className="text-primary text-sm uppercase font-black mt-6 animate-pulse tracking-widest font-display">
+                            <p className="text-primary text-lg uppercase font-black mt-6 animate-pulse tracking-widest font-display">
                               Waiting for players...
                             </p>
                           )}
@@ -297,7 +297,7 @@ export default function Home() {
                           ) : participant || foundParticipant ? (
                             <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl">
                               <p className="text-primary font-black text-3xl italic tracking-tighter mb-1 uppercase text-center">YOU'RE IN THE GAME!</p>
-                              <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">Wait for Next Game - Next round starts automatically</p>
+                              <p className="text-sm text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">Wait for Next Game - Next round starts automatically</p>
                             </div>
                           ) : (
                             <div className="space-y-4">
@@ -319,18 +319,18 @@ export default function Home() {
                     >
                       <div className="glass-card neon-border rounded-xl p-6 flex flex-row items-center justify-between bg-black/60 border-primary/30 shrink-0">
                         <div className="flex flex-col">
-                          <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
+                          <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
                           <div className="flex items-baseline gap-2">
                             <span className="text-6xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{formatCurrency(roundData.round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}</span>
                           </div>
                         </div>
                         <div className="flex gap-16">
                           <div className="text-center">
-                            <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-1">Room</p>
+                            <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-1">Room</p>
                             <p className="text-5xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
                           </div>
                           <div className="text-center">
-                            <p className="text-lg text-white/60 uppercase font-black tracking-widest font-mono mb-1">Players</p>
+                            <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-1">Players</p>
                             <p className="text-5xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                           </div>
                         </div>
@@ -366,16 +366,16 @@ export default function Home() {
                                     <div className="flex flex-col items-center gap-6">
                                       <span className="text-primary animate-pulse text-5xl md:text-7xl">BINGO! ROUND WON</span>
                                       <div className="bg-primary/10 border border-primary/30 rounded-[2rem] p-8 w-full max-w-3xl shadow-[0_0_50px_rgba(34,197,94,0.1)]">
-                                        <p className="text-sm text-white uppercase font-black tracking-[0.4em] mb-8 text-center border-b border-white/10 pb-4">ROUND STATISTICS</p>
+                                        <p className="text-lg text-white uppercase font-black tracking-[0.4em] mb-8 text-center border-b border-white/10 pb-4">ROUND STATISTICS</p>
                                         <div className="space-y-10">
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-xs text-white/60 uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
+                                            <span className="text-sm text-white/80 uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
                                             <span className="text-2xl md:text-5xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                                               {formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}
                                             </span>
                                           </div>
                                           <div className="flex flex-col items-center gap-2">
-                                            <span className="text-xs text-white/60 uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
+                                            <span className="text-sm text-white/80 uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
                                             <span className="text-4xl md:text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
                                               {formatCurrency(roundData.round.prizePool || 0)} <span className="text-2xl">PBINGO</span>
                                             </span>
