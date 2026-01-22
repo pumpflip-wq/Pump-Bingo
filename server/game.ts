@@ -169,8 +169,8 @@ export class GameManager {
             return;
         }
 
+        // Draw numbers faster if needed (every 1.5 seconds instead of 1s if we want it more dynamic, but keep 1s for stability)
         if (round.drawnNumbers.length >= 75) {
-            // Stop drawing but keep game open for winner claim
             return;
         }
 

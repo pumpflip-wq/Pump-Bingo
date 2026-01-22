@@ -35,13 +35,13 @@ export async function registerRoutes(
       .from(transactions)
       .where(eq(transactions.type, "BUY_IN"));
 
-    const userCount = await db.select({ count: sum(sql`1`) }).from(users);
+    const userCountResult = await db.select({ count: sql`count(*)` }).from(users);
     const walletBalance = await solanaManager.getMasterBalance();
 
     res.json({
       totalDistributed: Math.abs(Number(totalPrizePool[0]?.value || 0)),
       totalRevenue: Math.abs(Number(totalBuyIns[0]?.value || 0)),
-      userCount: Number(userCount[0]?.count || 0),
+      userCount: Number(userCountResult[0]?.count || 0),
       masterWalletBalance: walletBalance,
       isTestMode: !process.env.SOLANA_MASTER_WALLET_KEY
     });
