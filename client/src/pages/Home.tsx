@@ -125,11 +125,10 @@ export default function Home() {
     if (hasWinner && winnerDeclaredAt) {
       const elapsed = currentTime - winnerDeclaredAt;
       const totalDisplayTime = 10000; 
-      const remaining = Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000));
       
       // Stop showing if timer expired - ensure clean exit
       // Using a slightly more strict check to avoid re-triggering
-      if (elapsed >= totalDisplayTime) {
+      if (elapsed >= totalDisplayTime || isRoundFullyFinished) {
         return null;
       }
 
@@ -155,27 +154,26 @@ export default function Home() {
   useEffect(() => {
     const isRoundFinished = roundData?.round.status === 'FINISHED';
     const hasWinner = !!roundData?.round.winnerId;
+    const currentRound = roundData?.round;
     
     if (isRoundFinished || hasWinner) {
-      const winnerDeclaredAt = roundData.round.completedAt ? new Date(roundData.round.completedAt).getTime() : null;
+      const winnerDeclaredAt = currentRound?.completedAt ? new Date(currentRound.completedAt).getTime() : null;
       if (winnerDeclaredAt) {
         const elapsed = currentTime - winnerDeclaredAt;
         // The overlay should stay up for exactly 10s. 
         // Once elapsed hits 10s, we mark it as closed to prevent double triggers
-        // We use a small buffer to ensure we only trigger once
-        if (elapsed >= 10000 && !hasManuallyClosed && lastOverlayRoundId !== roundData.round.id) {
+        if (elapsed >= 10000 && !hasManuallyClosed && currentRound?.id === lastOverlayRoundId) {
           setHasManuallyClosed(true);
-          setLastOverlayRoundId(roundData.round.id);
         }
       }
-    } else {
+    } else if (currentRound) {
       // Reset manual close and overlay round ID when a new round starts
-      if (lastOverlayRoundId !== null && roundData?.round.id !== lastOverlayRoundId) {
+      if (lastOverlayRoundId === null || currentRound.id !== lastOverlayRoundId) {
         setHasManuallyClosed(false);
-        setLastOverlayRoundId(roundData.round.id);
+        setLastOverlayRoundId(currentRound.id);
       }
     }
-  }, [roundData?.round.status, roundData?.round.winnerId, roundData?.round.completedAt, roundData?.round.id, currentTime, hasManuallyClosed, lastOverlayRoundId]);
+  }, [roundData?.round, currentTime, hasManuallyClosed, lastOverlayRoundId]);
 
   const nextRoundTimer = useMemo(() => {
     if ((roundData?.round.status === 'FINISHED' || roundData?.round.winnerId) && roundData.round.completedAt) {
@@ -296,7 +294,7 @@ export default function Home() {
                             </div>
                           ) : (
                             <div className="space-y-4">
-                              <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} className="w-full h-14 text-xl font-black italic tracking-tighter" />
+                              <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
                               <p className="text-[12px] text-white uppercase font-black tracking-[0.2em] text-center opacity-80">JOIN BEFORE GAME STARTS</p>
                             </div>
                           )}
@@ -445,7 +443,7 @@ export default function Home() {
                               </div>
                               <div className="w-full max-w-md mx-auto mb-2">
                                 {(roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING') && (
-                                  <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} className="w-full h-14 text-xl font-black italic tracking-tighter" />
+                                  <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
                                 )}
                               </div>
                             </div>
