@@ -249,7 +249,7 @@ export default function Home() {
                                   ? "bg-primary text-black border-primary" 
                                   : "bg-primary/10 text-primary border-primary/20 group-hover:bg-primary group-hover:text-black"
                               )}>
-                                {roundData.round.status === 'IN_GAME' ? `#${p.ranking || sortedParticipants.indexOf(p) + 1}` : p.username[0].toUpperCase()}
+                                {Math.round(p.prob)}%
                               </div>
                               <div className="flex flex-col">
                                 <span className="text-sm font-bold text-white italic tracking-tight flex items-center gap-1">
@@ -257,26 +257,25 @@ export default function Home() {
                                   {isMe && <span className="text-[10px] text-primary font-black">(YOU)</span>}
                                 </span>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-[10px] text-primary/60 font-black font-mono">100 PBINGO</span>
-                                  {roundData.round.status === 'IN_GAME' && (
-                                    <div className="flex items-center gap-1">
-                                      <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
-                                        <motion.div 
-                                          initial={{ width: 0 }}
-                                          animate={{ width: `${p.prob}%` }}
-                                          className="h-full bg-primary"
-                                        />
-                                      </div>
-                                      <span className="text-[8px] font-black text-primary">{Math.round(p.prob)}%</span>
-                                    </div>
-                                  )}
+                                  <span className="text-[10px] text-primary/60 font-black font-mono">100 {PROTOCOL_CONFIG.SYMBOL}</span>
                                 </div>
                               </div>
                             </div>
-                            <ShieldCheck className={cn(
-                              "w-4 h-4 transition-colors",
-                              isMe ? "text-primary" : "text-primary/40 group-hover:text-primary"
-                            )} />
+                            <div className="flex items-center gap-2">
+                              {roundData.round.status === 'IN_GAME' && (
+                                <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                  <motion.div 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${p.prob}%` }}
+                                    className="h-full bg-primary"
+                                  />
+                                </div>
+                              )}
+                              <ShieldCheck className={cn(
+                                "w-4 h-4 transition-colors",
+                                isMe ? "text-primary" : "text-primary/40 group-hover:text-primary"
+                              )} />
+                            </div>
                           </motion.div>
                         );
                       })}

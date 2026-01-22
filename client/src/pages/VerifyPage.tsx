@@ -50,9 +50,10 @@ export default function VerifyPage() {
   }, [roundData, rId, rounds]);
 
   const verifySeed = (seed: string, expectedHash: string) => {
+    if (!seed || !expectedHash) return false;
     try {
-      const hash = crypto.createHash('sha256').update(seed).digest('hex');
-      return hash === expectedHash;
+      const hash = crypto.createHash('sha256').update(seed.trim()).digest('hex');
+      return hash.toLowerCase() === expectedHash.trim().toLowerCase();
     } catch (e) {
       return false;
     }

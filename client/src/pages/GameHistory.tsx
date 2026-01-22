@@ -108,8 +108,8 @@ export default function GameHistory() {
                                 )}
                               </div>
                             </TableCell>
-                            <TableCell className="text-white/60 text-base whitespace-nowrap">
-                              {round.completedAt ? format(new Date(round.completedAt), "MMM d, HH:mm") : "-"}
+                            <TableCell className="text-white text-base whitespace-nowrap font-bold">
+                              {round.completedAt ? format(new Date(round.completedAt), "MMM d, HH:mm:ss") : "-"}
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end items-center gap-2">
