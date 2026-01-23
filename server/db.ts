@@ -24,8 +24,7 @@ export const db = drizzle(pool, { schema });
 
 /**
  * Ensures the database schema is initialized and synchronized.
- * In a production environment like Railway, we might not have 
- * drizzle-kit push access easily, so we can run a simple check/init.
+ * Automatically creates tables if they don't exist (for Railway deployment).
  */
 export async function initializeDatabase() {
   try {
@@ -34,13 +33,85 @@ export async function initializeDatabase() {
     await db.execute(sql`SELECT 1`);
     console.log("Database connection successful.");
     
-    // On Railway, if tables are missing, we might need to notify or handle.
-    // The most reliable way is for the user to run db:push, but we can try to 
-    // provide a hint in logs if it fails.
-  } catch (err: any) {
-    if (err.message?.includes('relation "rounds" does not exist')) {
-      console.error("CRITICAL: Database tables are missing. Please run 'npm run db:push' or ensure the database is synchronized.");
+    // Check if tables exist, if not create them
+    const tablesExist = await checkTablesExist();
+    if (!tablesExist) {
+      console.log("Tables not found. Creating database schema...");
+      await createTables();
+      console.log("Database schema created successfully.");
+    } else {
+      console.log("Database tables already exist.");
     }
+  } catch (err: any) {
     console.error("Database initialization failed:", err);
+    throw err;
   }
+}
+
+async function checkTablesExist(): Promise<boolean> {
+  try {
+    await db.execute(sql`SELECT 1 FROM rounds LIMIT 1`);
+    return true;
+  } catch (err: any) {
+    if (err.code === '42P01') { // relation does not exist
+      return false;
+    }
+    throw err;
+  }
+}
+
+async function createTables() {
+  // Create users table
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      username TEXT NOT NULL UNIQUE,
+      balance INTEGER NOT NULL DEFAULT 10000,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  // Create rounds table
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS rounds (
+      id SERIAL PRIMARY KEY,
+      status TEXT NOT NULL DEFAULT 'OPEN',
+      start_time TIMESTAMP,
+      price INTEGER NOT NULL DEFAULT 100,
+      prize_pool INTEGER NOT NULL DEFAULT 0,
+      winner_id INTEGER,
+      server_seed TEXT NOT NULL,
+      public_hash TEXT NOT NULL,
+      drawn_numbers INTEGER[] DEFAULT '{}',
+      completed_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT NOW(),
+      spl_mint TEXT,
+      fee_percentage INTEGER DEFAULT 10
+    )
+  `);
+
+  // Create participants table
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS participants (
+      id SERIAL PRIMARY KEY,
+      round_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      card JSONB NOT NULL,
+      has_bingo BOOLEAN DEFAULT FALSE,
+      joined_at TIMESTAMP DEFAULT NOW(),
+      tx_signature TEXT
+    )
+  `);
+
+  // Create transactions table
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS transactions (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      amount INTEGER NOT NULL,
+      type TEXT NOT NULL,
+      round_id INTEGER,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
 }

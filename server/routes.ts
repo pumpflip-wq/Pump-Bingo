@@ -235,8 +235,8 @@ export async function registerRoutes(
 
   app.post(api.rounds.get.path + "/force-start", async (req, res) => {
     try {
-      // Basic admin restriction on the backend as well
-      const ADMIN_WALLET = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns";
+      // Admin wallet - configurable via ADMIN_WALLET environment variable
+      const ADMIN_WALLET = process.env.ADMIN_WALLET || "23caHs1DUE8Qh5G2fLtKGUtEicahB4roGhiedp7zWg4Z";
       const { adminWallet } = req.body;
 
       if (adminWallet !== ADMIN_WALLET) {

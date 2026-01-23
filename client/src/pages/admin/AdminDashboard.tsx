@@ -12,7 +12,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { cn, formatCurrency } from "@/lib/utils";
 import CryptoJS from "crypto-js";
 
-const ADMIN_WALLET = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns";
+// Admin wallet address - can be configured via VITE_ADMIN_WALLET environment variable
+const ADMIN_WALLET = import.meta.env.VITE_ADMIN_WALLET || "23caHs1DUE8Qh5G2fLtKGUtEicahB4roGhiedp7zWg4Z";
 
 interface AdminStats {
   totalDistributed: number;
