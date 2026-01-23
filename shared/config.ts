@@ -18,4 +18,7 @@ export const PROTOCOL_CONFIG = {
   NETWORK: "devnet",
   RPC_URL: "https://api.devnet.solana.com",
   IS_TEST_MODE: true, // Master toggle for free play
+
+  // Admin wallet address - change this to set a new admin
+  ADMIN_WALLET: "23caHs1DUE8Qh5G2fLtKGUtEicahB4roGhiedp7zWg4Z",
 };

@@ -11,9 +11,8 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn, formatCurrency } from "@/lib/utils";
 import CryptoJS from "crypto-js";
-
-// Admin wallet address - can be configured via VITE_ADMIN_WALLET environment variable
-const ADMIN_WALLET = import.meta.env.VITE_ADMIN_WALLET || "23caHs1DUE8Qh5G2fLtKGUtEicahB4roGhiedp7zWg4Z";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { PROTOCOL_CONFIG } from "@shared/config";
 
 interface AdminStats {
   totalDistributed: number;
@@ -27,6 +26,7 @@ export default function AdminDashboard() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { publicKey } = useWallet();
   const [verifySeed, setVerifySeed] = useState("");
   const [verifyHash, setVerifyHash] = useState("");
   const [verificationResult, setVerificationResult] = useState<{valid: boolean, hash: string} | null>(null);
@@ -41,7 +41,10 @@ export default function AdminDashboard() {
     refetchInterval: 5000
   });
 
-  if (!user || user.username !== ADMIN_WALLET) {
+  const walletAddress = publicKey?.toString();
+  const isAdmin = walletAddress === PROTOCOL_CONFIG.ADMIN_WALLET || user?.username === PROTOCOL_CONFIG.ADMIN_WALLET;
+
+  if (!isAdmin) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
         <AlertTriangle className="w-16 h-16 text-destructive mb-4" />
@@ -65,7 +68,7 @@ export default function AdminDashboard() {
 
   const forceStartMutation = useMutation({
     mutationFn: async (roundId: number) => {
-      await apiRequest("POST", `/api/rounds/${roundId}/force-start`, { adminWallet: ADMIN_WALLET });
+      await apiRequest("POST", `/api/rounds/${roundId}/force-start`, { adminWallet: PROTOCOL_CONFIG.ADMIN_WALLET });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });

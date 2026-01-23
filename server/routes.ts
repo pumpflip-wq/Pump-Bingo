@@ -235,11 +235,10 @@ export async function registerRoutes(
 
   app.post(api.rounds.get.path + "/force-start", async (req, res) => {
     try {
-      // Admin wallet - configurable via ADMIN_WALLET environment variable
-      const ADMIN_WALLET = process.env.ADMIN_WALLET || "23caHs1DUE8Qh5G2fLtKGUtEicahB4roGhiedp7zWg4Z";
+      // Admin wallet from shared config
       const { adminWallet } = req.body;
 
-      if (adminWallet !== ADMIN_WALLET) {
+      if (adminWallet !== PROTOCOL_CONFIG.ADMIN_WALLET) {
         return res.status(403).json({ message: "Unauthorized" });
       }
       

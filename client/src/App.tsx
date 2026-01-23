@@ -14,8 +14,9 @@ import { useEffect, useRef, useState } from "react";
 import { SolanaProvider } from "./components/SolanaProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
-import { History, ShieldCheck, Twitter } from "lucide-react";
+import { History, ShieldCheck, Twitter, Settings } from "lucide-react";
 import { PROTOCOL_CONFIG } from "@shared/config";
+import { useAuth } from "./hooks/use-auth";
 
 import { TermsModal } from "./components/TermsModal";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -39,6 +40,10 @@ function AppContent() {
   const scrollRef = useRef<HTMLElement>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const { connected, publicKey } = useWallet();
+  const { user } = useAuth();
+  
+  const walletAddress = publicKey?.toString();
+  const isAdmin = walletAddress === PROTOCOL_CONFIG.ADMIN_WALLET || user?.username === PROTOCOL_CONFIG.ADMIN_WALLET;
 
   useEffect(() => {
     // Force dark mode globally and remove any light mode references
@@ -107,6 +112,11 @@ function AppContent() {
                   <Link href="/verify" className="text-sm font-black uppercase tracking-[0.15em] text-white hover:text-primary transition-all flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4" /> Verify
                   </Link>
+                  {isAdmin && (
+                    <Link href="/admin" className="text-sm font-black uppercase tracking-[0.15em] text-primary hover:text-white transition-all flex items-center gap-2" data-testid="link-admin">
+                      <Settings className="w-4 h-4" /> Admin
+                    </Link>
+                  )}
                 </nav>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-3">
