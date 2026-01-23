@@ -2,8 +2,9 @@
 import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
 import { 
-  users, rounds, participants, transactions,
+  users, rounds, participants, transactions, paymentQueue,
   type User, type Round, type Participant, type Transaction, type CreateUserRequest,
+  type PaymentQueue, type InsertPaymentQueue,
   ROUND_STATUS
 } from "@shared/schema";
 
@@ -30,6 +31,11 @@ export interface IStorage {
   
   // Transactions
   createTransaction(tx: Partial<Transaction>): Promise<Transaction>;
+
+  // Payment Queue
+  getPendingPayments(): Promise<PaymentQueue[]>;
+  createPaymentQueue(payment: InsertPaymentQueue): Promise<PaymentQueue>;
+  markPaymentProcessed(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -174,6 +180,19 @@ export class DatabaseStorage implements IStorage {
   async createTransaction(tx: Partial<Transaction>): Promise<Transaction> {
     const [newTx] = await db.insert(transactions).values(tx as any).returning();
     return newTx;
+  }
+
+  async getPendingPayments(): Promise<PaymentQueue[]> {
+    return await db.select().from(paymentQueue).where(eq(paymentQueue.status, "PENDING"));
+  }
+
+  async createPaymentQueue(payment: InsertPaymentQueue): Promise<PaymentQueue> {
+    const [newPayment] = await db.insert(paymentQueue).values(payment).returning();
+    return newPayment;
+  }
+
+  async markPaymentProcessed(id: number): Promise<void> {
+    await db.update(paymentQueue).set({ status: "PROCESSED" }).where(eq(paymentQueue.id, id));
   }
 
   async resetSystem(): Promise<void> {

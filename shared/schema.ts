@@ -28,6 +28,19 @@ export const rounds = pgTable("rounds", {
   feePercentage: integer("fee_percentage").default(10), // House fee
 });
 
+export const paymentQueue = pgTable("payment_queue", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  amount: integer("amount").notNull(),
+  txSignature: text("tx_signature").notNull().unique(),
+  status: text("status").notNull().default("PENDING"), // PENDING, PROCESSED
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertPaymentQueueSchema = createInsertSchema(paymentQueue);
+export type PaymentQueue = typeof paymentQueue.$inferSelect;
+export type InsertPaymentQueue = z.infer<typeof insertPaymentQueueSchema>;
+
 export const participants = pgTable("participants", {
   id: serial("id").primaryKey(),
   roundId: integer("round_id").notNull(),

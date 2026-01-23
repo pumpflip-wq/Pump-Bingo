@@ -91,6 +91,39 @@ export class GameManager {
       drawnNumbers: []
     });
     console.log(`Created new round #${nextId}`);
+
+    // Process payment queue for the new round
+    await this.processPaymentQueue(nextId);
+  }
+
+  private async processPaymentQueue(roundId: number) {
+    const pending = await storage.getPendingPayments();
+    for (const payment of pending) {
+      try {
+        const card = this.generateCard();
+        await storage.joinRound(roundId, payment.userId, card, payment.txSignature);
+        
+        // Update user balance and transaction
+        await storage.updateUserBalance(payment.userId, -payment.amount);
+        await storage.createTransaction({
+          userId: payment.userId,
+          amount: -payment.amount,
+          type: "BUY_IN",
+          roundId
+        });
+
+        // Add to prize pool
+        const round = await storage.getRound(roundId);
+        if (round) {
+          await storage.updateRound(roundId, { prizePool: round.prizePool + payment.amount });
+        }
+
+        await storage.markPaymentProcessed(payment.id);
+        console.log(`Auto-joined user ${payment.userId} to round ${roundId} from queue`);
+      } catch (err) {
+        console.error("Error processing queued payment:", err);
+      }
+    }
   }
 
   private async processRound(round: Round) {

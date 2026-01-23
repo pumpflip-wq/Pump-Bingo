@@ -130,6 +130,20 @@ export async function registerRoutes(
       if (!round) return res.status(404).json({ message: "Round not found" });
       
       if (round.status !== "OPEN") {
+          // If round is not open, add to payment queue for next round
+          if (txSignature) {
+            const treasuryWallet = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns";
+            const isValid = await solanaManager.verifyTransaction(txSignature, round.price, treasuryWallet);
+            if (isValid) {
+              await storage.createPaymentQueue({
+                userId,
+                amount: round.price,
+                txSignature,
+                status: "PENDING"
+              });
+              return res.json({ queued: true, message: "Round in progress. You've been added to the next round automatically." });
+            }
+          }
           return res.status(400).json({ message: "Round is already in progress or finished" });
       }
 
