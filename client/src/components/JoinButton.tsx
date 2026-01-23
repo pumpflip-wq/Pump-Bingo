@@ -43,7 +43,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       const USE_REAL_SOLANA = PROTOCOL_CONFIG.NETWORK === "devnet" && !PROTOCOL_CONFIG.IS_TEST_MODE;
 
       if (USE_REAL_SOLANA) {
-        const treasury = new PublicKey("DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns");
+        const treasury = new PublicKey(PROTOCOL_CONFIG.TREASURY_WALLET);
         const lamports = price; // price is already in lamports from config
 
         const transaction = new Transaction().add(

@@ -132,7 +132,7 @@ export async function registerRoutes(
       if (round.status !== "OPEN") {
           // If round is not open, add to payment queue for next round
           if (txSignature) {
-            const treasuryWallet = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns";
+            const treasuryWallet = PROTOCOL_CONFIG.TREASURY_WALLET;
             const isValid = await solanaManager.verifyTransaction(txSignature, round.price, treasuryWallet);
             if (isValid) {
               await storage.createPaymentQueue({
@@ -152,7 +152,7 @@ export async function registerRoutes(
 
       // 0. Verify Transaction
       if (txSignature) {
-        const treasuryWallet = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns"; // Should move to config
+        const treasuryWallet = PROTOCOL_CONFIG.TREASURY_WALLET;
         const isValid = await solanaManager.verifyTransaction(txSignature, round.price, treasuryWallet);
         if (!isValid) {
           return res.status(400).json({ message: "Transaction verification failed" });
