@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn, formatCurrency } from "@/lib/utils";
-import crypto from "crypto";
+import CryptoJS from "crypto-js";
 
 const ADMIN_WALLET = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns";
 
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
 
   const handleVerify = () => {
     if (!verifySeed) return;
-    const computedHash = crypto.createHash('sha256').update(verifySeed).digest('hex');
+    const computedHash = CryptoJS.SHA256(verifySeed).toString();
     setVerificationResult({
       valid: computedHash === verifyHash,
       hash: computedHash
