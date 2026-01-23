@@ -102,7 +102,7 @@ export default function VerifyPage() {
 
           <div className="glass-card neon-border rounded-[2rem] p-6 space-y-6">
             <h2 className="text-2xl font-black italic text-white uppercase tracking-tighter flex items-center gap-3">
-              <Search className="w-6 h-6 text-primary" /> Recent Rounds
+              <Search className="w-6 h-6 text-primary" /> Current Round
             </h2>
             
             <div className="overflow-x-auto">

@@ -473,6 +473,7 @@ export default function Home() {
                 historyRounds={historyRounds}
                 historyLoading={historyLoading}
                 formatAddress={formatAddress}
+                currentRoundHash={roundData?.round?.publicHash}
               />
             </aside>
             </div>

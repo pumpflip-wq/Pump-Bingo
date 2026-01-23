@@ -8,9 +8,10 @@ interface GameHistoryProps {
   historyRounds: any;
   historyLoading: boolean;
   formatAddress: (address: string) => string;
+  currentRoundHash?: string;
 }
 
-export function GameHistory({ historyRounds, historyLoading, formatAddress }: GameHistoryProps) {
+export function GameHistory({ historyRounds, historyLoading, formatAddress, currentRoundHash }: GameHistoryProps) {
   return (
     <div className="glass-card neon-border rounded-2xl p-6 flex flex-col flex-1 overflow-hidden bg-black/20">
       <div className="flex items-center justify-between mb-6">
@@ -52,9 +53,8 @@ export function GameHistory({ historyRounds, historyLoading, formatAddress }: Ga
           </div>
           <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
             <p className="text-[10px] font-mono text-primary truncate flex-1">
-              {historyRounds?.rounds?.[0]?.publicHash || "..."}
+              {currentRoundHash || "..."}
             </p>
-            {/* We will handle copy logic in the parent or pass a prop if needed, but for now just showing it here as per image */}
           </div>
         </div>
         <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
