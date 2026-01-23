@@ -93,14 +93,19 @@ export class SolanaManager {
   async getMasterBalance(): Promise<number> {
     if (!this.masterKeypair) return 0;
     try {
-      const mint = new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS);
-      const account = await getOrCreateAssociatedTokenAccount(
-        this.connection,
-        this.masterKeypair,
-        mint,
-        this.masterKeypair.publicKey
-      );
-      return Number(account.amount) / Math.pow(10, PROTOCOL_CONFIG.DECIMALS);
+      const mint = PROTOCOL_CONFIG.MINT_ADDRESS ? new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS) : null;
+      if (mint) {
+        const account = await getOrCreateAssociatedTokenAccount(
+          this.connection,
+          this.masterKeypair,
+          mint,
+          this.masterKeypair.publicKey
+        );
+        return Number(account.amount) / Math.pow(10, PROTOCOL_CONFIG.DECIMALS);
+      } else {
+        const balance = await this.connection.getBalance(this.masterKeypair.publicKey);
+        return balance / 1e9;
+      }
     } catch {
       return 0;
     }
