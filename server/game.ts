@@ -170,11 +170,9 @@ export class GameManager {
             return;
         }
 
-        // AUTO-FINISH if no winner after all 75 numbers
-        if (round.drawnNumbers.length >= 75) {
-            console.log(`Round ${round.id} drawn all numbers with no winner, finishing...`);
-            await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
-            await this.createNewRound();
+        // AUTO-FINISH disabled per user request - only finish when Bingo claimed
+        if (round.drawnNumbers.length >= 75 && !round.winnerId) {
+            // Keep drawing loop active but don't finish
             return;
         }
 

@@ -37,14 +37,14 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     }
 
     try {
-      // 1. Solana Transaction (Buy-in) - DISABLED FOR TESTING
+      // 1. Solana Transaction (Buy-in) - Set to true for Devnet
       let signature = "TEST_TX_SIG_" + Date.now();
       
-      const USE_REAL_SOLANA = false; // Toggle for testing
+      const USE_REAL_SOLANA = PROTOCOL_CONFIG.NETWORK === "devnet" && !PROTOCOL_CONFIG.IS_TEST_MODE;
 
       if (USE_REAL_SOLANA) {
         const treasury = new PublicKey("DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns");
-        const lamports = price * 1000000;
+        const lamports = price; // price is already in lamports from config
 
         const transaction = new Transaction().add(
           SystemProgram.transfer({

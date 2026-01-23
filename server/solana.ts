@@ -1,4 +1,4 @@
-import { Connection, Keypair, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, Transaction, sendAndConfirmTransaction, SystemProgram } from "@solana/web3.js";
 import { getOrCreateAssociatedTokenAccount, createTransferInstruction } from "@solana/spl-token";
 import { PROTOCOL_CONFIG } from "../shared/config";
 import bs58 from "bs58";
@@ -31,36 +31,20 @@ export class SolanaManager {
 
   async sendReward(toAddress: string, amount: number): Promise<string | null> {
     if (!this.masterKeypair) {
-      console.log(`[TEST MODE] Would send ${amount} tokens to ${toAddress}`);
+      console.log(`[TEST MODE] Would send ${amount / 1e9} SOL to ${toAddress}`);
       // Return a mock signature for testing
       return "MOCK_SIG_" + Math.random().toString(36).substring(7);
     }
 
     try {
       const destinationWallet = new PublicKey(toAddress);
-      const mint = new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS);
       
-      const sourceAccount = await getOrCreateAssociatedTokenAccount(
-        this.connection,
-        this.masterKeypair,
-        mint,
-        this.masterKeypair.publicKey
-      );
-
-      const destinationAccount = await getOrCreateAssociatedTokenAccount(
-        this.connection,
-        this.masterKeypair,
-        mint,
-        destinationWallet
-      );
-
       const transaction = new Transaction().add(
-        createTransferInstruction(
-          sourceAccount.address,
-          destinationAccount.address,
-          this.masterKeypair.publicKey,
-          Math.floor(amount * Math.pow(10, PROTOCOL_CONFIG.DECIMALS))
-        )
+        SystemProgram.transfer({
+          fromPubkey: this.masterKeypair.publicKey,
+          toPubkey: destinationWallet,
+          lamports: Math.floor(amount)
+        })
       );
 
       const signature = await sendAndConfirmTransaction(
@@ -73,6 +57,36 @@ export class SolanaManager {
     } catch (err) {
       console.error("Failed to send reward:", err);
       throw err;
+    }
+  }
+
+  async verifyTransaction(signature: string, expectedAmount: number, recipient: string): Promise<boolean> {
+    if (!this.masterKeypair && signature.startsWith("TEST_TX_SIG_")) {
+      return true;
+    }
+
+    try {
+      const tx = await this.connection.getParsedTransaction(signature, {
+        commitment: "confirmed",
+        maxSupportedTransactionVersion: 0
+      });
+
+      if (!tx || !tx.meta || tx.meta.err) return false;
+
+      // Simple SOL transfer check
+      const instructions = tx.transaction.message.instructions;
+      for (const ix of instructions) {
+        if ("parsed" in ix && ix.program === "system" && ix.parsed.type === "transfer") {
+          const { info } = ix.parsed;
+          if (info.destination === recipient && Number(info.lamports) >= expectedAmount) {
+            return true;
+          }
+        }
+      }
+      return false;
+    } catch (err) {
+      console.error("TX Verification Error:", err);
+      return false;
     }
   }
 

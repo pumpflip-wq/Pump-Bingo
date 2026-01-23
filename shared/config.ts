@@ -1,11 +1,11 @@
 export const PROTOCOL_CONFIG = {
   // Replace with your actual Token Mint Address (CA)
-  MINT_ADDRESS: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  MINT_ADDRESS: null, // Set to null for SOL mode
   SYMBOL: "$PBINGO",
-  DECIMALS: 6,
+  DECIMALS: 9, // SOL has 9 decimals
 
   // Game Settings
-  DEFAULT_ENTRY_PRICE: 100000,
+  DEFAULT_ENTRY_PRICE: 0.1 * 1e9, // 0.1 SOL in lamports
   FEE_PERCENTAGE: 0, // No fees initially to maximize engagement
 
   // Links

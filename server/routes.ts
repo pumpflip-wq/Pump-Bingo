@@ -133,8 +133,14 @@ export async function registerRoutes(
           return res.status(400).json({ message: "Round is already in progress or finished" });
       }
 
-      const user = await storage.getUser(userId);
-      if (!user) return res.status(404).json({ message: "User not found" });
+      // 0. Verify Transaction
+      if (txSignature) {
+        const treasuryWallet = "DajB37qp74UzwND3N1rVWtLdxr55nhvuK2D4x476zmns"; // Should move to config
+        const isValid = await solanaManager.verifyTransaction(txSignature, round.price, treasuryWallet);
+        if (!isValid) {
+          return res.status(400).json({ message: "Transaction verification failed" });
+        }
+      }
 
       // Check if already joined
       const existing = await storage.getParticipant(roundId, userId);
