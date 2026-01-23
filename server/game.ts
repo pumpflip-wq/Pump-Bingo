@@ -170,8 +170,11 @@ export class GameManager {
             return;
         }
 
-        // Draw numbers faster if needed (every 1.5 seconds instead of 1s if we want it more dynamic, but keep 1s for stability)
+        // AUTO-FINISH if no winner after all 75 numbers
         if (round.drawnNumbers.length >= 75) {
+            console.log(`Round ${round.id} drawn all numbers with no winner, finishing...`);
+            await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
+            await this.createNewRound();
             return;
         }
 

@@ -189,6 +189,12 @@ export async function registerRoutes(
       const hasBingo = gameManager.validateBingo(participant.card as number[][], round.drawnNumbers || []);
       
       if (hasBingo) {
+          // Prevent duplicate claims for the same round
+          const currentRound = await storage.getRound(roundId);
+          if (currentRound?.winnerId) {
+              return res.status(400).json({ message: "Winner already declared for this round" });
+          }
+
           // Payout based on feePercentage
           const fee = Math.max(0, Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 10));
           const payoutMultiplier = (100 - fee) / 100;
