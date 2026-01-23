@@ -7,7 +7,7 @@ import { api } from "@shared/routes";
 import { gameManager } from "./game";
 import { solanaManager } from "./solana";
 import { ROUND_STATUS, users, participants, transactions } from "@shared/schema";
-import { eq, desc, sum } from "drizzle-orm";
+import { eq, desc, sum, sql } from "drizzle-orm";
 import { PROTOCOL_CONFIG } from "../shared/config";
 
 export async function registerRoutes(
