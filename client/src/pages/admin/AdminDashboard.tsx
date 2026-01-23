@@ -19,6 +19,7 @@ interface AdminStats {
   totalRevenue: number;
   userCount: number;
   masterWalletBalance: number;
+  masterWalletSymbol: string;
   isTestMode: boolean;
 }
 
@@ -137,7 +138,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-black text-white italic">
-              {formatCurrency(stats?.masterWalletBalance || 0, false)} <span className="text-sm">PUMP</span>
+              {formatCurrency(stats?.masterWalletBalance || 0, false)} <span className="text-sm">{stats?.masterWalletSymbol || 'PUMP'}</span>
             </p>
           </CardContent>
         </Card>
@@ -150,7 +151,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-black text-primary italic">
-              {formatCurrency(stats?.totalDistributed || 0, false)} <span className="text-sm text-white/60">PUMP</span>
+              {formatCurrency(stats?.totalDistributed || 0, false)} <span className="text-sm text-white/60">{stats?.masterWalletSymbol || 'PUMP'}</span>
             </p>
           </CardContent>
         </Card>
@@ -163,7 +164,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-black text-white italic">
-              {formatCurrency(stats?.totalRevenue || 0, false)} <span className="text-sm text-white/60">PUMP</span>
+              {formatCurrency(stats?.totalRevenue || 0, false)} <span className="text-sm text-white/60">{stats?.masterWalletSymbol || 'PUMP'}</span>
             </p>
           </CardContent>
         </Card>
@@ -256,7 +257,7 @@ export default function AdminDashboard() {
                       {round.status}
                     </span>
                   </TableCell>
-                  <TableCell className="font-black text-white italic">{formatCurrency(round.prizePool || 0, false)} PUMP</TableCell>
+                  <TableCell className="font-black text-white italic">{formatCurrency(round.prizePool || 0, false)} {stats?.masterWalletSymbol || 'PUMP'}</TableCell>
                   <TableCell>
                     {round.status === ROUND_STATUS.OPEN && (
                       <Button 

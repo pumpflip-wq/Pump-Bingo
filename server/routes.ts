@@ -44,6 +44,7 @@ export async function registerRoutes(
       userCount: Number(userCountResult[0]?.count || 0),
       masterWalletBalance: walletBalance,
       masterWalletPublicKey: solanaManager.getMasterPublicKey(),
+      masterWalletSymbol: PROTOCOL_CONFIG.SYMBOL,
       isTestMode: PROTOCOL_CONFIG.IS_TEST_MODE && !process.env.SOLANA_MASTER_WALLET_KEY
     });
   });
