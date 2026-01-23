@@ -21,5 +21,4 @@ export const PROTOCOL_CONFIG = {
 
   // Admin wallet address - change this to set a new admin
   ADMIN_WALLET: "23caHs1DUE8Qh5G2fLtKGUtEicahB4roGhiedp7zWg4Z",
-  TREASURY_WALLET: "23caHs1DUE8Qh5G2fLtKGUtEicahB4roGhiedp7zWg4Z", // User's master wallet
 };

@@ -43,6 +43,7 @@ export async function registerRoutes(
       totalRevenue: Math.abs(Number(totalBuyIns[0]?.value || 0)),
       userCount: Number(userCountResult[0]?.count || 0),
       masterWalletBalance: walletBalance,
+      masterWalletPublicKey: solanaManager.getMasterPublicKey(),
       isTestMode: PROTOCOL_CONFIG.IS_TEST_MODE && !process.env.SOLANA_MASTER_WALLET_KEY
     });
   });
@@ -132,7 +133,8 @@ export async function registerRoutes(
       if (round.status !== "OPEN") {
           // If round is not open, add to payment queue for next round
           if (txSignature) {
-            const treasuryWallet = PROTOCOL_CONFIG.TREASURY_WALLET;
+            const treasuryWallet = solanaManager.getMasterPublicKey();
+            if (!treasuryWallet) return res.status(500).json({ message: "Server wallet not initialized" });
             const isValid = await solanaManager.verifyTransaction(txSignature, round.price, treasuryWallet);
             if (isValid) {
               await storage.createPaymentQueue({
@@ -152,7 +154,8 @@ export async function registerRoutes(
 
       // 0. Verify Transaction
       if (txSignature) {
-        const treasuryWallet = PROTOCOL_CONFIG.TREASURY_WALLET;
+        const treasuryWallet = solanaManager.getMasterPublicKey();
+        if (!treasuryWallet) return res.status(500).json({ message: "Server wallet not initialized" });
         const isValid = await solanaManager.verifyTransaction(txSignature, round.price, treasuryWallet);
         if (!isValid) {
           return res.status(400).json({ message: "Transaction verification failed" });

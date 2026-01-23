@@ -29,6 +29,10 @@ export class SolanaManager {
     }
   }
 
+  public getMasterPublicKey(): string | null {
+    return this.masterKeypair?.publicKey.toBase58() || null;
+  }
+
   async sendReward(toAddress: string, amount: number): Promise<string | null> {
     if (!this.masterKeypair) {
       console.log(`[TEST MODE] Would send ${amount / 1e9} SOL to ${toAddress}`);

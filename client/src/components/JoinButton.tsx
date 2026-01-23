@@ -43,7 +43,16 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       const USE_REAL_SOLANA = PROTOCOL_CONFIG.NETWORK === "devnet" && !PROTOCOL_CONFIG.IS_TEST_MODE;
 
       if (USE_REAL_SOLANA) {
-        const treasury = new PublicKey(PROTOCOL_CONFIG.TREASURY_WALLET);
+        // Fetch current master wallet address from the server or use a fallback mechanism
+        // For efficiency, we can expose it via an API or just use a stable config if it doesn't change often
+        // But the requirement is to use the actual master wallet from private keys
+        const response = await fetch("/api/admin/stats");
+        const stats = await response.json();
+        const treasuryAddr = stats.masterWalletPublicKey;
+        
+        if (!treasuryAddr) throw new Error("Treasury wallet not initialized");
+        
+        const treasury = new PublicKey(treasuryAddr);
         const lamports = price; // price is already in lamports from config
 
         const transaction = new Transaction().add(
