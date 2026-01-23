@@ -1,7 +1,6 @@
 import { storage } from "./storage";
-import { db } from "./db";
-import { type Round, ROUND_STATUS, rounds } from "@shared/schema";
-import { sql } from "drizzle-orm";
+import { type Round, ROUND_STATUS } from "@shared/schema";
+import { sql, eq } from "drizzle-orm";
 import crypto from "crypto";
 
 // Bingo Game Logic
@@ -36,7 +35,7 @@ export class GameManager {
 
     try {
       // Find the LATEST round
-      const [latestRound] = await db.select().from(rounds).orderBy(sql`${rounds.id} DESC`).limit(1);
+      const latestRound = await storage.getLatestRound();
       
       // If no round exists OR the latest is FINISHED
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
@@ -69,7 +68,7 @@ export class GameManager {
   }
 
   private async createNewRound() {
-    const [latestRound] = await db.select().from(rounds).orderBy(sql`${rounds.id} DESC`).limit(1);
+    const latestRound = await storage.getLatestRound();
     const nextId = latestRound ? latestRound.id + 1 : 1;
 
     const seed = crypto.randomBytes(32).toString('hex').toLowerCase();
@@ -81,7 +80,7 @@ export class GameManager {
 
     console.log(`Creating new round #${nextId} with seed: ${seed} and hash: ${hash}`);
 
-    await db.insert(rounds).values({
+    await storage.createRound({
       id: nextId,
       status: ROUND_STATUS.OPEN,
       serverSeed: seed,

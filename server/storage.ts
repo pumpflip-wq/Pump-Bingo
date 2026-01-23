@@ -16,6 +16,7 @@ export interface IStorage {
 
   // Round
   getRound(id: number): Promise<Round | undefined>;
+  getLatestRound(): Promise<Round | undefined>;
   getOpenRounds(): Promise<Round[]>;
   createRound(round: Partial<Round>): Promise<Round>;
   updateRound(id: number, updates: Partial<Round>): Promise<Round>;
@@ -65,11 +66,17 @@ export class DatabaseStorage implements IStorage {
     return round;
   }
 
-  async getOpenRounds(): Promise<Round[]> {
-    // Return only the most recent round, regardless of status
-    return await db.select().from(rounds)
+  async getLatestRound(): Promise<Round | undefined> {
+    const [round] = await db.select().from(rounds)
       .orderBy(sql`${rounds.id} DESC`)
       .limit(1);
+    return round;
+  }
+
+  async getOpenRounds(): Promise<Round[]> {
+    // Return only the most recent round, regardless of status
+    const latest = await this.getLatestRound();
+    return latest ? [latest] : [];
   }
 
   async createRound(round: Partial<Round>): Promise<Round> {
