@@ -202,13 +202,13 @@ export async function registerRoutes(
 
           // WINNER!
           // Important: payout variable must be defined before calling solanaManager
-          const txSignature = await solanaManager.sendReward(participant.username, payout);
+          const user = await storage.getUser(userId);
+          const txSignature = await solanaManager.sendReward(user?.username || "", payout);
 
           await storage.updateRound(roundId, { 
               status: ROUND_STATUS.IN_GAME, // Keep in game for the 10s delay
               winnerId: userId,
               completedAt: new Date(), // Use this as "winnerDeclaredAt" effectively
-              txHash: txSignature || undefined
           });
           
           await storage.updateUserBalance(userId, payout);
