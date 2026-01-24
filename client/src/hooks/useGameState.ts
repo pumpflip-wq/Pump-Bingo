@@ -35,9 +35,10 @@ export function useGameState() {
   useEffect(() => {
     if (latestRound?.id) {
       const interval = setInterval(() => {
+        // Only invalidate if the game is active or starting to reduce unnecessary load
         queryClient.invalidateQueries({ queryKey: ["/api/rounds", latestRound.id] });
         refetchRound();
-      }, 1000);
+      }, 500); // Increased polling frequency to 500ms for smoother live feed
       return () => clearInterval(interval);
     }
   }, [latestRound?.id, refetchRound]);

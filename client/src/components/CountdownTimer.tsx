@@ -32,13 +32,9 @@ export function CountdownTimer({ secondsRemaining, status, participantCount }: C
     }
 
     // Synchronize with server data when it changes
-    // We update lastServerSeconds even if it's within 1 second to keep the ref accurate
     if (secondsRemaining !== lastServerSeconds.current) {
-      // If we jump from 0 to 60 or vice-versa significantly, reset the anchor
-      if (Math.abs(secondsRemaining - lastServerSeconds.current) > 2) {
-        setDisplaySeconds(secondsRemaining);
-      } else if (secondsRemaining > displaySeconds) {
-        // If server says we have more time than we display, catch up
+      // Always sync if it's 60 or 0 to ensure boundary cases are handled
+      if (secondsRemaining === 60 || secondsRemaining === 0 || Math.abs(secondsRemaining - lastServerSeconds.current) > 1) {
         setDisplaySeconds(secondsRemaining);
       }
       lastServerSeconds.current = secondsRemaining;
