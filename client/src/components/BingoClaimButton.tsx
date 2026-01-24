@@ -103,7 +103,18 @@ export function BingoClaimButton({
         onSuccess: () => {
           // Force immediate invalidation of round data to lock the room
           queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
-          queryClient.invalidateQueries({ queryKey: ["/api/rounds", roundId] });
+          queryClient.setQueryData(["/api/rounds", roundId], (old: any) => {
+            if (!old) return old;
+            return {
+              ...old,
+              round: {
+                ...old.round,
+                status: "FINISHED",
+                winnerId: userId,
+                completedAt: new Date().toISOString()
+              }
+            };
+          });
           queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
         },
         onError: (error: Error) => {

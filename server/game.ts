@@ -4,7 +4,7 @@ import crypto from "crypto";
 
 const OPEN_DELAY_MS = 60_000;
 const STARTING_MS = 5_000;
-const DRAW_INTERVAL_MS = 2_000;
+const DRAW_INTERVAL_MS = 1_500; // Faster drawing
 const POST_WIN_DELAY_MS = 10_000;
 const STALL_RECOVERY_MS = 10 * 60_000;
 

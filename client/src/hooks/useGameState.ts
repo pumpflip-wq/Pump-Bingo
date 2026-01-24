@@ -29,7 +29,17 @@ export function useGameState() {
 
   const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
-  const { data: roundData, isLoading: roundLoading, error: roundError } = useRound(latestRound?.id as number);
+  const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number);
+
+  // Poll round data more frequently for immediate updates
+  useEffect(() => {
+    if (latestRound?.id) {
+      const interval = setInterval(() => {
+        refetchRound();
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [latestRound?.id, refetchRound]);
 
   const { data: participant } = useParticipant(latestRound?.id as number, user?.id);
 

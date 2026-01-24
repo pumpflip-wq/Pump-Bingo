@@ -230,20 +230,19 @@ export default function Home() {
           ) : latestRound && roundData ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               
-            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
-              <PlayerList 
-                participants={[
-                  ...(walletAddress && participantsList.some(p => p.username === walletAddress) 
-                    ? [] 
-                    : (walletAddress && (participant || foundParticipant) ? [{ id: 'me', username: walletAddress, prob: 0 }] : [])),
-                  ...participantsList
-                ].map(p => ({ ...p, id: p.id || p.username }))}
-                walletAddress={walletAddress}
-                formatAddress={formatAddress}
-                roundStatus={roundData.round.status}
-                roundData={roundData}
-              />
-            </aside>
+              <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
+                <PlayerList 
+                  participants={[
+                    ...(walletAddress && (participantsList.some(p => p.username === walletAddress) || (participant || foundParticipant))
+                      ? participantsList
+                      : (walletAddress ? [{ id: 'me', username: walletAddress, prob: 0 }, ...participantsList] : participantsList))
+                  ].map(p => ({ ...p, id: p.id || p.username }))}
+                  walletAddress={walletAddress}
+                  formatAddress={formatAddress}
+                  roundStatus={roundData.round.status}
+                  roundData={roundData}
+                />
+              </aside>
 
               <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden relative" style={{ perspective: "1000px" }}>
                 <AnimatePresence mode="wait">

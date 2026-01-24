@@ -60,22 +60,6 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
 
         signature = await sendTransaction(transaction, connection, { preflightCommitment: 'processed' });
         
-        // Instant feedback: update UI state optimistically
-        queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
-          if (!old) return old;
-          const exists = old.participants?.some((p: any) => p.username === publicKey.toBase58());
-          if (exists) return old;
-
-          return {
-            ...old,
-            participantsCount: (old.participantsCount || 0) + 1,
-            participants: [
-              ...(old.participants || []),
-              { id: 'optimistic-' + Date.now(), username: publicKey.toBase58(), joinedAt: new Date().toISOString() }
-            ]
-          };
-        });
-
         // Background confirmation
         connection.confirmTransaction({
           signature,
@@ -84,6 +68,22 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         }, "processed").catch(console.error);
       }
 
+      // Optimistically update the UI to show the user as a participant
+      queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
+        if (!old) return old;
+        const exists = old.participants?.some((p: any) => p.username === publicKey.toBase58());
+        if (exists) return old;
+
+        return {
+          ...old,
+          participantsCount: (old.participantsCount || 0) + 1,
+          participants: [
+            ...(old.participants || []),
+            { id: 'optimistic-' + Date.now(), username: publicKey.toBase58(), joinedAt: new Date().toISOString(), card: [] }
+          ]
+        };
+      });
+
       joinRound(
         { roundId, userId, txSignature: signature },
         {
@@ -91,6 +91,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             // Update cache with real data immediately
             queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
               if (!old) return old;
+              // Remove the optimistic participant and add the real one
               const participants = (old.participants || []).filter((p: any) => !p.id?.toString().startsWith('optimistic-'));
               const exists = participants.some((p: any) => p.username === publicKey.toBase58());
               if (!exists && data.participant) {
@@ -109,6 +110,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             });
           },
           onError: (error: Error) => {
+            // Remove optimistic update on error
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             toast({
               title: "Failed to Join",
