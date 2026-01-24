@@ -160,6 +160,7 @@ export async function registerRoutes(
       // Update local balance
       await storage.updateUserBalance(userId, -Number(round.price));
 
+      const user = await storage.getUser(userId);
       res.json({ participant, balance: Number(user?.balance || 0) - Number(round.price) });
 
       // Verify signature in background after user is already in
