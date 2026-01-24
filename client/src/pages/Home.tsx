@@ -174,7 +174,7 @@ export default function Home() {
 
     // Determine if we should show the overlay
     // It should only show for participants of the actual round that just finished
-    if (!showWinnerOverlay || !winnerDeclaredAt || hasManuallyClosed || !isParticipantOfRound) {
+    if (!showWinnerOverlay || !winnerDeclaredAt || hasManuallyClosed) {
       return null;
     }
 

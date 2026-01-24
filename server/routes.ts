@@ -244,6 +244,9 @@ export async function registerRoutes(
       const participant = await storage.getParticipant(roundId, userId);
       if (!participant) return res.status(404).json({ message: "Participant not found" });
 
+      // Mark that this user won locally first to prevent race conditions in background
+      await db.update(participants).set({ hasBingo: true }).where(sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${userId}`);
+
       const result = await gameManager.claimBingo(roundId, userId, participant.card as number[][]);
       
       if (result) {

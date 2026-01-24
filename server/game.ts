@@ -175,6 +175,16 @@ export class GameManager {
     const targetDate = new Date(round.startTime);
     const target = targetDate.getTime();
     
+    // Check if the target time is realistic (within the next 70 seconds)
+    // If it's in the past or too far in the future, reset it
+    if (target < now - 5000 || target > now + 70000) {
+      console.log(`[GameManager] Round #${round.id} timer out of sync. Resetting.`);
+      const countdownTime = 60_000;
+      const targetTime = new Date(now + countdownTime);
+      await storage.updateRound(round.id, { startTime: targetTime });
+      return;
+    }
+    
     if (now >= target) { 
       console.log(`[GameManager] Round #${round.id} starting transition...`);
       await storage.updateRound(round.id, {
