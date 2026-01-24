@@ -58,9 +58,10 @@ export class DatabaseStorage implements IStorage {
     return newUser;
   }
 
-  async updateUserBalance(id: number, amount: number): Promise<User> {
+  async updateUserBalance(id: number, amount: number | string): Promise<User> {
+    const numericAmount = typeof amount === "string" ? parseInt(amount, 10) : amount;
     const [updated] = await db.update(users)
-      .set({ balance: sql`${users.balance} + ${amount}` })
+      .set({ balance: sql`${users.balance} + ${numericAmount}` })
       .where(eq(users.id, id))
       .returning();
     return updated;

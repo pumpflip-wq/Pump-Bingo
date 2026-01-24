@@ -1,5 +1,5 @@
 
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, bigint } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -8,7 +8,7 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(), // Acts as "Wallet Address" for MVP
-  balance: integer("balance").notNull().default(10000), // Starting fake PUMP tokens
+  balance: bigint("balance", { mode: "number" }).notNull().default(10000), // Starting fake PUMP tokens
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -16,8 +16,8 @@ export const rounds = pgTable("rounds", {
   id: serial("id").primaryKey(),
   status: text("status").notNull().default("OPEN"), // OPEN, STARTING, IN_GAME, FINISHED
   startTime: timestamp("start_time"),
-  price: integer("price").notNull().default(100), // Buy-in price
-  prizePool: integer("prize_pool").notNull().default(0),
+  price: bigint("price", { mode: "number" }).notNull().default(100), // Buy-in price
+  prizePool: bigint("prize_pool", { mode: "number" }).notNull().default(0),
   winnerId: integer("winner_id"), // Null until won
   serverSeed: text("server_seed").notNull(), // Secret seed for fairness
   publicHash: text("public_hash").notNull(), // SHA256(seed) shown before game
@@ -32,7 +32,7 @@ export const rounds = pgTable("rounds", {
 export const paymentQueue = pgTable("payment_queue", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
-  amount: integer("amount").notNull(),
+  amount: bigint("amount", { mode: "number" }).notNull(),
   txSignature: text("tx_signature").notNull().unique(),
   status: text("status").notNull().default("PENDING"), // PENDING, PROCESSED
   createdAt: timestamp("created_at").defaultNow(),
@@ -55,7 +55,7 @@ export const participants = pgTable("participants", {
 export const transactions = pgTable("transactions", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
-  amount: integer("amount").notNull(), // Negative for buy-in, Positive for win
+  amount: bigint("amount", { mode: "number" }).notNull(), // Negative for buy-in, Positive for win
   type: text("type").notNull(), // BUY_IN, PRIZE
   roundId: integer("round_id"),
   createdAt: timestamp("created_at").defaultNow(),
