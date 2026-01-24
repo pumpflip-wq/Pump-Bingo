@@ -147,7 +147,7 @@ export class GameManager {
 
     if (!round.startTime) {
       await storage.updateRound(round.id, {
-        startTime: new Date(Date.now() + OPEN_DELAY_MS),
+        startTime: new Date(Date.now() + 60_000), // Explicit 60 seconds
       });
       return;
     }

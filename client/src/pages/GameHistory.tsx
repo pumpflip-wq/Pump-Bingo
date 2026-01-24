@@ -66,8 +66,8 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                   <p className="text-sm font-black text-white">{p.username.slice(0, 6)}...{p.username.slice(-4)}</p>
                   <div className="flex flex-col gap-1 mt-1">
                     <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
-                    {p.winRate !== undefined && (
-                      <span className="text-[10px] font-black text-primary uppercase tracking-widest">Win Prob: {p.winRate}%</span>
+                    {p.winRate !== null && p.winRate !== undefined && (
+                      <span className="text-[10px] font-black text-primary uppercase tracking-widest">Final Chance: {p.winRate}%</span>
                     )}
                   </div>
                 </div>
