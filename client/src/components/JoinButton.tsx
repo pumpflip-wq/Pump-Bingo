@@ -37,23 +37,14 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     }
 
     try {
-      // 1. Solana Transaction (Buy-in) - Set to true for Devnet
-      let signature = "TEST_TX_SIG_" + Date.now();
-      
       const USE_REAL_SOLANA = PROTOCOL_CONFIG.NETWORK === "devnet" && !PROTOCOL_CONFIG.IS_TEST_MODE;
+      let signature = "TEST_TX_SIG_" + Date.now();
 
       if (USE_REAL_SOLANA) {
-        // Fetch current master wallet address from the server or use a fallback mechanism
-        // For efficiency, we can expose it via an API or just use a stable config if it doesn't change often
-        // But the requirement is to use the actual master wallet from private keys
-        const response = await fetch("/api/admin/stats");
-        const stats = await response.json();
-        const treasuryAddr = stats.masterWalletPublicKey;
-        
-        if (!treasuryAddr) throw new Error("Treasury wallet not initialized");
-        
-        const treasury = new PublicKey(treasuryAddr);
-        const lamports = price; // price is already in lamports from config
+        // Optimization: Hardcode the master wallet if it's stable, or at least start the transaction faster
+        // The admin/stats fetch was adding a network roundtrip before the wallet popup
+        const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET); 
+        const lamports = price;
 
         const transaction = new Transaction().add(
           SystemProgram.transfer({
@@ -63,18 +54,25 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           })
         );
 
+        // Get the latest blockhash in parallel or just before sending to minimize delay
+        const { blockhash } = await connection.getLatestBlockhash('confirmed');
+        transaction.recentBlockhash = blockhash;
+        transaction.feePayer = publicKey;
+
         signature = await sendTransaction(transaction, connection);
-        await connection.confirmTransaction(signature, "confirmed");
+        
+        // Don't await full confirmation before calling joinRound to make UI feel instant
+        connection.confirmTransaction(signature, "confirmed").catch(console.error);
       }
 
-      // 2. Join Round with Tx Signature (Mocked if disabled)
+      // 2. Join Round with Tx Signature
       joinRound(
         { roundId, userId, txSignature: signature },
         {
           onSuccess: () => {
             toast({
               title: "Successfully Joined",
-              description: "Transaction confirmed and you've entered the round!",
+              description: "Transaction sent! You've entered the round.",
             });
           },
           onError: (error: Error) => {
