@@ -10,11 +10,16 @@ interface CountdownTimerProps {
 }
 
 export function CountdownTimer({ targetDate, status, participantCount }: CountdownTimerProps) {
-  const [timeLeft, setTimeLeft] = useState({ minutes: 0, seconds: 0 });
+  const [timeLeft, setTimeLeft] = useState({ minutes: 1, seconds: 0 });
 
   useEffect(() => {
-    if (!targetDate || participantCount < 2) {
-      setTimeLeft({ minutes: 0, seconds: 0 });
+    if (participantCount < 2) {
+      setTimeLeft({ minutes: 1, seconds: 0 });
+      return;
+    }
+    
+    if (!targetDate) {
+      setTimeLeft({ minutes: 1, seconds: 0 });
       return;
     }
 

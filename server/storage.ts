@@ -103,10 +103,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async joinRound(roundId: number, userId: number, card: number[][], txSignature?: string): Promise<Participant> {
-    const [participant] = await db.insert(participants)
-      .values({ roundId, userId, card, txSignature })
-      .returning();
-    return participant;
+    const cardJson = JSON.stringify(card);
+    const res = await db.execute(sql`
+      INSERT INTO participants (round_id, user_id, card, tx_signature) 
+      VALUES (${roundId}, ${userId}, ${cardJson}::jsonb, ${txSignature || null})
+      RETURNING id, round_id, user_id, card, has_bingo, joined_at, tx_signature
+    `);
+    const row = res.rows?.[0] as any;
+    return {
+      id: row.id,
+      roundId: row.round_id,
+      userId: row.user_id,
+      card: row.card,
+      hasBingo: row.has_bingo,
+      finalWinProb: 0,
+      joinedAt: row.joined_at,
+      txSignature: row.tx_signature
+    } as Participant;
   }
 
   async getParticipant(roundId: number, userId: number): Promise<Participant | undefined> {
