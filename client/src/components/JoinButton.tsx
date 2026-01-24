@@ -84,10 +84,27 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       joinRound(
         { roundId, userId, txSignature: signature },
         {
-          onSuccess: () => {
-            // Force immediate refresh to sync with backend data
-            queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
-            queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
+          onSuccess: (data) => {
+            // Merge backend data with optimistic state to prevent flickering
+            queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
+              if (!old) return old;
+              // Ensure the user is in the list before invalidating
+              const participants = [...(old.participants || [])];
+              const exists = participants.some(p => p.username === publicKey.toBase58());
+              if (!exists && data.participant) {
+                participants.push(data.participant);
+              }
+              return {
+                ...old,
+                participants
+              };
+            });
+
+            // Delay invalidation slightly to allow backend state to stabilize
+            setTimeout(() => {
+              queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
+              queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
+            }, 1000);
             
             toast({
               title: "Successfully Joined",

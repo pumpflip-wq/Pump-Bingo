@@ -30,7 +30,12 @@ export function useRound(id: number) {
     enabled: !!id,
     refetchInterval: (query) => {
       const data = query.state.data as any;
-      if (!data) return 500;
+      if (!data) return 1000;
+      
+      // If we have an optimistic participant, keep polling fast to sync
+      const hasOptimistic = data.participants?.some((p: any) => p.id?.toString().startsWith('optimistic-'));
+      if (hasOptimistic) return 500;
+
       // Faster polling when waiting for players to ensure instant list updates
       if (data.round.status === 'OPEN' && data.participantsCount < 2) return 500;
       // Reduce polling frequency for finished rounds
@@ -38,7 +43,7 @@ export function useRound(id: number) {
       // Standard polling for active games
       return 1000;
     },
-    staleTime: 500,
+    staleTime: 0, // Ensure we always get fresh data when syncing
   });
 }
 
