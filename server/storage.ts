@@ -119,7 +119,12 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error fetching participant:", error);
       const res = await db.execute(sql`SELECT * FROM participants WHERE round_id = ${roundId} AND user_id = ${userId}`);
-      return res.rows?.[0] as Participant;
+      const row = res.rows?.[0] as any;
+      if (!row) return undefined;
+      return {
+        ...row,
+        finalWinProb: row.final_win_prob
+      } as Participant;
     }
   }
 

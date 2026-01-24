@@ -160,7 +160,7 @@ export async function registerRoutes(
       // Update local balance
       await storage.updateUserBalance(userId, -Number(round.price));
 
-      res.json({ participant, balance: (user.balance || 0) - Number(round.price) });
+      res.json({ participant, balance: Number(user?.balance || 0) - Number(round.price) });
 
       // Verify signature in background after user is already in
       solanaManager.verifyTransaction(txSignature, Number(round.price), treasuryWallet)
