@@ -54,15 +54,18 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           })
         );
 
-        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('processed');
         transaction.recentBlockhash = blockhash;
         transaction.feePayer = publicKey;
 
-        signature = await sendTransaction(transaction, connection);
+        signature = await sendTransaction(transaction, connection, { preflightCommitment: 'processed' });
         
-        // Instant feedback: update UI state optimistically before backend even confirms
+        // Instant feedback: update UI state optimistically
         queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
           if (!old) return old;
+          const exists = old.participants?.some((p: any) => p.username === publicKey.toBase58());
+          if (exists) return old;
+
           return {
             ...old,
             participantsCount: (old.participantsCount || 0) + 1,
@@ -78,16 +81,27 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           signature,
           blockhash,
           lastValidBlockHeight
-        }, "confirmed").catch(console.error);
+        }, "processed").catch(console.error);
       }
 
       joinRound(
         { roundId, userId, txSignature: signature },
         {
           onSuccess: (data) => {
-            // Force immediate refresh to sync with backend data
-            queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
-            queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
+            // Update cache with real data immediately
+            queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
+              if (!old) return old;
+              const participants = (old.participants || []).filter((p: any) => !p.id?.toString().startsWith('optimistic-'));
+              const exists = participants.some((p: any) => p.username === publicKey.toBase58());
+              if (!exists && data.participant) {
+                participants.push(data.participant);
+              }
+              return {
+                ...old,
+                participants,
+                participantsCount: participants.length
+              };
+            });
             
             toast({
               title: "Successfully Joined",
@@ -95,7 +109,6 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             });
           },
           onError: (error: Error) => {
-            // Rollback optimistic update on error
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             toast({
               title: "Failed to Join",
@@ -148,7 +161,10 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     <CyberButton
       onClick={handleJoin}
       disabled={isPending || !userId}
-      className={cn("w-full h-16 text-3xl font-black italic tracking-tighter uppercase", className)}
+      className={cn(
+        "w-full h-16 text-3xl font-black italic tracking-tighter uppercase transition-all active:scale-95 active:brightness-90",
+        className
+      )}
       data-testid="button-join-round"
     >
       {isPending ? (

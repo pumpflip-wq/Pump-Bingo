@@ -42,8 +42,8 @@ export class GameManager {
         // Wait exactly 10 seconds after round finished before starting a new one
         if (latestRound && latestRound.completedAt) {
           const finishedAt = new Date(latestRound.completedAt).getTime();
-          // Fixed 10s delay (10000ms)
-          if (Date.now() - finishedAt < 10000) {
+          // Precise 10.5s buffer to ensure frontend sees full 10s
+          if (Date.now() - finishedAt < 10500) {
             return;
           }
         }
@@ -162,8 +162,9 @@ export class GameManager {
         const startTime = new Date(round.startTime);
         const diff = startTime.getTime() - now.getTime();
         
-        // If the start time is too far in the future (>60s), reset it to exactly 60s
-        if (diff > 60000) {
+        // If the start time is too far in the future (>61s), reset it to exactly 60s
+        // Added 1s buffer to prevent constant resets due to tick jitter
+        if (diff > 61000) {
            await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
            return;
         }
