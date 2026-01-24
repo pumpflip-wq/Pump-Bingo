@@ -160,7 +160,7 @@ export class GameManager {
 
     if (!round.startTime) {
       const countdownTime = 60_000;
-      const targetTime = new Date(Date.now() + countdownTime);
+      const targetTime = new Date(Date.now() + countdownTime + 2000); // Buffer for network/loop latency
       await storage.updateRound(round.id, {
         startTime: targetTime, 
       });

@@ -54,7 +54,9 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       return;
     }
 
+    // Start wallet process immediately
     setIsWalleting(true);
+    
     try {
       const USE_REAL_SOLANA = PROTOCOL_CONFIG.NETWORK === "devnet" && !PROTOCOL_CONFIG.IS_TEST_MODE;
       let signature = "TEST_TX_SIG_" + Date.now();
@@ -62,6 +64,9 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       if (USE_REAL_SOLANA) {
         const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET); 
         const lamports = price;
+
+        // Fetch blockhash in background while preparing transaction
+        const bhPromise = connection.getLatestBlockhash('processed');
 
         const transaction = new Transaction().add(
           SystemProgram.transfer({
@@ -71,7 +76,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           })
         );
 
-        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('processed');
+        const { blockhash } = await bhPromise;
         transaction.recentBlockhash = blockhash;
         transaction.feePayer = publicKey;
 
