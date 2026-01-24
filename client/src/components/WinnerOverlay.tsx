@@ -28,7 +28,9 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
     }
   }, [show, isWinner]);
 
-  const explorerUrl = txHash ? `https://explorer.solana.com/tx/${txHash}?cluster=${PROTOCOL_CONFIG.NETWORK}` : null;
+  const nextRoundIn = Math.max(0, Math.ceil((10000 - (Date.now() - (timeLeft * 1000))) / 1000));
+  // Note: The above logic is a bit circular since timeLeft is passed in.
+  // Let's use the timeLeft directly as it's intended.
 
   return (
     <AnimatePresence>
@@ -69,7 +71,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
             </div>
 
             <h2 className={`text-6xl font-display font-black mb-4 tracking-tighter uppercase italic ${isWinner ? 'text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'text-red-500'}`}>
-              {isWinner ? 'YOU WIN!' : 'GAME OVER'}
+              {isWinner ? 'BINGO! YOU WIN!' : 'GAME OVER'}
             </h2>
             
             {isWinner ? (
@@ -83,8 +85,8 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
                     <div>
                       <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">WINNER ADDRESS</p>
                       <p className="text-xl font-bold text-white italic truncate text-center drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                        {username && username.length > 15 ? formatAddress(username) : username}
-                      </p>
+                      {username}
+                    </p>
                     </div>
                     <div>
                       <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">TOTAL REWARD</p>

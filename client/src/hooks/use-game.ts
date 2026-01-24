@@ -62,8 +62,6 @@ export function useJoinRound() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
       queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, variables.roundId] });
-      // Also invalidate user balance if we had a full user hook that tracked it
-      // For MVP auth hook handles basic user data
     },
   });
 }
@@ -104,6 +102,7 @@ export function useClaimBingo() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, variables.roundId] });
+      queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
     },
   });
 }

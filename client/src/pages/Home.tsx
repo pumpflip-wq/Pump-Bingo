@@ -385,7 +385,7 @@ export default function Home() {
                                           <div className="flex flex-col items-center gap-2">
                                             <span className="text-sm text-white uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
                                             <span className="text-4xl md:text-6xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                                              {formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}
+                                              {roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown"}
                                             </span>
                                           </div>
                                           <div className="flex flex-col items-center gap-2">
