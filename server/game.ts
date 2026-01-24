@@ -303,6 +303,10 @@ export class GameManager {
 
     return false;
   }
+
+  updateSettings(settings: { price?: number; feePercentage?: number }) {
+    // Implement if needed, or just leave as stub to fix crash
+  }
 }
 
 export const gameManager = new GameManager();
