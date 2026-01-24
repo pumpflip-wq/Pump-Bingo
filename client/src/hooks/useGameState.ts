@@ -9,9 +9,10 @@ export function useGameState() {
   const { publicKey, connected } = useWallet();
   const walletAddress = publicKey?.toBase58();
 
-  const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds();
-  const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
-  const { data: roundData, isLoading: roundLoading, error: roundError } = useRound(latestRound?.id as number);
+  const { data: user } = useQuery<User>({ 
+    queryKey: ["/api/auth/me"],
+    enabled: !!walletAddress
+  });
 
   const { mutate: login } = useMutation({
     mutationFn: (address: string) => apiRequest("POST", "/api/auth/login", { username: address }).then(res => res.json()),
@@ -21,16 +22,16 @@ export function useGameState() {
   });
 
   useEffect(() => {
-    if (connected && walletAddress) {
+    if (connected && walletAddress && !user) {
       login(walletAddress);
     }
-  }, [connected, walletAddress, login]);
+  }, [connected, walletAddress, login, user]);
 
-  const { data: user } = useQuery<User>({ 
-    queryKey: ["/api/auth/me"]
-  });
-  
-  const { data: participant } = useParticipant(latestRound?.id || 0, user?.id);
+  const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds();
+  const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
+  const { data: roundData, isLoading: roundLoading, error: roundError } = useRound(latestRound?.id as number);
+
+  const { data: participant } = useParticipant(latestRound?.id as number, user?.id);
 
   const { data: historyRounds, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
     queryKey: ["/api/rounds/history", 1],

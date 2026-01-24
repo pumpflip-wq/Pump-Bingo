@@ -21,11 +21,13 @@ export function useRound(id: number) {
   return useQuery({
     queryKey: [api.rounds.get.path, id],
     queryFn: async () => {
+      if (!id) return null;
       const url = buildUrl(api.rounds.get.path, { id });
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch round");
       return api.rounds.get.responses[200].parse(await res.json());
     },
+    enabled: !!id,
     refetchInterval: (query) => {
       const data = query.state.data as any;
       if (!data) return 1000;
@@ -71,14 +73,14 @@ export function useParticipant(roundId: number, userId: number | undefined) {
   return useQuery({
     queryKey: [api.participants.get.path, roundId, userId],
     queryFn: async () => {
-      if (!userId) return null;
+      if (!userId || !roundId) return null;
       const url = buildUrl(api.participants.get.path, { roundId, userId });
       const res = await fetch(url);
       if (res.status === 404) return null; // Not joined yet
       if (!res.ok) throw new Error("Failed to fetch participant");
       return api.participants.get.responses[200].parse(await res.json());
     },
-    enabled: !!userId,
+    enabled: !!userId && !!roundId,
   });
 }
 

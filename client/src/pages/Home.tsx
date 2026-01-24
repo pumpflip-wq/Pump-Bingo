@@ -150,21 +150,6 @@ export default function Home() {
     const isFinished = roundData?.round?.status === ROUND_STATUS.FINISHED;
     const isParticipantOfRound = roundData?.participants?.some((p: any) => p.userId === user?.id);
     
-    // User explicitly requested that winner overlay shows for everyone (winners, losers, and spectators)
-    if (!showWinnerOverlay || !winnerDeclaredAt || isFinished || hasManuallyClosed) {
-      return null;
-    }
-
-    const elapsed = currentTime - winnerDeclaredAt;
-    const totalDisplayTime = 10000; 
-    
-    if (elapsed >= totalDisplayTime) {
-      return null;
-    }
-
-    const winner = roundData?.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
-    const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData?.round?.winnerId?.toString() || "Unknown"));
-    
     // Determine if we should show the overlay
     // It should show for participants AND spectators
     if (!showWinnerOverlay || !winnerDeclaredAt || hasManuallyClosed) {
@@ -177,6 +162,9 @@ export default function Home() {
     if (elapsed >= totalDisplayTime) {
       return null;
     }
+
+    const winner = roundData?.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
+    const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData?.round?.winnerId?.toString() || "Unknown"));
 
     return {
       show: true,
