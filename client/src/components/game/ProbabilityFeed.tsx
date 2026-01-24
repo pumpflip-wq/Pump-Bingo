@@ -15,7 +15,7 @@ export function ProbabilityFeed({ participants, formatAddress, roundStatus, winn
       <AnimatePresence mode="popLayout">
         {participants.slice(0, 3).map((p: any, idx: number) => (
           <motion.div 
-            key={p.id}
+            key={p.id || p.username}
             layout
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

@@ -11,7 +11,7 @@ export function useGameState() {
 
   const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
-  const { data: roundData, isLoading: roundLoading, error: roundError } = useRound(latestRound?.id || 0);
+  const { data: roundData, isLoading: roundLoading, error: roundError } = useRound(latestRound?.id as number);
 
   const { mutate: login } = useMutation({
     mutationFn: (address: string) => apiRequest("POST", "/api/auth/login", { username: address }).then(res => res.json()),

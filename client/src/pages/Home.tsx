@@ -232,7 +232,7 @@ export default function Home() {
                     ? [] 
                     : (walletAddress && (participant || foundParticipant) ? [{ id: 'me', username: walletAddress, prob: 0 }] : [])),
                   ...participantsList
-                ]}
+                ].map(p => ({ ...p, id: p.id || p.username }))}
                 walletAddress={walletAddress}
                 formatAddress={formatAddress}
                 roundStatus={roundData.round.status}
@@ -484,7 +484,12 @@ export default function Home() {
               </main>
 
             <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
-              <ProbabilityFeed participants={sortedParticipants} />
+              <ProbabilityFeed 
+                participants={sortedParticipants} 
+                formatAddress={formatAddress}
+                roundStatus={roundData.round.status}
+                winnerId={roundData.round.winnerId || undefined}
+              />
               <GameHistory history={historyRounds} isLoading={historyLoading} />
             </aside>
           </div>
