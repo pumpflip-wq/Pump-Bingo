@@ -143,12 +143,6 @@ export class GameManager {
         OPEN
   ====================== */
   private async handleOpen(round: Round) {
-    const count = await storage.getRoundParticipantsCount(round.id);
-    
-    // Check for pending payments and process them for this round
-    await this.processPendingPayments(round.id);
-    
-    // Refresh count after processing payments
     const updatedCount = await storage.getRoundParticipantsCount(round.id);
 
     if (updatedCount < 2) {
@@ -165,18 +159,16 @@ export class GameManager {
       await storage.updateRound(round.id, {
         startTime: targetTime, 
       });
-      console.log(`[GameManager] Round #${round.id} countdown started for ${countdownTime / 1000} seconds with ${updatedCount} players. Target: ${targetTime.toISOString()}`);
+      console.log(`[GameManager] Round #${round.id} countdown started. Target: ${targetTime.toISOString()}`);
       return;
     }
 
     const now = Date.now();
-    const targetDate = round.startTime instanceof Date ? round.startTime : new Date(round.startTime);
+    const targetDate = new Date(round.startTime);
     const target = targetDate.getTime();
     
-    // START GAME TRANSITION: 
-    // If we've reached the target time, transition to STARTING then IN_GAME
     if (now >= target) { 
-      console.log(`[GameManager] Round #${round.id} starting... (now: ${now}, target: ${target})`);
+      console.log(`[GameManager] Round #${round.id} starting transition...`);
       await storage.updateRound(round.id, {
         status: ROUND_STATUS.STARTING,
         startTime: new Date(),

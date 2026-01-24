@@ -235,68 +235,62 @@ export async function registerRoutes(
 
       const { userId } = api.rounds.claim.input.parse(req.body);
 
-      const round = await storage.getRound(roundId);
+      // ATOMIC CLAIM: Use gameManager's centralized atomic logic
       const participant = await storage.getParticipant(roundId, userId);
+      if (!participant) return res.status(404).json({ message: "Participant not found" });
 
-      if (!round || !participant) return res.status(404).json({ message: "Not found" });
-      if (round.status !== ROUND_STATUS.IN_GAME) return res.status(400).json({ message: "Game not active" });
-
-      const hasBingo = gameManager.validateBingo(participant.card as number[][], round.drawnNumbers || []);
+      const result = await gameManager.claimBingo(roundId, userId, participant.card as number[][]);
       
-      if (hasBingo) {
-          // Prevent duplicate claims for the same round
-          const currentRound = await storage.getRound(roundId);
-          if (currentRound?.winnerId) {
-              return res.status(400).json({ message: "Winner already declared for this round" });
-          }
+      if (result) {
+          // Process payout and probabilities in background to return SUCCESS immediately
+          (async () => {
+            try {
+              const round = await storage.getRound(roundId);
+              if (!round) return;
 
-          // WINNER! - LOCK IMMEDIATELY
-          await storage.updateRound(roundId, { 
-              status: ROUND_STATUS.FINISHED, // Force finish immediately
-              winnerId: userId,
-              completedAt: new Date(), 
-          });
+              // Calculate and store final win probabilities for all participants
+              const allParticipants = await db.select({
+                userId: participants.userId,
+                card: participants.card
+              })
+              .from(participants)
+              .where(eq(participants.roundId, roundId));
 
-          // Calculate and store final win probabilities for all participants
-          const allParticipants = await db.select({
-            userId: participants.userId,
-            card: participants.card
-          })
-          .from(participants)
-          .where(eq(participants.roundId, roundId));
+              const drawnNumbers = round.drawnNumbers || [];
+              for (const p of allParticipants) {
+                const prob = gameManager.calculateWinProb(p.card as number[][], drawnNumbers);
+                await db.update(participants)
+                  .set({ finalWinProb: prob })
+                  .where(sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${p.userId}`);
+              }
 
-          // Use round.drawnNumbers which was fetched at the beginning
-          const drawnNumbers = round.drawnNumbers || [];
-          for (const p of allParticipants) {
-            const prob = gameManager.calculateWinProb(p.card as number[][], drawnNumbers);
-            await db.update(participants)
-              .set({ finalWinProb: prob })
-              .where(sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${p.userId}`);
-          }
+              // Payout based on feePercentage
+              const fee = Math.max(0, Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 10));
+              const payoutMultiplier = (100 - fee) / 100;
+              const payout = Math.floor(Number(round.prizePool) * payoutMultiplier);
 
-          // Payout based on feePercentage
-          const fee = Math.max(0, Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 10));
-          const payoutMultiplier = (100 - fee) / 100;
-          const payout = Math.floor(Number(round.prizePool) * payoutMultiplier);
-
-          const user = await storage.getUser(userId);
-          
-          // Send reward in background
-          solanaManager.sendReward(user?.username || "", payout).then(sig => {
-            if (sig) storage.updateRound(roundId, { payoutSignature: sig });
-          }).catch(err => console.error("Payout error:", err));
-          
-          await storage.updateUserBalance(userId, payout);
-          await storage.createTransaction({
-              userId,
-              amount: payout,
-              type: "PRIZE",
-              roundId
-          });
+              const user = await storage.getUser(userId);
+              
+              // Send reward in background
+              solanaManager.sendReward(user?.username || "", payout).then(sig => {
+                if (sig) storage.updateRound(roundId, { payoutSignature: sig });
+              }).catch(err => console.error("Payout error:", err));
+              
+              await storage.updateUserBalance(userId, payout);
+              await storage.createTransaction({
+                  userId,
+                  amount: payout,
+                  type: "PRIZE",
+                  roundId
+              });
+            } catch (err) {
+              console.error("Background claim processing error:", err);
+            }
+          })();
 
           return res.json({ valid: true, message: "BINGO! You won!" });
       } else {
-          return res.json({ valid: false, message: "Not a valid Bingo yet!" });
+          return res.status(400).json({ valid: false, message: "Not a valid Bingo or winner already declared!" });
       }
     } catch (err) {
       console.error("Error claiming bingo:", err);
