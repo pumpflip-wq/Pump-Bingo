@@ -396,18 +396,16 @@ export default function Home() {
                                           </div>
                                         </div>
                                       </div>
-                                      {roundData.round.completedAt && (
-                                        <div className="flex flex-col items-center gap-2">
-                                          <span className="text-white font-black text-2xl uppercase tracking-[0.4em] animate-pulse">NEXT ROUND IN {nextRoundTimer}S</span>
-                                          <div className="w-64 h-1 bg-white/10 rounded-full overflow-hidden">
-                                            <motion.div 
-                                              initial={{ width: "100%" }}
-                                              animate={{ width: `${(nextRoundTimer / 10) * 100}%` }}
-                                              className="h-full bg-primary"
-                                            />
-                                          </div>
+                                      <div className="flex flex-col items-center gap-2">
+                                        <span className="text-white font-black text-2xl uppercase tracking-[0.4em] animate-pulse">NEXT ROUND IN {nextRoundTimer}S</span>
+                                        <div className="w-64 h-1 bg-white/10 rounded-full overflow-hidden">
+                                          <motion.div 
+                                            initial={{ width: "100%" }}
+                                            animate={{ width: `${(nextRoundTimer / 10) * 100}%` }}
+                                            className="h-full bg-primary"
+                                          />
                                         </div>
-                                      )}
+                                      </div>
                                     </div>
                                   ) : 'WATCHING LIVE'}
                                 </h2>

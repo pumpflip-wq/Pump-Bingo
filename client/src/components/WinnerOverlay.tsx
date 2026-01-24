@@ -29,8 +29,6 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
   }, [show, isWinner]);
 
   const nextRoundIn = Math.max(0, Math.ceil((10000 - (Date.now() - (timeLeft * 1000))) / 1000));
-  // Note: The above logic is a bit circular since timeLeft is passed in.
-  // Let's use the timeLeft directly as it's intended.
 
   return (
     <AnimatePresence>
