@@ -91,7 +91,8 @@ async function createTables() {
       completed_at TIMESTAMP,
       created_at TIMESTAMP DEFAULT NOW(),
       spl_mint TEXT,
-      fee_percentage INTEGER DEFAULT 10
+      fee_percentage INTEGER DEFAULT 10,
+      payout_signature TEXT
     )
   `);
 
