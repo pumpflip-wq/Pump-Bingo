@@ -277,6 +277,11 @@ export default function Home() {
                             </div>
                           </div>
                         </div>
+                        
+                        <div className="flex justify-center py-4">
+                          <LastCalledNumber numbers={[]} />
+                        </div>
+                        
                         <div className="py-6 px-10 bg-black/60 rounded-[2.5rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto min-h-[190px] flex flex-col justify-center">
                           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
                           <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-3 font-mono">
