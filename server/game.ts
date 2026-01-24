@@ -149,9 +149,11 @@ export class GameManager {
     }
 
     if (!round.startTime) {
+      const countdownTime = 60_000;
       await storage.updateRound(round.id, {
-        startTime: new Date(Date.now() + 62_000), // Adjusted for tick/network delay
+        startTime: new Date(Date.now() + countdownTime), 
       });
+      console.log(`[GameManager] Round #${round.id} countdown started for ${countdownTime / 1000} seconds.`);
       return;
     }
 

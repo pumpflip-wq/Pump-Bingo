@@ -75,7 +75,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
                     <span className="text-[12px] text-primary font-black font-mono tracking-normal">
-                      +{formatCurrency(roundData?.round?.price || 10000000, false)} {PROTOCOL_CONFIG.SYMBOL}
+                      +{formatCurrency(roundData?.round?.price || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE, false)} {PROTOCOL_CONFIG.SYMBOL}
                     </span>
                     {showStats && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && (
                       <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
