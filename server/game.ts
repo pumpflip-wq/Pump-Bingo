@@ -74,7 +74,7 @@ export class GameManager {
     
     // Default wait time is 60 seconds
     const now = Date.now();
-    const startTime = new Date(now + 65000); // Increased buffer to 5s (65000ms) to ensure sync with client countdown
+    const startTime = new Date(now + 10000); // 10 seconds for next round instead of 65s
 
     await storage.createRound({
       id: nextId,
@@ -123,17 +123,17 @@ export class GameManager {
       // Only allow the countdown to progress if we have at least 2 players
       if (participantCount >= 2) {
         if (!round.startTime) {
-            // If we just reached 2 players and have no start time, set it to 60s from now
-            await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
+            // If we just reached 2 players and have no start time, set it to 10s from now
+            await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 10000) });
             return;
         }
 
         const startTime = new Date(round.startTime);
         const diff = startTime.getTime() - now.getTime();
         
-        // If the start time is too far in the future (>60s), reset it to exactly 60s
-        if (diff > 60000) {
-           await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
+        // If the start time is too far in the future (>10s), reset it to exactly 10s
+        if (diff > 10000) {
+           await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 10000) });
            return;
         }
 
@@ -141,13 +141,13 @@ export class GameManager {
           await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
         }
       } else {
-        // Not enough players: strictly freeze the start time at 60s in the future
-        const sixtySecondsFromNow = new Date(now.getTime() + 61000);
+        // Not enough players: strictly freeze the start time at 10s in the future
+        const tenSecondsFromNow = new Date(now.getTime() + 11000);
         
-        // Always ensure it's at least 60s away if under capacity
+        // Always ensure it's at least 10s away if under capacity
         const currentStartTime = round.startTime ? new Date(round.startTime) : null;
-        if (!currentStartTime || currentStartTime.getTime() < sixtySecondsFromNow.getTime()) {
-           await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
+        if (!currentStartTime || currentStartTime.getTime() < tenSecondsFromNow.getTime()) {
+           await storage.updateRound(round.id, { startTime: tenSecondsFromNow });
         }
       }
     }

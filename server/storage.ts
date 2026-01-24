@@ -197,8 +197,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async resetSystem(): Promise<void> {
-    // Explicitly use public schema and unquoted names to match common PostgreSQL case-insensitivity
-    await db.execute(sql`TRUNCATE public.transactions, public.participants, public.rounds, public.payment_queue RESTART IDENTITY CASCADE`);
+    // Drop all tables and recreate them to ensure a clean state
+    await db.execute(sql`TRUNCATE transactions, participants, rounds, payment_queue RESTART IDENTITY CASCADE`);
   }
 }
 
