@@ -27,8 +27,10 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
   const { roundData } = useGameState();
   const isWinnerDeclared = !!roundData?.round.winnerId;
 
+  const [isWalleting, setIsWalleting] = useState(false);
+
   const handleJoin = async () => {
-    if (isWinnerDeclared) return;
+    if (isWinnerDeclared || isWalleting) return;
     if (!publicKey || !userId) {
       toast({
         title: "Authentication Required",
@@ -38,6 +40,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       return;
     }
 
+    setIsWalleting(true);
     try {
       const USE_REAL_SOLANA = PROTOCOL_CONFIG.NETWORK === "devnet" && !PROTOCOL_CONFIG.IS_TEST_MODE;
       let signature = "TEST_TX_SIG_" + Date.now();
@@ -88,6 +91,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         { roundId, userId, txSignature: signature },
         {
           onSuccess: (data) => {
+            setIsWalleting(false);
             // Update cache with real data immediately
             queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
               if (!old) return old;
@@ -110,6 +114,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             });
           },
           onError: (error: Error) => {
+            setIsWalleting(false);
             // Remove optimistic update on error
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             toast({
@@ -121,6 +126,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         }
       );
     } catch (error: any) {
+      setIsWalleting(false);
       toast({
         title: "Transaction Failed",
         description: error.message || "Solana transaction was cancelled or failed.",
@@ -162,17 +168,17 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
   return (
     <CyberButton
       onClick={handleJoin}
-      disabled={isPending || !userId}
+      disabled={isPending || isWalleting || !userId}
       className={cn(
         "w-full h-16 text-3xl font-black italic tracking-tighter uppercase transition-all active:scale-95 active:brightness-90",
         className
       )}
       data-testid="button-join-round"
     >
-      {isPending ? (
+      {isPending || isWalleting ? (
         <div className="flex items-center justify-center gap-2">
           <Loader2 className="w-6 h-6 animate-spin" />
-          <span>JOINING...</span>
+          <span>{isWalleting ? 'WAITING FOR WALLET...' : 'JOINING...'}</span>
         </div>
       ) : (
         <div className="flex items-center justify-center gap-4">

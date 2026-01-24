@@ -127,6 +127,7 @@ export class GameManager {
       serverSeed,
       publicHash,
       startTime: null,
+      price: PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE,
       prizePool: 0,
       drawnNumbers: [],
       completedAt: null,
@@ -157,7 +158,10 @@ export class GameManager {
       return;
     }
 
-    if (Date.now() >= round.startTime.getTime()) {
+    const now = Date.now();
+    const target = round.startTime.getTime();
+    if (now >= target) {
+      console.log(`[GameManager] Round #${round.id} starting... (now: ${now}, target: ${target})`);
       await storage.updateRound(round.id, {
         status: ROUND_STATUS.STARTING,
         startTime: new Date(),
