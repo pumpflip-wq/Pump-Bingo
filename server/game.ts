@@ -77,11 +77,11 @@ export class GameManager {
     const seed = crypto.randomBytes(32).toString('hex').toLowerCase();
     const hash = crypto.createHash('sha256').update(seed).digest('hex').toLowerCase();
     
-    // Default wait time is 60 seconds
+    // Default wait time is 90 seconds for better countdown visibility
     const now = Date.now();
-    const startTime = new Date(now + 60000); // 60 seconds for next round (standard waiting)
+    const startTime = new Date(now + 90000); 
     
-    // Ensure we start exactly at 60s
+    // Stabilize to exactly 90s
     startTime.setMilliseconds(0);
 
     await storage.createRound({
@@ -151,9 +151,9 @@ export class GameManager {
       
       // Only allow the countdown to progress if we have at least 2 players
       if (participantCount >= 2) {
-        if (!round.startTime || round.status === ROUND_STATUS.OPEN && participantCount === 2) {
-            // Reset to exactly 60s when the second player joins
-            const startAt = new Date(now.getTime() + 60000);
+        if (!round.startTime) {
+            // Set to exactly 90s when we hit 2 players
+            const startAt = new Date(now.getTime() + 90000);
             startAt.setMilliseconds(0);
             await storage.updateRound(round.id, { startTime: startAt });
             return;
@@ -162,9 +162,9 @@ export class GameManager {
         const startTime = new Date(round.startTime);
         const diff = startTime.getTime() - now.getTime();
         
-        // If the start time is too far in the future (>60s), reset it to exactly 60s
-        if (diff > 60000) {
-           await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
+        // If the start time is too far in the future (>90s), reset it to exactly 90s
+        if (diff > 90000) {
+           await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 90000) });
            return;
         }
 
@@ -172,13 +172,13 @@ export class GameManager {
           await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
         }
       } else {
-        // Not enough players: strictly freeze the start time at 60s in the future
-        const sixtySecondsFromNow = new Date(now.getTime() + 60000);
+        // Not enough players: strictly freeze the start time at 90s in the future
+        const ninetySecondsFromNow = new Date(now.getTime() + 90000);
         
-        // Always ensure it's at least 60s away if under capacity
+        // Always ensure it's at least 90s away if under capacity
         const currentStartTime = round.startTime ? new Date(round.startTime) : null;
-        if (!currentStartTime || currentStartTime.getTime() < sixtySecondsFromNow.getTime()) {
-           await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
+        if (!currentStartTime || currentStartTime.getTime() < ninetySecondsFromNow.getTime()) {
+           await storage.updateRound(round.id, { startTime: ninetySecondsFromNow });
         }
       }
     }
@@ -193,7 +193,7 @@ export class GameManager {
             // Revert if players leave during the hype phase
             await storage.updateRound(round.id, { 
                 status: ROUND_STATUS.OPEN,
-                startTime: new Date(Date.now() + 60 * 1000) 
+                startTime: new Date(Date.now() + 90 * 1000) 
             });
         } else if (elapsed > 5000) {
             await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME });
