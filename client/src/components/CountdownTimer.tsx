@@ -85,7 +85,7 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
   }
 
   return (
-    <div className="text-6xl md:text-8xl font-black font-mono text-white tracking-tighter" data-testid="countdown-timer">
+    <div className="text-6xl md:text-8xl font-black font-mono text-white tracking-[0.4em] italic drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tabular-nums" data-testid="countdown-timer">
       {formatNumber(timeLeft.minutes)}:{formatNumber(timeLeft.seconds)}
     </div>
   );

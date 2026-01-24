@@ -148,8 +148,9 @@ export default function Home() {
     
     const isMe = roundData?.round?.winnerId === user?.id;
     const isFinished = roundData?.round?.status === ROUND_STATUS.FINISHED;
+    const isParticipantOfRound = roundData?.participants?.some((p: any) => p.userId === user?.id);
     
-    // user explicitly requested that winner overlay shows for everyone
+    // User explicitly requested that winner overlay shows for everyone (winners, losers, and spectators)
     if (!showWinnerOverlay || !winnerDeclaredAt || isFinished || hasManuallyClosed) {
       return null;
     }
@@ -169,6 +170,7 @@ export default function Home() {
       username: winnerUsername,
       prize: roundData?.round?.prizePool || 0,
       isWinner: isMe,
+      isParticipant: isParticipantOfRound,
       txHash: roundData?.round?.payoutSignature || undefined,
       timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
       currentRoundId: currentRoundId
@@ -205,6 +207,7 @@ export default function Home() {
         username={overlayState?.username || ""}
         prize={overlayState?.prize || 0}
         isWinner={overlayState?.isWinner || false}
+        isParticipant={overlayState?.isParticipant || false}
         timeLeft={overlayState?.timeLeft || 0}
         txHash={overlayState?.txHash}
         onClose={() => setHasManuallyClosed(true)}

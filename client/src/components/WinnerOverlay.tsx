@@ -11,12 +11,13 @@ interface WinnerOverlayProps {
   username: string;
   prize: number;
   isWinner: boolean;
+  isParticipant?: boolean;
   timeLeft: number;
   txHash?: string;
   onClose: () => void;
 }
 
-export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHash, onClose }: WinnerOverlayProps) {
+export function WinnerOverlay({ show, username, prize, isWinner, isParticipant, timeLeft, txHash, onClose }: WinnerOverlayProps) {
   useEffect(() => {
     if (show && isWinner) {
       confetti({
@@ -29,6 +30,20 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
   }, [show, isWinner]);
 
   const explorerUrl = txHash ? `https://solscan.io/tx/${txHash}?cluster=${PROTOCOL_CONFIG.NETWORK}` : null;
+
+  // Header and Subtitle logic based on being a winner, loser, or spectator
+  let headerText = 'GAME OVER';
+  let subtitleText = "DON'T GIVE UP! LUCK IS JUST AROUND THE CORNER";
+  let descriptionText = "Better luck next time! Keep playing to win big.";
+
+  if (isWinner) {
+    headerText = 'BINGO! YOU WIN!';
+    subtitleText = 'CONGRATULATIONS CHAMPION';
+  } else if (!isParticipant) {
+    headerText = 'ROUND ENDED';
+    subtitleText = 'SPECTATOR MODE';
+    descriptionText = "The round has concluded. Join the next one to win!";
+  }
 
   return (
     <AnimatePresence>
@@ -68,53 +83,43 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
               </div>
             </div>
 
-            <h2 className={`text-6xl font-display font-black mb-4 tracking-tighter uppercase italic ${isWinner ? 'text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'text-red-500'}`}>
-              {isWinner ? 'BINGO! YOU WIN!' : 'GAME OVER'}
+            <h2 className={`text-6xl font-display font-black mb-4 tracking-tighter uppercase italic ${isWinner ? 'text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : (isParticipant ? 'text-red-500' : 'text-primary')}`}>
+              {headerText}
             </h2>
             
-            {isWinner ? (
-              <>
-                <p className="text-white font-black uppercase tracking-[0.3em] text-[10px] mb-6">
-                  CONGRATULATIONS CHAMPION
-                </p>
+            <p className="text-white font-black uppercase tracking-[0.3em] text-[10px] mb-6">
+              {subtitleText}
+            </p>
 
-                <div className="bg-black/40 rounded-3xl p-6 mb-6 border border-white/10 text-center relative overflow-hidden">
-                  <div className="space-y-6">
-                    <div>
-                      <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">WINNER ADDRESS</p>
-                      <p className="text-xl font-bold text-white italic truncate text-center drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                      {formatAddress(username)}
+            <div className="bg-black/40 rounded-3xl p-6 mb-6 border border-white/10 text-center relative overflow-hidden">
+              <div className="space-y-6">
+                <div>
+                  <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">WINNER ADDRESS</p>
+                  <p className="text-xl font-bold text-white italic truncate text-center drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+                  {formatAddress(username)}
+                </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">TOTAL REWARD</p>
+                  <div className="flex flex-col items-center gap-0">
+                    <p className="text-5xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
+                      {formatCurrency(prize, false)}
                     </p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">TOTAL REWARD</p>
-                      <div className="flex flex-col items-center gap-0">
-                        <p className="text-5xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
-                          {formatCurrency(prize, false)}
-                        </p>
-                        <span className="text-[10px] font-black text-primary italic uppercase tracking-[0.3em] mt-2">PBINGO TOKEN</span>
-                      </div>
-                    </div>
-                    {explorerUrl && (
-                      <a href={explorerUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 text-xs text-primary hover:text-white transition-colors font-black uppercase tracking-widest pt-4 border-t border-white/10">
-                        <ExternalLink className="w-4 h-4" /> VERIFY ON-CHAIN
-                      </a>
-                    )}
+                    <span className="text-[10px] font-black text-primary italic uppercase tracking-[0.3em] mt-2">PBINGO TOKEN</span>
                   </div>
                 </div>
-              </>
-            ) : (
-              <>
-                <p className="text-white font-black uppercase tracking-[0.3em] text-[10px] mb-6">
-                  DON'T GIVE UP! LUCK IS JUST AROUND THE CORNER
-                </p>
-                <div className="bg-black/40 rounded-3xl p-6 mb-6 border border-white/10 text-center relative overflow-hidden">
-                  <p className="text-lg font-bold text-white italic tracking-tight">
-                    Better luck next time! Keep playing to win big.
+                {isWinner && explorerUrl && (
+                  <a href={explorerUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 text-xs text-primary hover:text-white transition-colors font-black uppercase tracking-widest pt-4 border-t border-white/10">
+                    <ExternalLink className="w-4 h-4" /> VERIFY ON-CHAIN
+                  </a>
+                )}
+                {!isWinner && (
+                   <p className="text-sm font-bold text-white italic tracking-tight pt-4 border-t border-white/10">
+                    {descriptionText}
                   </p>
-                </div>
-              </>
-            )}
+                )}
+              </div>
+            </div>
 
             <div className="pt-2">
               <CyberButton onClick={onClose} variant={isWinner ? "primary" : "outline"} className="w-full h-16 text-xl font-black italic tracking-tighter shadow-2xl">
