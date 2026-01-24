@@ -9,6 +9,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { queryClient } from "@/lib/queryClient";
+import { api } from "@shared/routes";
 
 interface JoinButtonProps {
   roundId: number;
@@ -60,7 +61,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         signature = await sendTransaction(transaction, connection);
         
         // Instant feedback: update UI state optimistically before backend even confirms
-        queryClient.setQueryData(["/api/rounds", roundId], (old: any) => {
+        queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
           if (!old) return old;
           return {
             ...old,
@@ -72,8 +73,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           };
         });
 
-        // Instant Join: Don't wait for confirmation to hit our backend
-        // Use a background confirmation for reliability but return immediately
+        // Background confirmation
         connection.confirmTransaction({
           signature,
           blockhash,
@@ -85,9 +85,9 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         { roundId, userId, txSignature: signature },
         {
           onSuccess: () => {
-            // Optimistically update the UI by invalidating immediately
-            queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
-            queryClient.invalidateQueries({ queryKey: ["/api/rounds", roundId] });
+            // Force immediate refresh to sync with backend data
+            queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
+            queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             
             toast({
               title: "Successfully Joined",
@@ -95,6 +95,8 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             });
           },
           onError: (error: Error) => {
+            // Rollback optimistic update on error
+            queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             toast({
               title: "Failed to Join",
               description: error.message || "Could not join the round.",

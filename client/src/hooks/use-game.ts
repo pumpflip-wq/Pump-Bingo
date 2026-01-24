@@ -30,7 +30,9 @@ export function useRound(id: number) {
     enabled: !!id,
     refetchInterval: (query) => {
       const data = query.state.data as any;
-      if (!data) return 1000;
+      if (!data) return 500;
+      // Faster polling when waiting for players to ensure instant list updates
+      if (data.round.status === 'OPEN' && data.participantsCount < 2) return 500;
       // Reduce polling frequency for finished rounds
       if (data.round.status === 'FINISHED') return 30000;
       // Standard polling for active games
