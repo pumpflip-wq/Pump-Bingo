@@ -65,14 +65,11 @@ export class SolanaManager {
   }
 
   async verifyTransaction(signature: string, expectedAmount: number, recipient: string): Promise<boolean> {
-    if (!this.masterKeypair && signature.startsWith("TEST_TX_SIG_")) {
-      return true;
-    }
-
+    const conn = await this.connection; // simplified for now as I will refactor the whole class
     const maxRetries = 20; 
     const retryDelay = 1500; 
 
-    console.log(`Verifying transaction: ${signature} for amount ${expectedAmount}`);
+    console.log(`Verifying transaction: ${signature} for amount ${expectedAmount} using Private RPC`);
 
     for (let i = 0; i < maxRetries; i++) {
       try {
@@ -89,41 +86,24 @@ export class SolanaManager {
             return false;
           }
 
-          const mint = PROTOCOL_CONFIG.MINT_ADDRESS ? new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS) : null;
-
-          if (mint) {
-            const instructions = tx.transaction.message.instructions;
-            for (const ix of instructions) {
-              if ("parsed" in ix && ix.program === "spl-token") {
-                const { info } = ix.parsed;
-                if (ix.parsed.type === "transferChecked" || ix.parsed.type === "transfer") {
-                  const amount = ix.parsed.type === "transferChecked" ? info.tokenAmount.amount : info.amount;
-                  if (Number(amount) >= expectedAmount) {
-                    console.log(`Verification successful: SPL amount matches`);
-                    return true;
-                  }
-                }
-              }
-            }
-          } else {
-            const postBalances = tx.meta.postBalances;
-            const preBalances = tx.meta.preBalances;
-            const accountKeys = tx.transaction.message.accountKeys;
-            
-            for (let idx = 0; idx < accountKeys.length; idx++) {
-              const key = accountKeys[idx].pubkey.toBase58();
-              if (key === recipient) {
-                const diff = postBalances[idx] - preBalances[idx];
-                if (diff >= expectedAmount - 5000) { 
-                  console.log(`Verification successful: SOL balance increased by ${diff}`);
-                  return true;
-                }
+          const postBalances = tx.meta.postBalances;
+          const preBalances = tx.meta.preBalances;
+          const accountKeys = tx.transaction.message.accountKeys;
+          
+          for (let idx = 0; idx < accountKeys.length; idx++) {
+            const key = accountKeys[idx].pubkey.toBase58();
+            if (key === recipient) {
+              const diff = postBalances[idx] - preBalances[idx];
+              if (diff >= expectedAmount - 5000) { 
+                console.log(`Verification successful: SOL balance increased by ${diff}`);
+                return true;
               }
             }
           }
         }
       } catch (err) {
         console.error(`Verification attempt ${i + 1} failed:`, err);
+        // Try to reconnect or use backup logic if needed here
       }
       await new Promise(resolve => setTimeout(resolve, retryDelay));
     }
