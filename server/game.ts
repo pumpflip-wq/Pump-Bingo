@@ -175,7 +175,7 @@ export class GameManager {
     // START GAME TRANSITION: 
     // If we've reached the target time, transition to STARTING then IN_GAME
     if (now >= target) { 
-      console.log(`[GameManager] Round #${round.id} transitioning to STARTING...`);
+      console.log(`[GameManager] Round #${round.id} starting... (now: ${now}, target: ${target})`);
       await storage.updateRound(round.id, {
         status: ROUND_STATUS.STARTING,
         startTime: new Date(),
@@ -198,7 +198,6 @@ export class GameManager {
       return;
     }
 
-    // Spend 5 seconds in STARTING (Verifying state) then go live
     if (elapsed >= STARTING_MS) {
       console.log(`[GameManager] Round #${round.id} GOING LIVE!`);
       await storage.updateRound(round.id, {
