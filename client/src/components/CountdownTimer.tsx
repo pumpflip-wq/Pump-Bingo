@@ -19,6 +19,7 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
     }
 
     const calculateTimeLeft = () => {
+      if (!targetDate) return;
       const target = new Date(targetDate).getTime();
       const now = Date.now();
       const diff = target - now;

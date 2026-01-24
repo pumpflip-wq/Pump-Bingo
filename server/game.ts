@@ -160,10 +160,11 @@ export class GameManager {
 
     if (!round.startTime) {
       const countdownTime = 60_000;
+      const targetTime = new Date(Date.now() + countdownTime);
       await storage.updateRound(round.id, {
-        startTime: new Date(Date.now() + countdownTime), 
+        startTime: targetTime, 
       });
-      console.log(`[GameManager] Round #${round.id} countdown started for ${countdownTime / 1000} seconds with ${updatedCount} players.`);
+      console.log(`[GameManager] Round #${round.id} countdown started for ${countdownTime / 1000} seconds with ${updatedCount} players. Target: ${targetTime.toISOString()}`);
       return;
     }
 
@@ -171,7 +172,8 @@ export class GameManager {
     const targetDate = round.startTime instanceof Date ? round.startTime : new Date(round.startTime);
     const target = targetDate.getTime();
     
-    if (now >= (target - 500)) { // Small buffer to ensure it starts when timer hits 0
+    // Ensure we are comparing correctly
+    if (now >= target) { 
       console.log(`[GameManager] Round #${round.id} starting... (now: ${now}, target: ${target})`);
       await storage.updateRound(round.id, {
         status: ROUND_STATUS.STARTING,
