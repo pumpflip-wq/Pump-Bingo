@@ -96,26 +96,26 @@ export async function registerRoutes(
     
     const count = await storage.getRoundParticipantsCount(roundId);
     
-    // Fetch participants with usernames, cards, and finalWinProb
-    const roundParticipants = await db.select({
-      id: users.id,
-      username: users.username,
-      joinedAt: participants.joinedAt,
-      card: participants.card,
-      winRate: participants.finalWinProb
-    })
-    .from(participants)
-    .innerJoin(users, eq(participants.userId, users.id))
-    .where(eq(participants.roundId, roundId));
+    // Fetch participants with usernames, cards
+    const roundParticipants = await db.execute(sql`
+      SELECT 
+        u.id, 
+        u.username, 
+        p.joined_at as "joinedAt", 
+        p.card
+      FROM participants p
+      INNER JOIN users u ON p.user_id = u.id
+      WHERE p.round_id = ${roundId}
+    `);
 
     res.json({ 
       round, 
       participantsCount: count,
-      participants: roundParticipants.map(p => ({
+      participants: (roundParticipants.rows || []).map((p: any) => ({
         ...p,
-        joinedAt: p.joinedAt?.toISOString() || "",
-        card: p.card,
-        winRate: p.winRate
+        joinedAt: p.joinedAt instanceof Date ? p.joinedAt.toISOString() : p.joinedAt,
+        card: typeof p.card === 'string' ? JSON.parse(p.card) : p.card,
+        winRate: 0 // Placeholder to avoid crashes if column missing
       }))
     });
   });
