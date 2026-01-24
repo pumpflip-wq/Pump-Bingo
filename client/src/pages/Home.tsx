@@ -245,7 +245,9 @@ export default function Home() {
                             <div className="flex flex-col text-center scale-110">
                               <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
                               <div className="flex flex-col items-center">
-                                <span className="text-7xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{formatCurrency(roundData.round.prizePool || 0)}</span>
+                                <span className="text-7xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">
+                                  {formatCurrency(roundData.round.prizePool || 0)}
+                                </span>
                                 <span className="text-3xl text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
                               </div>
                             </div>
@@ -310,7 +312,9 @@ export default function Home() {
                         <div className="flex flex-col">
                           <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{formatCurrency(roundData.round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}</span>
+                            <span className="text-3xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">
+                              {formatCurrency(roundData.round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}
+                            </span>
                           </div>
                         </div>
                         <div className="flex gap-8">

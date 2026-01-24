@@ -6,15 +6,21 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number, useSmartFormatting: boolean = true): string {
+  if (amount === 0) return "0";
+  
+  // Convert lamports to SOL for display
+  const val = amount / 1e9;
+
   if (useSmartFormatting) {
-    if (amount >= 1000000) {
-      return (amount / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+    if (val >= 1000000) {
+      return (val / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
     }
-    if (amount >= 10000) {
-      return (amount / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+    if (val >= 1000) {
+      return (val / 1000).toFixed(1).replace(/\.0$/, "") + "K";
     }
+    return val.toFixed(2).replace(/\.00$/, "");
   }
-  return amount.toLocaleString("en-US");
+  return val.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 9 });
 }
 
 export function formatAddress(address: string) {

@@ -272,7 +272,10 @@ export class GameManager {
 
   validateBingo(card: number[][], drawn: number[]): boolean {
     if (!drawn || drawn.length < 4) return false; 
-    const isMarked = (n: number) => n === 0 || drawn.includes(n);
+    
+    // Create a set for O(1) lookup
+    const drawnSet = new Set(drawn);
+    const isMarked = (n: number) => n === 0 || drawnSet.has(n);
 
     // Rows
     for (let r = 0; r < 5; r++) {
