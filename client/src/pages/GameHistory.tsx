@@ -84,7 +84,7 @@ export default function GameHistory() {
                               ) : "No Winner"}
                             </TableCell>
                             <TableCell className="font-black text-primary text-lg">
-                              {round.prizePool.toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}
+                              {formatCurrency(round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-col gap-1 min-w-[240px]">

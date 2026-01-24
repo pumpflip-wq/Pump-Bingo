@@ -36,7 +36,9 @@ export default function Admin() {
                 <TrendingUp className="w-4 h-4 text-primary" />
                 <span className="text-[10px] text-white/50 uppercase font-black">Total Payouts</span>
               </div>
-              <p className="text-2xl font-black text-primary mt-2 italic">{formatCurrency(stats?.totalPrize || 0)}</p>
+              <p className="text-2xl font-black text-primary mt-2 italic">
+                {formatCurrency(stats?.totalPrize || 0)} {PROTOCOL_CONFIG.SYMBOL}
+              </p>
             </CardContent>
           </Card>
           <Card className="bg-black/40 border-primary/20 min-w-[200px]">
@@ -71,7 +73,7 @@ export default function Admin() {
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Amount Disbursed</p>
-                  <p className="text-lg font-black text-primary italic">+{formatCurrency(round.prizePool || 0)} PBINGO</p>
+                  <p className="text-lg font-black text-primary italic">+{formatCurrency(round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}</p>
                   <p className="text-[10px] text-white/30">{round.completedAt ? format(new Date(round.completedAt), "PPp") : "Pending"}</p>
                 </div>
               </div>
