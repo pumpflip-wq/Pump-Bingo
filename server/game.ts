@@ -83,7 +83,9 @@ export class GameManager {
       startTime: startTime,
       price: this.price, 
       prizePool: 0,
-      drawnNumbers: []
+      drawnNumbers: [],
+      completedAt: null, // Explicitly reset completedAt
+      winnerId: null // Explicitly reset winnerId
     });
 
     // Process payment queue for the new round

@@ -22,6 +22,7 @@ export default function GameHistory() {
     queryKey: ["/api/rounds/history", page],
     queryFn: async () => {
       const res = await fetch(`/api/rounds/history?page=${page}&limit=${limit}`);
+      if (!res.ok) return { rounds: [], total: 0 };
       return res.json();
     }
   });

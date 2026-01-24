@@ -8,9 +8,11 @@ export function useRounds() {
     queryFn: async () => {
       const res = await fetch(api.rounds.list.path);
       if (!res.ok) throw new Error("Failed to fetch rounds");
-      return api.rounds.list.responses[200].parse(await res.json());
+      const data = await res.json();
+      // Ensure we always have an array even if server returns something else
+      return Array.isArray(data) ? api.rounds.list.responses[200].parse(data) : [];
     },
-    refetchInterval: 2000, // Poll list occasionally
+    refetchInterval: 5000, // Reduced polling for the list
   });
 }
 
