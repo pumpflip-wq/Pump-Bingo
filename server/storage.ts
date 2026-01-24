@@ -199,7 +199,16 @@ export class DatabaseStorage implements IStorage {
   async resetSystem(): Promise<void> {
     // Drop all tables and recreate them to ensure a clean state
     // Using double quotes to ensure exact match in Postgres
-    await db.execute(sql`TRUNCATE "transactions", "participants", "rounds", "users" RESTART IDENTITY CASCADE`);
+    // Checking if payment_queue exists before truncating to avoid errors in environments where it's missing
+    await db.execute(sql`
+      DO $$ 
+      BEGIN
+        TRUNCATE "transactions", "participants", "rounds", "users" RESTART IDENTITY CASCADE;
+        IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'payment_queue') THEN
+          EXECUTE 'TRUNCATE "payment_queue" RESTART IDENTITY CASCADE';
+        END IF;
+      END $$;
+    `);
   }
 }
 

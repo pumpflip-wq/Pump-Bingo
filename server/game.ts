@@ -89,28 +89,37 @@ export class GameManager {
       winnerId: null // Explicitly reset winnerId
     });
 
-    // Process payment queue for the new round
-    await this.processPaymentQueue(nextId);
+    // Handle payment queue - automatically join next round for users who paid late
+    try {
+      const pendingPayments = await storage.getPendingPayments();
+      if (pendingPayments.length > 0) {
+        console.log(`Processing ${pendingPayments.length} pending payments from queue for round ${nextId}`);
+        for (const payment of pendingPayments) {
+          try {
+            const card = this.generateCard();
+            await storage.joinRound(nextId, payment.userId, card, payment.txSignature);
+            
+            // Add to prize pool
+            const round = await storage.getRound(nextId);
+            if (round) {
+              await storage.updateRound(nextId, { prizePool: round.prizePool + payment.amount });
+            }
+
+            await storage.markPaymentProcessed(payment.id);
+            console.log(`User ${payment.userId} automatically joined round ${nextId} from queue`);
+          } catch (err) {
+            console.error(`Failed to process queued payment ${payment.id}:`, err);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error processing payment queue:", err);
+    }
   }
 
   private async processPaymentQueue(roundId: number) {
-    const pending = await storage.getPendingPayments();
-    for (const payment of pending) {
-      try {
-        const card = this.generateCard();
-        await storage.joinRound(roundId, payment.userId, card, payment.txSignature);
-        
-        // Add to prize pool
-        const round = await storage.getRound(roundId);
-        if (round) {
-          await storage.updateRound(roundId, { prizePool: round.prizePool + payment.amount });
-        }
-
-        await storage.markPaymentProcessed(payment.id);
-      } catch (err) {
-        console.error("Error processing queued payment:", err);
-      }
-    }
+    // This method is now integrated into createNewRound or handled at tick level
+    // Kept for backward compatibility if needed elsewhere
   }
 
   private async processRound(round: Round) {
@@ -182,12 +191,6 @@ export class GameManager {
                 await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
                 await this.createNewRound();
             }
-            return;
-        }
-
-        // AUTO-FINISH disabled per user request - only finish when Bingo claimed
-        if (round.drawnNumbers.length >= 75 && !round.winnerId) {
-            // Keep drawing loop active but don't finish
             return;
         }
 
