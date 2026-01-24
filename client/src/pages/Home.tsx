@@ -179,7 +179,7 @@ export default function Home() {
     }
 
     const elapsed = currentTime - winnerDeclaredAt;
-    const totalDisplayTime = 10000;
+    const totalDisplayTime = 15000; // Matched with server POST_WIN_DELAY_MS
 
     if (elapsed >= totalDisplayTime) {
       return null;

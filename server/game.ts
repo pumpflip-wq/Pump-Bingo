@@ -5,8 +5,8 @@ import { PROTOCOL_CONFIG } from "@shared/config";
 
 const OPEN_DELAY_MS = 60_000;
 const STARTING_MS = 5_000;
-const DRAW_INTERVAL_MS = 1_500; // Faster drawing
-const POST_WIN_DELAY_MS = 10_000;
+const DRAW_INTERVAL_MS = 2_000; // Slower drawing to sync better with UI animations
+const POST_WIN_DELAY_MS = 15_000; // Increased to 15s to allow UI celebration to finish
 const STALL_RECOVERY_MS = 10 * 60_000;
 
 /* ======================
