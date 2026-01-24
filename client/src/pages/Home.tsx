@@ -277,11 +277,6 @@ export default function Home() {
                             </div>
                           </div>
                         </div>
-                        
-                        <div className="flex justify-center py-4">
-                          <LastCalledNumber numbers={[]} />
-                        </div>
-                        
                         <div className="py-6 px-10 bg-black/60 rounded-[2.5rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto min-h-[190px] flex flex-col justify-center">
                           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
                           <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-3 font-mono">
@@ -353,13 +348,6 @@ export default function Home() {
                           </div>
                         </div>
                       </div>
-                      
-                      {roundData.round.status === 'IN_GAME' && !roundData.round.winnerId && (
-                        <div className="flex justify-center shrink-0 py-2">
-                          <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
-                        </div>
-                      )}
-                      
                           {isParticipant && currentCard && roundData.round.status !== 'FINISHED' && !roundData.round.winnerId ? (
                             <div className="relative space-y-4 flex flex-col items-center flex-1 min-h-0 justify-center w-full">
                                 <BingoCard 
@@ -499,7 +487,10 @@ export default function Home() {
                 </AnimatePresence>
               </main>
 
-            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
+            <aside className="lg:col-span-3 flex flex-col h-[750px]">
+              <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 bg-black/40 border-primary/20 mb-4">
+                <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
+              </div>
               <GameHistory 
                 historyRounds={historyRounds} 
                 historyLoading={historyLoading} 
