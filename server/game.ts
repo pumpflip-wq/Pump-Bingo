@@ -59,8 +59,10 @@ export class GameManager {
 
     try {
       const round = await storage.getLatestRound();
-      if (round) {
-        console.log(`[GameManager] Tick - Round #${round.id} Status: ${round.status}`);
+      
+      // CRITICAL: Always process pending payments even if no round exists
+      if (round && round.status === ROUND_STATUS.OPEN) {
+        await this.processPendingPayments(round.id);
       }
 
       if (!round || round.status === ROUND_STATUS.FINISHED) {
@@ -282,6 +284,7 @@ export class GameManager {
         // Double check participant doesn't already exist for this round
         const existing = await storage.getParticipant(roundId, p.userId);
         if (existing) {
+          // If already in this round, just mark as processed to prevent duplicate joins
           await storage.markPaymentProcessed(p.id);
           continue;
         }
@@ -302,6 +305,8 @@ export class GameManager {
 
         await storage.updateUserBalance(p.userId, -Number(p.amount));
         await storage.markPaymentProcessed(p.id);
+        
+        console.log(`[GameManager] Processed pending payment for user ${p.userId} in round #${roundId}`);
       } catch (err) {
         console.error("Error processing pending payment:", err);
       }

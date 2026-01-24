@@ -133,12 +133,12 @@ export async function registerRoutes(
     // Calculate seconds remaining for countdown (server-side to avoid clock sync issues)
     let secondsRemaining = 0;
     if (round.status === ROUND_STATUS.OPEN) {
+      const now = Date.now();
       if (round.startTime) {
         const targetTime = round.startTime instanceof Date ? round.startTime.getTime() : new Date(round.startTime).getTime();
-        const now = Date.now();
         secondsRemaining = Math.max(0, Math.ceil((targetTime - now) / 1000));
       } else if (count >= 2) {
-        // Return 60 immediately when 2 players are present, even before game tick
+        // Return 60 immediately when 2 players are present
         secondsRemaining = 60;
       }
     }
