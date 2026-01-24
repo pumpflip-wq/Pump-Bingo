@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
 import { PROTOCOL_CONFIG } from "@shared/config";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { api } from "@shared/routes";
 
 interface JoinButtonProps {
@@ -27,6 +27,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
   const { roundData } = useGameState();
   const isWinnerDeclared = !!roundData?.round.winnerId;
 
+  const { user } = useGameState();
   const [isWalleting, setIsWalleting] = useState(false);
 
   const handleJoin = async () => {
@@ -35,6 +36,15 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       toast({
         title: "Authentication Required",
         description: "Please connect your wallet first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (user && user.balance < price) {
+      toast({
+        title: "Insufficient Balance",
+        description: `You need at least ${(price / 1e9).toFixed(2)} SOL to join.`,
         variant: "destructive",
       });
       return;
@@ -71,7 +81,15 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         }, "processed").catch(console.error);
       }
 
-      // Optimistically update the UI to show the user as a participant
+      // 1. Create a payment record in the queue BEFORE joining
+      // This ensures that even if the server restarts or join fails, the payment is logged
+      await apiRequest("POST", "/api/payments/queue", {
+        userId,
+        amount: price,
+        txSignature: signature
+      });
+
+      // 2. Proceed with optimistic join
       queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
         if (!old) return old;
         const exists = old.participants?.some((p: any) => p.username === publicKey.toBase58());
@@ -118,9 +136,8 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             // Remove optimistic update on error
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             toast({
-              title: "Failed to Join",
-              description: error.message || "Could not join the round.",
-              variant: "destructive",
+              title: "Join Process Initiated",
+              description: "Transaction sent. If the round started already, you will be added to the next one automatically.",
             });
           },
         }

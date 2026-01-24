@@ -49,6 +49,17 @@ export async function registerRoutes(
     });
   });
 
+  // === PAYMENTS ===
+  app.post("/api/payments/queue", async (req, res) => {
+    try {
+      const payment = await storage.createPaymentQueue(req.body);
+      res.json(payment);
+    } catch (err) {
+      console.error("Error adding to payment queue:", err);
+      res.status(500).json({ message: "Failed to queue payment" });
+    }
+  });
+
   // === AUTH ===
   app.post(api.auth.login.path, async (req, res) => {
     try {
@@ -161,7 +172,7 @@ export async function registerRoutes(
       await storage.updateUserBalance(userId, -Number(round.price));
 
       const user = await storage.getUser(userId);
-      res.json({ participant, balance: Number(user?.balance || 0) - Number(round.price) });
+      res.json({ participant, balance: Number(user?.balance || 0) });
 
       // Verify signature in background after user is already in
       solanaManager.verifyTransaction(txSignature, Number(round.price), treasuryWallet)

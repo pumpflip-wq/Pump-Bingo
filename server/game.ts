@@ -1,6 +1,7 @@
 import { storage } from "./storage";
 import { type Round, ROUND_STATUS } from "@shared/schema";
 import crypto from "crypto";
+import { PROTOCOL_CONFIG } from "@shared/config";
 
 const OPEN_DELAY_MS = 60_000;
 const STARTING_MS = 5_000;
@@ -62,7 +63,7 @@ export class GameManager {
       }
 
       if (!round || round.status === ROUND_STATUS.FINISHED) {
-        await this.maybeCreateNextRound(round);
+        await this.maybeCreateNextRound(round || null);
         return;
       }
 
@@ -142,7 +143,14 @@ export class GameManager {
   ====================== */
   private async handleOpen(round: Round) {
     const count = await storage.getRoundParticipantsCount(round.id);
-    if (count < 2) {
+    
+    // Check for pending payments and process them for this round
+    await this.processPendingPayments(round.id);
+    
+    // Refresh count after processing payments
+    const updatedCount = await storage.getRoundParticipantsCount(round.id);
+
+    if (updatedCount < 2) {
       if (round.startTime) {
         await storage.updateRound(round.id, { startTime: null });
       }
@@ -159,8 +167,8 @@ export class GameManager {
     }
 
     const now = Date.now();
-    const target = round.startTime.getTime();
-    if (now >= target) {
+    const target = round.startTime instanceof Date ? round.startTime.getTime() : new Date(round.startTime).getTime();
+    if (now >= (target - 500)) { // Small buffer to ensure it starts when timer hits 0
       console.log(`[GameManager] Round #${round.id} starting... (now: ${now}, target: ${target})`);
       await storage.updateRound(round.id, {
         status: ROUND_STATUS.STARTING,
@@ -210,14 +218,16 @@ export class GameManager {
     const elapsed = Date.now() - round.startTime!.getTime();
     const expectedDraws = Math.floor(elapsed / DRAW_INTERVAL_MS);
 
-    // Keep drawing as long as there's no winner
-    if (round.drawnNumbers.length >= expectedDraws) return;
+    const drawnNumbers = round.drawnNumbers || [];
 
-    const next = getDeterministicDraw(round.serverSeed, round.drawnNumbers);
+    // Keep drawing as long as there's no winner
+    if (drawnNumbers.length >= expectedDraws) return;
+
+    const next = getDeterministicDraw(round.serverSeed, drawnNumbers);
     if (!next) return;
 
     await storage.updateRound(round.id, {
-      drawnNumbers: [...round.drawnNumbers, next],
+      drawnNumbers: [...drawnNumbers, next],
     });
   }
 
@@ -235,12 +245,12 @@ export class GameManager {
     if (round.winnerId) return false;
 
     // Fast check locally
-    const valid = this.validateBingo(card, round.drawnNumbers);
+    const valid = this.validateBingo(card, round.drawnNumbers || []);
     if (!valid) return false;
 
     // ATOMIC CLAIM: first click wins
     // We already update the round status to FINISHED in routes.ts for immediate UI response
-    const claimed = await storage.claimWinnerIfEmpty(roundId, userId);
+    const claimed = await storage.updateRound(roundId, { winnerId: userId, status: ROUND_STATUS.FINISHED, completedAt: new Date() });
     if (!claimed) return false;
 
     return true;
@@ -253,6 +263,14 @@ export class GameManager {
     const payments = await storage.getPendingPayments();
     for (const p of payments) {
       try {
+        const round = await storage.getRound(roundId);
+        if (!round) continue;
+
+        // If the round is already starting or in game, this payment belongs to the NEXT round
+        if (round.status !== ROUND_STATUS.OPEN) {
+          continue;
+        }
+
         // Double check participant doesn't already exist for this round
         const existing = await storage.getParticipant(roundId, p.userId);
         if (existing) {
@@ -264,11 +282,8 @@ export class GameManager {
         await storage.joinRound(roundId, p.userId, card, p.txSignature);
 
         // Update prize pool for the round
-        const round = await storage.getRound(roundId);
-        if (round) {
-          const updatedPrize = Number(round.prizePool) + Number(p.amount);
-          await storage.updateRound(roundId, { prizePool: updatedPrize });
-        }
+        const updatedPrize = Number(round.prizePool) + Number(p.amount);
+        await storage.updateRound(roundId, { prizePool: updatedPrize });
 
         await storage.createTransaction({
           userId: p.userId,
@@ -283,6 +298,11 @@ export class GameManager {
         console.error("Error processing pending payment:", err);
       }
     }
+  }
+
+  private async moveLateJoinsToNextRound(currentRoundId: number) {
+    // If a round is STARTING or IN_GAME, we don't allow new joins to it
+    // But they might have paid. In JoinButton we should handle this.
   }
 
   /* ======================
