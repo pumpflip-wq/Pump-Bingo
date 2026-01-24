@@ -88,7 +88,12 @@ export async function registerRoutes(
   // === ROUNDS ===
   app.get(api.rounds.list.path, async (req, res) => {
     const rounds = await storage.getOpenRounds();
-    res.json(rounds);
+    // PROVABLY FAIR: Hide serverSeed until round is FINISHED
+    const safeRounds = rounds.map(round => ({
+      ...round,
+      serverSeed: round.status === ROUND_STATUS.FINISHED ? round.serverSeed : null
+    }));
+    res.json(safeRounds);
   });
 
   app.get("/api/rounds/history", async (req, res) => {
