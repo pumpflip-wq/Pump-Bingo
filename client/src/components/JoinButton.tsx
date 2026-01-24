@@ -140,7 +140,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       ) : (
         <div className="flex items-center justify-center gap-4">
           <span>JOIN GAME -</span>
-          <span className="text-3xl text-black font-black">{formatCurrency(price / 1e9, false)} SOL</span>
+          <span className="text-3xl text-black font-black">{(price / 1e9).toString()} SOL</span>
         </div>
       )}
     </CyberButton>
