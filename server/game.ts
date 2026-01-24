@@ -201,19 +201,20 @@ export class GameManager {
             return;
         }
 
-        // Draw one number every 2 seconds for faster gameplay
+    // Draw one number every 2 seconds for faster gameplay
         const startTime = new Date(round.startTime!).getTime() + 5000;
         const elapsed = now.getTime() - startTime;
         // Faster draw timing: 2 seconds per number
         const expectedNumbersCount = Math.max(0, Math.min(75, Math.floor(elapsed / 2000)));
 
-        if (round.drawnNumbers.length < expectedNumbersCount) {
+        if ((round.drawnNumbers?.length || 0) < expectedNumbersCount) {
+            const currentDrawn = round.drawnNumbers || [];
             const available = Array.from({length: 75}, (_, i) => i + 1)
-                .filter(n => !round.drawnNumbers!.includes(n));
+                .filter(n => !currentDrawn.includes(n));
             
             if (available.length > 0) {
                 const nextNum = available[Math.floor(Math.random() * available.length)];
-                const newNumbers = [...round.drawnNumbers, nextNum];
+                const newNumbers = [...currentDrawn, nextNum];
                 await storage.updateRound(round.id, { drawnNumbers: newNumbers });
             }
         }
