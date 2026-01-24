@@ -5,7 +5,7 @@ export const PROTOCOL_CONFIG = {
   DECIMALS: 9, // SOL has 9 decimals
 
   // Game Settings
-  DEFAULT_ENTRY_PRICE: 0.1 * 1e9, // 0.1 SOL in lamports
+  DEFAULT_ENTRY_PRICE: 0.01 * 1e9, // 0.1 SOL in lamports
   FEE_PERCENTAGE: 0, // No fees initially to maximize engagement
 
   // Links
