@@ -69,53 +69,66 @@ export class SolanaManager {
       return true;
     }
 
-    try {
-      const tx = await this.connection.getParsedTransaction(signature, {
-        commitment: "confirmed",
-        maxSupportedTransactionVersion: 0
-      });
+    const maxRetries = 15;
+    const retryDelay = 2000;
 
-      if (!tx || !tx.meta || tx.meta.err) return false;
+    console.log(`Verifying transaction: ${signature} for amount ${expectedAmount}`);
 
-      const mint = PROTOCOL_CONFIG.MINT_ADDRESS ? new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS) : null;
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const tx = await this.connection.getParsedTransaction(signature, {
+          commitment: "confirmed",
+          maxSupportedTransactionVersion: 0
+        });
 
-      if (mint) {
-        // SPL Token transfer check
-        const instructions = tx.transaction.message.instructions;
-        for (const ix of instructions) {
-          if ("parsed" in ix && ix.program === "spl-token" && ix.parsed.type === "transferChecked") {
-            const { info } = ix.parsed;
-            // Verify destination is an ATA of our recipient for this mint
-            // In a real scenario, we'd derive the ATA, but for now we check the amount and mint
-            if (info.mint === mint.toBase58() && Number(info.tokenAmount.amount) >= expectedAmount) {
-              return true;
+        if (tx && tx.meta && !tx.meta.err) {
+          console.log(`Transaction found: ${signature}`);
+          const mint = PROTOCOL_CONFIG.MINT_ADDRESS ? new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS) : null;
+
+          if (mint) {
+            // SPL Token transfer check
+            const instructions = tx.transaction.message.instructions;
+            for (const ix of instructions) {
+              if ("parsed" in ix && ix.program === "spl-token") {
+                const { info } = ix.parsed;
+                if (ix.parsed.type === "transferChecked" || ix.parsed.type === "transfer") {
+                  const amount = ix.parsed.type === "transferChecked" ? info.tokenAmount.amount : info.amount;
+                  if (Number(amount) >= expectedAmount) {
+                    console.log(`Verification successful: SPL amount matches`);
+                    return true;
+                  }
+                }
+              }
+            }
+          } else {
+            // Simple SOL transfer check - check account keys in meta for balance changes
+            // This is more reliable than checking instructions for system transfers
+            const postBalances = tx.meta.postBalances;
+            const preBalances = tx.meta.preBalances;
+            const accountKeys = tx.transaction.message.accountKeys;
+            
+            const recipientIndex = accountKeys.findIndex(key => key.pubkey.toBase58() === recipient);
+            
+            if (recipientIndex !== -1) {
+              const diff = postBalances[recipientIndex] - preBalances[recipientIndex];
+              // We check if the recipient's balance increased by at least expectedAmount
+              if (diff >= expectedAmount) {
+                console.log(`Verification successful: SOL balance increased by ${diff}`);
+                return true;
+              }
             }
           }
-          // Support regular transfer if needed
-          if ("parsed" in ix && ix.program === "spl-token" && ix.parsed.type === "transfer") {
-             const { info } = ix.parsed;
-             if (Number(info.amount) >= expectedAmount) {
-               return true;
-             }
-          }
+        } else if (tx && tx.meta && tx.meta.err) {
+          console.log(`Transaction failed on-chain: ${signature}`);
+          return false;
         }
-      } else {
-        // Simple SOL transfer check
-        const instructions = tx.transaction.message.instructions;
-        for (const ix of instructions) {
-          if ("parsed" in ix && ix.program === "system" && ix.parsed.type === "transfer") {
-            const { info } = ix.parsed;
-            if (info.destination === recipient && Number(info.lamports) >= expectedAmount) {
-              return true;
-            }
-          }
-        }
+      } catch (err) {
+        console.error(`Verification attempt ${i + 1} failed:`, err);
       }
-      return false;
-    } catch (err) {
-      console.error("TX Verification Error:", err);
-      return false;
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
     }
+    console.log(`Verification timed out after ${maxRetries} attempts`);
+    return false;
   }
 
   async getMasterBalance(): Promise<number> {
