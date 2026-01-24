@@ -59,6 +59,19 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
 
         signature = await sendTransaction(transaction, connection);
         
+        // Instant feedback: update UI state optimistically before backend even confirms
+        queryClient.setQueryData(["/api/rounds", roundId], (old: any) => {
+          if (!old) return old;
+          return {
+            ...old,
+            participantsCount: (old.participantsCount || 0) + 1,
+            participants: [
+              ...(old.participants || []),
+              { id: 'optimistic-' + Date.now(), username: publicKey.toBase58(), joinedAt: new Date().toISOString() }
+            ]
+          };
+        });
+
         // Instant Join: Don't wait for confirmation to hit our backend
         // Use a background confirmation for reliability but return immediately
         connection.confirmTransaction({

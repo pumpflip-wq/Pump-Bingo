@@ -165,6 +165,19 @@ export default function Home() {
     const winner = roundData?.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
     const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData?.round?.winnerId?.toString() || "Unknown"));
     
+    // Determine if we should show the overlay
+    // It should show for participants AND spectators
+    if (!showWinnerOverlay || !winnerDeclaredAt || hasManuallyClosed) {
+      return null;
+    }
+
+    const elapsed = currentTime - winnerDeclaredAt;
+    const totalDisplayTime = 10000; 
+    
+    if (elapsed >= totalDisplayTime) {
+      return null;
+    }
+
     return {
       show: true,
       username: winnerUsername,

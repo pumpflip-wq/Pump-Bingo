@@ -80,6 +80,9 @@ export class GameManager {
     // Default wait time is 60 seconds
     const now = Date.now();
     const startTime = new Date(now + 60000); // 60 seconds for next round (standard waiting)
+    
+    // Ensure we start exactly at 60s
+    startTime.setMilliseconds(0);
 
     await storage.createRound({
       id: nextId,
@@ -148,9 +151,11 @@ export class GameManager {
       
       // Only allow the countdown to progress if we have at least 2 players
       if (participantCount >= 2) {
-        if (!round.startTime) {
-            // If we just reached 2 players and have no start time, set it to 60s from now
-            await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
+        if (!round.startTime || round.status === ROUND_STATUS.OPEN && participantCount === 2) {
+            // Reset to exactly 60s when the second player joins
+            const startAt = new Date(now.getTime() + 60000);
+            startAt.setMilliseconds(0);
+            await storage.updateRound(round.id, { startTime: startAt });
             return;
         }
 
