@@ -102,54 +102,70 @@ export default function VerifyPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-white/10">
-                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white">Round ID</th>
-                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white">Public Hash</th>
-                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white">Server Seed</th>
-                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white">Status</th>
+                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white whitespace-nowrap">Round ID</th>
+                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white whitespace-nowrap">Status</th>
+                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white whitespace-nowrap">Drawn Numbers</th>
+                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white whitespace-nowrap">Verification Info</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {rounds?.slice(0, 10).map((round) => (
                     <tr key={round.id} className="group hover:bg-white/[0.02] transition-colors">
-                      <td className="py-4 px-6 font-mono text-base text-white font-bold">#{round.id}</td>
+                      <td className="py-4 px-6 font-mono text-base text-white font-bold whitespace-nowrap">#{round.id}</td>
                       <td className="py-4 px-6">
-                        <div className="flex items-center gap-2 max-w-[250px]">
-                          <span className="font-mono text-xs text-white font-bold truncate">{round.publicHash}</span>
-                          <Copy className="w-4 h-4 text-white/40 cursor-pointer hover:text-primary transition-colors" onClick={() => {
-                            navigator.clipboard.writeText(round.publicHash);
-                            toast({ title: "Hash Copied" });
-                          }} />
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        {round.status === 'FINISHED' ? (
-                          <div className="flex items-center gap-2 max-w-[250px]">
-                            <span className="font-mono text-xs text-primary font-bold truncate">{round.serverSeed}</span>
-                            <Copy className="w-4 h-4 text-primary/60 cursor-pointer hover:text-primary transition-colors" onClick={() => {
-                              navigator.clipboard.writeText(round.serverSeed || "");
-                              toast({ title: "Seed Copied" });
-                            }} />
-                          </div>
-                        ) : (
-                          <span className="text-xs font-black uppercase tracking-widest text-white/40">Hidden</span>
-                        )}
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <span className={`text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-md ${
-                            round.status === 'FINISHED' ? 'bg-primary/20 text-primary border border-primary/20' : 'bg-white/10 text-white border border-white/10'
+                        <div className="flex flex-col gap-1">
+                          <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md w-fit ${
+                            round.status === 'FINISHED' ? 'bg-primary/20 text-primary border border-primary/20' : 
+                            round.status === 'IN_GAME' ? 'bg-orange-500/20 text-orange-500 border border-orange-500/20' :
+                            'bg-white/10 text-white border border-white/10'
                           }`}>
                             {round.status}
                           </span>
-                          <button 
-                            onClick={() => {
-                              setManualHash(round.publicHash);
-                              setManualSeed(round.status === 'FINISHED' ? (round.serverSeed || "") : "");
-                            }}
-                            className="text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors underline"
-                          >
-                            Use for manual
-                          </button>
+                          {round.status === 'OPEN' && (
+                            <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Waiting for players...</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 min-w-[200px]">
+                        <div className="flex flex-wrap gap-1 max-w-[300px]">
+                          {round.drawnNumbers && round.drawnNumbers.length > 0 ? (
+                            round.drawnNumbers.slice(0, 10).map((num, i) => (
+                              <span key={i} className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-bold text-white border border-white/10">
+                                {num}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-[10px] font-black uppercase tracking-widest text-white/20">No draws yet</span>
+                          )}
+                          {round.drawnNumbers && round.drawnNumbers.length > 10 && (
+                            <span className="text-[9px] font-bold text-white/40 self-end">+{round.drawnNumbers.length - 10}</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[8px] font-black uppercase text-white/40">Hash:</span>
+                            <span className="font-mono text-[9px] text-white/60 font-bold truncate max-w-[100px]">{round.publicHash}</span>
+                            <Copy className="w-3 h-3 text-white/40 cursor-pointer hover:text-primary transition-colors" onClick={() => {
+                              navigator.clipboard.writeText(round.publicHash);
+                              toast({ title: "Hash Copied" });
+                            }} />
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button 
+                              onClick={() => {
+                                setManualHash(round.publicHash);
+                                setManualSeed(round.status === 'FINISHED' ? (round.serverSeed || "") : "");
+                              }}
+                              className="text-[9px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors underline whitespace-nowrap"
+                            >
+                              Verify Manually
+                            </button>
+                            {round.status === 'FINISHED' && (
+                              <span className="text-[9px] font-black uppercase text-primary/40 italic">Seed Revealed</span>
+                            )}
+                          </div>
                         </div>
                       </td>
                     </tr>

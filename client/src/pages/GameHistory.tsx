@@ -3,15 +3,86 @@ import { useQuery } from "@tanstack/react-query";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Trophy, History, ShieldCheck, ChevronLeft, ChevronRight, ExternalLink, Copy, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Loader2, Trophy, History, ShieldCheck, ChevronLeft, ChevronRight, ExternalLink, Copy, Search, Users, Hash } from "lucide-react";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { format } from "date-fns";
 import { Link } from "wouter";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useToast } from "@/hooks/use-toast";
-import { formatAddress, formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
+import { useRound } from "@/hooks/use-game";
+
+function RoundDetailsModal({ roundId }: { roundId: number }) {
+  const { data: details, isLoading } = useRound(roundId);
+
+  if (isLoading) return <Loader2 className="w-6 h-6 animate-spin text-primary mx-auto" />;
+  if (!details) return null;
+
+  return (
+    <div className="space-y-6 py-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2 mb-1">
+            <Users className="w-4 h-4 text-primary" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Participants</span>
+          </div>
+          <p className="text-2xl font-black italic text-white">{details.participantsCount}</p>
+        </div>
+        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2 mb-1">
+            <Hash className="w-4 h-4 text-primary" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Drawn Count</span>
+          </div>
+          <p className="text-2xl font-black italic text-white">{details.round.drawnNumbers?.length || 0}</p>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-xs font-black uppercase tracking-widest text-primary italic">Draw Sequence</h3>
+        <div className="flex flex-wrap gap-2 p-4 rounded-2xl bg-black/40 border border-white/5">
+          {details.round.drawnNumbers?.map((num: number, i: number) => (
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: i * 0.02 }}
+              key={i}
+              className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]"
+            >
+              {num}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-xs font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
+        <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+          {details.participants.map((p: any) => (
+            <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-[10px] font-bold">
+                  {p.username.slice(0, 2)}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-white">{p.username.slice(0, 6)}...{p.username.slice(-4)}</p>
+                  <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
+                </div>
+              </div>
+              {details.round.winnerId === p.id && (
+                <div className="px-2 py-1 rounded bg-primary/20 border border-primary/20 flex items-center gap-1">
+                  <Trophy className="w-3 h-3 text-primary" />
+                  <span className="text-[9px] font-black uppercase text-primary">Winner</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function GameHistory() {
   const [page, setPage] = useState(1);
@@ -115,9 +186,26 @@ export default function GameHistory() {
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end items-center gap-2">
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="hover:text-primary transition-colors flex items-center gap-2 px-3">
+                                      <Search className="w-4 h-4" />
+                                      <span className="text-[10px] font-black uppercase tracking-widest">Details</span>
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white">
+                                    <DialogHeader>
+                                      <DialogTitle className="text-2xl font-black italic italic tracking-tighter uppercase flex items-center gap-2">
+                                        <History className="w-6 h-6 text-primary" />
+                                        Round <span className="text-primary">#{round.id}</span>
+                                      </DialogTitle>
+                                    </DialogHeader>
+                                    <RoundDetailsModal roundId={round.id} />
+                                  </DialogContent>
+                                </Dialog>
                                 <Link href={`/verify?roundId=${round.id}`}>
                                   <Button variant="ghost" size="sm" className="hover:text-primary transition-colors flex items-center gap-2 px-3">
-                                    <Search className="w-4 h-4" />
+                                    <ShieldCheck className="w-4 h-4" />
                                     <span className="text-[10px] font-black uppercase tracking-widest">Verify</span>
                                   </Button>
                                 </Link>
