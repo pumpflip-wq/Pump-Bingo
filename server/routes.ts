@@ -200,6 +200,10 @@ export async function registerRoutes(
       const card = gameManager.generateCard();
       const participant = await storage.joinRound(roundId, userId, card, txSignature);
 
+      // CRITICAL: Ensure player is NOT in subsequent rounds by default
+      // This is handled by storage.joinRound which only inserts for the specific roundId.
+      // We must ensure the client doesn't keep a stale state.
+
       const user = await storage.getUser(userId);
       res.json({ participant, balance: Number(user?.balance || 0) });
 

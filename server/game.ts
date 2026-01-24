@@ -110,6 +110,10 @@ export class GameManager {
       )
         return;
     }
+    // Double check we don't already have an open round before creating
+    const existingOpen = await storage.getLatestRound();
+    if (existingOpen && existingOpen.status === ROUND_STATUS.OPEN) return;
+    
     await this.createNewRound();
   }
 
@@ -153,9 +157,11 @@ export class GameManager {
       return;
     }
 
+    const now = Date.now();
+    
     if (!round.startTime) {
       const countdownTime = 60_000;
-      const targetTime = new Date(Date.now() + countdownTime);
+      const targetTime = new Date(now + countdownTime);
       await storage.updateRound(round.id, {
         startTime: targetTime, 
       });
@@ -163,7 +169,6 @@ export class GameManager {
       return;
     }
 
-    const now = Date.now();
     const targetDate = new Date(round.startTime);
     const target = targetDate.getTime();
     
