@@ -215,19 +215,21 @@ export class GameManager {
       return;
     }
 
-    const elapsed = Date.now() - round.startTime!.getTime();
-    const expectedDraws = Math.floor(elapsed / DRAW_INTERVAL_MS);
-
+    const elapsed = Date.now() - new Date(round.startTime!).getTime();
+    const expectedDraws = Math.min(75, Math.floor(elapsed / DRAW_INTERVAL_MS));
     const drawnNumbers = round.drawnNumbers || [];
 
-    // Keep drawing as long as there's no winner
     if (drawnNumbers.length >= expectedDraws) return;
 
-    const next = getDeterministicDraw(round.serverSeed, drawnNumbers);
-    if (!next) return;
+    const newDrawn = [...drawnNumbers];
+    while (newDrawn.length < expectedDraws) {
+      const next = getDeterministicDraw(round.serverSeed, newDrawn);
+      if (!next) break;
+      newDrawn.push(next);
+    }
 
     await storage.updateRound(round.id, {
-      drawnNumbers: [...drawnNumbers, next],
+      drawnNumbers: newDrawn,
     });
   }
 

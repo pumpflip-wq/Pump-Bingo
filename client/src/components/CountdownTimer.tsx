@@ -15,8 +15,16 @@ export function CountdownTimer({ secondsRemaining, status, participantCount }: C
   const lastServerSeconds = useRef(secondsRemaining);
 
   useEffect(() => {
+    // If waiting for players, reset to 01:00 (60s)
+    if (participantCount < 2) {
+      setDisplaySeconds(60);
+      lastServerSeconds.current = 60;
+      lastUpdateTime.current = Date.now();
+      return;
+    }
+
     // Synchronize with server data when it changes significantly
-    if (Math.abs(secondsRemaining - lastServerSeconds.current) > 1 || secondsRemaining === 0) {
+    if (Math.abs(secondsRemaining - lastServerSeconds.current) > 1 || (secondsRemaining === 0 && lastServerSeconds.current > 0)) {
       setDisplaySeconds(secondsRemaining);
       lastServerSeconds.current = secondsRemaining;
       lastUpdateTime.current = Date.now();
@@ -25,11 +33,13 @@ export function CountdownTimer({ secondsRemaining, status, participantCount }: C
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - lastUpdateTime.current) / 1000);
       const nextSeconds = Math.max(0, lastServerSeconds.current - elapsed);
-      setDisplaySeconds(nextSeconds);
+      if (nextSeconds !== displaySeconds) {
+        setDisplaySeconds(nextSeconds);
+      }
     }, 200);
 
     return () => clearInterval(interval);
-  }, [secondsRemaining]);
+  }, [secondsRemaining, participantCount]);
 
   const timeLeft = {
     minutes: Math.floor(displaySeconds / 60),
