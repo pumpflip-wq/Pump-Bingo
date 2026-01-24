@@ -81,19 +81,39 @@ export default function AdminDashboard() {
         <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase">
           PROTOCOL <span className="text-primary">CONTROL</span>
         </h1>
-        <div className="flex gap-4">
-          <div className="bg-card p-4 rounded-xl border border-white/10 flex items-center gap-3">
-            <Activity className="text-primary w-5 h-5" />
-            <div>
-              <p className="text-[10px] uppercase font-black text-white/40">Active Rounds</p>
-              <p className="text-xl font-black text-white italic">{activeRoundsCount}</p>
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="destructive" 
+            size="sm"
+            className="font-black italic uppercase h-9 px-4 text-[10px] gap-2"
+            onClick={async () => {
+              if (confirm("Are you sure? This will reset the entire system!")) {
+                try {
+                  await apiRequest("POST", "/api/admin/reset", { adminWallet: PROTOCOL_CONFIG.ADMIN_WALLET });
+                  toast({ title: "System Reset Successful" });
+                  queryClient.invalidateQueries();
+                } catch (err: any) {
+                  toast({ title: "Reset Failed", description: err.message, variant: "destructive" });
+                }
+              }
+            }}
+          >
+            <AlertTriangle className="w-3 h-3" /> EMERGENCY RESET
+          </Button>
+          <div className="flex gap-4">
+            <div className="bg-card p-4 rounded-xl border border-white/10 flex items-center gap-3">
+              <Activity className="text-primary w-5 h-5" />
+              <div>
+                <p className="text-[10px] uppercase font-black text-white/40">Active Rounds</p>
+                <p className="text-xl font-black text-white italic">{activeRoundsCount}</p>
+              </div>
             </div>
-          </div>
-          <div className="bg-card p-4 rounded-xl border border-white/10 flex items-center gap-3">
-            <Users className="text-primary w-5 h-5" />
-            <div>
-              <p className="text-[10px] uppercase font-black text-white/40">Total Users</p>
-              <p className="text-xl font-black text-white italic">{stats?.userCount}</p>
+            <div className="bg-card p-4 rounded-xl border border-white/10 flex items-center gap-3">
+              <Users className="text-primary w-5 h-5" />
+              <div>
+                <p className="text-[10px] uppercase font-black text-white/40">Total Users</p>
+                <p className="text-xl font-black text-white italic">{stats?.userCount}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -144,36 +164,6 @@ export default function AdminDashboard() {
             <p className="text-3xl font-black text-white italic">
               {formatCurrency(stats?.totalRevenue || 0, false)} <span className="text-sm text-white/60">{PROTOCOL_CONFIG.SYMBOL}</span>
             </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-card/80 border-white/10">
-          <CardHeader>
-            <CardTitle className="text-sm font-black uppercase text-white/60">Admin Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col gap-2">
-              <Button 
-                variant="destructive" 
-                className="font-black italic uppercase"
-                onClick={async () => {
-                  if (confirm("Are you sure? This will reset the entire system!")) {
-                    try {
-                      await apiRequest("POST", "/api/admin/reset", { adminWallet: PROTOCOL_CONFIG.ADMIN_WALLET });
-                      toast({ title: "System Reset Successful" });
-                      queryClient.invalidateQueries();
-                    } catch (err: any) {
-                      toast({ title: "Reset Failed", description: err.message, variant: "destructive" });
-                    }
-                  }
-                }}
-              >
-                <AlertTriangle className="w-4 h-4 mr-2" /> EMERGENCY RESET
-              </Button>
-              <p className="text-[10px] text-white/40 uppercase font-black text-center italic">Use only in case of critical failure</p>
-            </div>
           </CardContent>
         </Card>
       </div>
