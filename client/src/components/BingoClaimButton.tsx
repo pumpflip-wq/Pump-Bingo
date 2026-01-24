@@ -4,6 +4,7 @@ import { Loader2, Trophy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ROUND_STATUS } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import { queryClient } from "@/lib/queryClient";
 
 interface BingoClaimButtonProps {
   roundId: number;

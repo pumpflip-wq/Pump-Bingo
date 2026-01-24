@@ -192,7 +192,9 @@ export class GameManager {
             // User requested exactly 10 seconds post-win
             const winnerDeclaredAt = round.completedAt ? new Date(round.completedAt).getTime() : Date.now();
             
+            // Wait exactly 10 seconds post-win before moving to FINISHED
             if (Date.now() - winnerDeclaredAt >= 10000) {
+                console.log(`Round ${round.id} reached 10s post-win delay, finishing...`);
                 await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
                 await this.createNewRound();
             }
