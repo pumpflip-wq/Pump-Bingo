@@ -104,11 +104,7 @@ export function BingoClaimButton({
           // Force immediate invalidation of round data to lock the room
           queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
           queryClient.invalidateQueries({ queryKey: ["/api/rounds", roundId] });
-          
-          toast({
-            title: "BINGO!",
-            description: "Congratulations! You won the round!",
-          });
+          queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
         },
         onError: (error: Error) => {
           toast({
@@ -121,21 +117,8 @@ export function BingoClaimButton({
     );
   };
 
-  if (status === ROUND_STATUS.FINISHED) {
-    return (
-      <div className={cn("text-center py-4 px-8 bg-white/5 rounded-xl border border-white/10", className)}>
-        <p className="text-white/60 text-sm font-black uppercase tracking-widest">Round Complete</p>
-      </div>
-    );
-  }
-
-  if (isBingoed) {
-    return (
-      <div className={cn("text-center py-4 px-8 bg-primary/20 rounded-xl border border-primary/30 flex items-center gap-3 justify-center", className)}>
-        <Trophy className="w-5 h-5 text-primary" />
-        <p className="text-primary text-sm font-black uppercase tracking-widest">Bingo Claimed!</p>
-      </div>
-    );
+  if (status === ROUND_STATUS.FINISHED || isBingoed) {
+    return null;
   }
 
   return (

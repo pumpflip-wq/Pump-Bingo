@@ -206,10 +206,9 @@ export class GameManager {
         
         // Check if winner was already declared (e.g. via claim route)
         if (round.winnerId) {
-            // User requested exactly 10 seconds post-win
             const winnerDeclaredAt = round.completedAt ? new Date(round.completedAt).getTime() : Date.now();
             
-            // Wait exactly 10 seconds post-win before moving to FINISHED
+            // Fixed 10s delay
             if (Date.now() - winnerDeclaredAt >= 10000) {
                 console.log(`Round ${round.id} reached 10s post-win delay, finishing...`);
                 await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
