@@ -370,7 +370,7 @@ export default function Home() {
                                           <div className="flex flex-col items-center gap-2">
                                             <span className="text-sm text-white uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
                                             <span className="text-5xl md:text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
-                                              {formatCurrency(roundData.round.prizePool || 0)} <span className="text-2xl">PBINGO</span>
+                                              {formatCurrency(roundData.round.prizePool || 0)} <span className="text-3xl ml-2">{PROTOCOL_CONFIG.SYMBOL}</span>
                                             </span>
                                           </div>
                                         </div>
