@@ -28,14 +28,22 @@ export const db = drizzle(pool, { schema });
  */
 export async function initializeDatabase() {
   try {
-    await db.execute(sql`SELECT 1`);
+    const res = await db.execute(sql`SELECT 1`);
+    console.log("Database connection successful:", res);
     
     const tablesExist = await checkTablesExist();
     if (!tablesExist) {
+      console.log("Tables not found, creating schema...");
       await createTables();
+      console.log("Schema creation successful.");
+    } else {
+      console.log("Database tables already exist.");
     }
   } catch (err: any) {
     console.error("Database initialization failed:", err);
+    // Log more details about the error
+    if (err.message) console.error("Error message:", err.message);
+    if (err.code) console.error("Error code:", err.code);
     throw err;
   }
 }
@@ -103,6 +111,18 @@ async function createTables() {
       amount INTEGER NOT NULL,
       type TEXT NOT NULL,
       round_id INTEGER,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  // Create payment_queue table
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS payment_queue (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      amount INTEGER NOT NULL,
+      tx_signature TEXT NOT NULL UNIQUE,
+      status TEXT NOT NULL DEFAULT 'PENDING',
       created_at TIMESTAMP DEFAULT NOW()
     )
   `);
