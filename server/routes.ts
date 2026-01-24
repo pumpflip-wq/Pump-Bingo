@@ -172,17 +172,24 @@ export async function registerRoutes(
         roundId
       });
 
-      // Update local balance (optional, since it's on-chain, but good for UI consistency)
-      const userToUpdate = await storage.getUser(userId);
-      if (userToUpdate) {
-        await storage.updateUserBalance(userId, -Number(round.price));
-      }
+      // Update local balance
+      await storage.updateUserBalance(userId, -Number(round.price));
 
       // Generate Card
       const card = gameManager.generateCard();
       const participant = await storage.joinRound(roundId, userId, card, txSignature);
 
-      res.json({ participant, balance: (userToUpdate?.balance || 0) - Number(round.price) });
+      // Verify signature in background
+      solanaManager.verifyTransaction(txSignature, Number(round.price), treasuryWallet)
+        .then(valid => {
+          if (!valid) {
+            console.error(`Transaction verification failed for ${txSignature}`);
+            // In a real scenario, we might want to flag the participant or handle fraud
+          }
+        })
+        .catch(err => console.error("Verification background error:", err));
+
+      res.json({ participant, balance: (user.balance || 0) - Number(round.price) });
     } catch (err) {
        console.error("Error joining round:", err);
        res.status(500).json({ message: "Failed to join round. Please try again." });

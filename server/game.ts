@@ -102,12 +102,24 @@ export class GameManager {
         for (const payment of pendingPayments) {
           try {
             const card = this.generateCard();
-            await storage.joinRound(nextId, payment.userId, card, payment.txSignature);
+            const participant = await storage.joinRound(nextId, payment.userId, card, payment.txSignature);
             
             // Add to prize pool
             const round = await storage.getRound(nextId);
             if (round) {
-              await storage.updateRound(nextId, { prizePool: round.prizePool + payment.amount });
+              const newPrizePool = Number(round.prizePool) + Number(payment.amount);
+              await storage.updateRound(nextId, { prizePool: newPrizePool });
+              
+              // Create transaction record
+              await storage.createTransaction({
+                userId: payment.userId,
+                amount: -Number(payment.amount),
+                type: "BUY_IN",
+                roundId: nextId
+              });
+
+              // Update user balance
+              await storage.updateUserBalance(payment.userId, -Number(payment.amount));
             }
 
             await storage.markPaymentProcessed(payment.id);
