@@ -79,7 +79,7 @@ export class GameManager {
     
     // Default wait time is 60 seconds
     const now = Date.now();
-    const startTime = new Date(now + 65000); // 65 seconds for next round (standard waiting)
+    const startTime = new Date(now + 60000); // 60 seconds for next round (standard waiting)
 
     await storage.createRound({
       id: nextId,
@@ -156,7 +156,7 @@ export class GameManager {
         }
       } else {
         // Not enough players: strictly freeze the start time at 60s in the future
-        const sixtySecondsFromNow = new Date(now.getTime() + 61000);
+        const sixtySecondsFromNow = new Date(now.getTime() + 60000);
         
         // Always ensure it's at least 60s away if under capacity
         const currentStartTime = round.startTime ? new Date(round.startTime) : null;
