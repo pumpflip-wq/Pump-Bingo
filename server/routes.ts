@@ -236,8 +236,10 @@ export async function registerRoutes(
           .from(participants)
           .where(eq(participants.roundId, roundId));
 
+          // Use round.drawnNumbers which was fetched at the beginning
+          const drawnNumbers = round.drawnNumbers || [];
           for (const p of allParticipants) {
-            const prob = gameManager.calculateWinProb(p.card as number[][], currentRound?.drawnNumbers || []);
+            const prob = gameManager.calculateWinProb(p.card as number[][], drawnNumbers);
             await db.update(participants)
               .set({ finalWinProb: prob })
               .where(sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${p.userId}`);
