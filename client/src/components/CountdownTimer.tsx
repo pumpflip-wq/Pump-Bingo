@@ -15,17 +15,18 @@ export function CountdownTimer({ secondsRemaining, status, participantCount }: C
   const lastUpdateTime = useRef(Date.now());
 
   useEffect(() => {
-    // When server sends new secondsRemaining, update our reference point
-    if (secondsRemaining !== lastServerSeconds.current) {
-      lastServerSeconds.current = secondsRemaining;
-      lastUpdateTime.current = Date.now();
-      setDisplaySeconds(secondsRemaining);
-    }
-
     // If waiting for players, show default
     if (participantCount < 2) {
       setDisplaySeconds(60);
+      lastServerSeconds.current = 60;
       return;
+    }
+
+    // When server sends new secondsRemaining > 0, update our reference point
+    if (secondsRemaining > 0 && secondsRemaining !== lastServerSeconds.current) {
+      lastServerSeconds.current = secondsRemaining;
+      lastUpdateTime.current = Date.now();
+      setDisplaySeconds(secondsRemaining);
     }
 
     // Local countdown interpolation between server updates

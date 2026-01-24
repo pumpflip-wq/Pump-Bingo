@@ -123,10 +123,16 @@ export async function registerRoutes(
 
     // Calculate seconds remaining for countdown (server-side to avoid clock sync issues)
     let secondsRemaining = 0;
-    if (round.startTime && round.status === ROUND_STATUS.OPEN) {
-      const targetTime = round.startTime instanceof Date ? round.startTime.getTime() : new Date(round.startTime).getTime();
-      const now = Date.now();
-      secondsRemaining = Math.max(0, Math.ceil((targetTime - now) / 1000));
+    if (round.status === ROUND_STATUS.OPEN) {
+      if (round.startTime) {
+        const targetTime = round.startTime instanceof Date ? round.startTime.getTime() : new Date(round.startTime).getTime();
+        const now = Date.now();
+        secondsRemaining = Math.max(0, Math.ceil((targetTime - now) / 1000));
+      } else if (count >= 2) {
+        // Race condition: 2 players joined but game tick hasn't set startTime yet
+        // Return full countdown so timer doesn't flash 00:00
+        secondsRemaining = 60;
+      }
     }
     
     res.json({ 
