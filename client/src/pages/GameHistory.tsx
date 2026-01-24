@@ -195,14 +195,16 @@ export default function GameHistory() {
                                       <span className="text-xs font-black uppercase tracking-widest">Details</span>
                                     </Button>
                                   </DialogTrigger>
-                                  <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white max-w-2xl w-[90vw] max-h-[85vh] overflow-y-auto custom-scrollbar translate-y-[2%]">
-                                    <DialogHeader>
+                                  <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white max-w-2xl w-[90vw] max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-[2rem]">
+                                    <DialogHeader className="p-6 pb-2 shrink-0">
                                       <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase flex items-center gap-2">
                                         <History className="w-8 h-8 text-primary" />
                                         Round <span className="text-primary">#{round.id}</span>
                                       </DialogTitle>
                                     </DialogHeader>
-                                    <RoundDetailsModal roundId={round.id} />
+                                    <div className="flex-1 overflow-y-auto custom-scrollbar px-6 pb-6">
+                                      <RoundDetailsModal roundId={round.id} />
+                                    </div>
                                   </DialogContent>
                                 </Dialog>
                                 <Link href={`/verify?roundId=${round.id}`}>
