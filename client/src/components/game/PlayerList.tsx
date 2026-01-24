@@ -75,7 +75,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
                     <span className="text-[12px] text-primary font-black font-mono tracking-normal">
-                      -{(Number(roundData?.round?.price || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) / 1e9).toFixed(2)} SOL
+                      +{(Number(roundData?.round?.price || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) / 1e9).toFixed(2)} SOL
                     </span>
                     {showStats && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && (
                       <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">

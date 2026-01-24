@@ -13,22 +13,29 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
   const [timeLeft, setTimeLeft] = useState({ minutes: 1, seconds: 0 });
 
   useEffect(() => {
+    // Reset to 1 minute when waiting for more players
     if (participantCount < 2) {
       setTimeLeft({ minutes: 1, seconds: 0 });
       return;
     }
     
+    // If no target date yet but we have 2+ players, show 1:00 (waiting for countdown to start)
     if (!targetDate) {
       setTimeLeft({ minutes: 1, seconds: 0 });
       return;
     }
 
     const calculateTimeLeft = () => {
-      if (!targetDate) return;
+      if (!targetDate) {
+        setTimeLeft({ minutes: 1, seconds: 0 });
+        return;
+      }
+      
       const target = new Date(targetDate).getTime();
       const now = Date.now();
       const diff = target - now;
       
+      // If target is in the past, the game should be starting soon
       if (diff <= 0) {
         setTimeLeft({ minutes: 0, seconds: 0 });
         return;
@@ -42,7 +49,7 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
     };
 
     calculateTimeLeft();
-    const interval = setInterval(calculateTimeLeft, 100);
+    const interval = setInterval(calculateTimeLeft, 200);
 
     return () => clearInterval(interval);
   }, [targetDate, participantCount]);
