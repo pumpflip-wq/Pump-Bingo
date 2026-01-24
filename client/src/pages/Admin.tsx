@@ -4,6 +4,7 @@ import { formatCurrency, formatAddress } from "@/lib/utils";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Loader2, ShieldCheck, TrendingUp, Users } from "lucide-react";
 import { format } from "date-fns";
+import { PROTOCOL_CONFIG } from "@shared/config";
 
 export default function Admin() {
   const { data: rounds, isLoading: roundsLoading } = useQuery<(Round & { winnerUsername?: string })[]>({

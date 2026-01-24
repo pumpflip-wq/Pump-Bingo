@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { Link } from "wouter";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useToast } from "@/hooks/use-toast";
+import { formatAddress, formatCurrency } from "@/lib/utils";
 
 export default function GameHistory() {
   const [page, setPage] = useState(1);
