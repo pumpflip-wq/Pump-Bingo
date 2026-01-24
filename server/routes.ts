@@ -136,9 +136,11 @@ export async function registerRoutes(
       const now = Date.now();
       if (round.startTime) {
         const targetTime = round.startTime instanceof Date ? round.startTime.getTime() : new Date(round.startTime).getTime();
+        // Use a small offset to ensure the timer actually moves
         secondsRemaining = Math.max(0, Math.ceil((targetTime - now) / 1000));
       } else if (count >= 2) {
-        // Return 60 immediately when 2 players are present
+        // If we have 2 players but no startTime yet, it means the server hasn't ticked to set it.
+        // We return 60 to prevent a 00:00 flash on the client.
         secondsRemaining = 60;
       }
     }

@@ -163,12 +163,13 @@ export class GameManager {
     
     if (!round.startTime) {
       const countdownTime = 60_000;
-      const targetTime = new Date(now + countdownTime);
+      const targetTime = new Date(Date.now() + countdownTime);
       // Wait for the storage update to complete before continuing
       await storage.updateRound(round.id, {
         startTime: targetTime, 
       });
       console.log(`[GameManager] Round #${round.id} countdown started. Target: ${targetTime.toISOString()}`);
+      // Return immediately so the next tick starts the countdown logic
       return;
     }
 
