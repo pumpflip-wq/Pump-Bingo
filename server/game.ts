@@ -237,12 +237,21 @@ export class GameManager {
     const payments = await storage.getPendingPayments();
     for (const p of payments) {
       try {
+        // Double check participant doesn't already exist for this round
+        const existing = await storage.getParticipant(roundId, p.userId);
+        if (existing) {
+          await storage.markPaymentProcessed(p.id);
+          continue;
+        }
+
         const card = this.generateCard();
         await storage.joinRound(roundId, p.userId, card, p.txSignature);
 
+        // Update prize pool for the round
         const round = await storage.getRound(roundId);
         if (round) {
-          // Prize pool יתעדכן רק בסוף העסקה המאושרת בבלוק
+          const updatedPrize = Number(round.prizePool) + Number(p.amount);
+          await storage.updateRound(roundId, { prizePool: updatedPrize });
         }
 
         await storage.createTransaction({
@@ -254,7 +263,9 @@ export class GameManager {
 
         await storage.updateUserBalance(p.userId, -Number(p.amount));
         await storage.markPaymentProcessed(p.id);
-      } catch {}
+      } catch (err) {
+        console.error("Error processing pending payment:", err);
+      }
     }
   }
 
