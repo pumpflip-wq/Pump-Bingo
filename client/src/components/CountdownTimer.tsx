@@ -11,29 +11,36 @@ interface CountdownTimerProps {
 
 export function CountdownTimer({ secondsRemaining, status, participantCount }: CountdownTimerProps) {
   const [displaySeconds, setDisplaySeconds] = useState(60);
-  const lastServerSeconds = useRef(secondsRemaining);
+  const lastServerSeconds = useRef(60);
   const lastUpdateTime = useRef(Date.now());
+  const hasReceivedValidCountdown = useRef(false);
 
   useEffect(() => {
-    // If waiting for players, show default
+    // If waiting for players, reset to default
     if (participantCount < 2) {
       setDisplaySeconds(60);
       lastServerSeconds.current = 60;
+      hasReceivedValidCountdown.current = false;
       return;
     }
 
     // When server sends new secondsRemaining > 0, update our reference point
-    if (secondsRemaining > 0 && secondsRemaining !== lastServerSeconds.current) {
-      lastServerSeconds.current = secondsRemaining;
-      lastUpdateTime.current = Date.now();
-      setDisplaySeconds(secondsRemaining);
+    if (secondsRemaining > 0) {
+      hasReceivedValidCountdown.current = true;
+      if (secondsRemaining !== lastServerSeconds.current) {
+        lastServerSeconds.current = secondsRemaining;
+        lastUpdateTime.current = Date.now();
+        setDisplaySeconds(secondsRemaining);
+      }
     }
 
     // Local countdown interpolation between server updates
     const interval = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - lastUpdateTime.current) / 1000);
-      const remaining = Math.max(0, lastServerSeconds.current - elapsed);
-      setDisplaySeconds(remaining);
+      if (hasReceivedValidCountdown.current) {
+        const elapsed = Math.floor((Date.now() - lastUpdateTime.current) / 1000);
+        const remaining = Math.max(0, lastServerSeconds.current - elapsed);
+        setDisplaySeconds(remaining);
+      }
     }, 200);
 
     return () => clearInterval(interval);
@@ -92,8 +99,9 @@ export function CountdownTimer({ secondsRemaining, status, participantCount }: C
     );
   }
 
-  // Show "STARTING" animation when countdown reaches 0 but still waiting for server to transition
-  if (displaySeconds === 0 && status === ROUND_STATUS.OPEN) {
+  // Show "STARTING" animation ONLY when countdown has legitimately counted down to 0
+  // (not when server briefly sends 0 before setting the countdown)
+  if (displaySeconds === 0 && status === ROUND_STATUS.OPEN && hasReceivedValidCountdown.current) {
     return (
       <div className="flex flex-col items-center justify-center space-y-6">
         <div className="relative">
