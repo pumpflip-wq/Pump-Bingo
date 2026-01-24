@@ -69,8 +69,8 @@ export class SolanaManager {
       return true;
     }
 
-    const maxRetries = 15;
-    const retryDelay = 2000;
+    const maxRetries = 20; 
+    const retryDelay = 1500; 
 
     console.log(`Verifying transaction: ${signature} for amount ${expectedAmount}`);
 
@@ -81,12 +81,17 @@ export class SolanaManager {
           maxSupportedTransactionVersion: 0
         });
 
-        if (tx && tx.meta && !tx.meta.err) {
+        if (tx && tx.meta) {
           console.log(`Transaction found: ${signature}`);
+          
+          if (tx.meta.err) {
+            console.log(`Transaction failed on-chain: ${signature}`);
+            return false;
+          }
+
           const mint = PROTOCOL_CONFIG.MINT_ADDRESS ? new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS) : null;
 
           if (mint) {
-            // SPL Token transfer check
             const instructions = tx.transaction.message.instructions;
             for (const ix of instructions) {
               if ("parsed" in ix && ix.program === "spl-token") {
@@ -101,26 +106,21 @@ export class SolanaManager {
               }
             }
           } else {
-            // Simple SOL transfer check - check account keys in meta for balance changes
-            // This is more reliable than checking instructions for system transfers
             const postBalances = tx.meta.postBalances;
             const preBalances = tx.meta.preBalances;
             const accountKeys = tx.transaction.message.accountKeys;
             
-            const recipientIndex = accountKeys.findIndex(key => key.pubkey.toBase58() === recipient);
-            
-            if (recipientIndex !== -1) {
-              const diff = postBalances[recipientIndex] - preBalances[recipientIndex];
-              // We check if the recipient's balance increased by at least expectedAmount
-              if (diff >= expectedAmount) {
-                console.log(`Verification successful: SOL balance increased by ${diff}`);
-                return true;
+            for (let idx = 0; idx < accountKeys.length; idx++) {
+              const key = accountKeys[idx].pubkey.toBase58();
+              if (key === recipient) {
+                const diff = postBalances[idx] - preBalances[idx];
+                if (diff >= expectedAmount - 5000) { 
+                  console.log(`Verification successful: SOL balance increased by ${diff}`);
+                  return true;
+                }
               }
             }
           }
-        } else if (tx && tx.meta && tx.meta.err) {
-          console.log(`Transaction failed on-chain: ${signature}`);
-          return false;
         }
       } catch (err) {
         console.error(`Verification attempt ${i + 1} failed:`, err);
