@@ -103,6 +103,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async joinRound(roundId: number, userId: number, card: number[][], txSignature?: string): Promise<Participant> {
+    // Check if user already joined this round
+    const existingParticipant = await this.getParticipant(roundId, userId);
+    if (existingParticipant) {
+      return existingParticipant; // Return existing participation instead of creating duplicate
+    }
+    
     const cardJson = JSON.stringify(card);
     const res = await db.execute(sql`
       INSERT INTO participants (round_id, user_id, card, tx_signature) 

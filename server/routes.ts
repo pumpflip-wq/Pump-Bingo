@@ -164,6 +164,13 @@ export async function registerRoutes(
 
       const round = await storage.getRound(roundId);
       if (!round) return res.status(404).json({ message: "Round not found" });
+      
+      // Check if user already joined this round
+      const existingParticipant = await storage.getParticipant(roundId, Number(userId));
+      if (existingParticipant) {
+        const user = await storage.getUser(Number(userId));
+        return res.json({ participant: existingParticipant, balance: Number(user?.balance || 0) });
+      }
 
       const treasuryWallet = solanaManager.getMasterPublicKey();
       if (!treasuryWallet) return res.status(500).json({ message: "Server wallet not initialized" });
