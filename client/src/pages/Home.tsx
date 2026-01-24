@@ -44,6 +44,10 @@ export default function Home() {
     historyLoading 
   } = useGameState();
 
+  // If we have any round data at all, even with an error, don't show the error screen
+  const hasData = !!roundData?.round;
+  const showErrorMessage = error && !hasData;
+
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
 
   const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
@@ -212,11 +216,11 @@ export default function Home() {
       <div className="flex flex-col w-full">
         <div className="flex-1 flex flex-col space-y-4">
             {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1">
+            <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1 text-center">
               <Loader2 className="w-16 h-16 text-primary animate-spin" />
               <p className="font-mono text-xs text-primary uppercase tracking-[0.3em]">Connecting Node...</p>
             </div>
-          ) : error ? (
+          ) : showErrorMessage ? (
             <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1 text-center">
               <AlertTriangle className="w-16 h-16 text-destructive animate-pulse" />
               <p className="font-mono text-xs text-destructive uppercase tracking-[0.3em]">System Link Failure</p>

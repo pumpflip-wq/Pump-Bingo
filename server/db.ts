@@ -11,14 +11,12 @@ if (!process.env.DATABASE_URL) {
   console.error("For Railway: Add a PostgreSQL database and link DATABASE_URL to your web service.");
 }
 
+const isProduction = process.env.NODE_ENV === "production" || process.env.RAILWAY_ENVIRONMENT;
+
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  ssl: (process.env.NODE_ENV === "production" || 
-        process.env.DATABASE_URL?.includes("railway") || 
-        process.env.RAILWAY_STATIC_URL ||
-        process.env.RAILWAY_ENVIRONMENT ||
-        process.env.RAILWAY_TCP_PROXY_DOMAIN) ? { rejectUnauthorized: false } : false,
-  max: 20,
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
+  max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,
 });
