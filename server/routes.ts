@@ -147,7 +147,8 @@ export async function registerRoutes(
     // Before game ends, only show the publicHash so players can verify later
     const safeRound = {
       ...round,
-      serverSeed: round.status === ROUND_STATUS.FINISHED ? round.serverSeed : null
+      serverSeed: round.status === ROUND_STATUS.FINISHED ? round.serverSeed : null,
+      drawnNumbers: round.drawnNumbers || []
     };
     
     res.json({ 
@@ -158,7 +159,8 @@ export async function registerRoutes(
         ...p,
         joinedAt: p.joinedAt instanceof Date ? p.joinedAt.toISOString() : p.joinedAt,
         card: typeof p.card === 'string' ? JSON.parse(p.card) : p.card,
-        winRate: p.finalWinProb || 0
+        winRate: p.finalWinProb || 0,
+        finalWinProb: p.finalWinProb || 0
       }))
     });
   });

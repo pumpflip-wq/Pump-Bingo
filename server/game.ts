@@ -264,7 +264,7 @@ export class GameManager {
     // ATOMIC CLAIM: first click wins
     // We already update the round status to FINISHED in routes.ts for immediate UI response
     const claimed = await storage.updateRound(roundId, { winnerId: userId, status: ROUND_STATUS.FINISHED, completedAt: new Date() });
-    if (!claimed) return false;
+    if (!claimed || !claimed.winnerId) return false;
 
     return true;
   }

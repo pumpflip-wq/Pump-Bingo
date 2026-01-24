@@ -111,9 +111,9 @@ export class DatabaseStorage implements IStorage {
     
     const cardJson = JSON.stringify(card);
     const res = await db.execute(sql`
-      INSERT INTO participants (round_id, user_id, card, tx_signature) 
-      VALUES (${roundId}, ${userId}, ${cardJson}::jsonb, ${txSignature || null})
-      RETURNING id, round_id, user_id, card, has_bingo, joined_at, tx_signature
+      INSERT INTO participants (round_id, user_id, card, tx_signature, final_win_prob) 
+      VALUES (${roundId}, ${userId}, ${cardJson}::jsonb, ${txSignature || null}, 0)
+      RETURNING id, round_id, user_id, card, has_bingo, joined_at, tx_signature, final_win_prob
     `);
     const row = res.rows?.[0] as any;
     return {
@@ -122,7 +122,7 @@ export class DatabaseStorage implements IStorage {
       userId: row.user_id,
       card: row.card,
       hasBingo: row.has_bingo,
-      finalWinProb: 0,
+      finalWinProb: row.final_win_prob || 0,
       joinedAt: row.joined_at,
       txSignature: row.tx_signature
     } as Participant;
@@ -132,7 +132,7 @@ export class DatabaseStorage implements IStorage {
     if (!roundId || isNaN(roundId) || !userId || isNaN(userId)) return undefined;
     
     // Explicitly handling possible schema mismatch by selecting only known columns
-    const res = await db.execute(sql`SELECT id, round_id, user_id, card, has_bingo, joined_at, tx_signature FROM participants WHERE round_id = ${roundId} AND user_id = ${userId}`);
+    const res = await db.execute(sql`SELECT id, round_id, user_id, card, has_bingo, joined_at, tx_signature, final_win_prob FROM participants WHERE round_id = ${roundId} AND user_id = ${userId}`);
     const row = res.rows?.[0] as any;
     if (!row) return undefined;
     
@@ -144,7 +144,7 @@ export class DatabaseStorage implements IStorage {
       hasBingo: row.has_bingo,
       joinedAt: row.joined_at,
       txSignature: row.tx_signature,
-      finalWinProb: 0
+      finalWinProb: row.final_win_prob || 0
     } as Participant;
   }
 
