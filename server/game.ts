@@ -196,6 +196,7 @@ export class GameManager {
     const elapsed = Date.now() - round.startTime!.getTime();
     const expectedDraws = Math.floor(elapsed / DRAW_INTERVAL_MS);
 
+    // Keep drawing as long as there's no winner
     if (round.drawnNumbers.length >= expectedDraws) return;
 
     const next = getDeterministicDraw(round.serverSeed, round.drawnNumbers);

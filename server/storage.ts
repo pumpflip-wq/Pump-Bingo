@@ -95,7 +95,7 @@ export class DatabaseStorage implements IStorage {
     const [updated] = await db.update(rounds)
       .set({
         ...updates,
-        completedAt: updates.status === ROUND_STATUS.FINISHED ? new Date() : updates.completedAt
+        completedAt: updates.status === ROUND_STATUS.FINISHED ? new Date() : (updates.completedAt || null)
       })
       .where(eq(rounds.id, id))
       .returning();
