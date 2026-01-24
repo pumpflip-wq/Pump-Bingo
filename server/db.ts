@@ -82,6 +82,14 @@ async function runMigrations() {
       created_at TIMESTAMP DEFAULT NOW()
     )
   `);
+  
+  // Add final_win_prob column to participants if it doesn't exist
+  try {
+    await db.execute(sql`ALTER TABLE participants ADD COLUMN IF NOT EXISTS final_win_prob INTEGER DEFAULT 0`);
+  } catch (e) {
+    console.log("Column final_win_prob migration:", e);
+  }
+  
   console.log("Migrations complete.");
 }
 
