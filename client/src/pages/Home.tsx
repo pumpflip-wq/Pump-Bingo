@@ -232,11 +232,7 @@ export default function Home() {
               
               <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
                 <PlayerList 
-                  participants={[
-                    ...(walletAddress && (participantsList.some(p => p.username === walletAddress) || (participant || foundParticipant))
-                      ? participantsList
-                      : (walletAddress ? [{ id: 'me', username: walletAddress, prob: 0 }, ...participantsList] : participantsList))
-                  ].map(p => ({ ...p, id: p.id || p.username }))}
+                  participants={participantsList.map(p => ({ ...p, id: p.id || p.username }))}
                   walletAddress={walletAddress}
                   formatAddress={formatAddress}
                   roundStatus={roundData.round.status}
