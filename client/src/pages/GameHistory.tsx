@@ -41,7 +41,7 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
 
       <div className="space-y-3">
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Draw Sequence</h3>
-        <div className="flex flex-wrap gap-2 p-4 rounded-2xl bg-black/40 border border-white/5 max-h-[300px] overflow-y-auto custom-scrollbar">
+        <div className="flex flex-wrap gap-2 p-4 rounded-2xl bg-black/40 border border-white/5 max-h-[160px] overflow-y-auto custom-scrollbar">
           {details.round.drawnNumbers?.map((num: number, i: number) => (
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
@@ -58,16 +58,16 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
 
       <div className="space-y-3">
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
-        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+        <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2 custom-scrollbar">
           {details.participants.map((p: any) => (
             <div key={p.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
               <div className="flex items-center gap-3">
                 <div>
-                  <p className="text-sm font-black text-white">{p.username}</p>
+                  <p className="text-sm font-black text-white">{p.username.slice(0, 6)}...{p.username.slice(-4)}</p>
                   <div className="flex flex-col gap-1 mt-1">
-                    <p className="text-[10px] text-white font-black uppercase tracking-widest">Joined {format(new Date(p.joinedAt), "MMM d, HH:mm:ss")}</p>
+                    <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
                     {p.winRate !== undefined && (
-                      <span className="text-[10px] font-black text-primary uppercase tracking-widest">Win Probability: {p.winRate}%</span>
+                      <span className="text-[10px] font-black text-primary uppercase tracking-widest">Win Prob: {p.winRate}%</span>
                     )}
                   </div>
                 </div>
