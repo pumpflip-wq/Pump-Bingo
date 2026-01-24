@@ -108,18 +108,22 @@ export async function registerRoutes(
     const count = await storage.getRoundParticipantsCount(roundId);
     
     // Fetch participants with usernames, cards, and finalWinProb
+    // Use LEFT JOIN to handle cases where user might not exist
     const roundParticipants = await db.execute(sql`
       SELECT 
-        u.id, 
-        u.username, 
+        p.user_id as "id", 
+        COALESCE(u.username, 'Unknown') as username, 
         p.joined_at as "joinedAt", 
         p.card,
         p.final_win_prob as "finalWinProb",
         p.user_id as "userId"
       FROM participants p
-      INNER JOIN users u ON p.user_id = u.id
+      LEFT JOIN users u ON p.user_id = u.id
       WHERE p.round_id = ${roundId}
     `);
+    
+    // Handle both Drizzle result formats (rows array or direct array)
+    const participantsData = Array.isArray(roundParticipants) ? roundParticipants : ((roundParticipants as any).rows || []);
 
     // Calculate seconds remaining for countdown (server-side to avoid clock sync issues)
     let secondsRemaining = 0;
@@ -139,7 +143,7 @@ export async function registerRoutes(
       round, 
       participantsCount: count,
       secondsRemaining,
-      participants: (roundParticipants.rows || []).map((p: any) => ({
+      participants: participantsData.map((p: any) => ({
         ...p,
         joinedAt: p.joinedAt instanceof Date ? p.joinedAt.toISOString() : p.joinedAt,
         card: typeof p.card === 'string' ? JSON.parse(p.card) : p.card,
