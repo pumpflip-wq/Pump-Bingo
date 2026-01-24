@@ -210,14 +210,17 @@ export async function registerRoutes(
           const payout = Math.floor(round.prizePool * payoutMultiplier);
 
           // WINNER!
-          // Important: payout variable must be defined before calling solanaManager
           const user = await storage.getUser(userId);
-          const txSignature = await solanaManager.sendReward(user?.username || "", payout);
+          
+          // Send reward in background to not block UI
+          solanaManager.sendReward(user?.username || "", payout).then(sig => {
+            if (sig) storage.updateRound(roundId, { payoutSignature: sig });
+          }).catch(err => console.error("Payout error:", err));
 
           await storage.updateRound(roundId, { 
-              status: ROUND_STATUS.IN_GAME, // Keep in game for the 10s delay
+              status: ROUND_STATUS.IN_GAME, 
               winnerId: userId,
-              completedAt: new Date(), // Use this as "winnerDeclaredAt" effectively
+              completedAt: new Date(), 
           });
           
           await storage.updateUserBalance(userId, payout);

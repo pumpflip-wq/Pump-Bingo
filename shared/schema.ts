@@ -26,6 +26,7 @@ export const rounds = pgTable("rounds", {
   createdAt: timestamp("created_at").defaultNow(),
   splMint: text("spl_mint"), // Added for future SPL token integration
   feePercentage: integer("fee_percentage").default(10), // House fee
+  payoutSignature: text("payout_signature"), 
 });
 
 export const paymentQueue = pgTable("payment_queue", {
