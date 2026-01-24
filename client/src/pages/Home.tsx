@@ -44,26 +44,33 @@ export default function Home() {
     historyLoading 
   } = useGameState();
 
+  const [currentTime, setCurrentTime] = useState(Date.now());
+  const [showWinnerOverlay, setShowWinnerOverlay] = useState(false);
+  const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
+  const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
+  const completionTimeRef = useRef<{ roundId: number; time: number } | null>(null);
+
   // If we have any round data at all, even with an error, don't show the error screen
   const hasData = !!roundData?.round;
   const showErrorMessage = error && !hasData;
 
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
 
-  const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
-  const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
-  const completionTimeRef = useRef<{ roundId: number; time: number } | null>(null);
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Recovery effect for stuck "INITIALIZING" state
   useEffect(() => {
-    if (roundData?.round?.status === 'OPEN' && !roundData.round.startTime) {
+    if (roundData?.round?.status === 'OPEN' && !roundData?.round?.startTime) {
       console.log("Stuck round detected, refreshing query...");
       queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
     }
   }, [roundData?.round?.id]);
 
   // Stabilize completion time to prevent restarts on refetch
-  if (roundData?.round.winnerId && roundData.round.completedAt) {
+  if (roundData?.round?.winnerId && roundData?.round?.completedAt) {
     if (completionTimeRef.current?.roundId !== roundData.round.id) {
       completionTimeRef.current = {
         roundId: roundData.round.id,
@@ -73,13 +80,26 @@ export default function Home() {
     }
   }
 
-  const isParticipant = !!participant || !!foundParticipant;
+  useEffect(() => {
+    if (roundData?.round?.winnerId && roundData.round.id !== lastOverlayRoundId) {
+      setShowWinnerOverlay(true);
+      setLastOverlayRoundId(roundData.round.id);
+      
+      const timer = setTimeout(() => {
+        setShowWinnerOverlay(false);
+      }, 10000);
+      
+      return () => clearTimeout(timer);
+    } else if (!roundData?.round?.winnerId) {
+      setShowWinnerOverlay(false);
+      setLastOverlayRoundId(null);
+    }
+  }, [roundData?.round?.winnerId, roundData?.round?.id, lastOverlayRoundId]);
 
   const calculateWinProb = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);
     drawnSet.add(0); // Free space
     
-    // STRICTLY 0% if no numbers drawn or only 1 number drawn (it's impossible to have meaningful prob yet)
     if (drawn.length <= 1) return 0;
     
     const lines = [
@@ -99,28 +119,20 @@ export default function Home() {
       if (marked === 4) potentialLines++;
     });
 
-    // Count unique marked numbers (excluding free space 0)
     card.flat().forEach(num => {
       if (num !== 0 && drawnSet.has(num)) totalMarked++;
     });
 
     if (maxMarked === 5) return 100;
     
-    // Start showing percentage immediately when first number is hit
     if (totalMarked >= 1 && drawn.length > 0) {
-      // Base probability from total hits (creates differentiation between boards with same max line)
       const hitDensity = (totalMarked / 24) * 15; 
-      
-      // Threshold based probability for lines
-      // 2 marks -> 5-8%
-      // 3 marks -> 15-25%
-      // 4 marks -> 45-75%
       let baseLineProb = 0;
       if (maxMarked === 2) baseLineProb = 5;
       else if (maxMarked === 3) baseLineProb = 20;
       else if (maxMarked === 4) baseLineProb = 50;
 
-      const proximityBonus = potentialLines * 12; // High weight for 4/5 lines
+      const proximityBonus = potentialLines * 12; 
       const gameProgress = (drawn.length / 75) * 10;
       
       const finalProb = Math.min(99, Math.floor(baseLineProb + hitDensity + proximityBonus + gameProgress));
@@ -130,26 +142,14 @@ export default function Home() {
     return 0;
   };
 
-  const [currentTime, setCurrentTime] = useState(Date.now());
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const [lastWinKey, setLastWinKey] = useState<string | null>(null);
-
   const overlayState = useMemo(() => {
-    const hasWinner = !!roundData?.round.winnerId;
     const winnerDeclaredAt = completionTimeRef.current?.time;
-    const currentRoundId = roundData?.round.id;
+    const currentRoundId = roundData?.round?.id;
     
-    const isMe = roundData?.round.winnerId === user?.id;
-    const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
+    const isMe = roundData?.round?.winnerId === user?.id;
+    const isFinished = roundData?.round?.status === ROUND_STATUS.FINISHED;
     
-    // Check if I was a participant in this round
-    const amIParticipant = isParticipant;
-
-    if (hasManuallyClosed || !winnerDeclaredAt || isFinished) {
+    if (!showWinnerOverlay || !winnerDeclaredAt || isFinished || hasManuallyClosed) {
       return null;
     }
 
@@ -160,35 +160,21 @@ export default function Home() {
       return null;
     }
 
-    // Only show overlay for active participants
-    if (!amIParticipant) {
-      return null;
-    }
-
-    const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
-    const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
+    const winner = roundData?.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
+    const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData?.round?.winnerId?.toString() || "Unknown"));
     
     return {
       show: true,
       username: winnerUsername,
-      prize: roundData.round.prizePool || 0,
+      prize: roundData?.round?.prizePool || 0,
       isWinner: isMe,
-      txHash: roundData.round.payoutSignature ? `https://explorer.solana.com/tx/${roundData.round.payoutSignature}?cluster=${PROTOCOL_CONFIG.NETWORK}` : undefined,
+      txHash: roundData?.round?.payoutSignature || undefined,
       timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
       currentRoundId: currentRoundId
     };
-  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime]);
+  }, [roundData, user?.id, walletAddress, showWinnerOverlay, currentTime, hasManuallyClosed]);
 
-  useEffect(() => {
-    const completedAtRaw = roundData?.round.completedAt;
-    if (completedAtRaw) {
-      const winnerDeclaredAt = new Date(completedAtRaw).getTime();
-      const elapsed = currentTime - winnerDeclaredAt;
-      if (elapsed >= 10000 && !hasManuallyClosed) {
-        setHasManuallyClosed(true);
-      }
-    }
-  }, [roundData?.round.completedAt, currentTime, hasManuallyClosed]);
+  const isParticipant = !!participant || !!foundParticipant;
 
   const nextRoundTimer = useMemo(() => {
     const completionTime = completionTimeRef.current?.time;
@@ -197,15 +183,15 @@ export default function Home() {
       return Math.max(0, Math.ceil((10000 - elapsed) / 1000));
     }
     return 0;
-  }, [roundData?.round.id, currentTime]);
+  }, [roundData?.round?.id, currentTime]);
 
   const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];
     return roundData.participants.map(p => ({
       ...p,
-      prob: calculateWinProb(p.card, roundData.round.drawnNumbers || [])
+      prob: calculateWinProb(p.card, roundData?.round?.drawnNumbers || [])
     }));
-  }, [roundData?.participants, roundData?.round.drawnNumbers]);
+  }, [roundData?.participants, roundData?.round?.drawnNumbers]);
 
   const sortedParticipants = useMemo(() => {
     return [...participantsList].sort((a, b) => b.prob - a.prob);
@@ -213,6 +199,15 @@ export default function Home() {
 
   return (
     <>
+      <WinnerOverlay 
+        show={overlayState?.show || false}
+        username={overlayState?.username || ""}
+        prize={overlayState?.prize || 0}
+        isWinner={overlayState?.isWinner || false}
+        timeLeft={overlayState?.timeLeft || 0}
+        txHash={overlayState?.txHash}
+        onClose={() => setHasManuallyClosed(true)}
+      />
       <div className="flex flex-col w-full">
         <div className="flex-1 flex flex-col space-y-4">
             {isLoading ? (
@@ -385,7 +380,7 @@ export default function Home() {
                                           <div className="flex flex-col items-center gap-2">
                                             <span className="text-sm text-white uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
                                             <span className="text-4xl md:text-6xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                                              {roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown"}
+                                              {formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}
                                             </span>
                                           </div>
                                           <div className="flex flex-col items-center gap-2">
@@ -488,37 +483,14 @@ export default function Home() {
                 </AnimatePresence>
               </main>
 
-            <aside className="lg:col-span-3 flex flex-col h-[750px]">
-              <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 bg-black/40 border-primary/20 mb-4">
-                <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
-              </div>
-              <GameHistory 
-                historyRounds={historyRounds}
-                historyLoading={historyLoading}
-                formatAddress={formatAddress}
-                currentRoundHash={roundData?.round?.publicHash}
-              />
+            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
+              <ProbabilityFeed participants={sortedParticipants} />
+              <GameHistory history={historyRounds} isLoading={historyLoading} />
             </aside>
-            </div>
-          ) : (
-            <div className="py-32 text-center bg-card/80 rounded-[4rem] border border-dashed border-white/10 space-y-6 flex-1">
-              <Trophy className="w-16 h-16 text-primary mx-auto opacity-20" />
-              <h2 className="text-2xl font-black font-display italic text-white tracking-tighter uppercase">INITIALIZING BINGO...</h2>
-            </div>
-          )}
+          </div>
+          ) : null}
         </div>
       </div>
-      {overlayState && (
-        <WinnerOverlay 
-          show={overlayState.show} 
-          username={overlayState.username || "Unknown"} 
-          prize={overlayState.prize}
-          isWinner={overlayState.isWinner}
-          timeLeft={overlayState.timeLeft}
-          txHash={overlayState.txHash}
-          onClose={() => setHasManuallyClosed(true)}
-        />
-      )}
     </>
   );
 }

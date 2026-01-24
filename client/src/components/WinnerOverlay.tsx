@@ -28,7 +28,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
     }
   }, [show, isWinner]);
 
-  const nextRoundIn = Math.max(0, Math.ceil((10000 - (Date.now() - (timeLeft * 1000))) / 1000));
+  const explorerUrl = txHash ? `https://solscan.io/tx/${txHash}?cluster=${PROTOCOL_CONFIG.NETWORK}` : null;
 
   return (
     <AnimatePresence>
@@ -83,7 +83,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, timeLeft, txHas
                     <div>
                       <p className="text-[10px] text-white uppercase font-black tracking-widest mb-1 text-center">WINNER ADDRESS</p>
                       <p className="text-xl font-bold text-white italic truncate text-center drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                      {username}
+                      {formatAddress(username)}
                     </p>
                     </div>
                     <div>

@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
 import { PROTOCOL_CONFIG } from "@shared/config";
+import { queryClient } from "@/lib/queryClient";
 
 interface JoinButtonProps {
   roundId: number;
@@ -41,8 +42,6 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       let signature = "TEST_TX_SIG_" + Date.now();
 
       if (USE_REAL_SOLANA) {
-        // Optimization: Hardcode the master wallet if it's stable, or at least start the transaction faster
-        // The admin/stats fetch was adding a network roundtrip before the wallet popup
         const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET); 
         const lamports = price;
 
@@ -54,26 +53,23 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           })
         );
 
-        // Get the latest blockhash in parallel or just before sending to minimize delay
         const { blockhash } = await connection.getLatestBlockhash('confirmed');
         transaction.recentBlockhash = blockhash;
         transaction.feePayer = publicKey;
 
         signature = await sendTransaction(transaction, connection);
         
-        // Don't await full confirmation before calling joinRound to make UI feel instant
         connection.confirmTransaction(signature, "confirmed").catch(console.error);
       }
 
-      // 2. Join Round with Tx Signature
       joinRound(
         { roundId, userId, txSignature: signature },
         {
           onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
-          queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
-          queryClient.invalidateQueries({ queryKey: [api.participants.get.path, roundId, userId] });
-          queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/rounds", roundId] });
+            queryClient.invalidateQueries({ queryKey: ["/api/rounds", roundId, "participants", userId] });
+            queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
 
             toast({
               title: "Successfully Joined",
