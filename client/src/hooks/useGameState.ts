@@ -31,12 +31,13 @@ export function useGameState() {
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
   const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number);
 
-  // Poll round data more frequently for immediate updates
+  // Poll round data more frequently during critical transitions
   useEffect(() => {
     if (latestRound?.id) {
+      // Faster polling during transitions, useRound already handles dynamic refetch intervals
       const interval = setInterval(() => {
         refetchRound();
-      }, 1000);
+      }, 800);
       return () => clearInterval(interval);
     }
   }, [latestRound?.id, refetchRound]);

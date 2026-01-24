@@ -39,7 +39,8 @@ export class GameManager {
 
   start() {
     if (this.loopInterval) return;
-    this.loopInterval = setInterval(() => this.tick(), 2000);
+    // Faster tick for more responsive game state transitions
+    this.loopInterval = setInterval(() => this.tick(), 1000);
   }
 
   stop() {

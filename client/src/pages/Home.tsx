@@ -84,19 +84,17 @@ export default function Home() {
     if (roundData?.round?.winnerId && roundData.round.id !== lastOverlayRoundId) {
       setShowWinnerOverlay(true);
       setLastOverlayRoundId(roundData.round.id);
+      setHasManuallyClosed(false);
       
       const timer = setTimeout(() => {
         setShowWinnerOverlay(false);
+        // Only invalidate after the overlay has been shown for 10 seconds
+        queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
       }, 10000);
-      
-      // Invalidate queries to ensure we get the fresh round (new one)
-      queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
 
       return () => clearTimeout(timer);
-    } else if (!roundData?.round?.winnerId) {
-      setShowWinnerOverlay(false);
-      setLastOverlayRoundId(null);
     }
+    // Don't reset overlay state when roundData changes - let it persist for the full 10 seconds
   }, [roundData?.round?.winnerId, roundData?.round?.id, lastOverlayRoundId]);
 
   const calculateWinProb = (card: number[][], drawn: number[]) => {

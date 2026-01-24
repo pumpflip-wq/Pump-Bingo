@@ -101,9 +101,9 @@ export function BingoClaimButton({
       { roundId, userId },
       {
         onSuccess: () => {
-          // Force immediate invalidation of round data to lock the room
-          queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
-          queryClient.setQueryData(["/api/rounds", roundId], (old: any) => {
+          // Force immediate update of round data to show winner overlay
+          // Use the correct query key format that matches use-game.ts
+          queryClient.setQueryData(["/api/rounds/:id", roundId], (old: any) => {
             if (!old) return old;
             return {
               ...old,
@@ -115,6 +115,8 @@ export function BingoClaimButton({
               }
             };
           });
+          // Invalidate the rounds list to trigger updates
+          queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
           queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
         },
         onError: (error: Error) => {
