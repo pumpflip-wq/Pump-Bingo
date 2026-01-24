@@ -149,6 +149,7 @@ export default function Home() {
     const isMe = roundData?.round?.winnerId === user?.id;
     const isFinished = roundData?.round?.status === ROUND_STATUS.FINISHED;
     
+    // user explicitly requested that winner overlay shows for everyone
     if (!showWinnerOverlay || !winnerDeclaredAt || isFinished || hasManuallyClosed) {
       return null;
     }
@@ -484,12 +485,6 @@ export default function Home() {
               </main>
 
             <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
-              <ProbabilityFeed 
-                participants={sortedParticipants} 
-                formatAddress={formatAddress}
-                roundStatus={roundData.round.status}
-                winnerId={roundData.round.winnerId || undefined}
-              />
               <GameHistory history={historyRounds} isLoading={historyLoading} />
             </aside>
           </div>

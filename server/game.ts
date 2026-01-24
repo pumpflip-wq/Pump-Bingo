@@ -39,10 +39,15 @@ export class GameManager {
       
       // If no round exists OR the latest is FINISHED
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
-        // Only create if we haven't already just created one (prevents race condition)
-        if (!latestRound || (latestRound.completedAt && Date.now() - new Date(latestRound.completedAt).getTime() > 1000)) {
-           await this.createNewRound();
+        // Wait exactly 10 seconds after round finished before starting a new one
+        if (latestRound && latestRound.completedAt) {
+          const finishedAt = new Date(latestRound.completedAt).getTime();
+          // Decrease threshold to 10s for faster transitions
+          if (Date.now() - finishedAt < 10000) {
+            return;
+          }
         }
+        await this.createNewRound();
         return;
       }
 
