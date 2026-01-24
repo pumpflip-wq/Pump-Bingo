@@ -121,7 +121,7 @@ export default function GameHistory() {
                                   </Button>
                                 </Link>
                                 <Button variant="ghost" size="icon" className="hover:text-primary transition-colors" asChild>
-                                  <a href={`https://explorer.solana.com/address/${PROTOCOL_CONFIG.MINT_ADDRESS}?cluster=${PROTOCOL_CONFIG.NETWORK}`} target="_blank" rel="noreferrer">
+                                  <a href={`https://explorer.solana.com/address/${round.winnerUsername || PROTOCOL_CONFIG.MINT_ADDRESS || ''}?cluster=${PROTOCOL_CONFIG.NETWORK}`} target="_blank" rel="noreferrer">
                                     <ExternalLink className="w-4 h-4" />
                                   </a>
                                 </Button>

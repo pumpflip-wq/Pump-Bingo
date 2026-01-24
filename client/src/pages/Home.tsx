@@ -159,7 +159,7 @@ export default function Home() {
       username: winnerUsername,
       prize: roundData.round.prizePool || 0,
       isWinner: isMe,
-      txHash: (roundData.round as any).txHash,
+      txHash: roundData.round.winnerId ? `https://explorer.solana.com/address/${winnerUsername}?cluster=${PROTOCOL_CONFIG.NETWORK}` : undefined,
       timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
       currentRoundId: currentRoundId
     };
