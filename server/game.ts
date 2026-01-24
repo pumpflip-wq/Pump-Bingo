@@ -172,9 +172,10 @@ export class GameManager {
     const targetDate = round.startTime instanceof Date ? round.startTime : new Date(round.startTime);
     const target = targetDate.getTime();
     
-    // Check if we are close enough or passed the target
-    if (now >= target - 500) { 
-      console.log(`[GameManager] Round #${round.id} starting... (now: ${now}, target: ${target})`);
+    // START GAME TRANSITION: 
+    // If we've reached the target time, transition to STARTING then IN_GAME
+    if (now >= target) { 
+      console.log(`[GameManager] Round #${round.id} transitioning to STARTING...`);
       await storage.updateRound(round.id, {
         status: ROUND_STATUS.STARTING,
         startTime: new Date(),
@@ -197,7 +198,9 @@ export class GameManager {
       return;
     }
 
+    // Spend 5 seconds in STARTING (Verifying state) then go live
     if (elapsed >= STARTING_MS) {
+      console.log(`[GameManager] Round #${round.id} GOING LIVE!`);
       await storage.updateRound(round.id, {
         status: ROUND_STATUS.IN_GAME,
         startTime: new Date(),
