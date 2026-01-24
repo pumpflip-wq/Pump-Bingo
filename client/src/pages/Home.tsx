@@ -1,40 +1,18 @@
 import { formatAddress, formatCurrency } from "@/lib/utils";
-import { ProbabilityFeed } from "@/components/game/ProbabilityFeed";
 import { PlayerList } from "@/components/game/PlayerList";
 import { GameHistory } from "@/components/game/GameHistory";
-import { useRounds, useRound, useParticipant } from "@/hooks/use-game";
 import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
-import {
-  Users,
-  Trophy,
-  Loader2,
-  History,
-  ShieldCheck,
-  Globe,
-  Copy,
-  ExternalLink,
-  AlertTriangle,
-} from "lucide-react";
+import { Users, Loader2, Globe, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { PROTOCOL_CONFIG } from "@shared/config";
-import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { format } from "date-fns";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import {
-  type Round,
-  type User,
-  type Transaction,
-  ROUND_STATUS,
-} from "@shared/schema";
+import { ROUND_STATUS } from "@shared/schema";
 import { cn } from "@/lib/utils";
 
 import { CountdownTimer } from "@/components/CountdownTimer";

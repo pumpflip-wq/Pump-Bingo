@@ -308,11 +308,6 @@ export class GameManager {
     }
   }
 
-  private async moveLateJoinsToNextRound(currentRoundId: number) {
-    // If a round is STARTING or IN_GAME, we don't allow new joins to it
-    // But they might have paid. In JoinButton we should handle this.
-  }
-
   /* ======================
         Bingo Utils
   ====================== */
