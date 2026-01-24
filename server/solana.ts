@@ -32,29 +32,65 @@ export class SolanaManager {
 
   async sendReward(toAddress: string, amount: number): Promise<string | null> {
     if (!this.masterKeypair) {
+      console.log(`[SolanaManager] No master wallet - returning mock signature for ${amount} to ${toAddress}`);
       return "MOCK_SIG_" + Math.random().toString(36).substring(7);
     }
 
     try {
       const destinationWallet = new PublicKey(toAddress);
+      const mint = PROTOCOL_CONFIG.MINT_ADDRESS ? new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS) : null;
       
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: this.masterKeypair.publicKey,
-          toPubkey: destinationWallet,
-          lamports: Math.floor(amount)
-        })
-      );
+      let transaction: Transaction;
+      
+      if (mint) {
+        // SPL Token transfer for MAINNET with custom token
+        console.log(`[SolanaManager] Sending SPL token reward: ${amount} to ${toAddress}`);
+        
+        const sourceAccount = await getOrCreateAssociatedTokenAccount(
+          this.connection,
+          this.masterKeypair,
+          mint,
+          this.masterKeypair.publicKey
+        );
+        
+        const destinationAccount = await getOrCreateAssociatedTokenAccount(
+          this.connection,
+          this.masterKeypair,
+          mint,
+          destinationWallet
+        );
+        
+        transaction = new Transaction().add(
+          createTransferInstruction(
+            sourceAccount.address,
+            destinationAccount.address,
+            this.masterKeypair.publicKey,
+            BigInt(Math.floor(amount))
+          )
+        );
+      } else {
+        // Native SOL transfer for DEVNET or SOL mode
+        console.log(`[SolanaManager] Sending SOL reward: ${amount} lamports to ${toAddress}`);
+        
+        transaction = new Transaction().add(
+          SystemProgram.transfer({
+            fromPubkey: this.masterKeypair.publicKey,
+            toPubkey: destinationWallet,
+            lamports: Math.floor(amount)
+          })
+        );
+      }
 
       const signature = await sendAndConfirmTransaction(
         this.connection,
         transaction,
         [this.masterKeypair]
       );
-
+      
+      console.log(`[SolanaManager] Reward sent successfully: ${signature}`);
       return signature;
     } catch (err) {
-      console.error("Failed to send reward:", err);
+      console.error("[SolanaManager] Failed to send reward:", err);
       throw err;
     }
   }
