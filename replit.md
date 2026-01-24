@@ -76,3 +76,22 @@ Key schema design decisions:
 - **Vite**: Frontend dev server and build tool with HMR
 - **esbuild**: Fast server bundling for production
 - **Replit plugins**: Runtime error overlay, cartographer, dev banner
+
+## Recent Changes (Jan 24, 2026)
+
+### Code Optimization
+- Removed unused `attached_assets` folder with old screenshots
+- Removed unused `ProbabilityFeed` component from `client/src/components/game/`
+- Cleaned up unused imports in `Home.tsx`:
+  - Removed unused lucide icons (Trophy, History, ShieldCheck, Copy, ExternalLink)
+  - Removed unused hooks (useRounds, useRound, useParticipant imports - still used via useGameState)
+  - Removed unused `Link` from wouter
+  - Removed unused `format` from date-fns
+  - Removed unused type imports (User, Transaction)
+  - Removed unused `useToast` hook
+- Removed empty `moveLateJoinsToNextRound` function from `server/game.ts`
+- Removed noisy "Stuck round detected" console log
+
+### Security Fix
+- Server seed is now properly hidden during OPEN, STARTING, and IN_GAME phases
+- Only revealed when round status is FINISHED (provably fair security)

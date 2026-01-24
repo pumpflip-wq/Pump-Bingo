@@ -64,13 +64,6 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  // Recovery effect for stuck "INITIALIZING" state
-  useEffect(() => {
-    if (roundData?.round?.status === "OPEN" && !roundData?.round?.startTime) {
-      console.log("Stuck round detected, refreshing query...");
-      queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
-    }
-  }, [roundData?.round?.id]);
 
   // Stabilize completion time to prevent restarts on refetch
   if (roundData?.round?.winnerId && roundData?.round?.completedAt) {
