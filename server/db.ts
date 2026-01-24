@@ -46,6 +46,8 @@ export async function initializeDatabase() {
       console.log("Schema creation successful.");
     } else {
       console.log("Database tables already exist.");
+      // Run migrations for any new tables that might be missing
+      await runMigrations();
     }
   } catch (err: any) {
     console.error("Database initialization failed:", err);
@@ -66,6 +68,21 @@ async function checkTablesExist(): Promise<boolean> {
     }
     throw err;
   }
+}
+
+async function runMigrations() {
+  // Ensure payment_queue table exists (added after initial schema)
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS payment_queue (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      amount BIGINT NOT NULL,
+      tx_signature TEXT NOT NULL UNIQUE,
+      status TEXT NOT NULL DEFAULT 'PENDING',
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  console.log("Migrations complete.");
 }
 
 async function createTables() {
