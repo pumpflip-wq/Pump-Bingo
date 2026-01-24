@@ -42,7 +42,7 @@ export class GameManager {
         // Wait exactly 10 seconds after round finished before starting a new one
         if (latestRound && latestRound.completedAt) {
           const finishedAt = new Date(latestRound.completedAt).getTime();
-          // Decrease threshold to 10s for faster transitions
+          // Fixed 10s delay (10000ms)
           if (Date.now() - finishedAt < 10000) {
             return;
           }
