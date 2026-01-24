@@ -109,7 +109,7 @@ async function createTables() {
     CREATE TABLE IF NOT EXISTS payment_queue (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
-      amount INTEGER NOT NULL,
+      amount BIGINT NOT NULL,
       tx_signature TEXT NOT NULL UNIQUE,
       status TEXT NOT NULL DEFAULT 'PENDING',
       created_at TIMESTAMP DEFAULT NOW()
@@ -134,21 +134,9 @@ async function createTables() {
     CREATE TABLE IF NOT EXISTS transactions (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
-      amount INTEGER NOT NULL,
+      amount BIGINT NOT NULL,
       type TEXT NOT NULL,
       round_id INTEGER,
-      created_at TIMESTAMP DEFAULT NOW()
-    )
-  `);
-
-  // Create payment_queue table
-  await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS payment_queue (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL,
-      amount INTEGER NOT NULL,
-      tx_signature TEXT NOT NULL UNIQUE,
-      status TEXT NOT NULL DEFAULT 'PENDING',
       created_at TIMESTAMP DEFAULT NOW()
     )
   `);

@@ -219,14 +219,15 @@ export class GameManager {
     if (!round || round.status !== ROUND_STATUS.IN_GAME) return false;
     if (round.winnerId) return false;
 
+    // Fast check locally
     const valid = this.validateBingo(card, round.drawnNumbers);
     if (!valid) return false;
 
     // ATOMIC CLAIM: first click wins
+    // We already update the round status to FINISHED in routes.ts for immediate UI response
     const claimed = await storage.claimWinnerIfEmpty(roundId, userId);
     if (!claimed) return false;
 
-    await storage.updateRound(roundId, { completedAt: new Date() });
     return true;
   }
 
