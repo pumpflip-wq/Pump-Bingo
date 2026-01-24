@@ -32,31 +32,8 @@ export default function AdminDashboard() {
   const [verifyHash, setVerifyHash] = useState("");
   const [verificationResult, setVerificationResult] = useState<{valid: boolean, hash: string} | null>(null);
 
-  const { data: rounds, isLoading: roundsLoading } = useQuery<Round[]>({ 
-    queryKey: ["/api/rounds"],
-    refetchInterval: 2000
-  });
-
-  const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
-    queryKey: ["/api/admin/stats"],
-    refetchInterval: 5000
-  });
-
   const walletAddress = publicKey?.toString();
   const isAdmin = walletAddress === PROTOCOL_CONFIG.ADMIN_WALLET || user?.username === PROTOCOL_CONFIG.ADMIN_WALLET;
-
-  if (!isAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
-        <AlertTriangle className="w-16 h-16 text-destructive mb-4" />
-        <h1 className="text-2xl font-black uppercase italic tracking-tighter mb-2">ACCESS RESTRICTED</h1>
-        <p className="text-muted-foreground max-w-md">
-          This terminal is restricted to authorized administrator protocols only.
-          Your current signature does not match the required clearance level.
-        </p>
-      </div>
-    );
-  }
 
   const handleVerify = () => {
     if (!verifySeed) return;
@@ -86,16 +63,31 @@ export default function AdminDashboard() {
       });
     }
   });
-  
-  if (roundsLoading || statsLoading) {
+
+  const { data: rounds, isLoading: roundsLoading } = useQuery<Round[]>({ 
+    queryKey: ["/api/rounds"],
+    refetchInterval: 2000
+  });
+
+  const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
+    queryKey: ["/api/admin/stats"],
+    refetchInterval: 5000
+  });
+
+  const activeRoundsCount = rounds?.filter(r => r.status !== ROUND_STATUS.FINISHED).length || 0;
+
+  if (!isAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8">
+        <AlertTriangle className="w-16 h-16 text-destructive mb-4" />
+        <h1 className="text-2xl font-black uppercase italic tracking-tighter mb-2">ACCESS RESTRICTED</h1>
+        <p className="text-muted-foreground max-w-md">
+          This terminal is restricted to authorized administrator protocols only.
+          Your current signature does not match the required clearance level.
+        </p>
       </div>
     );
   }
-
-  const activeRoundsCount = rounds?.filter(r => r.status !== ROUND_STATUS.FINISHED).length || 0;
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">

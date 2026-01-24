@@ -197,8 +197,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async resetSystem(): Promise<void> {
-    // Correct table names based on Drizzle schema (snake_case in DB)
-    await db.execute(sql`TRUNCATE "transactions", "participants", "rounds", "payment_queue", "users" RESTART IDENTITY CASCADE`);
+    // Drop all tables and recreate them to ensure a clean state
+    // Using simple names as they are in public schema
+    await db.execute(sql`TRUNCATE transactions, participants, rounds, payment_queue, users RESTART IDENTITY CASCADE`);
   }
 }
 
