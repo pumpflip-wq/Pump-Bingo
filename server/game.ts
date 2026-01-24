@@ -153,6 +153,7 @@ export class GameManager {
     if (updatedCount < 2) {
       if (round.startTime) {
         await storage.updateRound(round.id, { startTime: null });
+        console.log(`[GameManager] Round #${round.id} reset countdown - not enough players.`);
       }
       return;
     }
@@ -162,7 +163,7 @@ export class GameManager {
       await storage.updateRound(round.id, {
         startTime: new Date(Date.now() + countdownTime), 
       });
-      console.log(`[GameManager] Round #${round.id} countdown started for ${countdownTime / 1000} seconds.`);
+      console.log(`[GameManager] Round #${round.id} countdown started for ${countdownTime / 1000} seconds with ${updatedCount} players.`);
       return;
     }
 
