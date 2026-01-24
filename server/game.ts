@@ -167,7 +167,9 @@ export class GameManager {
     }
 
     const now = Date.now();
-    const target = round.startTime instanceof Date ? round.startTime.getTime() : new Date(round.startTime).getTime();
+    const targetDate = round.startTime instanceof Date ? round.startTime : new Date(round.startTime);
+    const target = targetDate.getTime();
+    
     if (now >= (target - 500)) { // Small buffer to ensure it starts when timer hits 0
       console.log(`[GameManager] Round #${round.id} starting... (now: ${now}, target: ${target})`);
       await storage.updateRound(round.id, {

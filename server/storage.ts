@@ -131,10 +131,10 @@ export class DatabaseStorage implements IStorage {
 
   async getRoundParticipantsCount(roundId: number): Promise<number> {
     if (!roundId || isNaN(roundId)) return 0;
-    const [result] = await db.select({ count: sql<number>`count(*)` })
+    const [result] = await db.select({ count: sql<string>`count(*)` })
         .from(participants)
         .where(eq(participants.roundId, roundId));
-    return Number(result.count || 0);
+    return parseInt(result.count || "0", 10);
   }
 
   async getRecentFinishedRounds(): Promise<(Round & { winnerUsername: string | null })[]> {

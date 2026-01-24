@@ -21,7 +21,12 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
     const calculateTimeLeft = () => {
       const target = new Date(targetDate).getTime();
       const now = Date.now();
-      const diff = Math.max(0, target - now);
+      const diff = target - now;
+      
+      if (diff <= 0) {
+        setTimeLeft({ minutes: 0, seconds: 0 });
+        return;
+      }
       
       const totalSeconds = Math.ceil(diff / 1000);
       const minutes = Math.floor(totalSeconds / 60);

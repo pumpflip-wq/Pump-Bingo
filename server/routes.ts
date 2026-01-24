@@ -160,19 +160,18 @@ export async function registerRoutes(
       const card = gameManager.generateCard();
       const participant = await storage.joinRound(roundId, userId, card, txSignature);
 
-      // Create transaction record for buy-in
-      await storage.createTransaction({
+      const user = await storage.getUser(userId);
+      res.json({ participant, balance: Number(user?.balance || 0) });
+
+      // Create transaction record for buy-in and update balance in background
+      storage.createTransaction({
         userId,
         amount: -Number(round.price),
         type: "BUY_IN",
         roundId
-      });
+      }).catch(err => console.error("Error creating buy-in transaction:", err));
 
-      // Update local balance
-      await storage.updateUserBalance(userId, -Number(round.price));
-
-      const user = await storage.getUser(userId);
-      res.json({ participant, balance: Number(user?.balance || 0) });
+      storage.updateUserBalance(userId, -Number(round.price)).catch(err => console.error("Error updating balance:", err));
 
       // Verify signature in background after user is already in
       solanaManager.verifyTransaction(txSignature, Number(round.price), treasuryWallet)

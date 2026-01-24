@@ -75,23 +75,22 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         transaction.recentBlockhash = blockhash;
         transaction.feePayer = publicKey;
 
-        signature = await sendTransaction(transaction, connection, { preflightCommitment: 'processed' });
+        signature = await sendTransaction(transaction, connection, { 
+          preflightCommitment: 'processed',
+          skipPreflight: true 
+        });
         
         // Background confirmation
-        connection.confirmTransaction({
-          signature,
-          blockhash,
-          lastValidBlockHeight
-        }, "processed").catch(console.error);
+        connection.confirmTransaction(signature, "processed").catch(console.error);
       }
 
       // 1. Create a payment record in the queue BEFORE joining
       // This ensures that even if the server restarts or join fails, the payment is logged
-      await apiRequest("POST", "/api/payments/queue", {
+      apiRequest("POST", "/api/payments/queue", {
         userId,
         amount: price,
         txSignature: signature
-      });
+      }).catch(console.error);
 
       // 2. Proceed with optimistic join
       queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
@@ -99,12 +98,23 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         const exists = old.participants?.some((p: any) => p.username === publicKey.toBase58());
         if (exists) return old;
 
+        const newParticipant = { 
+          id: 'optimistic-' + Date.now(), 
+          username: publicKey.toBase58(), 
+          joinedAt: new Date().toISOString(), 
+          card: [] 
+        };
+
         return {
           ...old,
           participantsCount: (old.participantsCount || 0) + 1,
+          round: {
+            ...old.round,
+            prizePool: (old.round?.prizePool || 0) + price
+          },
           participants: [
             ...(old.participants || []),
-            { id: 'optimistic-' + Date.now(), username: publicKey.toBase58(), joinedAt: new Date().toISOString(), card: [] }
+            newParticipant
           ]
         };
       });
