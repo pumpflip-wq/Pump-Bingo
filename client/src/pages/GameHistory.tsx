@@ -25,22 +25,22 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 rounded-xl bg-white/5 border border-white/10">
           <div className="flex items-center gap-2 mb-1">
-            <Users className="w-4 h-4 text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Participants</span>
+            <Users className="w-5 h-5 text-primary" />
+            <span className="text-xs font-black uppercase tracking-widest text-white">Participants</span>
           </div>
-          <p className="text-2xl font-black italic text-white">{details.participantsCount}</p>
+          <p className="text-3xl font-black italic text-white">{details.participantsCount}</p>
         </div>
         <div className="p-4 rounded-xl bg-white/5 border border-white/10">
           <div className="flex items-center gap-2 mb-1">
-            <Hash className="w-4 h-4 text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Drawn Count</span>
+            <Hash className="w-5 h-5 text-primary" />
+            <span className="text-xs font-black uppercase tracking-widest text-white">Drawn Count</span>
           </div>
-          <p className="text-2xl font-black italic text-white">{details.round.drawnNumbers?.length || 0}</p>
+          <p className="text-3xl font-black italic text-white">{details.round.drawnNumbers?.length || 0}</p>
         </div>
       </div>
 
       <div className="space-y-3">
-        <h3 className="text-xs font-black uppercase tracking-widest text-primary italic">Draw Sequence</h3>
+        <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Draw Sequence</h3>
         <div className="flex flex-wrap gap-2 p-4 rounded-2xl bg-black/40 border border-white/5 max-h-[300px] overflow-y-auto custom-scrollbar">
           {details.round.drawnNumbers?.map((num: number, i: number) => (
             <motion.div
@@ -57,28 +57,25 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
       </div>
 
       <div className="space-y-3">
-        <h3 className="text-xs font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
-        <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+        <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
+        <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {details.participants.map((p: any) => (
-            <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+            <div key={p.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-[10px] font-black text-white">
-                  {p.username.slice(0, 2)}
-                </div>
                 <div>
-                  <p className="text-xs font-black text-white">{p.username.slice(0, 6)}...{p.username.slice(-4)}</p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-[9px] text-white/60 font-black uppercase tracking-widest">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
+                  <p className="text-sm font-black text-white">{p.username}</p>
+                  <div className="flex flex-col gap-1 mt-1">
+                    <p className="text-[10px] text-white font-black uppercase tracking-widest">Joined {format(new Date(p.joinedAt), "MMM d, HH:mm:ss")}</p>
                     {p.winRate !== undefined && (
-                      <span className="text-[9px] font-black text-primary/80 uppercase tracking-widest">WR: {p.winRate}%</span>
+                      <span className="text-[10px] font-black text-primary uppercase tracking-widest">Win Probability: {p.winRate}%</span>
                     )}
                   </div>
                 </div>
               </div>
               {details.round.winnerId === p.id && (
-                <div className="px-2 py-1 rounded bg-primary/20 border border-primary/20 flex items-center gap-1">
-                  <Trophy className="w-3 h-3 text-primary" />
-                  <span className="text-[9px] font-black uppercase text-primary">Winner</span>
+                <div className="px-3 py-1.5 rounded bg-primary/20 border border-primary/20 flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-black uppercase text-primary">Winner</span>
                 </div>
               )}
             </div>
@@ -168,8 +165,8 @@ export default function GameHistory() {
                   <div className="flex flex-col gap-1 min-w-[240px]">
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs text-white uppercase font-black">Hash:</span>
-                                  <span className="text-xs font-mono text-white/90 truncate max-w-[150px]">{round.publicHash}</span>
-                                  <Copy className="w-4 h-4 text-white/40 cursor-pointer hover:text-primary transition-colors" onClick={() => {
+                                  <span className="text-xs font-mono text-white font-black truncate max-w-[150px]">{round.publicHash}</span>
+                                  <Copy className="w-4 h-4 text-white cursor-pointer hover:text-primary transition-colors" onClick={() => {
                                     navigator.clipboard.writeText(round.publicHash);
                                     toast({ title: "Hash Copied" });
                                   }} />
@@ -177,8 +174,8 @@ export default function GameHistory() {
                                 {round.serverSeed && (
                                   <div className="flex items-center gap-2">
                                     <span className="text-xs text-primary uppercase font-black">Seed:</span>
-                                    <span className="text-xs font-mono text-primary truncate max-w-[150px]">{round.serverSeed}</span>
-                                    <Copy className="w-4 h-4 text-primary/20 cursor-pointer hover:text-primary transition-colors" onClick={() => {
+                                    <span className="text-xs font-mono text-primary font-black truncate max-w-[150px]">{round.serverSeed}</span>
+                                    <Copy className="w-4 h-4 text-primary cursor-pointer hover:text-primary transition-colors" onClick={() => {
                                       navigator.clipboard.writeText(round.serverSeed);
                                       toast({ title: "Seed Copied" });
                                     }} />
@@ -193,15 +190,15 @@ export default function GameHistory() {
                               <div className="flex justify-end items-center gap-2">
                                 <Dialog>
                                   <DialogTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="hover:text-primary transition-colors flex items-center gap-2 px-3">
-                                      <Search className="w-4 h-4" />
-                                      <span className="text-[10px] font-black uppercase tracking-widest">Details</span>
+                                    <Button variant="ghost" size="default" className="hover:text-primary transition-colors flex items-center gap-2 px-4">
+                                      <Search className="w-5 h-5" />
+                                      <span className="text-xs font-black uppercase tracking-widest">Details</span>
                                     </Button>
                                   </DialogTrigger>
-                                  <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white">
+                                  <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white max-w-2xl w-[90vw] max-h-[90vh] overflow-y-auto custom-scrollbar">
                                     <DialogHeader>
-                                      <DialogTitle className="text-2xl font-black italic italic tracking-tighter uppercase flex items-center gap-2">
-                                        <History className="w-6 h-6 text-primary" />
+                                      <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase flex items-center gap-2">
+                                        <History className="w-8 h-8 text-primary" />
                                         Round <span className="text-primary">#{round.id}</span>
                                       </DialogTitle>
                                     </DialogHeader>
@@ -209,14 +206,14 @@ export default function GameHistory() {
                                   </DialogContent>
                                 </Dialog>
                                 <Link href={`/verify?roundId=${round.id}`}>
-                                  <Button variant="ghost" size="sm" className="hover:text-primary transition-colors flex items-center gap-2 px-3">
-                                    <ShieldCheck className="w-4 h-4" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">Verify</span>
+                                  <Button variant="ghost" size="default" className="hover:text-primary transition-colors flex items-center gap-2 px-4">
+                                    <ShieldCheck className="w-5 h-5" />
+                                    <span className="text-xs font-black uppercase tracking-widest">Verify</span>
                                   </Button>
                                 </Link>
-                                <Button variant="ghost" size="icon" className="hover:text-primary transition-colors" asChild>
+                                <Button variant="ghost" size="icon" className="h-10 w-10 hover:text-primary transition-colors" asChild>
                                   <a href={`https://explorer.solana.com/tx/${round.payoutSignature || ''}?cluster=${PROTOCOL_CONFIG.NETWORK}`} target="_blank" rel="noreferrer">
-                                    <ExternalLink className="w-4 h-4" />
+                                    <ExternalLink className="w-5 h-5" />
                                   </a>
                                 </Button>
                               </div>

@@ -111,61 +111,54 @@ export default function VerifyPage() {
                 <tbody className="divide-y divide-white/5">
                   {rounds?.slice(0, 10).map((round) => (
                     <tr key={round.id} className="group hover:bg-white/[0.02] transition-colors">
-                      <td className="py-4 px-6 font-mono text-base text-white font-bold whitespace-nowrap">#{round.id}</td>
-                      <td className="py-4 px-6">
-                        <div className="flex flex-col gap-1">
-                          <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md w-fit ${
+                      <td className="py-6 px-6 font-mono text-lg text-white font-black whitespace-nowrap">#{round.id}</td>
+                      <td className="py-6 px-6">
+                        <div className="flex flex-col gap-2">
+                          <span className={`text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-lg w-fit shadow-lg ${
                             round.status === 'FINISHED' ? 'bg-primary/20 text-primary border border-primary/20' : 
                             round.status === 'IN_GAME' ? 'bg-orange-500/20 text-orange-500 border border-orange-500/20' :
-                            'bg-white/10 text-white border border-white/10'
+                            'bg-white/20 text-white border border-white/20'
                           }`}>
                             {round.status}
                           </span>
                           {round.status === 'OPEN' && (
-                            <span className="text-[8px] font-black text-white/60 uppercase tracking-widest">Waiting for players...</span>
+                            <span className="text-[10px] font-black text-white uppercase tracking-widest">Waiting for players...</span>
                           )}
                         </div>
                       </td>
-                      <td className="py-4 px-6 min-w-[200px]">
-                        <div className="flex flex-wrap gap-1 max-w-[300px]">
+                      <td className="py-6 px-6 min-w-[250px]">
+                        <div className="flex flex-wrap gap-2 max-w-[350px]">
                           {round.drawnNumbers && round.drawnNumbers.length > 0 ? (
-                            round.drawnNumbers.slice(0, 10).map((num, i) => (
-                              <span key={i} className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-black text-white border border-white/10">
+                            round.drawnNumbers.map((num, i) => (
+                              <span key={i} className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs font-black text-white border border-white/20 shadow-inner">
                                 {num}
                               </span>
                             ))
                           ) : (
-                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">No draws yet</span>
-                          )}
-                          {round.drawnNumbers && round.drawnNumbers.length > 10 && (
-                            <span className="text-[9px] font-black text-white/60 self-end">+{round.drawnNumbers.length - 10}</span>
+                            <span className="text-xs font-black uppercase tracking-widest text-white">No draws yet</span>
                           )}
                         </div>
                       </td>
-                      <td className="py-4 px-6">
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[8px] font-black uppercase text-white/60">Hash:</span>
-                            <span className="font-mono text-[9px] text-white/80 font-black truncate max-w-[100px]">{round.publicHash}</span>
-                            <Copy className="w-3 h-3 text-white/40 cursor-pointer hover:text-primary transition-colors" onClick={() => {
+                      <td className="py-6 px-6">
+                        <div className="flex flex-col gap-3">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-black uppercase text-white">Hash:</span>
+                            <span className="font-mono text-xs text-white font-black truncate max-w-[150px]">{round.publicHash}</span>
+                            <Copy className="w-4 h-4 text-white cursor-pointer hover:text-primary transition-colors" onClick={() => {
                               navigator.clipboard.writeText(round.publicHash);
                               toast({ title: "Hash Copied" });
                             }} />
                           </div>
-                          <div className="flex items-center gap-3">
-                            <button 
-                              onClick={() => {
-                                setManualHash(round.publicHash);
-                                setManualSeed(round.status === 'FINISHED' ? (round.serverSeed || "") : "");
-                              }}
-                              className="text-[9px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors underline whitespace-nowrap"
-                            >
-                              Verify Manually
-                            </button>
-                            {round.status === 'FINISHED' && (
-                              <span className="text-[9px] font-black uppercase text-primary/40 italic">Seed Revealed</span>
-                            )}
-                          </div>
+                          {round.status === 'FINISHED' && round.serverSeed && (
+                            <div className="flex items-center gap-3">
+                              <span className="text-[10px] font-black uppercase text-primary">Seed:</span>
+                              <span className="font-mono text-xs text-primary font-black truncate max-w-[150px]">{round.serverSeed}</span>
+                              <Copy className="w-4 h-4 text-primary cursor-pointer hover:text-white transition-colors" onClick={() => {
+                                navigator.clipboard.writeText(round.serverSeed);
+                                toast({ title: "Seed Copied" });
+                              }} />
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>
