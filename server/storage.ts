@@ -197,6 +197,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async resetSystem(): Promise<void> {
+    // Force lowercase table names in SQL to match standard PostgreSQL behavior and avoid "relation does not exist"
     await db.execute(sql`TRUNCATE transactions, participants, rounds, payment_queue RESTART IDENTITY CASCADE`);
   }
 }

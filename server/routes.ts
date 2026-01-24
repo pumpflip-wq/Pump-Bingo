@@ -217,24 +217,24 @@ export async function registerRoutes(
               return res.status(400).json({ message: "Winner already declared for this round" });
           }
 
-          // Payout based on feePercentage
-          const fee = Math.max(0, Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 10));
-          const payoutMultiplier = (100 - fee) / 100;
-          const payout = Math.floor(round.prizePool * payoutMultiplier);
-
-          // WINNER!
-          const user = await storage.getUser(userId);
-          
-          // Send reward in background to not block UI
-          solanaManager.sendReward(user?.username || "", payout).then(sig => {
-            if (sig) storage.updateRound(roundId, { payoutSignature: sig });
-          }).catch(err => console.error("Payout error:", err));
-
+          // WINNER! - LOCK IMMEDIATELY
           await storage.updateRound(roundId, { 
-              status: ROUND_STATUS.IN_GAME, 
+              status: ROUND_STATUS.FINISHED, // Force finish immediately
               winnerId: userId,
               completedAt: new Date(), 
           });
+
+          // Payout based on feePercentage
+          const fee = Math.max(0, Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 10));
+          const payoutMultiplier = (100 - fee) / 100;
+          const payout = Math.floor(Number(round.prizePool) * payoutMultiplier);
+
+          const user = await storage.getUser(userId);
+          
+          // Send reward in background
+          solanaManager.sendReward(user?.username || "", payout).then(sig => {
+            if (sig) storage.updateRound(roundId, { payoutSignature: sig });
+          }).catch(err => console.error("Payout error:", err));
           
           await storage.updateUserBalance(userId, payout);
           await storage.createTransaction({
