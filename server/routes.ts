@@ -96,12 +96,13 @@ export async function registerRoutes(
     
     const count = await storage.getRoundParticipantsCount(roundId);
     
-    // Fetch participants with usernames and cards
+    // Fetch participants with usernames, cards, and finalWinProb
     const roundParticipants = await db.select({
       id: users.id,
       username: users.username,
       joinedAt: participants.joinedAt,
-      card: participants.card
+      card: participants.card,
+      winRate: participants.finalWinProb
     })
     .from(participants)
     .innerJoin(users, eq(participants.userId, users.id))
@@ -113,7 +114,8 @@ export async function registerRoutes(
       participants: roundParticipants.map(p => ({
         ...p,
         joinedAt: p.joinedAt?.toISOString() || "",
-        card: p.card
+        card: p.card,
+        winRate: p.winRate
       }))
     });
   });
@@ -203,6 +205,21 @@ export async function registerRoutes(
               winnerId: userId,
               completedAt: new Date(), 
           });
+
+          // Calculate and store final win probabilities for all participants
+          const allParticipants = await db.select({
+            userId: participants.userId,
+            card: participants.card
+          })
+          .from(participants)
+          .where(eq(participants.roundId, roundId));
+
+          for (const p of allParticipants) {
+            const prob = gameManager.calculateWinProb(p.card as number[][], currentRound?.drawnNumbers || []);
+            await db.update(participants)
+              .set({ finalWinProb: prob })
+              .where(sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${p.userId}`);
+          }
 
           // Payout based on feePercentage
           const fee = Math.max(0, Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 10));

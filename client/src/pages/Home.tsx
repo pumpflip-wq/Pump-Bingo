@@ -89,6 +89,9 @@ export default function Home() {
         setShowWinnerOverlay(false);
       }, 10000);
       
+      // Invalidate queries to ensure we get the fresh round (new one)
+      queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
+
       return () => clearTimeout(timer);
     } else if (!roundData?.round?.winnerId) {
       setShowWinnerOverlay(false);

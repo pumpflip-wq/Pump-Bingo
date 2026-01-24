@@ -48,6 +48,7 @@ export const participants = pgTable("participants", {
   userId: integer("user_id").notNull(),
   card: jsonb("card").notNull(), // 5x5 grid of numbers
   hasBingo: boolean("has_bingo").default(false),
+  finalWinProb: integer("final_win_prob"),
   joinedAt: timestamp("joined_at").defaultNow(),
   txSignature: text("tx_signature"), // Solana transaction signature for verification
 });

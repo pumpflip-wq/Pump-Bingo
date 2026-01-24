@@ -138,7 +138,12 @@ export class GameManager {
   ====================== */
   private async handleOpen(round: Round) {
     const count = await storage.getRoundParticipantsCount(round.id);
-    if (count < 2) return;
+    if (count < 2) {
+      if (round.startTime) {
+        await storage.updateRound(round.id, { startTime: null });
+      }
+      return;
+    }
 
     if (!round.startTime) {
       await storage.updateRound(round.id, {
@@ -304,6 +309,52 @@ export class GameManager {
     if ([0, 1, 2, 3, 4].every((i) => ok(card[i][4 - i]))) return true;
 
     return false;
+  }
+
+  calculateWinProb(card: number[][], drawn: number[]): number {
+    const drawnSet = new Set(drawn);
+    drawnSet.add(0); // Free space
+
+    if (drawn.length <= 1) return 0;
+
+    const lines = [
+      ...Array(5).fill(0).map((_, r) => card[r]),
+      ...Array(5).fill(0).map((_, c) => card.map(r => r[c])),
+      Array(5).fill(0).map((_, i) => card[i][i]),
+      Array(5).fill(0).map((_, i) => card[i][4 - i])
+    ];
+
+    let maxMarked = 0;
+    let potentialLines = 0;
+    let totalMarked = 0;
+
+    lines.forEach(line => {
+      const marked = line.filter(n => drawnSet.has(n)).length;
+      if (marked > maxMarked) maxMarked = marked;
+      if (marked === 4) potentialLines++;
+    });
+
+    card.flat().forEach(num => {
+      if (num !== 0 && drawnSet.has(num)) totalMarked++;
+    });
+
+    if (maxMarked === 5) return 100;
+
+    if (totalMarked >= 1 && drawn.length > 0) {
+      const hitDensity = (totalMarked / 24) * 15;
+      let baseLineProb = 0;
+      if (maxMarked === 2) baseLineProb = 5;
+      else if (maxMarked === 3) baseLineProb = 20;
+      else if (maxMarked === 4) baseLineProb = 50;
+
+      const proximityBonus = potentialLines * 12;
+      const gameProgress = (drawn.length / 75) * 10;
+
+      const finalProb = Math.min(99, Math.floor(baseLineProb + hitDensity + proximityBonus + gameProgress));
+      return Math.max(1, finalProb);
+    }
+
+    return 0;
   }
 
   updateSettings(settings: { price?: number; feePercentage?: number }) {
