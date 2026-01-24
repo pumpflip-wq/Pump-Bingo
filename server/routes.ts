@@ -130,56 +130,38 @@ export async function registerRoutes(
 
       const round = await storage.getRound(roundId);
       if (!round) return res.status(404).json({ message: "Round not found" });
-      
+
+      const treasuryWallet = solanaManager.getMasterPublicKey();
+      if (!treasuryWallet) return res.status(500).json({ message: "Server wallet not initialized" });
+
+      // 0. Verify Transaction
+      if (txSignature) {
+        const isValid = await solanaManager.verifyTransaction(txSignature, round.price, treasuryWallet);
+        if (!isValid) {
+          return res.status(400).json({ message: "Transaction verification failed" });
+        }
+      } else {
+        return res.status(400).json({ message: "Transaction signature required" });
+      }
+
       if (round.status !== "OPEN") {
           // If round is not open, add to payment queue for next round
-          if (txSignature) {
-            const treasuryWallet = solanaManager.getMasterPublicKey();
-            if (!treasuryWallet) return res.status(500).json({ message: "Server wallet not initialized" });
-            const isValid = await solanaManager.verifyTransaction(txSignature, round.price, treasuryWallet);
-            if (isValid) {
-              await storage.createPaymentQueue({
-                userId,
-                amount: round.price,
-                txSignature,
-                status: "PENDING"
-              });
-              return res.json({ queued: true, message: "Round in progress. You've been added to the next round automatically." });
-            }
-          }
-          return res.status(400).json({ message: "Round is already in progress or finished" });
+          await storage.createPaymentQueue({
+            userId,
+            amount: round.price,
+            txSignature,
+            status: "PENDING"
+          });
+          return res.json({ queued: true, message: "Round in progress. You've been added to the next round automatically." });
       }
 
       const user = await storage.getUser(userId);
       if (!user) return res.status(404).json({ message: "User not found" });
 
-      // 0. Verify Transaction
-      if (txSignature) {
-        const treasuryWallet = solanaManager.getMasterPublicKey();
-        if (!treasuryWallet) return res.status(500).json({ message: "Server wallet not initialized" });
-        const isValid = await solanaManager.verifyTransaction(txSignature, round.price, treasuryWallet);
-        if (!isValid) {
-          return res.status(400).json({ message: "Transaction verification failed" });
-        }
-      }
       const existing = await storage.getParticipant(roundId, userId);
       if (existing) {
         return res.status(400).json({ message: "Already joined this round" });
       }
-
-      // Check if user has enough balance
-      if (user.balance < round.price) {
-        return res.status(400).json({ message: "Insufficient balance" });
-      }
-
-      // Deduct from balance
-      await storage.updateUserBalance(userId, -round.price);
-      await storage.createTransaction({
-        userId,
-        amount: -round.price,
-        type: "BUY_IN",
-        roundId
-      });
 
       // Add to prize pool
       await storage.updateRound(roundId, { prizePool: round.prizePool + round.price });
@@ -188,10 +170,10 @@ export async function registerRoutes(
       const card = gameManager.generateCard();
       const participant = await storage.joinRound(roundId, userId, card, txSignature);
 
-      const updatedUser = await storage.getUser(userId); // get new balance
+      // Fetch user to get latest state (balance is maintained on-chain now)
+      const updatedUser = await storage.getUser(userId);
 
       res.json({ participant, balance: updatedUser?.balance || 0 });
-
     } catch (err) {
        console.error("Error joining round:", err);
        res.status(500).json({ message: "Failed to join round. Please try again." });

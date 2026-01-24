@@ -1,6 +1,6 @@
 export const PROTOCOL_CONFIG = {
   // Replace with your actual Token Mint Address (CA)
-  MINT_ADDRESS: null, // Set to null for SOL mode
+  MINT_ADDRESS: null, // Set to null for SOL mode, or provide CA for SPL token
   SYMBOL: "$PBINGO",
   DECIMALS: 9, // SOL has 9 decimals
 

@@ -103,15 +103,6 @@ export class GameManager {
         const card = this.generateCard();
         await storage.joinRound(roundId, payment.userId, card, payment.txSignature);
         
-        // Update user balance and transaction
-        await storage.updateUserBalance(payment.userId, -payment.amount);
-        await storage.createTransaction({
-          userId: payment.userId,
-          amount: -payment.amount,
-          type: "BUY_IN",
-          roundId
-        });
-
         // Add to prize pool
         const round = await storage.getRound(roundId);
         if (round) {

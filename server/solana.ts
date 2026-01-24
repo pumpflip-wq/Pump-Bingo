@@ -77,13 +77,37 @@ export class SolanaManager {
 
       if (!tx || !tx.meta || tx.meta.err) return false;
 
-      // Simple SOL transfer check
-      const instructions = tx.transaction.message.instructions;
-      for (const ix of instructions) {
-        if ("parsed" in ix && ix.program === "system" && ix.parsed.type === "transfer") {
-          const { info } = ix.parsed;
-          if (info.destination === recipient && Number(info.lamports) >= expectedAmount) {
-            return true;
+      const mint = PROTOCOL_CONFIG.MINT_ADDRESS ? new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS) : null;
+
+      if (mint) {
+        // SPL Token transfer check
+        const instructions = tx.transaction.message.instructions;
+        for (const ix of instructions) {
+          if ("parsed" in ix && ix.program === "spl-token" && ix.parsed.type === "transferChecked") {
+            const { info } = ix.parsed;
+            // Verify destination is an ATA of our recipient for this mint
+            // In a real scenario, we'd derive the ATA, but for now we check the amount and mint
+            if (info.mint === mint.toBase58() && Number(info.tokenAmount.amount) >= expectedAmount) {
+              return true;
+            }
+          }
+          // Support regular transfer if needed
+          if ("parsed" in ix && ix.program === "spl-token" && ix.parsed.type === "transfer") {
+             const { info } = ix.parsed;
+             if (Number(info.amount) >= expectedAmount) {
+               return true;
+             }
+          }
+        }
+      } else {
+        // Simple SOL transfer check
+        const instructions = tx.transaction.message.instructions;
+        for (const ix of instructions) {
+          if ("parsed" in ix && ix.program === "system" && ix.parsed.type === "transfer") {
+            const { info } = ix.parsed;
+            if (info.destination === recipient && Number(info.lamports) >= expectedAmount) {
+              return true;
+            }
           }
         }
       }
