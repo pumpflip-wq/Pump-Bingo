@@ -1,58 +1,47 @@
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ROUND_STATUS } from "@shared/schema";
 
 interface CountdownTimerProps {
-  targetDate: string | null;
+  secondsRemaining: number;
   status: string;
   participantCount: number;
 }
 
-export function CountdownTimer({ targetDate, status, participantCount }: CountdownTimerProps) {
-  const [timeLeft, setTimeLeft] = useState({ minutes: 1, seconds: 0 });
+export function CountdownTimer({ secondsRemaining, status, participantCount }: CountdownTimerProps) {
+  const [displaySeconds, setDisplaySeconds] = useState(60);
+  const lastServerSeconds = useRef(secondsRemaining);
+  const lastUpdateTime = useRef(Date.now());
 
   useEffect(() => {
-    // Reset to 1 minute when waiting for more players
+    // When server sends new secondsRemaining, update our reference point
+    if (secondsRemaining !== lastServerSeconds.current) {
+      lastServerSeconds.current = secondsRemaining;
+      lastUpdateTime.current = Date.now();
+      setDisplaySeconds(secondsRemaining);
+    }
+
+    // If waiting for players, show default
     if (participantCount < 2) {
-      setTimeLeft({ minutes: 1, seconds: 0 });
-      return;
-    }
-    
-    // If no target date yet but we have 2+ players, show 1:00 (waiting for countdown to start)
-    if (!targetDate) {
-      setTimeLeft({ minutes: 1, seconds: 0 });
+      setDisplaySeconds(60);
       return;
     }
 
-    const calculateTimeLeft = () => {
-      if (!targetDate) {
-        setTimeLeft({ minutes: 1, seconds: 0 });
-        return;
-      }
-      
-      const target = new Date(targetDate).getTime();
-      const now = Date.now();
-      const diff = target - now;
-      
-      // If target is in the past, the game should be starting soon
-      if (diff <= 0) {
-        setTimeLeft({ minutes: 0, seconds: 0 });
-        return;
-      }
-      
-      const totalSeconds = Math.ceil(diff / 1000);
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      
-      setTimeLeft({ minutes, seconds });
-    };
-
-    calculateTimeLeft();
-    const interval = setInterval(calculateTimeLeft, 200);
+    // Local countdown interpolation between server updates
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - lastUpdateTime.current) / 1000);
+      const remaining = Math.max(0, lastServerSeconds.current - elapsed);
+      setDisplaySeconds(remaining);
+    }, 200);
 
     return () => clearInterval(interval);
-  }, [targetDate, participantCount]);
+  }, [secondsRemaining, participantCount]);
+
+  const timeLeft = {
+    minutes: Math.floor(displaySeconds / 60),
+    seconds: displaySeconds % 60
+  };
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 

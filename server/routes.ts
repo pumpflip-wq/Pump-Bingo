@@ -119,9 +119,18 @@ export async function registerRoutes(
       WHERE p.round_id = ${roundId}
     `);
 
+    // Calculate seconds remaining for countdown (server-side to avoid clock sync issues)
+    let secondsRemaining = 0;
+    if (round.startTime && round.status === ROUND_STATUS.OPEN && count >= 2) {
+      const targetTime = round.startTime instanceof Date ? round.startTime.getTime() : new Date(round.startTime).getTime();
+      const now = Date.now();
+      secondsRemaining = Math.max(0, Math.ceil((targetTime - now) / 1000));
+    }
+    
     res.json({ 
       round, 
       participantsCount: count,
+      secondsRemaining,
       participants: (roundParticipants.rows || []).map((p: any) => ({
         ...p,
         joinedAt: p.joinedAt instanceof Date ? p.joinedAt.toISOString() : p.joinedAt,
