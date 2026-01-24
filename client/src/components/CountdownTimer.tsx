@@ -15,7 +15,7 @@ export function CountdownTimer({ secondsRemaining, status, participantCount }: C
   const lastServerSeconds = useRef(secondsRemaining);
 
   useEffect(() => {
-    // If waiting for players, reset to 01:00 (60s)
+    // If waiting for players, show --:--
     if (participantCount < 2) {
       setDisplaySeconds(60);
       lastServerSeconds.current = 60;
@@ -23,8 +23,16 @@ export function CountdownTimer({ secondsRemaining, status, participantCount }: C
       return;
     }
 
+    // Force an immediate update if the server sends 60 and we haven't started yet
+    // This prevents the 00:00 flash while waiting for the server tick
+    if (secondsRemaining > 0 && (lastServerSeconds.current === 0 || lastServerSeconds.current === 60)) {
+      setDisplaySeconds(secondsRemaining);
+      lastServerSeconds.current = secondsRemaining;
+      lastUpdateTime.current = Date.now();
+    }
+
     // Synchronize with server data when it changes significantly
-    if (Math.abs(secondsRemaining - lastServerSeconds.current) > 1 || (secondsRemaining === 0 && lastServerSeconds.current > 0)) {
+    if (Math.abs(secondsRemaining - lastServerSeconds.current) > 1) {
       setDisplaySeconds(secondsRemaining);
       lastServerSeconds.current = secondsRemaining;
       lastUpdateTime.current = Date.now();
@@ -36,10 +44,10 @@ export function CountdownTimer({ secondsRemaining, status, participantCount }: C
       if (nextSeconds !== displaySeconds) {
         setDisplaySeconds(nextSeconds);
       }
-    }, 200);
+    }, 100);
 
     return () => clearInterval(interval);
-  }, [secondsRemaining, participantCount]);
+  }, [secondsRemaining, participantCount, displaySeconds]);
 
   const timeLeft = {
     minutes: Math.floor(displaySeconds / 60),

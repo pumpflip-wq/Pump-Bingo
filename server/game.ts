@@ -162,6 +162,7 @@ export class GameManager {
     if (!round.startTime) {
       const countdownTime = 60_000;
       const targetTime = new Date(now + countdownTime);
+      // Wait for the storage update to complete before continuing
       await storage.updateRound(round.id, {
         startTime: targetTime, 
       });

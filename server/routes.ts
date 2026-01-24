@@ -138,8 +138,7 @@ export async function registerRoutes(
         const now = Date.now();
         secondsRemaining = Math.max(0, Math.ceil((targetTime - now) / 1000));
       } else if (count >= 2) {
-        // Race condition: 2 players joined but game tick hasn't set startTime yet
-        // Return full countdown so timer doesn't flash 00:00
+        // Return 60 immediately when 2 players are present, even before game tick
         secondsRemaining = 60;
       }
     }
