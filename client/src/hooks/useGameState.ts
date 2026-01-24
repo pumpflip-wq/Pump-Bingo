@@ -35,13 +35,13 @@ export function useGameState() {
   const { data: historyRounds, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
     queryKey: ["/api/rounds/history", 1],
     queryFn: () => fetch("/api/rounds/history?page=1&limit=5").then(res => res.json()),
-    refetchInterval: 30000 
+    refetchInterval: 2000 
   });
 
   const { data: userTransactions } = useQuery<Transaction[]>({
     queryKey: ["/api/auth/me/transactions", user?.id],
     enabled: !!user?.id,
-    refetchInterval: 20000 
+    refetchInterval: 2000 
   });
 
   const foundParticipant = roundData?.participants?.find((p: any) => p.username === walletAddress);

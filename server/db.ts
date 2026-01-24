@@ -74,7 +74,7 @@ async function createTables() {
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       username TEXT NOT NULL UNIQUE,
-      balance INTEGER NOT NULL DEFAULT 10000,
+      balance BIGINT NOT NULL DEFAULT 10000,
       created_at TIMESTAMP DEFAULT NOW()
     )
   `);
@@ -85,8 +85,8 @@ async function createTables() {
       id SERIAL PRIMARY KEY,
       status TEXT NOT NULL DEFAULT 'OPEN',
       start_time TIMESTAMP,
-      price INTEGER NOT NULL DEFAULT 100,
-      prize_pool INTEGER NOT NULL DEFAULT 0,
+      price BIGINT NOT NULL DEFAULT 100,
+      prize_pool BIGINT NOT NULL DEFAULT 0,
       winner_id INTEGER,
       server_seed TEXT NOT NULL,
       public_hash TEXT NOT NULL,

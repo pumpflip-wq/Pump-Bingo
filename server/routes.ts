@@ -164,7 +164,22 @@ export async function registerRoutes(
       }
 
       // Add to prize pool
-      await storage.updateRound(roundId, { prizePool: round.prizePool + round.price });
+      const updatedPrize = Number(round.prizePool) + Number(round.price);
+      await storage.updateRound(roundId, { prizePool: updatedPrize });
+
+      // Create transaction record for buy-in
+      await storage.createTransaction({
+        userId,
+        amount: -Number(round.price),
+        type: "BUY_IN",
+        roundId
+      });
+
+      // Update local balance (optional, since it's on-chain, but good for UI consistency)
+      const userToUpdate = await storage.getUser(userId);
+      if (userToUpdate) {
+        await storage.updateUserBalance(userId, userToUpdate.balance - Number(round.price));
+      }
 
       // Generate Card
       const card = gameManager.generateCard();

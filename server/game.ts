@@ -191,11 +191,11 @@ export class GameManager {
             return;
         }
 
-        // Draw one number every 3 seconds for balanced gameplay
+        // Draw one number every 2 seconds for faster gameplay
         const startTime = new Date(round.startTime!).getTime() + 5000;
         const elapsed = now.getTime() - startTime;
-        // Granular draw timing
-        const expectedNumbersCount = Math.max(0, Math.min(75, Math.floor(elapsed / 3000)));
+        // Faster draw timing: 2 seconds per number
+        const expectedNumbersCount = Math.max(0, Math.min(75, Math.floor(elapsed / 2000)));
 
         if (round.drawnNumbers.length < expectedNumbersCount) {
             const available = Array.from({length: 75}, (_, i) => i + 1)

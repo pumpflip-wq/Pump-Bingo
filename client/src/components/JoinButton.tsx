@@ -70,6 +70,12 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         { roundId, userId, txSignature: signature },
         {
           onSuccess: () => {
+            // Immediate cache invalidation for instant feedback
+            queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
+            queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
+            queryClient.invalidateQueries({ queryKey: [api.participants.get.path, roundId, userId] });
+            queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+
             toast({
               title: "Successfully Joined",
               description: "Transaction sent! You've entered the round.",
