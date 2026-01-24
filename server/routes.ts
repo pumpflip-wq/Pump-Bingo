@@ -139,8 +139,15 @@ export async function registerRoutes(
       }
     }
     
+    // PROVABLY FAIR: Only reveal serverSeed after the round is FINISHED
+    // Before game ends, only show the publicHash so players can verify later
+    const safeRound = {
+      ...round,
+      serverSeed: round.status === ROUND_STATUS.FINISHED ? round.serverSeed : null
+    };
+    
     res.json({ 
-      round, 
+      round: safeRound, 
       participantsCount: count,
       secondsRemaining,
       participants: participantsData.map((p: any) => ({
