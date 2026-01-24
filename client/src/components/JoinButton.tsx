@@ -32,32 +32,34 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
 
   const handleJoin = async () => {
     if (isWinnerDeclared || isWalleting) return;
+    
+    // Start wallet process immediately to prevent double-click and improve speed
+    setIsWalleting(true);
+
     if (!publicKey || !userId) {
       toast({
         title: "Authentication Required",
         description: "Please connect your wallet first.",
         variant: "destructive",
       });
+      setIsWalleting(false);
       return;
     }
 
-    // On Devnet, we might want to check the actual wallet balance instead of the DB balance
-    // since the user might have just received test SOL
-    const actualBalance = await connection.getBalance(publicKey);
-    
-    if (user && (user.balance < price && actualBalance < price)) {
-      toast({
-        title: "Insufficient Balance",
-        description: `You need at least ${(price / 1e9).toFixed(2)} SOL to join. Your balance: ${(actualBalance / 1e9).toFixed(4)} SOL`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Start wallet process immediately
-    setIsWalleting(true);
-    
     try {
+      // Check balance after setting loading state for speed
+      const actualBalance = await connection.getBalance(publicKey);
+      
+      if (user && (user.balance < price && actualBalance < price)) {
+        toast({
+          title: "Insufficient Balance",
+          description: `You need at least ${(price / 1e9).toFixed(2)} SOL to join. Your balance: ${(actualBalance / 1e9).toFixed(4)} SOL`,
+          variant: "destructive",
+        });
+        setIsWalleting(false);
+        return;
+      }
+
       const USE_REAL_SOLANA = PROTOCOL_CONFIG.NETWORK === "devnet" && !PROTOCOL_CONFIG.IS_TEST_MODE;
       let signature = "TEST_TX_SIG_" + Date.now();
 

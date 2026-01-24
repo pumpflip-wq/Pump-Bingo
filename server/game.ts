@@ -160,7 +160,7 @@ export class GameManager {
 
     if (!round.startTime) {
       const countdownTime = 60_000;
-      const targetTime = new Date(Date.now() + countdownTime + 2000); // Buffer for network/loop latency
+      const targetTime = new Date(Date.now() + countdownTime);
       await storage.updateRound(round.id, {
         startTime: targetTime, 
       });
@@ -172,8 +172,8 @@ export class GameManager {
     const targetDate = round.startTime instanceof Date ? round.startTime : new Date(round.startTime);
     const target = targetDate.getTime();
     
-    // Ensure we are comparing correctly
-    if (now >= target) { 
+    // Check if we are close enough or passed the target
+    if (now >= target - 500) { 
       console.log(`[GameManager] Round #${round.id} starting... (now: ${now}, target: ${target})`);
       await storage.updateRound(round.id, {
         status: ROUND_STATUS.STARTING,
