@@ -107,13 +107,15 @@ export async function registerRoutes(
     
     const count = await storage.getRoundParticipantsCount(roundId);
     
-    // Fetch participants with usernames, cards
+    // Fetch participants with usernames, cards, and finalWinProb
     const roundParticipants = await db.execute(sql`
       SELECT 
         u.id, 
         u.username, 
         p.joined_at as "joinedAt", 
-        p.card
+        p.card,
+        p.final_win_prob as "finalWinProb",
+        p.user_id as "userId"
       FROM participants p
       INNER JOIN users u ON p.user_id = u.id
       WHERE p.round_id = ${roundId}
@@ -121,7 +123,7 @@ export async function registerRoutes(
 
     // Calculate seconds remaining for countdown (server-side to avoid clock sync issues)
     let secondsRemaining = 0;
-    if (round.startTime && round.status === ROUND_STATUS.OPEN && count >= 2) {
+    if (round.startTime && round.status === ROUND_STATUS.OPEN) {
       const targetTime = round.startTime instanceof Date ? round.startTime.getTime() : new Date(round.startTime).getTime();
       const now = Date.now();
       secondsRemaining = Math.max(0, Math.ceil((targetTime - now) / 1000));
@@ -135,7 +137,7 @@ export async function registerRoutes(
         ...p,
         joinedAt: p.joinedAt instanceof Date ? p.joinedAt.toISOString() : p.joinedAt,
         card: typeof p.card === 'string' ? JSON.parse(p.card) : p.card,
-        winRate: 0 // Placeholder to avoid crashes if column missing
+        winRate: p.finalWinProb || 0
       }))
     });
   });
