@@ -42,3 +42,4 @@ waitForPort = 5000
 
 [userenv.shared]
 SOLANA_RPC_URL = "https://devnet.helius-rpc.com/?api-key=dd4d0f55-719e-4f2e-b8b8-2f686bc7d2bf"
+DATABASE_URL_EXTERNAL = "postgresql://postgres:pvEEJhAcMbOdsPIoVhXRHrcBFzcdLHMx@postgres.railway.internal:5432/railway"

@@ -6,7 +6,10 @@ import { sql } from "drizzle-orm";
 
 const { Pool } = pg;
 
-if (!process.env.DATABASE_URL) {
+// Use DATABASE_URL_EXTERNAL if provided (for manual sync), otherwise fall back to DATABASE_URL
+const connectionString = process.env.DATABASE_URL_EXTERNAL || process.env.DATABASE_URL;
+
+if (!connectionString) {
   console.error("ERROR: DATABASE_URL must be set. Did you forget to provision a database?");
   console.error("For Railway: Add a PostgreSQL database and link DATABASE_URL to your web service.");
 }
@@ -14,7 +17,7 @@ if (!process.env.DATABASE_URL) {
 const isProduction = process.env.NODE_ENV === "production" || process.env.RAILWAY_ENVIRONMENT;
 
 export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
   ssl: isProduction ? { rejectUnauthorized: false } : false,
   max: 10,
   idleTimeoutMillis: 30000,
