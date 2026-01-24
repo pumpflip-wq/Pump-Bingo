@@ -485,7 +485,12 @@ export default function Home() {
               </main>
 
             <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
-              <GameHistory history={historyRounds} isLoading={historyLoading} />
+              <GameHistory 
+                historyRounds={historyRounds} 
+                historyLoading={historyLoading} 
+                formatAddress={formatAddress} 
+                currentRoundHash={roundData?.round?.publicHash}
+              />
             </aside>
           </div>
           ) : null}
