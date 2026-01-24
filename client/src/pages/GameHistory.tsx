@@ -195,7 +195,7 @@ export default function GameHistory() {
                                       <span className="text-xs font-black uppercase tracking-widest">Details</span>
                                     </Button>
                                   </DialogTrigger>
-                                  <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white max-w-2xl w-[90vw] max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-[2rem]">
+                                  <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white max-w-2xl w-[90vw] max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[2rem] mt-12">
                                     <DialogHeader className="p-6 pb-2 shrink-0">
                                       <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase flex items-center gap-2">
                                         <History className="w-8 h-8 text-primary" />
