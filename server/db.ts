@@ -103,7 +103,12 @@ async function createTables() {
   await db.execute(sql`ALTER TABLE rounds ADD COLUMN IF NOT EXISTS payout_signature TEXT`);
   await db.execute(sql`ALTER TABLE rounds ADD COLUMN IF NOT EXISTS spl_mint TEXT`);
   await db.execute(sql`ALTER TABLE rounds ADD COLUMN IF NOT EXISTS fee_percentage INTEGER DEFAULT 10`);
-  await db.execute(sql`ALTER TABLE participants ADD COLUMN IF NOT EXISTS final_win_prob INTEGER`);
+  
+  try {
+    await db.execute(sql`ALTER TABLE participants ADD COLUMN IF NOT EXISTS final_win_prob INTEGER`);
+  } catch (e) {
+    console.log("Column final_win_prob might already exist or table is being created");
+  }
 
   // Create payment_queue table
   await db.execute(sql`
@@ -131,11 +136,8 @@ async function createTables() {
     )
   `);
 
-  // Ensure column exists for participants
-  await db.execute(sql`ALTER TABLE participants ADD COLUMN IF NOT EXISTS final_win_prob INTEGER`);
-
-  // Ensure column exists for participants
-  await db.execute(sql`ALTER TABLE participants ADD COLUMN IF NOT EXISTS final_win_prob INTEGER`);
+  // Force column existence
+  await db.execute(sql`DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='participants' AND column_name='final_win_prob') THEN ALTER TABLE participants ADD COLUMN final_win_prob integer; END IF; END $$;`);
 
   // Create transactions table
   await db.execute(sql`
