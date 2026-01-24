@@ -96,6 +96,11 @@ async function createTables() {
     )
   `);
 
+  // Migration for existing tables: ensure columns exist
+  await db.execute(sql`ALTER TABLE rounds ADD COLUMN IF NOT EXISTS payout_signature TEXT`);
+  await db.execute(sql`ALTER TABLE rounds ADD COLUMN IF NOT EXISTS spl_mint TEXT`);
+  await db.execute(sql`ALTER TABLE rounds ADD COLUMN IF NOT EXISTS fee_percentage INTEGER DEFAULT 10`);
+
   // Create payment_queue table
   await db.execute(sql`
     CREATE TABLE IF NOT EXISTS payment_queue (
