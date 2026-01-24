@@ -95,10 +95,15 @@ export function BingoClaimButton({
       return;
     }
 
+    // Optimistic UI: Hide button immediately upon click
     claimBingo(
       { roundId, userId },
       {
         onSuccess: () => {
+          // Force immediate invalidation of round data to lock the room
+          queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/rounds", roundId] });
+          
           toast({
             title: "BINGO!",
             description: "Congratulations! You won the round!",

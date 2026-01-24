@@ -189,7 +189,7 @@ export class GameManager {
         
         // Check if winner was already declared (e.g. via claim route)
         if (round.winnerId) {
-            // Wait exactly 10 seconds post-win before moving to FINISHED
+            // User requested exactly 10 seconds post-win
             const winnerDeclaredAt = round.completedAt ? new Date(round.completedAt).getTime() : Date.now();
             
             if (Date.now() - winnerDeclaredAt >= 10000) {

@@ -59,6 +59,8 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
 
         signature = await sendTransaction(transaction, connection);
         
+        // Instant Join: Don't wait for confirmation to hit our backend
+        // Use a background confirmation for reliability but return immediately
         connection.confirmTransaction(signature, "confirmed").catch(console.error);
       }
 
@@ -66,11 +68,10 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         { roundId, userId, txSignature: signature },
         {
           onSuccess: () => {
+            // Optimistically update the UI by invalidating immediately
             queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
             queryClient.invalidateQueries({ queryKey: ["/api/rounds", roundId] });
-            queryClient.invalidateQueries({ queryKey: ["/api/rounds", roundId, "participants", userId] });
-            queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-
+            
             toast({
               title: "Successfully Joined",
               description: "Transaction sent! You've entered the round.",

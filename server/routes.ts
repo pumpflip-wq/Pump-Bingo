@@ -175,17 +175,14 @@ export async function registerRoutes(
       // Update local balance (optional, since it's on-chain, but good for UI consistency)
       const userToUpdate = await storage.getUser(userId);
       if (userToUpdate) {
-        await storage.updateUserBalance(userId, userToUpdate.balance - Number(round.price));
+        await storage.updateUserBalance(userId, -Number(round.price));
       }
 
       // Generate Card
       const card = gameManager.generateCard();
       const participant = await storage.joinRound(roundId, userId, card, txSignature);
 
-      // Fetch user to get latest state (balance is maintained on-chain now)
-      const updatedUser = await storage.getUser(userId);
-
-      res.json({ participant, balance: updatedUser?.balance || 0 });
+      res.json({ participant, balance: (userToUpdate?.balance || 0) - Number(round.price) });
     } catch (err) {
        console.error("Error joining round:", err);
        res.status(500).json({ message: "Failed to join round. Please try again." });
