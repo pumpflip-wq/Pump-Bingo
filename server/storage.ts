@@ -199,7 +199,7 @@ export class DatabaseStorage implements IStorage {
   async resetSystem(): Promise<void> {
     // Drop all tables and recreate them to ensure a clean state
     // Using double quotes to ensure exact match in Postgres
-    await db.execute(sql`TRUNCATE "transactions", "participants", "rounds", "payment_queue", "users" RESTART IDENTITY CASCADE`);
+    await db.execute(sql`TRUNCATE "transactions", "participants", "rounds", "users" RESTART IDENTITY CASCADE`);
   }
 }
 
