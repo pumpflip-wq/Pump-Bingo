@@ -103,6 +103,7 @@ async function createTables() {
   await db.execute(sql`ALTER TABLE rounds ADD COLUMN IF NOT EXISTS payout_signature TEXT`);
   await db.execute(sql`ALTER TABLE rounds ADD COLUMN IF NOT EXISTS spl_mint TEXT`);
   await db.execute(sql`ALTER TABLE rounds ADD COLUMN IF NOT EXISTS fee_percentage INTEGER DEFAULT 10`);
+  await db.execute(sql`ALTER TABLE participants ADD COLUMN IF NOT EXISTS final_win_prob INTEGER`);
 
   // Create payment_queue table
   await db.execute(sql`
@@ -124,10 +125,17 @@ async function createTables() {
       user_id INTEGER NOT NULL,
       card JSONB NOT NULL,
       has_bingo BOOLEAN DEFAULT FALSE,
+      final_win_prob INTEGER,
       joined_at TIMESTAMP DEFAULT NOW(),
       tx_signature TEXT
     )
   `);
+
+  // Ensure column exists for participants
+  await db.execute(sql`ALTER TABLE participants ADD COLUMN IF NOT EXISTS final_win_prob INTEGER`);
+
+  // Ensure column exists for participants
+  await db.execute(sql`ALTER TABLE participants ADD COLUMN IF NOT EXISTS final_win_prob INTEGER`);
 
   // Create transactions table
   await db.execute(sql`

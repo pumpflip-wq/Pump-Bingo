@@ -111,9 +111,9 @@ export class DatabaseStorage implements IStorage {
 
   async getParticipant(roundId: number, userId: number): Promise<Participant | undefined> {
     if (!roundId || isNaN(roundId) || !userId || isNaN(userId)) return undefined;
-    const [participant] = await db.select().from(participants)
+    const results = await db.select().from(participants)
       .where(sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${userId}`);
-    return participant;
+    return results[0];
   }
 
   async getRoundParticipantsCount(roundId: number): Promise<number> {
