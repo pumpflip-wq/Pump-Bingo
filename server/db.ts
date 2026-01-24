@@ -13,7 +13,11 @@ if (!process.env.DATABASE_URL) {
 
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  ssl: (process.env.NODE_ENV === "production" || process.env.DATABASE_URL?.includes("railway.app")) ? { rejectUnauthorized: false } : false
+  ssl: (process.env.NODE_ENV === "production" || 
+        process.env.DATABASE_URL?.includes("railway") || 
+        process.env.RAILWAY_STATIC_URL ||
+        process.env.RAILWAY_ENVIRONMENT ||
+        process.env.RAILWAY_TCP_PROXY_DOMAIN) ? { rejectUnauthorized: false } : false
 });
 
 pool.on('error', (err) => {

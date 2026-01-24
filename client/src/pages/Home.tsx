@@ -5,18 +5,20 @@ import { GameHistory } from "@/components/game/GameHistory";
 import { useRounds, useRound, useParticipant } from "@/hooks/use-game";
 import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
-import { Users, Trophy, Loader2, History, ShieldCheck, Globe, Copy, ExternalLink } from "lucide-react";
+import { Users, Trophy, Loader2, History, ShieldCheck, Globe, Copy, ExternalLink, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
+import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { format } from "date-fns";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import { type Round, type User, type Transaction, ROUND_STATUS } from "@shared/schema";
 import { cn } from "@/lib/utils";
 
@@ -37,16 +39,24 @@ export default function Home() {
     participant, 
     foundParticipant, 
     isLoading,
+    error,
     historyRounds,
     historyLoading 
   } = useGameState();
-  const { toast } = useToast();
 
   const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
 
   const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
   const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
   const completionTimeRef = useRef<{ roundId: number; time: number } | null>(null);
+
+  // Recovery effect for stuck "INITIALIZING" state
+  useEffect(() => {
+    if (roundData?.round?.status === 'OPEN' && !roundData.round.startTime) {
+      console.log("Stuck round detected, refreshing query...");
+      queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
+    }
+  }, [roundData?.round?.id]);
 
   // Stabilize completion time to prevent restarts on refetch
   if (roundData?.round.winnerId && roundData.round.completedAt) {
@@ -205,6 +215,13 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1">
               <Loader2 className="w-16 h-16 text-primary animate-spin" />
               <p className="font-mono text-xs text-primary uppercase tracking-[0.3em]">Connecting Node...</p>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1 text-center">
+              <AlertTriangle className="w-16 h-16 text-destructive animate-pulse" />
+              <p className="font-mono text-xs text-destructive uppercase tracking-[0.3em]">System Link Failure</p>
+              <p className="text-white/60 text-sm max-w-md italic uppercase font-black tracking-widest">Database connection could not be established</p>
+              <Button variant="outline" onClick={() => window.location.reload()} className="mt-4 font-black italic uppercase">Reconnect Protocol</Button>
             </div>
           ) : latestRound && roundData ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">

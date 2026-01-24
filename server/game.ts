@@ -15,7 +15,8 @@ export class GameManager {
 
   start() {
     if (this.loopInterval) return;
-    this.loopInterval = setInterval(() => this.tick(), 1000);
+    // Tick every 2 seconds to save memory/CPU
+    this.loopInterval = setInterval(() => this.tick(), 2000);
   }
 
   private loopInterval: NodeJS.Timeout | null = null;

@@ -9,9 +9,9 @@ export function useGameState() {
   const { publicKey, connected } = useWallet();
   const walletAddress = publicKey?.toBase58();
 
-  const { data: rounds, isLoading: roundsLoading } = useRounds();
+  const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
-  const { data: roundData, isLoading: roundLoading } = useRound(latestRound?.id || 0);
+  const { data: roundData, isLoading: roundLoading, error: roundError } = useRound(latestRound?.id || 0);
 
   const { mutate: login } = useMutation({
     mutationFn: (address: string) => apiRequest("POST", "/api/auth/login", { username: address }).then(res => res.json()),
@@ -35,13 +35,13 @@ export function useGameState() {
   const { data: historyRounds, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
     queryKey: ["/api/rounds/history", 1],
     queryFn: () => fetch("/api/rounds/history?page=1&limit=5").then(res => res.json()),
-    refetchInterval: 30000 // Reduced from 10s to 30s
+    refetchInterval: 30000 
   });
 
   const { data: userTransactions } = useQuery<Transaction[]>({
     queryKey: ["/api/auth/me/transactions", user?.id],
     enabled: !!user?.id,
-    refetchInterval: 20000 // Reduced from 5s to 20s
+    refetchInterval: 20000 
   });
 
   const foundParticipant = roundData?.participants?.find((p: any) => p.username === walletAddress);
@@ -54,7 +54,8 @@ export function useGameState() {
     latestRound,
     participant,
     foundParticipant,
-    isLoading: roundsLoading || (latestRound && roundLoading),
+    isLoading: roundsLoading || (!!latestRound && roundLoading),
+    error: roundsError || roundError,
     historyRounds,
     historyLoading,
     userTransactions

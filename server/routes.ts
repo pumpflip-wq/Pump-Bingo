@@ -288,12 +288,30 @@ export async function registerRoutes(
   });
 
   app.post("/api/admin/reset", async (req, res) => {
-    const { adminWallet } = req.body;
-    if (adminWallet !== PROTOCOL_CONFIG.ADMIN_WALLET) {
-      return res.status(403).json({ message: "Unauthorized" });
+    try {
+      const { adminWallet } = req.body;
+      if (adminWallet !== PROTOCOL_CONFIG.ADMIN_WALLET) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+      
+      console.log("CRITICAL: Admin initiated system reset.");
+      
+      // Stop the game loop first to prevent concurrent database writes
+      gameManager.stop();
+      
+      // Clear all database tables
+      await storage.resetSystem();
+      
+      // Restart game manager to initialize fresh state (new round, etc.)
+      gameManager.start();
+      
+      res.json({ message: "System reset successful" });
+    } catch (err: any) {
+      console.error("Reset error:", err);
+      // Attempt to restart game manager even if storage reset failed partially
+      try { gameManager.start(); } catch (e) {}
+      res.status(500).json({ message: err.message || "Failed to reset system" });
     }
-    await storage.resetSystem();
-    res.json({ message: "System reset successful" });
   });
 
   return httpServer;

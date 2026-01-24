@@ -219,9 +219,15 @@ export default function AdminDashboard() {
               <Button 
                 variant="destructive" 
                 className="font-black italic uppercase"
-                onClick={() => {
+                onClick={async () => {
                   if (confirm("Are you sure? This will reset the entire system!")) {
-                    apiRequest("POST", "/api/admin/reset", {});
+                    try {
+                      await apiRequest("POST", "/api/admin/reset", { adminWallet: PROTOCOL_CONFIG.ADMIN_WALLET });
+                      toast({ title: "System Reset Successful" });
+                      queryClient.invalidateQueries();
+                    } catch (err: any) {
+                      toast({ title: "Reset Failed", description: err.message, variant: "destructive" });
+                    }
                   }
                 }}
               >
