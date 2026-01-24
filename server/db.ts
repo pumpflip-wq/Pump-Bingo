@@ -96,6 +96,21 @@ async function createTables() {
     )
   `);
 
+  // Create payment_queue table
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS payment_queue (
+      id SERIAL PRIMARY KEY,
+      round_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      amount BIGINT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'PENDING',
+      signature TEXT,
+      error TEXT,
+      created_at TIMESTAMP DEFAULT NOW(),
+      processed_at TIMESTAMP
+    )
+  `);
+
   // Create participants table
   await db.execute(sql`
     CREATE TABLE IF NOT EXISTS participants (
