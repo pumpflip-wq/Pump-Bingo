@@ -41,10 +41,14 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       return;
     }
 
-    if (user && user.balance < price) {
+    // On Devnet, we might want to check the actual wallet balance instead of the DB balance
+    // since the user might have just received test SOL
+    const actualBalance = await connection.getBalance(publicKey);
+    
+    if (user && (user.balance < price && actualBalance < price)) {
       toast({
         title: "Insufficient Balance",
-        description: `You need at least ${(price / 1e9).toFixed(2)} SOL to join.`,
+        description: `You need at least ${(price / 1e9).toFixed(2)} SOL to join. Your balance: ${(actualBalance / 1e9).toFixed(4)} SOL`,
         variant: "destructive",
       });
       return;

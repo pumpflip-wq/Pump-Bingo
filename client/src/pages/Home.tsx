@@ -265,7 +265,7 @@ export default function Home() {
                               <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
                               <div className="flex flex-col items-center">
                                 <span className="text-7xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">
-                                  {(roundData.round.prizePool || 0) / 1e9}
+                                  {roundData.round.prizePool ? (roundData.round.prizePool / 1e9).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 9 }).replace(/\.?0+$/, "") : "0"}
                                 </span>
                                 <span className="text-3xl text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
                               </div>
@@ -332,7 +332,7 @@ export default function Home() {
                           <p className="text-sm text-white uppercase font-black tracking-widest font-mono mb-1">Prize Pool</p>
                           <div className="flex items-baseline gap-2">
                             <span className="text-3xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">
-                              {(roundData.round.prizePool || 0) / 1e9} {PROTOCOL_CONFIG.SYMBOL}
+                              {roundData.round.prizePool ? (roundData.round.prizePool / 1e9).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 9 }).replace(/\.?0+$/, "") : "0"} {PROTOCOL_CONFIG.SYMBOL}
                             </span>
                           </div>
                         </div>
@@ -389,7 +389,7 @@ export default function Home() {
                                           <div className="flex flex-col items-center gap-2">
                                             <span className="text-sm text-white uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
                                             <span className="text-5xl md:text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
-                                              {(roundData.round.prizePool || 0) / 1e9} <span className="text-3xl ml-2">{PROTOCOL_CONFIG.SYMBOL}</span>
+                                              {roundData.round.prizePool ? (roundData.round.prizePool / 1e9).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 9 }).replace(/\.?0+$/, "") : "0"} <span className="text-3xl ml-2">{PROTOCOL_CONFIG.SYMBOL}</span>
                                             </span>
                                           </div>
                                         </div>
