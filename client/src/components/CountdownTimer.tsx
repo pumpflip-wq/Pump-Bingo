@@ -10,9 +10,30 @@ interface CountdownTimerProps {
 }
 
 export function CountdownTimer({ secondsRemaining, status, participantCount }: CountdownTimerProps) {
+  const [displaySeconds, setDisplaySeconds] = useState(secondsRemaining);
+  const lastUpdateTime = useRef(Date.now());
+  const lastServerSeconds = useRef(secondsRemaining);
+
+  useEffect(() => {
+    // Synchronize with server data when it changes significantly
+    if (Math.abs(secondsRemaining - lastServerSeconds.current) > 1 || secondsRemaining === 0) {
+      setDisplaySeconds(secondsRemaining);
+      lastServerSeconds.current = secondsRemaining;
+      lastUpdateTime.current = Date.now();
+    }
+
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - lastUpdateTime.current) / 1000);
+      const nextSeconds = Math.max(0, lastServerSeconds.current - elapsed);
+      setDisplaySeconds(nextSeconds);
+    }, 200);
+
+    return () => clearInterval(interval);
+  }, [secondsRemaining]);
+
   const timeLeft = {
-    minutes: Math.floor(secondsRemaining / 60),
-    seconds: secondsRemaining % 60
+    minutes: Math.floor(displaySeconds / 60),
+    seconds: displaySeconds % 60
   };
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
