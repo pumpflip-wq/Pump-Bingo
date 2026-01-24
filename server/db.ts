@@ -28,19 +28,11 @@ export const db = drizzle(pool, { schema });
  */
 export async function initializeDatabase() {
   try {
-    console.log("Initializing database connection...");
-    // Simple query to test connection
     await db.execute(sql`SELECT 1`);
-    console.log("Database connection successful.");
     
-    // Check if tables exist, if not create them
     const tablesExist = await checkTablesExist();
     if (!tablesExist) {
-      console.log("Tables not found. Creating database schema...");
       await createTables();
-      console.log("Database schema created successfully.");
-    } else {
-      console.log("Database tables already exist.");
     }
   } catch (err: any) {
     console.error("Database initialization failed:", err);

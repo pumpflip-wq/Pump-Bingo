@@ -134,13 +134,11 @@ export async function registerRoutes(
       const treasuryWallet = solanaManager.getMasterPublicKey();
       if (!treasuryWallet) return res.status(500).json({ message: "Server wallet not initialized" });
 
-      // 0. Verify Transaction (Simplified Fast Check)
+      // 0. Verify Transaction
       if (txSignature) {
         const isValid = await solanaManager.verifyTransaction(txSignature, Number(round.price), treasuryWallet);
         if (!isValid) {
-          // If verification fails but we have a signature, let's log it and allow for now to ensure smooth UX
-          // Real production would be stricter, but we want speed and reliability
-          console.warn(`Transaction verification failed for ${txSignature}, but allowing join for UX.`);
+          return res.status(400).json({ message: "Transaction verification failed. Please try again." });
         }
       } else {
         return res.status(400).json({ message: "Transaction signature required" });
@@ -289,8 +287,11 @@ export async function registerRoutes(
     res.json(userTxs);
   });
 
-  app.post("/api/admin/reset", async (_req, res) => {
-    // In a real app, check for admin auth here
+  app.post("/api/admin/reset", async (req, res) => {
+    const { adminWallet } = req.body;
+    if (adminWallet !== PROTOCOL_CONFIG.ADMIN_WALLET) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
     await storage.resetSystem();
     res.json({ message: "System reset successful" });
   });

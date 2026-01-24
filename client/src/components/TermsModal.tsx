@@ -13,7 +13,6 @@ export function TermsModal({ onAccept, show = false }: TermsModalProps) {
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
 
   useEffect(() => {
-    console.log(`[TermsModal] Visibility Check - Show Prop: ${show}`);
     if (show) {
       const timer = setTimeout(() => setIsOpen(true), 100);
       return () => clearTimeout(timer);
@@ -23,7 +22,6 @@ export function TermsModal({ onAccept, show = false }: TermsModalProps) {
   }, [show]);
 
   const handleAccept = () => {
-    console.log("[TermsModal] Accepting terms");
     onAccept();
   };
 

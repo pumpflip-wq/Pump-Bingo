@@ -58,13 +58,6 @@ export default function VerifyPage() {
       // Use crypto-js for browser-compatible SHA256 hashing
       const hash = CryptoJS.SHA256(trimmedSeed).toString(CryptoJS.enc.Hex).toLowerCase();
       
-      console.log("Verification Logic Debug:", { 
-        rawSeed: seed,
-        trimmedSeed,
-        computedHash: hash, 
-        expectedHash: trimmedHash 
-      });
-      
       return hash === trimmedHash;
     } catch (e) {
       console.error("Verification Error:", e);

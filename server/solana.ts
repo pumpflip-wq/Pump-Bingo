@@ -20,12 +20,9 @@ export class SolanaManager {
     if (secretKey) {
       try {
         this.masterKeypair = Keypair.fromSecretKey(bs58.decode(secretKey));
-        console.log("Solana Master Wallet initialized:", this.masterKeypair.publicKey.toBase58());
       } catch (err) {
         console.error("Failed to initialize Solana Master Wallet:", err);
       }
-    } else {
-      console.log("Solana Manager running in TEST mode (No master wallet configured)");
     }
   }
 
@@ -35,8 +32,6 @@ export class SolanaManager {
 
   async sendReward(toAddress: string, amount: number): Promise<string | null> {
     if (!this.masterKeypair) {
-      console.log(`[TEST MODE] Would send ${amount / 1e9} SOL to ${toAddress}`);
-      // Return a mock signature for testing
       return "MOCK_SIG_" + Math.random().toString(36).substring(7);
     }
 

@@ -15,8 +15,7 @@ export class GameManager {
 
   start() {
     if (this.loopInterval) return;
-    console.log("Starting Game Manager Loop...");
-    this.loopInterval = setInterval(() => this.tick(), 1000); // 1 tick per second
+    this.loopInterval = setInterval(() => this.tick(), 1000);
   }
 
   private loopInterval: NodeJS.Timeout | null = null;
@@ -51,9 +50,7 @@ export class GameManager {
           const lastUpdate = latestRound.startTime ? new Date(latestRound.startTime).getTime() : 0;
           const stallThreshold = 10 * 60 * 1000; // 10 minutes for recovery
           if (Date.now() - lastUpdate > stallThreshold && !latestRound.winnerId) {
-              console.log(`Round ${latestRound.id} seems stalled, resetting...`);
               await storage.updateRound(latestRound.id, { status: ROUND_STATUS.FINISHED, completedAt: new Date() });
-              // IMMEDIATELY create new round to avoid delay
               await this.createNewRound();
               return;
           }
@@ -78,8 +75,6 @@ export class GameManager {
     const now = Date.now();
     const startTime = new Date(now + 65000); // Increased buffer to 5s (65000ms) to ensure sync with client countdown
 
-    console.log(`Creating new round #${nextId} with seed: ${seed} and hash: ${hash}`);
-
     await storage.createRound({
       id: nextId,
       status: ROUND_STATUS.OPEN,
@@ -90,7 +85,6 @@ export class GameManager {
       prizePool: 0,
       drawnNumbers: []
     });
-    console.log(`Created new round #${nextId}`);
 
     // Process payment queue for the new round
     await this.processPaymentQueue(nextId);
@@ -110,7 +104,6 @@ export class GameManager {
         }
 
         await storage.markPaymentProcessed(payment.id);
-        console.log(`Auto-joined user ${payment.userId} to round ${roundId} from queue`);
       } catch (err) {
         console.error("Error processing queued payment:", err);
       }
@@ -143,7 +136,6 @@ export class GameManager {
 
         if (now >= startTime) {
           await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
-          console.log(`Round ${round.id} starting...`);
         }
       } else {
         // Not enough players: strictly freeze the start time at 60s in the future
@@ -169,10 +161,8 @@ export class GameManager {
                 status: ROUND_STATUS.OPEN,
                 startTime: new Date(Date.now() + 60 * 1000) 
             });
-            console.log(`Round ${round.id} reverted to OPEN - not enough players`);
         } else if (elapsed > 5000) {
             await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME });
-            console.log(`Round ${round.id} is now IN_GAME`);
         }
     }
 
@@ -186,9 +176,7 @@ export class GameManager {
             const winnerDeclaredAt = round.completedAt ? new Date(round.completedAt).getTime() : Date.now();
             
             if (Date.now() - winnerDeclaredAt >= 10000) {
-                console.log(`Round ${round.id} reached 10s post-win delay, finishing...`);
                 await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
-                // IMMEDIATELY create new round to avoid delay
                 await this.createNewRound();
             }
             return;
@@ -214,7 +202,6 @@ export class GameManager {
                 const nextNum = available[Math.floor(Math.random() * available.length)];
                 const newNumbers = [...round.drawnNumbers, nextNum];
                 await storage.updateRound(round.id, { drawnNumbers: newNumbers });
-                console.log(`Round ${round.id} drew number ${nextNum} (Total: ${newNumbers.length})`);
             }
         }
     }
