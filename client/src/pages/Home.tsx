@@ -37,6 +37,15 @@ export default function Home() {
     historyLoading,
   } = useGameState();
 
+  // Force a refetch when the window regains focus to keep sync
+  useEffect(() => {
+    const handleFocus = () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, []);
+
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [showWinnerOverlay, setShowWinnerOverlay] = useState(false);
   const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(

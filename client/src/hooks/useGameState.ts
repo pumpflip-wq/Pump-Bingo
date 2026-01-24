@@ -31,10 +31,11 @@ export function useGameState() {
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
   const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number);
 
-  // Poll round data more frequently
+  // Poll round data more frequently with invalidation to ensure UI reflects server changes
   useEffect(() => {
     if (latestRound?.id) {
       const interval = setInterval(() => {
+        queryClient.invalidateQueries({ queryKey: ["/api/rounds", latestRound.id] });
         refetchRound();
       }, 1000);
       return () => clearInterval(interval);
