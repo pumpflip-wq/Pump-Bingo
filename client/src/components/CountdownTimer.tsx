@@ -23,9 +23,9 @@ export function CountdownTimer({ targetDate, status, participantCount }: Countdo
       const now = Date.now();
       const diff = Math.max(0, target - now);
       
-      // If we are very close to start, show 00:00 but let status handle the "Verifying" state
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      const totalSeconds = Math.ceil(diff / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
       
       setTimeLeft({ minutes, seconds });
     };

@@ -57,6 +57,9 @@ export class GameManager {
 
     try {
       const round = await storage.getLatestRound();
+      if (round) {
+        console.log(`[GameManager] Tick - Round #${round.id} Status: ${round.status}`);
+      }
 
       if (!round || round.status === ROUND_STATUS.FINISHED) {
         await this.maybeCreateNextRound(round);
@@ -147,7 +150,7 @@ export class GameManager {
 
     if (!round.startTime) {
       await storage.updateRound(round.id, {
-        startTime: new Date(Date.now() + 60_000), // Explicit 60 seconds
+        startTime: new Date(Date.now() + 62_000), // Adjusted for tick/network delay
       });
       return;
     }

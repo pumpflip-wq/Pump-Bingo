@@ -102,6 +102,11 @@ app.use((req, res, next) => {
     },
     () => {
       log(`serving on port ${port}`);
+      // Start the game manager loop
+      import("./game").then(({ gameManager }) => {
+        gameManager.start();
+        log("Game Manager started");
+      });
     },
   );
 })();
