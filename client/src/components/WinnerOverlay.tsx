@@ -45,6 +45,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, isParticipant, 
     descriptionText = "The round has concluded. Join the next one to win!";
   }
 
+  // Ensure background elements are visible
   return (
     <AnimatePresence>
       {show && (
@@ -52,7 +53,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, isParticipant, 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-2xl p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
         >
           <motion.div
             initial={{ scale: 0.8, y: 40, rotate: -2 }}

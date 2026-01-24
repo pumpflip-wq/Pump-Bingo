@@ -53,7 +53,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           })
         );
 
-        const { blockhash } = await connection.getLatestBlockhash('confirmed');
+        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
         transaction.recentBlockhash = blockhash;
         transaction.feePayer = publicKey;
 
@@ -61,7 +61,11 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         
         // Instant Join: Don't wait for confirmation to hit our backend
         // Use a background confirmation for reliability but return immediately
-        connection.confirmTransaction(signature, "confirmed").catch(console.error);
+        connection.confirmTransaction({
+          signature,
+          blockhash,
+          lastValidBlockHeight
+        }, "confirmed").catch(console.error);
       }
 
       joinRound(
