@@ -122,7 +122,7 @@ export default function VerifyPage() {
                             {round.status}
                           </span>
                           {round.status === 'OPEN' && (
-                            <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Waiting for players...</span>
+                            <span className="text-[8px] font-black text-white/60 uppercase tracking-widest">Waiting for players...</span>
                           )}
                         </div>
                       </td>
@@ -130,23 +130,23 @@ export default function VerifyPage() {
                         <div className="flex flex-wrap gap-1 max-w-[300px]">
                           {round.drawnNumbers && round.drawnNumbers.length > 0 ? (
                             round.drawnNumbers.slice(0, 10).map((num, i) => (
-                              <span key={i} className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-bold text-white border border-white/10">
+                              <span key={i} className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-black text-white border border-white/10">
                                 {num}
                               </span>
                             ))
                           ) : (
-                            <span className="text-[10px] font-black uppercase tracking-widest text-white/20">No draws yet</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40">No draws yet</span>
                           )}
                           {round.drawnNumbers && round.drawnNumbers.length > 10 && (
-                            <span className="text-[9px] font-bold text-white/40 self-end">+{round.drawnNumbers.length - 10}</span>
+                            <span className="text-[9px] font-black text-white/60 self-end">+{round.drawnNumbers.length - 10}</span>
                           )}
                         </div>
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex flex-col gap-2">
                           <div className="flex items-center gap-2">
-                            <span className="text-[8px] font-black uppercase text-white/40">Hash:</span>
-                            <span className="font-mono text-[9px] text-white/60 font-bold truncate max-w-[100px]">{round.publicHash}</span>
+                            <span className="text-[8px] font-black uppercase text-white/60">Hash:</span>
+                            <span className="font-mono text-[9px] text-white/80 font-black truncate max-w-[100px]">{round.publicHash}</span>
                             <Copy className="w-3 h-3 text-white/40 cursor-pointer hover:text-primary transition-colors" onClick={() => {
                               navigator.clipboard.writeText(round.publicHash);
                               toast({ title: "Hash Copied" });

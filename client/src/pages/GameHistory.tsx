@@ -41,7 +41,7 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
 
       <div className="space-y-3">
         <h3 className="text-xs font-black uppercase tracking-widest text-primary italic">Draw Sequence</h3>
-        <div className="flex flex-wrap gap-2 p-4 rounded-2xl bg-black/40 border border-white/5">
+        <div className="flex flex-wrap gap-2 p-4 rounded-2xl bg-black/40 border border-white/5 max-h-[300px] overflow-y-auto custom-scrollbar">
           {details.round.drawnNumbers?.map((num: number, i: number) => (
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
@@ -58,16 +58,21 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
 
       <div className="space-y-3">
         <h3 className="text-xs font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
-        <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+        <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
           {details.participants.map((p: any) => (
             <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-[10px] font-bold">
+                <div className="w-8 h-8 rounded-full bg-black/60 border border-white/10 flex items-center justify-center text-[10px] font-black text-white">
                   {p.username.slice(0, 2)}
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white">{p.username.slice(0, 6)}...{p.username.slice(-4)}</p>
-                  <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
+                  <p className="text-xs font-black text-white">{p.username.slice(0, 6)}...{p.username.slice(-4)}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[9px] text-white/60 font-black uppercase tracking-widest">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
+                    {p.winRate !== undefined && (
+                      <span className="text-[9px] font-black text-primary/80 uppercase tracking-widest">WR: {p.winRate}%</span>
+                    )}
+                  </div>
                 </div>
               </div>
               {details.round.winnerId === p.id && (
@@ -160,18 +165,18 @@ export default function GameHistory() {
                               {formatCurrency(round.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}
                             </TableCell>
                             <TableCell>
-                              <div className="flex flex-col gap-1 min-w-[240px]">
+                  <div className="flex flex-col gap-1 min-w-[240px]">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs text-white uppercase font-bold">Hash:</span>
-                                  <span className="text-xs font-mono text-white truncate max-w-[150px]">{round.publicHash}</span>
-                                  <Copy className="w-4 h-4 text-white/20 cursor-pointer hover:text-primary transition-colors" onClick={() => {
+                                  <span className="text-xs text-white uppercase font-black">Hash:</span>
+                                  <span className="text-xs font-mono text-white/90 truncate max-w-[150px]">{round.publicHash}</span>
+                                  <Copy className="w-4 h-4 text-white/40 cursor-pointer hover:text-primary transition-colors" onClick={() => {
                                     navigator.clipboard.writeText(round.publicHash);
                                     toast({ title: "Hash Copied" });
                                   }} />
                                 </div>
                                 {round.serverSeed && (
                                   <div className="flex items-center gap-2">
-                                    <span className="text-xs text-primary uppercase font-bold">Seed:</span>
+                                    <span className="text-xs text-primary uppercase font-black">Seed:</span>
                                     <span className="text-xs font-mono text-primary truncate max-w-[150px]">{round.serverSeed}</span>
                                     <Copy className="w-4 h-4 text-primary/20 cursor-pointer hover:text-primary transition-colors" onClick={() => {
                                       navigator.clipboard.writeText(round.serverSeed);
