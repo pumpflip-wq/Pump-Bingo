@@ -316,15 +316,21 @@ export class GameManager {
 
   validateBingo(card: number[][], drawn: number[]): boolean {
     const set = new Set(drawn);
+    // free space is always checked (represented by 0)
     const ok = (n: number) => n === 0 || set.has(n);
 
+    // Rows
     for (let i = 0; i < 5; i++) {
       if (card[i].every(ok)) return true;
+    }
+    // Columns
+    for (let i = 0; i < 5; i++) {
       if (card.map((r) => r[i]).every(ok)) return true;
     }
-
+    // Diagonals
     if ([0, 1, 2, 3, 4].every((i) => ok(card[i][i]))) return true;
     if ([0, 1, 2, 3, 4].every((i) => ok(card[i][4 - i]))) return true;
+    
     return false;
   }
 

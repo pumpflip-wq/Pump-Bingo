@@ -53,7 +53,7 @@ export function useGameState() {
     }
   }, [latestRound?.id]);
 
-  const { data: participant } = useParticipant(latestRound?.id as number, user?.id);
+  const { data: participant, refetch: refetchParticipant } = useParticipant(latestRound?.id as number, user?.id);
 
   const { data: historyRounds, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
     queryKey: ["/api/rounds/history", 1],
@@ -82,6 +82,9 @@ export function useGameState() {
     historyRounds,
     historyLoading,
     userTransactions,
-    refetch: refetchRound
+    refetch: () => {
+      refetchRound();
+      refetchParticipant();
+    }
   };
 }
