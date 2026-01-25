@@ -263,7 +263,6 @@ export default function Home() {
               </Button>
             </div>
           ) : latestRound && roundData ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
                 <PlayerList
                   participants={participantsList}
@@ -272,10 +271,38 @@ export default function Home() {
                   roundStatus={roundData.round.status}
                   roundData={roundData}
                 />
+                
+                <div className="glass-card neon-border rounded-2xl bg-black/60 border-primary/30 p-4 flex-1 flex flex-col min-h-0 overflow-hidden">
+                  <div className="flex items-center justify-between mb-4 shrink-0">
+                    <p className="text-white text-xs font-black uppercase tracking-[0.3em]">
+                      Game Activity
+                    </p>
+                    <div className="flex gap-2">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 flex flex-col min-h-0 space-y-4">
+                    <div className="shrink-0">
+                      <LastCalledNumber
+                        numbers={roundData.round.drawnNumbers || []}
+                      />
+                    </div>
+                    
+                    <div className="flex-1 min-h-0 overflow-hidden">
+                      <GameHistory
+                        rounds={historyRounds}
+                        isLoading={historyLoading}
+                        formatCurrency={formatCurrency}
+                        formatAddress={formatAddress}
+                      />
+                    </div>
+                  </div>
+                </div>
               </aside>
 
               <main
-                className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden relative"
+                className="lg:col-span-9 space-y-4 h-[750px] flex flex-col overflow-hidden relative"
                 style={{ perspective: "1000px" }}
               >
                 <AnimatePresence mode="wait">
@@ -621,20 +648,6 @@ export default function Home() {
                   )}
                 </AnimatePresence>
               </main>
-
-              <aside className="lg:col-span-3 space-y-4 h-[750px] flex flex-col">
-                <LastCalledNumber
-                  numbers={roundData.round.drawnNumbers || []}
-                />
-                <div className="flex-1 overflow-hidden min-h-0">
-                  <GameHistory
-                    rounds={historyRounds}
-                    isLoading={historyLoading}
-                    formatCurrency={formatCurrency}
-                    formatAddress={formatAddress}
-                  />
-                </div>
-              </aside>
             </div>
           ) : null}
         </div>
