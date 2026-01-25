@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
 import { ROUND_STATUS } from "@shared/schema";
 
 interface CountdownTimerProps {
@@ -10,33 +9,10 @@ interface CountdownTimerProps {
 }
 
 export function CountdownTimer({ secondsRemaining, status, participantCount }: CountdownTimerProps) {
-  const [displaySeconds, setDisplaySeconds] = useState(secondsRemaining);
-  const lastServerSeconds = useRef(secondsRemaining);
-
-  useEffect(() => {
-    // If waiting for players, show --:-- or 01:00
-    if (participantCount < 2) {
-      setDisplaySeconds(60);
-      lastServerSeconds.current = 60;
-      return;
-    }
-
-    // Always trust the server's secondsRemaining if it's lower than what we have
-    // or if the difference is significant (more than 2 seconds)
-    if (secondsRemaining !== lastServerSeconds.current) {
-      if (secondsRemaining < displaySeconds || Math.abs(secondsRemaining - displaySeconds) > 2) {
-        setDisplaySeconds(secondsRemaining);
-      }
-      lastServerSeconds.current = secondsRemaining;
-    }
-
-    const interval = setInterval(() => {
-      setDisplaySeconds(prev => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [secondsRemaining, participantCount]);
-
+  // IMPORTANT: Display-only component - NO local state, NO setInterval
+  // Server is the single source of truth for time
+  const displaySeconds = participantCount < 2 ? 60 : Math.max(0, secondsRemaining);
+  
   const timeLeft = {
     minutes: Math.floor(displaySeconds / 60),
     seconds: displaySeconds % 60
