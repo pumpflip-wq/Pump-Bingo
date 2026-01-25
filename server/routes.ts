@@ -18,12 +18,6 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express,
 ): Promise<Server> {
-  // Update game settings
-  gameManager.updateSettings({
-    price: PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE,
-    feePercentage: PROTOCOL_CONFIG.FEE_PERCENTAGE,
-  });
-
   // Start game loop
   gameManager.start();
 

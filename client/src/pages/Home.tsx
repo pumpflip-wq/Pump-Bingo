@@ -1,6 +1,5 @@
 import { api } from "@shared/routes";
 import { formatAddress, formatCurrency } from "@/lib/utils";
-import { ProbabilityFeed } from "@/components/game/ProbabilityFeed";
 import { PlayerList } from "@/components/game/PlayerList";
 import { GameHistory } from "@/components/game/GameHistory";
 import { useRounds, useRound, useParticipant } from "@/hooks/use-game";
@@ -72,7 +71,9 @@ export default function Home() {
 
   const isParticipant = !!participant || !!foundParticipant;
 
-  const calculateWinProb = (card: number[][], drawn: number[]) => {
+// Player statistics calculated on frontend for real-time differentiation, 
+// though the final win prob is stored in the database.
+const calculateWinProb = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);
     drawnSet.add(0); // Free space
     
@@ -203,7 +204,7 @@ export default function Home() {
     if (!roundData?.participants) return [];
     return roundData.participants.map(p => ({
       ...p,
-      prob: p.finalWinProb || calculateWinProb(p.card, roundData.round.drawnNumbers || [])
+      prob: (p as any).finalWinProb || calculateWinProb(p.card, roundData.round.drawnNumbers || [])
     }));
   }, [roundData?.participants, roundData?.round.drawnNumbers]);
 
@@ -354,7 +355,7 @@ export default function Home() {
                                   card={currentCard}
                                   drawnNumbers={roundData.round.drawnNumbers || []}
                                   status={roundData.round.status}
-                                  isBingoed={participant?.hasBingo || false}
+                                  isBingoed={(participant as any)?.hasBingo || false}
                                   className="w-full h-16 text-3xl font-black italic tracking-tighter"
                                 />
                               </div>
