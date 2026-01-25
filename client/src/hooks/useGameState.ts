@@ -59,13 +59,11 @@ export function useGameState() {
     refetchInterval: 5000 
   });
 
-  const { data: historyData, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
+  const { data: historyRounds, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
     queryKey: ["/api/rounds/history", 1],
-    queryFn: () => fetch("/api/rounds/history?page=1&limit=5").then(res => res.json()),
+    queryFn: () => fetch("/api/rounds/history?page=1&limit=10").then(res => res.json()),
     refetchInterval: 10000 
   });
-
-  const historyRounds = historyData?.rounds || [];
 
   const participant = roundData?.participants?.find((p: any) => p.userId === userId);
   const foundParticipant = participant; 
