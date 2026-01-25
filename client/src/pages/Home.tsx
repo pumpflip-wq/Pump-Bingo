@@ -263,6 +263,7 @@ export default function Home() {
               </Button>
             </div>
           ) : latestRound && roundData ? (
+            <div className="grid lg:grid-cols-12 gap-4">
               <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
                 <PlayerList
                   participants={participantsList}
