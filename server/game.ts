@@ -155,11 +155,7 @@ export class GameManager {
 
     // 1. OPEN -> STARTING
     if (round.status === ROUND_STATUS.OPEN) {
-      const actualParticipants = await db.select()
-        .from(participants)
-        .where(sql`${participants.roundId} = ${round.id} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`);
-      
-      const participantCount = actualParticipants.length;
+      const participantCount = await storage.getRoundParticipantsCount(round.id);
       
       if (participantCount >= 2) {
         // Only initialize startTime if it's null

@@ -152,7 +152,7 @@ export class DatabaseStorage implements IStorage {
     if (!roundId || isNaN(roundId)) return 0;
     const [result] = await db.select({ count: sql<string>`count(*)` })
         .from(participants)
-        .where(eq(participants.roundId, roundId));
+        .where(sql`${participants.roundId} = ${roundId} AND (${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != '')`);
     return parseInt(result.count || "0", 10);
   }
 
