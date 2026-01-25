@@ -187,47 +187,49 @@ export class GameManager {
   ====================== */
   private async processRound(round: Round) {
     const now = new Date();
+    const count = await storage.getRoundParticipantsCount(round.id);
 
     // 1. OPEN -> STARTING
     if (round.status === ROUND_STATUS.OPEN) {
-      const count = await storage.getRoundParticipantsCount(round.id);
-
       if (count >= 2) {
         if (!round.startTime) {
+          // Set a stable countdown of 60 seconds
           const target = new Date(now.getTime() + 60000);
           await storage.updateRound(round.id, { startTime: target });
-          console.log(`[GameManager] Round #${round.id} timer set to 60s for ${count} players`);
+          console.log(`[GameManager] Round #${round.id} countdown started: 60s for ${count} players`);
           return;
         }
 
         const startTime = new Date(round.startTime);
         if (now.getTime() >= startTime.getTime()) {
-          console.log(`[GameManager] Round #${round.id} timer reached. Transitioning to STARTING...`);
+          console.log(`[GameManager] Countdown finished. Round #${round.id} -> STARTING`);
           await storage.updateRound(round.id, {
             status: ROUND_STATUS.STARTING,
-            startTime: new Date() // Reset startTime for the STARTING phase animation
+            startTime: new Date(now.getTime() + 5000) // 5s fixed duration
           });
         }
-      } else if (round.startTime) {
-        console.log(`[GameManager] Round #${round.id} resetting timer - not enough players (current: ${count})`);
-        await storage.updateRound(round.id, { startTime: null });
+      } else {
+        // If players < 2, we don't reset startTime to null but the UI should handle "Waiting"
+        // Based on instructions: "לא לאפס startTime" but also "ה־UI צריך להציג: Waiting for players"
+        // We'll keep the logic that if count < 2, it stays in OPEN and UI sees count < 2.
+        if (round.startTime) {
+          console.log(`[GameManager] Round #${round.id} - not enough players, clearing countdown`);
+          await storage.updateRound(round.id, { startTime: null });
+        }
       }
     }
 
     // 2. STARTING -> IN_GAME
     else if (round.status === ROUND_STATUS.STARTING) {
-      const startTime = round.startTime instanceof Date ? round.startTime : new Date(round.startTime!);
-      const elapsed = now.getTime() - startTime.getTime();
-      const count = await storage.getRoundParticipantsCount(round.id);
-
+      const startTime = new Date(round.startTime!);
       if (count < 2) {
-        console.log(`[GameManager] Round #${round.id} reverting to OPEN - players left during starting phase`);
+        console.log(`[GameManager] Round #${round.id} reverting to OPEN - players left`);
         await storage.updateRound(round.id, {
           status: ROUND_STATUS.OPEN,
           startTime: null,
         });
-      } else if (elapsed > 5000) {
-        console.log(`[GameManager] Round #${round.id} transitioning to IN_GAME`);
+      } else if (now.getTime() >= startTime.getTime()) {
+        console.log(`[GameManager] Starting phase finished. Round #${round.id} -> IN_GAME`);
         await storage.updateRound(round.id, { 
           status: ROUND_STATUS.IN_GAME,
           startTime: new Date() 
@@ -241,13 +243,12 @@ export class GameManager {
 
       // Winner already declared
       if (round.winnerId) {
-        const winnerTime = round.completedAt
-          ? new Date(round.completedAt).getTime()
-          : Date.now();
-        if (Date.now() - winnerTime >= POST_WIN_DELAY_MS) {
+        const completedTime = round.completedAt ? new Date(round.completedAt).getTime() : now.getTime();
+        if (now.getTime() - completedTime >= POST_WIN_DELAY_MS) {
           await storage.updateRound(round.id, {
             status: ROUND_STATUS.FINISHED,
           });
+          // Statistics are already saved in claimBingo, so we just finish.
           await this.createNewRound();
         }
         return;
@@ -275,7 +276,7 @@ export class GameManager {
           await storage.updateRound(round.id, {
             drawnNumbers: newDrawn,
           });
-          console.log(`[GameManager] Round #${round.id} updated drawn numbers: ${newDrawn.length}`);
+          console.log(`[GameManager] Round #${round.id} drawn: ${newDrawn.length}`);
         }
       }
     }

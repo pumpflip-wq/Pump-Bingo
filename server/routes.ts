@@ -137,18 +137,14 @@ export async function registerRoutes(
     let secondsRemaining = 0;
     let nextRoundSecondsRemaining = 0;
     const now = Date.now();
-    if ((round.status === ROUND_STATUS.OPEN || round.status === ROUND_STATUS.STARTING) && round.startTime) {
-      const startMs =
-        round.startTime instanceof Date
-          ? round.startTime.getTime()
-          : new Date(round.startTime).getTime();
+    
+    if (round.startTime) {
+      const startMs = new Date(round.startTime).getTime();
       secondsRemaining = Math.max(0, Math.floor((startMs - now) / 1000));
     }
+
     if (round.winnerId && round.completedAt) {
-      const completedMs =
-        round.completedAt instanceof Date
-          ? round.completedAt.getTime()
-          : new Date(round.completedAt).getTime();
+      const completedMs = new Date(round.completedAt).getTime();
       nextRoundSecondsRemaining = Math.max(
         0,
         Math.ceil((10000 - (now - completedMs)) / 1000),
@@ -175,6 +171,7 @@ export async function registerRoutes(
         winRate: p.finalWinProb || 0,
         finalWinProb: p.finalWinProb || 0,
       })),
+      status: round.status, // Explicit status for UI state machine
     });
   });
 
