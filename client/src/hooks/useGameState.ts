@@ -48,7 +48,7 @@ export function useGameState() {
         // Refetch both the specific round and the list to ensure full synchronization
         queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, latestRound.id] });
         queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
-      }, 1000); 
+      }, 500); 
       return () => clearInterval(interval);
     }
   }, [latestRound?.id]);

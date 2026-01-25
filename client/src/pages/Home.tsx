@@ -200,7 +200,7 @@ export default function Home() {
     if (!roundData?.participants) return [];
     return roundData.participants.map(p => ({
       ...p,
-      prob: calculateWinProb(p.card, roundData.round.drawnNumbers || [])
+      prob: p.finalWinProb || calculateWinProb(p.card, roundData.round.drawnNumbers || [])
     }));
   }, [roundData?.participants, roundData?.round.drawnNumbers]);
 
