@@ -36,9 +36,8 @@ export function useGameState() {
   useEffect(() => {
     if (latestRound?.id) {
       const interval = setInterval(() => {
-        // Refetch the specific round data
+        // Refetch both the specific round and the list to ensure full synchronization
         queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, latestRound.id] });
-        // Also refetch the list to catch new rounds
         queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
       }, 1000); 
       return () => clearInterval(interval);

@@ -155,44 +155,35 @@ export class GameManager {
 
     // 1. OPEN -> STARTING
     if (round.status === ROUND_STATUS.OPEN) {
-      // Fetch only participants who have a txSignature (truly joined)
       const actualParticipants = await db.select()
         .from(participants)
         .where(sql`${participants.roundId} = ${round.id} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`);
       
       const participantCount = actualParticipants.length;
       
-      // Only allow the countdown to progress if we have at least 2 real players
       if (participantCount >= 2) {
-        if (!round.startTime || new Date(round.startTime).getTime() < now.getTime() - 2000) {
-            // If we just reached 2 players OR the previous startTime is in the past, set it to 60s from now
+        // Force initialize if no startTime OR if the startTime is in the past while still in OPEN status
+        // We use a small buffer (2s) to avoid race conditions with updates
+        const startTimeTs = round.startTime ? new Date(round.startTime).getTime() : 0;
+        if (startTimeTs < now.getTime() - 2000) {
             const targetTime = new Date(now.getTime() + 60000);
             await storage.updateRound(round.id, { startTime: targetTime });
-            console.log(`[GameManager] Round #${round.id} timer initialized to 60s for ${participantCount} players`);
+            console.log(`[GameManager] Round #${round.id} RESET timer to 60s for ${participantCount} players`);
             return;
         }
 
-        const startTime = new Date(round.startTime);
-        const diff = startTime.getTime() - now.getTime();
-        
-        // If the start time is too far in the future (>60s), reset it to exactly 60s
-        if (diff > 60000) {
-           await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
-           return;
-        }
-
+        const startTime = new Date(round.startTime!);
         if (now.getTime() >= startTime.getTime()) {
-          console.log(`[GameManager] Round #${round.id} starting...`);
+          console.log(`[GameManager] Round #${round.id} countdown finished. Transitioning to STARTING...`);
           await storage.updateRound(round.id, { 
             status: ROUND_STATUS.STARTING,
-            startTime: new Date() // Reset startTime to mark beginning of STARTING phase
+            startTime: new Date()
           });
         }
-      } else {
-        // Not enough players: strictly freeze/reset the start time if it was set
-        if (round.startTime) {
-          await storage.updateRound(round.id, { startTime: null });
-        }
+      } else if (round.startTime) {
+        // Reset if players leave
+        console.log(`[GameManager] Round #${round.id} resetting timer - not enough players`);
+        await storage.updateRound(round.id, { startTime: null });
       }
     }
 
