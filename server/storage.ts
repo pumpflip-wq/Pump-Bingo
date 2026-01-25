@@ -59,6 +59,7 @@ export interface IStorage {
 
   // Payment Queue
   getPendingPayments(): Promise<PaymentQueue[]>;
+  getPendingPaymentByUser(userId: number): Promise<PaymentQueue | undefined>;
   createPaymentQueue(payment: InsertPaymentQueue): Promise<PaymentQueue>;
   markPaymentProcessed(id: number): Promise<void>;
 }
@@ -311,6 +312,15 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(paymentQueue)
       .where(eq(paymentQueue.status, "PENDING"));
+  }
+
+  async getPendingPaymentByUser(userId: number): Promise<PaymentQueue | undefined> {
+    if (!userId || isNaN(userId)) return undefined;
+    const [payment] = await db
+      .select()
+      .from(paymentQueue)
+      .where(sql`${paymentQueue.userId} = ${userId} AND ${paymentQueue.status} = 'PENDING'`);
+    return payment;
   }
 
   async createPaymentQueue(payment: InsertPaymentQueue): Promise<PaymentQueue> {

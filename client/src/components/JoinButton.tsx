@@ -61,6 +61,24 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     }
 
     try {
+      // Check if user already has a pending payment
+      try {
+        const pendingRes = await fetch(`/api/payments/pending/${userId}`);
+        if (pendingRes.ok) {
+          const pendingData = await pendingRes.json();
+          if (pendingData.hasPending) {
+            toast({
+              title: "Already Queued",
+              description: "You have a pending deposit. You'll be automatically joined to the next round!",
+            });
+            setIsWalleting(false);
+            return;
+          }
+        }
+      } catch (e) {
+        // Continue if check fails
+      }
+
       // Check balance after setting loading state for speed
       const actualBalance = await connection.getBalance(publicKey);
       
@@ -143,19 +161,24 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       joinRound(
         { roundId, userId, txSignature: signature },
         {
-          onSuccess: (data) => {
+          onSuccess: (data: any) => {
             setIsWalleting(false);
-            // Invalidate queries to get fresh data including correct participants
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             
-            toast({
-              title: "Successfully Joined",
-              description: "Transaction sent! You've entered the round.",
-            });
+            if (data.queued) {
+              toast({
+                title: "Queued for Next Round",
+                description: "Round already started. You'll be automatically joined to the next round!",
+              });
+            } else {
+              toast({
+                title: "Successfully Joined",
+                description: "Transaction sent! You've entered the round.",
+              });
+            }
           },
           onError: (error: Error) => {
             setIsWalleting(false);
-            // Invalidate queries on error to clean up UI
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             toast({
               title: "Join Process Initiated",

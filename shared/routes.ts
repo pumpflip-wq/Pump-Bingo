@@ -66,11 +66,17 @@ export const api = {
       path: '/api/rounds/:id/join',
       input: z.object({ userId: z.number() }),
       responses: {
-        200: z.object({
+        200: z.union([
+          z.object({
             participant: z.custom<typeof participants.$inferSelect>(),
             balance: z.number()
-        }),
-        400: errorSchemas.validation, // Insufficient funds or already joined
+          }),
+          z.object({
+            queued: z.literal(true),
+            message: z.string()
+          })
+        ]),
+        400: errorSchemas.validation,
         404: errorSchemas.notFound,
       },
     },

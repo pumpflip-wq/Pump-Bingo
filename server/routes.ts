@@ -56,11 +56,42 @@ export async function registerRoutes(
   });
 
   // ===== PAYMENTS =====
+  app.get("/api/payments/pending/:userId", async (req, res) => {
+    try {
+      const userId = Number(req.params.userId);
+      if (isNaN(userId)) return res.status(400).json({ message: "Invalid user ID" });
+      const pending = await storage.getPendingPaymentByUser(userId);
+      res.json({ hasPending: !!pending, payment: pending || null });
+    } catch (err) {
+      console.error("Check pending payment error:", err);
+      res.status(500).json({ message: "Failed to check pending payments" });
+    }
+  });
+
   app.post("/api/payments/queue", async (req, res) => {
     try {
+      const { userId, txSignature, amount } = req.body;
+      
+      // Check if user already has a pending payment
+      const existing = await storage.getPendingPaymentByUser(Number(userId));
+      if (existing) {
+        return res.json({ 
+          queued: true, 
+          message: "You already have a pending payment. You will be joined automatically.",
+          payment: existing 
+        });
+      }
+      
       const payment = await storage.createPaymentQueue(req.body);
       res.json(payment);
-    } catch (err) {
+    } catch (err: any) {
+      // Handle unique constraint violation (duplicate txSignature)
+      if (err.code === '23505') {
+        return res.json({ 
+          queued: true, 
+          message: "Transaction already recorded. You will be joined automatically." 
+        });
+      }
       console.error("Payment queue error:", err);
       res.status(500).json({ message: "Failed to queue payment" });
     }

@@ -146,7 +146,7 @@ export default function Home() {
       prize: roundData.round.prizePool || 0,
       isWinner: isMe,
       isParticipant: amIParticipant,
-      txHash: roundData.round.payoutSignature ? `https://explorer.solana.com/tx/${roundData.round.payoutSignature}?cluster=${PROTOCOL_CONFIG.NETWORK}` : undefined,
+      txHash: roundData.round.payoutSignature || undefined,
       timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
       currentRoundId: currentRoundId
     };
