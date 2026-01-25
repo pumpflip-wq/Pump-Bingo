@@ -281,12 +281,13 @@ export default function Home() {
                           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
                           <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-3 font-mono text-center">
                             {roundData.round.status === 'STARTING' ? 'SECURING GAME PROTOCOL...' : 
-                             roundData.participantsCount < 2 ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
+                             roundData.isWaitingForPlayers ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
                           </p>
                           <CountdownTimer 
                             secondsRemaining={roundData.secondsRemaining || 0} 
                             status={roundData.round.status}
                             participantCount={roundData.participantsCount}
+                            isWaitingForPlayers={roundData.isWaitingForPlayers}
                           />
                         </div>
                         <div className="w-full max-w-2xl mx-auto mb-2">

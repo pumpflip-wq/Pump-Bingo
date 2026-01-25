@@ -41,14 +41,14 @@ export function useGameState() {
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
   const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number);
 
-  // Poll round data more frequently with invalidation to ensure UI reflects server changes
+  // Poll round data based on server-driven status and timers
   useEffect(() => {
     if (latestRound?.id) {
       const interval = setInterval(() => {
-        // Refetch both the specific round and the list to ensure full synchronization
+        // Just invalidate, useRound handles the timing
         queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, latestRound.id] });
         queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
-      }, 500); 
+      }, 1000); 
       return () => clearInterval(interval);
     }
   }, [latestRound?.id]);
@@ -56,13 +56,13 @@ export function useGameState() {
   const { data: userTransactions } = useQuery<Transaction[]>({
     queryKey: ["/api/auth/me/transactions", user?.id],
     enabled: !!user?.id,
-    refetchInterval: 2000 
+    refetchInterval: 5000 
   });
 
   const { data: historyData, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
     queryKey: ["/api/rounds/history", 1],
     queryFn: () => fetch("/api/rounds/history?page=1&limit=5").then(res => res.json()),
-    refetchInterval: 2000 
+    refetchInterval: 10000 
   });
 
   const historyRounds = historyData?.rounds || [];
