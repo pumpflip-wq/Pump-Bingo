@@ -16,7 +16,7 @@ export const PROTOCOL_CONFIG = {
 
   // Devnet/Mainnet toggle (currently using Devnet)
   NETWORK: "devnet",
-  RPC_URL: "https://api.devnet.solana.com",
+  RPC_URL: "https://devnet.helius-rpc.com/?api-key=dd4d0f55-719e-4f2e-b8b8-2f686bc7d2bf",
   IS_TEST_MODE: false, // Set to false to enable real transactions
 
   // Admin wallet address - change this to set a new admin

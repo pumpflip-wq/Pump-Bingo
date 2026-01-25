@@ -30,6 +30,11 @@ export class GameManager {
     if (this.isProcessing) return;
     this.isProcessing = true;
     try {
+      // Use a database advisory lock to ensure only one server processes the game loop at a time
+      // This is critical when running multiple server instances (e.g., Replit and Railway)
+      // connected to the same database.
+      await db.execute(sql`SELECT pg_advisory_xact_lock(12345)`);
+      
       const latestRound = await storage.getLatestRound();
       
       // If no round exists, or the latest round is finished, create a new one

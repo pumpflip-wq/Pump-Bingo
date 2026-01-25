@@ -46,7 +46,8 @@ export function useGameState() {
     if (latestRound?.id) {
       const interval = setInterval(() => {
         // Just invalidate, useRound handles the timing
-        queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, latestRound.id] });
+        // Using refetchInterval: 0 and manual invalidation to prevent stale cache
+        queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, latestRound.id], exact: true });
         queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
       }, 1000); 
       return () => clearInterval(interval);
