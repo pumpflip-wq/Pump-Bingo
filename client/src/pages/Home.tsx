@@ -199,8 +199,7 @@ export default function Home() {
 
     const winner = roundData.participants?.find(
       (p: any) =>
-        p.userId === roundData.round.winnerId ||
-        p.id === roundData.round.winnerId,
+        Number(p.userId) === Number(roundData.round.winnerId)
     );
     const winnerUsername =
       winner?.username ||

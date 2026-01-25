@@ -39,7 +39,11 @@ export function WinnerOverlay({ show, username, prize, isWinner, isParticipant, 
   if (isWinner) {
     headerText = 'BINGO! YOU WIN!';
     subtitleText = 'CONGRATULATIONS CHAMPION';
-  } else if (!isParticipant) {
+  } else if (isParticipant) {
+    headerText = 'GAME OVER';
+    subtitleText = "DON'T GIVE UP! LUCK IS JUST AROUND THE CORNER";
+    descriptionText = "Better luck next time! Keep playing to win big.";
+  } else {
     headerText = 'ROUND ENDED';
     subtitleText = 'SPECTATOR MODE';
     descriptionText = "The round has concluded. Join the next one to win!";
