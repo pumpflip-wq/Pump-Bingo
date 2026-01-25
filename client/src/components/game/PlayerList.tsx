@@ -28,9 +28,9 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
 
     list.forEach(p => {
       const uId = p.userId || p.username;
-      // Filter out participants without a txSignature unless they are the current user
-      // and we just started joining, but even then, it's safer to wait for txSignature
-      if (uId && p.username !== "Unknown" && (p.txSignature || p.isOptimistic)) {
+      // Show all participants that are in the roundData, regardless of txSignature
+      // This ensures they stay in the list throughout the round
+      if (uId && p.username !== "Unknown") {
         map.set(uId, p);
       }
     });

@@ -197,31 +197,35 @@ export default function Home() {
     const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
     const amIParticipant = isParticipant;
 
-    if (hasManuallyClosed || !winnerDeclaredAt || !roundData) return null;
-    const elapsed = currentTime - winnerDeclaredAt;
-    const totalDisplayTime = 10000;
-    if (elapsed >= totalDisplayTime) return null;
+    if (winnerDeclaredAt || !roundData) {
+      const elapsed = currentTime - (winnerDeclaredAt || 0);
+      const totalDisplayTime = 10000;
+      
+      // If winner is declared, show overlay for 10 seconds
+      if (winnerDeclaredAt && elapsed < totalDisplayTime && !hasManuallyClosed) {
+        const winner = roundData.participants?.find(
+          (p: any) =>
+            Number(p.userId) === Number(roundData.round.winnerId)
+        );
+        const winnerUsername =
+          winner?.username ||
+          (isMe
+            ? walletAddress
+            : roundData.round.winnerId?.toString() || "Unknown");
 
-    const winner = roundData.participants?.find(
-      (p: any) =>
-        Number(p.userId) === Number(roundData.round.winnerId)
-    );
-    const winnerUsername =
-      winner?.username ||
-      (isMe
-        ? walletAddress
-        : roundData.round.winnerId?.toString() || "Unknown");
-
-    return {
-      show: true,
-      username: winnerUsername || "Unknown",
-      prize: roundData.round.prizePool || 0,
-      isWinner: isMe,
-      isParticipant: amIParticipant,
-      txHash: roundData.round.payoutSignature || undefined,
-      timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
-      currentRoundId: currentRoundId,
-    };
+        return {
+          show: true,
+          username: winnerUsername || "Unknown",
+          prize: roundData.round.prizePool || 0,
+          isWinner: isMe,
+          isParticipant: amIParticipant,
+          txHash: roundData.round.payoutSignature || undefined,
+          timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
+          currentRoundId: currentRoundId,
+        };
+      }
+    }
+    return null;
   }, [
     roundData,
     user?.id,
@@ -487,13 +491,12 @@ export default function Home() {
                               </h4>
                               <Users className="w-3 h-3 text-primary/40" />
                             </div>
-                            <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                               {sortedParticipants
                                 .filter(
                                   (p) =>
                                     !p.txSignature?.startsWith("TEST_TX_SIG_"),
                                 )
-                                .slice(0, 5)
                                 .map((p, idx) => (
                                   <div
                                     key={p.id}
