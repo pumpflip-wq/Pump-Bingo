@@ -81,6 +81,7 @@ export function useGameState() {
     error: roundsError || roundError,
     historyRounds,
     historyLoading,
-    userTransactions
+    userTransactions,
+    refetch: refetchRound
   };
 }
