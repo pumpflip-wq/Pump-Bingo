@@ -418,31 +418,35 @@ export default function Home() {
                             <Trophy className="w-6 h-6 text-primary" />
                           </div>
                           <div>
-                            <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">
+                            <p className="text-[12px] text-white uppercase font-black tracking-widest">
                               Prize Pool
                             </p>
                             <p className="text-2xl font-black text-primary italic font-display">
-                              {formatCurrency(roundData.round.prizePool)} $
-                              {PROTOCOL_CONFIG.SYMBOL}
+                              {formatCurrency(roundData.round.prizePool)} {PROTOCOL_CONFIG.SYMBOL}
                             </p>
                           </div>
                         </div>
-                        <div className="flex gap-4">
-                          <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-right">
-                            <p className="text-[8px] text-white/40 uppercase font-black tracking-[0.2em] mb-1">
-                              Room
-                            </p>
-                            <p className="text-2xl font-black text-white font-display italic leading-none">
-                              #{roundData.round.id}
-                            </p>
+                        <div className="flex items-center gap-2">
+                          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase animate-pulse">
+                            <div className="w-2 h-2 rounded-full bg-primary" /> LIVE
                           </div>
-                          <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-right">
-                            <p className="text-[8px] text-white/40 uppercase font-black tracking-[0.2em] mb-1">
-                              Players
-                            </p>
-                            <p className="text-2xl font-black text-white font-display italic leading-none">
-                              {roundData.participantsCount}
-                            </p>
+                          <div className="flex gap-4">
+                            <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-center">
+                              <p className="text-[12px] text-white uppercase font-black tracking-[0.2em] mb-1">
+                                Room
+                              </p>
+                              <p className="text-2xl font-black text-white font-display italic leading-none">
+                                #{roundData.round.id}
+                              </p>
+                            </div>
+                            <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-center">
+                              <p className="text-[12px] text-white uppercase font-black tracking-[0.2em] mb-1">
+                                Players
+                              </p>
+                              <p className="text-2xl font-black text-white font-display italic leading-none">
+                                {roundData.participantsCount}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -475,27 +479,25 @@ export default function Home() {
                           </div>
                         </div>
                       ) : (
-                        <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-start space-y-8 relative overflow-hidden flex-1 w-full pt-12">
+                        <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-start space-y-8 relative overflow-hidden flex-1 w-full pt-6">
                           <div className="text-center space-y-4 relative z-10 shrink-0">
-                            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
-                              <Globe className="w-3 h-3 animate-spin-slow" />{" "}
-                              Live Feed Active
-                            </div>
-                            <h2 className="text-6xl font-black text-white italic tracking-tighter uppercase font-display leading-none">
+                            <h2 className="text-7xl font-black text-white italic tracking-tighter uppercase font-display leading-none">
                               Watching{" "}
                               <span className="text-primary">Live</span>
                             </h2>
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/40 text-[8px] font-black uppercase tracking-[0.2em]">
-                              <ShieldCheck className="w-2.5 h-2.5" /> Spectator
-                              Mode Active
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white text-[12px] font-black uppercase tracking-[0.2em]">
+                                <ShieldCheck className="w-4 h-4" /> Spectator
+                                Mode Active
+                              </div>
                             </div>
                           </div>
-                          <div className="w-full max-w-sm space-y-4 relative z-10 flex-1 min-h-0 flex flex-col">
+                          <div className="w-full max-w-sm space-y-4 relative z-10 flex-1 min-h-0 flex-col flex">
                             <div className="flex items-center justify-between px-2 mb-2 shrink-0">
-                              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+                              <h4 className="text-[12px] font-black uppercase tracking-[0.3em] text-white">
                                 Live Player Rankings
                               </h4>
-                              <Users className="w-3 h-3 text-primary/40" />
+                              <Users className="w-4 h-4 text-primary" />
                             </div>
                             <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-0 max-h-[400px]">
                               {sortedParticipants
@@ -508,7 +510,7 @@ export default function Home() {
                                       <span className="w-6 h-6 rounded-lg bg-black/40 flex items-center justify-center text-[10px] font-black text-primary/60 group-hover:text-primary">
                                         {idx + 1}
                                       </span>
-                                      <span className="text-sm font-black text-white/80 group-hover:text-white truncate max-w-[120px]">
+                                      <span className="text-base font-black text-white group-hover:text-primary transition-colors truncate max-w-[120px]">
                                         {formatAddress(p.username)}
                                       </span>
                                     </div>
@@ -520,7 +522,7 @@ export default function Home() {
                                           className="h-full bg-primary shadow-[0_0_10px_rgba(34,197,94,0.4)]"
                                         />
                                       </div>
-                                      <span className="text-[10px] font-mono font-black text-primary/80 min-w-[3ch]">
+                                      <span className="text-sm font-mono font-black text-primary min-w-[3ch] drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">
                                         {Math.round(p.prob || 0)}%
                                       </span>
                                     </div>
