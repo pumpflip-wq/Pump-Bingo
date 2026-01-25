@@ -155,15 +155,15 @@ export class GameManager {
 
     // 1. OPEN -> STARTING
     if (round.status === ROUND_STATUS.OPEN) {
+      // Use the storage method to get valid participants
       const participantCount = await storage.getRoundParticipantsCount(round.id);
-      console.log(`[GameManager] Round #${round.id} status: OPEN, participants: ${participantCount}, startTime: ${round.startTime}`);
       
       if (participantCount >= 2) {
         // Only initialize startTime if it's null
         if (!round.startTime) {
             const targetTime = new Date(now.getTime() + 60000);
             await storage.updateRound(round.id, { startTime: targetTime });
-            console.log(`[GameManager] Round #${round.id} SET timer to 60s for ${participantCount} players`);
+            console.log(`[GameManager] Round #${round.id} SET timer to 60s for ${participantCount} valid players`);
             return;
         }
 
@@ -176,8 +176,8 @@ export class GameManager {
           });
         }
       } else if (round.startTime) {
-        // Reset if players leave
-        console.log(`[GameManager] Round #${round.id} resetting timer - not enough players (current: ${participantCount})`);
+        // Reset if players leave or if we don't have enough VALID players
+        console.log(`[GameManager] Round #${round.id} resetting timer - not enough valid players (current: ${participantCount})`);
         await storage.updateRound(round.id, { startTime: null });
       }
     }

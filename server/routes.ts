@@ -110,10 +110,7 @@ export async function registerRoutes(
     const round = await storage.getRound(roundId);
     if (!round) return res.status(404).json({ message: "Round not found" });
     
-    const countResult = await db.select({ count: sql`count(*)` })
-      .from(participants)
-      .where(sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`);
-    const count = Number(countResult[0]?.count || 0);
+    const count = await storage.getRoundParticipantsCount(roundId);
     
     // Fetch participants with usernames, cards, and finalWinProb who have truly joined
     const roundParticipants = await db.execute(sql`
