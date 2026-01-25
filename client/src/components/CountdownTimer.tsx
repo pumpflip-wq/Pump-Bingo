@@ -25,7 +25,7 @@ export function CountdownTimer({ secondsRemaining, status, participantCount, isW
   if (isWaitingForPlayers || (status === ROUND_STATUS.OPEN && participantCount < 2) || 
       (status === ROUND_STATUS.OPEN && (secondsRemaining === 0 || !secondsRemaining))) {
     return (
-      <div className="text-6xl md:text-8xl font-black font-mono text-white/50 tracking-[0.4em] italic drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] tabular-nums" data-testid="countdown-timer">
+      <div className="text-6xl md:text-8xl font-black font-mono text-white tracking-[0.4em] italic drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tabular-nums" data-testid="countdown-timer">
         01:00
       </div>
     );
