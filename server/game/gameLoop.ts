@@ -1,7 +1,7 @@
 import { storage } from "../storage";
 import { db } from "../db";
 import { participants, ROUND_STATUS, type Round } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { calculateWinProb, validateBingo, generateBingoCard } from "./bingoLogic";
 import { getDeterministicDraw } from "./provablyFair";
 import { PROTOCOL_CONFIG } from "@shared/config";
