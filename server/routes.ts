@@ -269,14 +269,21 @@ export async function registerRoutes(
       if (isNaN(roundId))
         return res.status(400).json({ message: "Invalid round ID" });
 
-      const { userId } = api.rounds.claim.input.parse(req.body);
-      const participant = await storage.getParticipant(roundId, userId);
+      const { userId, participantId } = req.body;
+      let participant;
+      
+      if (participantId) {
+        participant = await storage.getParticipantById(Number(participantId));
+      } else {
+        participant = await storage.getParticipant(roundId, Number(userId));
+      }
+
       if (!participant)
         return res.status(404).json({ message: "Participant not found" });
 
       const result = await gameManager.claimBingo(
         roundId,
-        userId,
+        participant.userId,
         participant.card as number[][],
       );
       if (!result)

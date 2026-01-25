@@ -50,6 +50,13 @@ export default function Home() {
   const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
   const completionTimeRef = useRef<{ roundId: number; time: number } | null>(null);
 
+  // Sync participant manually if query is inconsistent
+  const [participantOverride, setParticipantOverride] = useState<any>(null);
+  useEffect(() => {
+    if (participant) setParticipantOverride(participant);
+    else if (foundParticipant) setParticipantOverride(foundParticipant);
+  }, [participant, foundParticipant]);
+
   // Recovery effect for stuck "INITIALIZING" state
   useEffect(() => {
     if (roundData?.round?.status === 'OPEN' && !roundData.round.startTime && !roundData.isWaitingForPlayers) {
@@ -352,10 +359,11 @@ const calculateWinProbLocal = (card: number[][], drawn: number[]) => {
                                 <BingoClaimButton 
                                   roundId={roundData?.round?.id || 0} 
                                   userId={user?.id || 0} 
+                                  participantId={participantOverride?.id || participant?.id || foundParticipant?.id}
                                   card={currentCard}
                                   drawnNumbers={roundData?.round?.drawnNumbers || []}
                                   status={roundData?.round?.status || ROUND_STATUS.OPEN}
-                                  isBingoed={(participant as any)?.hasBingo || false}
+                                  isBingoed={(participantOverride || participant || foundParticipant)?.hasBingo || false}
                                   className="w-full h-16 text-3xl font-black italic tracking-tighter"
                                 />
                               </div>
