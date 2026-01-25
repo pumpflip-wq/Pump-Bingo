@@ -182,6 +182,24 @@ export async function registerRoutes(
       const round = await storage.getRound(roundId);
       if (!round) return res.status(404).json({ message: "Round not found" });
       
+      // Check if round is still open for joining
+      if (round.status !== ROUND_STATUS.OPEN) {
+        // Queue payment for the NEXT round if current is already full/started
+        if (txSignature) {
+          await storage.createPaymentQueue({
+            userId: Number(userId),
+            txSignature,
+            amount: Number(round.price),
+            status: "PENDING"
+          });
+          return res.json({ 
+            queued: true, 
+            message: "Round already started. You will be automatically joined to the next round." 
+          });
+        }
+        return res.status(400).json({ message: "Round is no longer open for joining." });
+      }
+
       // Check if user already joined this round
       const existingParticipant = await storage.getParticipant(roundId, Number(userId));
       if (existingParticipant) {

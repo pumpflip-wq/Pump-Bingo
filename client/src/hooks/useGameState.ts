@@ -35,13 +35,14 @@ export function useGameState() {
   useEffect(() => {
     if (latestRound?.id) {
       const interval = setInterval(() => {
-        // Only invalidate if the game is active or starting to reduce unnecessary load
-        queryClient.invalidateQueries({ queryKey: ["/api/rounds", latestRound.id] });
-        refetchRound();
-      }, 500); // Increased polling frequency to 500ms for smoother live feed
+        // Refetch the specific round data
+        queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, latestRound.id] });
+        // Also refetch the list to catch new rounds
+        queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
+      }, 1000); 
       return () => clearInterval(interval);
     }
-  }, [latestRound?.id, refetchRound]);
+  }, [latestRound?.id]);
 
   const { data: participant } = useParticipant(latestRound?.id as number, user?.id);
 
