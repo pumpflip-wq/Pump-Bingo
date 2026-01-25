@@ -94,16 +94,23 @@ export default function Home() {
       setLastOverlayRoundId(roundData.round.id);
       setHasManuallyClosed(false);
 
+      // We do NOT invalidate here anymore to prevent the "flip" to loser state
+      // The overlay relies on the data of the round that just ended.
+      // We will only allow the UI to transition to a new round after the overlay finishes.
+    }
+  }, [roundData?.round?.winnerId, roundData?.round?.id, lastOverlayRoundId]);
+
+  // Handle the end of the overlay display
+  useEffect(() => {
+    if (showWinnerOverlay) {
       const timer = setTimeout(() => {
         setShowWinnerOverlay(false);
-        // Only invalidate after the overlay has been shown for 10 seconds
+        // Refresh to see the new round after overlay is done
         queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
       }, 10000);
-
       return () => clearTimeout(timer);
     }
-    // Don't reset overlay state when roundData changes - let it persist for the full 10 seconds
-  }, [roundData?.round?.winnerId, roundData?.round?.id, lastOverlayRoundId]);
+  }, [showWinnerOverlay]);
 
   const calculateWinProb = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);

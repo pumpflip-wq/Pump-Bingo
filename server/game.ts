@@ -124,6 +124,13 @@ export class GameManager {
     const pending = await storage.getPendingPayments();
     for (const payment of pending) {
       try {
+        // Double check they aren't already in this round (though createNewRound implies fresh ID)
+        const existing = await storage.getParticipant(roundId, payment.userId);
+        if (existing) {
+          await storage.markPaymentProcessed(payment.id);
+          continue;
+        }
+
         const card = this.generateCard();
         await storage.joinRound(roundId, payment.userId, card, payment.txSignature);
         
@@ -131,11 +138,12 @@ export class GameManager {
         const round = await storage.getRound(roundId);
         if (round) {
           const currentPrize = Number(round.prizePool || 0);
-          const paymentAmount = Number(payment.amount || 0);
+          const paymentAmount = Number(payment.price || payment.amount || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE);
           await storage.updateRound(roundId, { prizePool: currentPrize + paymentAmount });
         }
 
         await storage.markPaymentProcessed(payment.id);
+        console.log(`[GameManager] Auto-joined queued player ${payment.userId} to new round #${roundId}`);
       } catch (err) {
         console.error("Error processing queued payment:", err);
       }
