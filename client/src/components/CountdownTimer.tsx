@@ -24,10 +24,8 @@ export function CountdownTimer({ secondsRemaining, status, participantCount, isW
   if (isWaitingForPlayers || (status === ROUND_STATUS.OPEN && participantCount < 2)) {
     return (
       <div className="flex flex-col items-center justify-center">
-        <div className="text-4xl md:text-6xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase italic">
-          WAITING
-        </div>
-        <div className="text-[10px] text-white/40 uppercase font-black tracking-widest mt-2 text-center">
+        <h2 className="text-7xl font-black text-primary italic tracking-tighter uppercase font-display mb-8 drop-shadow-[0_0_15px_rgba(34,197,94,0.4)]">WAITING</h2>
+        <div className="text-[10px] text-white/40 uppercase font-black tracking-[0.5em] mb-12 text-center">
           FOR CHALLENGERS
         </div>
       </div>

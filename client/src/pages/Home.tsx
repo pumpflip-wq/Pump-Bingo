@@ -91,7 +91,7 @@ export default function Home() {
   const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];
     return (roundData.participants as any[])
-      .filter(p => !p.txSignature?.startsWith('TEST_TX_SIG_'))
+      .filter(p => !p.txSignature?.startsWith('TEST_TX_SIG_') && p.username !== PROTOCOL_CONFIG.ADMIN_WALLET)
       .map(p => ({
         ...p,
         prob: p.finalWinProb || calculateWinProbLocal(p.card, roundData.round.drawnNumbers || [])
@@ -204,8 +204,6 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="relative z-10 scale-150 py-12 flex flex-col items-center">
-                      <h2 className="text-7xl font-black text-primary italic tracking-tighter uppercase font-display mb-8 drop-shadow-[0_0_15px_rgba(34,197,94,0.4)]">WAITING</h2>
-                      <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.5em] mb-12">FOR CHALLENGERS</p>
                       <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={roundData.isWaitingForPlayers} />
                     </div>
                     <div className="w-full max-w-xl space-y-8 relative z-10 pb-8">

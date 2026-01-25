@@ -47,6 +47,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
             
             // Filter out system account or invalid players
             if (!p.username || p.username === "Unknown") return null;
+            // Never show the system/master wallet in the player list
+            if (p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return null;
             if (p.txSignature && p.txSignature.startsWith('TEST_TX_SIG_')) return null;
 
             return (
