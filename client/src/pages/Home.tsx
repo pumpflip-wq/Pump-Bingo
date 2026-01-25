@@ -132,7 +132,7 @@ export default function Home() {
     const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
     const amIParticipant = isParticipant;
 
-    if (hasManuallyClosed || !winnerDeclaredAt) return null;
+    if (hasManuallyClosed || !winnerDeclaredAt || !roundData) return null;
     const elapsed = currentTime - winnerDeclaredAt;
     const totalDisplayTime = 10000; 
     if (elapsed >= totalDisplayTime) return null;
@@ -142,7 +142,7 @@ export default function Home() {
     
     return {
       show: true,
-      username: winnerUsername,
+      username: winnerUsername || "Unknown",
       prize: roundData.round.prizePool || 0,
       isWinner: isMe,
       isParticipant: amIParticipant,
@@ -231,7 +231,7 @@ export default function Home() {
                         {roundData.round.status === 'STARTING' ? 'SECURING GAME PROTOCOL...' : 
                          roundData.participantsCount < 2 ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
                       </p>
-                      <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={roundData.isWaitingForPlayers} />
+                      <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={(roundData as any).isWaitingForPlayers || roundData.participantsCount < 2} />
                       {roundData.participantsCount < 2 && (
                         <div className="space-y-1 mt-4">
                           <p className="text-primary text-lg uppercase font-black animate-pulse tracking-[0.15em] font-display">
@@ -299,7 +299,7 @@ export default function Home() {
                         <div className="relative space-y-4 flex flex-col items-center flex-1 min-h-0 justify-center w-full">
                           <BingoCard card={currentCard} drawnNumbers={roundData?.round?.drawnNumbers || []} className="w-full max-w-[520px] scale-100" />
                           <div className="flex justify-center w-full max-w-[520px] shrink-0">
-                            <BingoClaimButton roundId={roundData?.round?.id || 0} userId={user?.id || 0} card={currentCard} drawnNumbers={roundData?.round?.drawnNumbers || []} status={roundData?.round?.status || ROUND_STATUS.OPEN} isBingoed={myParticipant?.hasBingo || false} className="w-full h-16 text-3xl font-black italic tracking-tighter" />
+                            <BingoClaimButton roundId={roundData?.round?.id || 0} userId={user?.id || 0} card={currentCard} drawnNumbers={roundData?.round?.drawnNumbers || []} status={roundData?.round?.status || ROUND_STATUS.OPEN} isBingoed={(myParticipant as any)?.hasBingo || false} className="w-full h-16 text-3xl font-black italic tracking-tighter" />
                           </div>
                         </div>
                       ) : (
