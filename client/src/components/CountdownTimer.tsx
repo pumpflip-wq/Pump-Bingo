@@ -34,6 +34,15 @@ export function CountdownTimer({ secondsRemaining, status, participantCount, isW
     );
   }
 
+  // Display 01:00 if timer hasn't started yet but we have enough players
+  if (status === ROUND_STATUS.OPEN && secondsRemaining === 0) {
+    return (
+      <div className="text-6xl md:text-8xl font-black font-mono text-white tracking-[0.4em] italic drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tabular-nums" data-testid="countdown-timer">
+        01:00
+      </div>
+    );
+  }
+
   if (status === ROUND_STATUS.STARTING) {
     return (
       <div className="flex flex-col items-center justify-center space-y-6">
