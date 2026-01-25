@@ -119,8 +119,8 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             toast({
               title: data.queued ? "Queued for Next Round" : "Successfully Joined",
               description: data.queued 
-                ? "Round already started. You'll join the next one!" 
-                : "You've entered the round!",
+                ? "You've been added to the queue for the next game!" 
+                : "You've successfully entered the round!",
             });
           },
           onError: () => {
