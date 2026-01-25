@@ -284,13 +284,10 @@ export async function registerRoutes(
       storage.updateUserBalance(userId, entryPrice * -1).catch(console.error);
 
       // Verify on Solana in background
-      if (txSignature) {
+      const masterPubKey = solanaManager.getMasterPublicKey();
+      if (txSignature && masterPubKey) {
         solanaManager
-          .verifyTransaction(
-            txSignature,
-            entryPrice,
-            solanaManager.getMasterPublicKey(),
-          )
+          .verifyTransaction(txSignature, entryPrice, masterPubKey)
           .then((valid) => {
             if (!valid) console.error(`Transaction invalid: ${txSignature}`);
           })
