@@ -12,7 +12,7 @@ interface CountdownTimerProps {
 export function CountdownTimer({ secondsRemaining, status, participantCount, isWaitingForPlayers }: CountdownTimerProps) {
   // IMPORTANT: Display-only component - NO local state, NO setInterval
   // Server is the single source of truth for time
-  const displaySeconds = isWaitingForPlayers ? 60 : Math.max(0, secondsRemaining);
+  const displaySeconds = Math.max(0, secondsRemaining);
   
   const timeLeft = {
     minutes: Math.floor(displaySeconds / 60),
@@ -21,20 +21,7 @@ export function CountdownTimer({ secondsRemaining, status, participantCount, isW
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 
-  if (isWaitingForPlayers) {
-    return (
-      <div className="flex flex-col items-center justify-center">
-        <div className="text-4xl md:text-6xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase italic">
-          WAITING
-        </div>
-        <div className="text-[10px] text-white/40 uppercase font-black tracking-widest mt-2">
-          FOR PLAYERS
-        </div>
-      </div>
-    );
-  }
-
-  if (status === ROUND_STATUS.OPEN && participantCount < 2) {
+  if (isWaitingForPlayers || (status === ROUND_STATUS.OPEN && participantCount < 2)) {
     return (
       <div className="flex flex-col items-center justify-center">
         <div className="text-4xl md:text-6xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase italic">

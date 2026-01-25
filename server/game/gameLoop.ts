@@ -138,6 +138,7 @@ export class GameManager {
     const updated = await storage.updateRound(roundId, {
       winnerId: userId,
       completedAt: new Date(),
+      drawnNumbers: round.drawnNumbers, // Persist final drawn numbers state
     });
     return !!(updated && updated.winnerId === userId);
   }

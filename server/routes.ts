@@ -139,7 +139,7 @@ export async function registerRoutes(
       const startMs = new Date(round.startTime).getTime();
       secondsRemaining = Math.max(0, Math.floor((startMs - now) / 1000));
     } else if (isWaitingForPlayers) {
-      secondsRemaining = 60; // Default display value while waiting
+      secondsRemaining = 0; // Return 0 when waiting, frontend handles display
     }
 
     if (round.winnerId && round.completedAt) {
