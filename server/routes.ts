@@ -379,6 +379,28 @@ export async function registerRoutes(
     }
   });
 
+  // ===== GET PARTICIPANT =====
+  app.get("/api/rounds/:roundId/participants/:userId", async (req, res) => {
+    try {
+      const roundId = Number(req.params.roundId);
+      const userId = Number(req.params.userId);
+      
+      if (isNaN(roundId) || isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid round or user ID" });
+      }
+      
+      const participant = await storage.getParticipant(roundId, userId);
+      if (!participant) {
+        return res.status(404).json({ message: "Participant not found" });
+      }
+      
+      res.json(participant);
+    } catch (err) {
+      console.error("Get participant error:", err);
+      res.status(500).json({ message: "Failed to get participant" });
+    }
+  });
+
   // ===== SYSTEM RESET =====
   app.post("/api/admin/reset", async (req, res) => {
     try {
