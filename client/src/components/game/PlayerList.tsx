@@ -15,7 +15,7 @@ interface PlayerListProps {
 export function PlayerList({ participants, walletAddress, formatAddress, roundStatus, roundData }: PlayerListProps) {
   const amIParticipating = useMemo(() => participants.some(participant => participant.username === walletAddress), [participants, walletAddress]);
 
-    const activeParticipants = useMemo(() => {
+  const activeParticipants = useMemo(() => {
     if (!participants) return [];
     
     const map = new Map();
@@ -41,9 +41,14 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
   }, [participants]);
 
   const sortedParticipants = useMemo(() => {
-    // Always show in joined order for Active Players sidebar
+    // Players (active participants) see sorted list with probabilities
+    // Spectators see fixed join order (handled inside the return loop or via simple return)
+    if (amIParticipating && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED')) {
+      return [...activeParticipants].sort((a, b) => (b.prob || 0) - (a.prob || 0));
+    }
+    // Default/Spectator: Joined order
     return activeParticipants;
-  }, [activeParticipants]);
+  }, [activeParticipants, roundStatus, amIParticipating]);
 
   return (
     <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[750px] overflow-hidden bg-black/20">
@@ -57,7 +62,9 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
-            const showStats = false; // Always show simple list in Active Players sidebar
+            
+            // SHOW probabilities and ranking numbers ONLY for players during active game
+            const showStats = amIParticipating && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED');
             
             // Filter out system account or invalid players
             if (!p.username || p.username === "Unknown") return null;
