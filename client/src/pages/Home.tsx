@@ -45,11 +45,11 @@ export default function Home() {
     refetch,
   } = useGameState();
 
-  // Force refetch every second to keep the server-driven timer moving
+  // Force refetch more frequently to keep UI in sync
   useEffect(() => {
     const interval = setInterval(() => {
       refetch();
-    }, 1000);
+    }, 500); // Poll every 500ms
     return () => clearInterval(interval);
   }, [refetch]);
 
@@ -75,139 +75,7 @@ export default function Home() {
       ? ((foundParticipant as any).card as number[][])
       : undefined);
 
-  // Server-provided timer for next round
-  const nextRoundSecondsRemaining =
-    (roundData as any)?.nextRoundSecondsRemaining ?? 0;
-
-  // Stabilize completion time to prevent restarts on refetch
-  if (roundData?.round?.winnerId && roundData?.round?.completedAt) {
-    if (completionTimeRef.current?.roundId !== roundData.round.id) {
-      completionTimeRef.current = {
-        roundId: roundData.round.id,
-        time: new Date(roundData.round.completedAt).getTime(),
-      };
-      setHasManuallyClosed(false);
-    }
-  }
-
-  // Handle the end of the overlay display
-  useEffect(() => {
-    if (showWinnerOverlay && nextRoundSecondsRemaining <= 0) {
-      setShowWinnerOverlay(false);
-      // Refresh to see the new round after overlay is done
-      queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
-    }
-  }, [showWinnerOverlay, nextRoundSecondsRemaining]);
-
-  const calculateWinProb = (card: number[][], drawn: number[]) => {
-    const drawnSet = new Set(drawn);
-    drawnSet.add(0); // Free space
-
-    if (drawn.length <= 1) return 0;
-
-    const lines = [
-      ...Array(5)
-        .fill(0)
-        .map((_, r) => card[r]),
-      ...Array(5)
-        .fill(0)
-        .map((_, c) => card.map((r) => r[c])),
-      Array(5)
-        .fill(0)
-        .map((_, i) => card[i][i]),
-      Array(5)
-        .fill(0)
-        .map((_, i) => card[i][4 - i]),
-    ];
-
-    let maxMarked = 0;
-    let potentialLines = 0;
-    let totalMarked = 0;
-
-    lines.forEach((line) => {
-      const marked = line.filter((n) => drawnSet.has(n)).length;
-      if (marked > maxMarked) maxMarked = marked;
-      if (marked === 4) potentialLines++;
-    });
-
-    card.flat().forEach((num) => {
-      if (num !== 0 && drawnSet.has(num)) totalMarked++;
-    });
-
-    if (maxMarked === 5) return 100;
-
-    if (totalMarked >= 1 && drawn.length > 0) {
-      const hitDensity = (totalMarked / 24) * 15;
-      let baseLineProb = 0;
-      if (maxMarked === 2) baseLineProb = 5;
-      else if (maxMarked === 3) baseLineProb = 20;
-      else if (maxMarked === 4) baseLineProb = 50;
-
-      const proximityBonus = potentialLines * 12;
-      const gameProgress = (drawn.length / 75) * 10;
-
-      const finalProb = Math.min(
-        99,
-        Math.floor(baseLineProb + hitDensity + proximityBonus + gameProgress),
-      );
-      return Math.max(1, finalProb);
-    }
-
-    return 0;
-  };
-
-  const overlayState = useMemo(() => {
-    const winnerDeclaredAt = completionTimeRef.current?.time;
-    const currentRoundId = roundData?.round?.id;
-
-    const isMe = roundData?.round?.winnerId === user?.id;
-    const isFinished = roundData?.round?.status === ROUND_STATUS.FINISHED;
-    const isParticipantOfRound = roundData?.participants?.some(
-      (p: any) => p.userId === user?.id,
-    );
-
-    // Determine if we should show the overlay
-    // It should only show for participants of the actual round that just finished
-    if (!winnerDeclaredAt || hasManuallyClosed) {
-      return null;
-    }
-
-    // Use server-provided timer - if 0, the overlay display time has expired
-    if (nextRoundSecondsRemaining <= 0) {
-      return null;
-    }
-
-    const winner = roundData?.participants?.find(
-      (p: any) =>
-        p.userId === roundData.round.winnerId ||
-        p.id === roundData.round.winnerId,
-    );
-    const winnerUsername =
-      winner?.username ||
-      (isMe
-        ? walletAddress
-        : roundData?.round?.winnerId?.toString() || "Unknown");
-
-    return {
-      show: true,
-      username: winnerUsername,
-      prize: roundData?.round?.prizePool || 0,
-      isWinner: isMe,
-      isParticipant: isParticipantOfRound,
-      txHash: roundData?.round?.payoutSignature || undefined,
-      timeLeft: nextRoundSecondsRemaining,
-      currentRoundId: currentRoundId,
-    };
-  }, [
-    roundData,
-    user?.id,
-    walletAddress,
-    showWinnerOverlay,
-    nextRoundSecondsRemaining,
-    hasManuallyClosed,
-  ]);
-
-  const isParticipant = !!participant || !!foundParticipant;
+  const isParticipant = (!!participant || !!foundParticipant) && !!currentCard;
 
   // Use server-provided timer - no local calculation
   const nextRoundTimer = nextRoundSecondsRemaining;

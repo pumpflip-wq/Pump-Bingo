@@ -143,6 +143,14 @@ export class GameManager {
     const pending = await storage.getPendingPayments();
     for (const payment of pending) {
       try {
+        // Only process payments for the CURRENT round
+        // If a payment was made but the game already started, it should stay pending
+        // until the NEXT round is created.
+        const round = await storage.getRound(roundId);
+        if (!round || round.status !== ROUND_STATUS.OPEN) {
+          continue; 
+        }
+
         const existing = await storage.getParticipant(roundId, payment.userId);
         if (existing) {
           await storage.markPaymentProcessed(payment.id);
@@ -157,15 +165,12 @@ export class GameManager {
           payment.txSignature,
         );
 
-        const round = await storage.getRound(roundId);
-        if (round) {
-          const paymentAmount = Number(
-            payment.amount || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE,
-          );
-          await storage.updateRound(roundId, {
-            prizePool: Number(round.prizePool || 0) + paymentAmount,
-          });
-        }
+        const paymentAmount = Number(
+          payment.amount || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE,
+        );
+        await storage.updateRound(roundId, {
+          prizePool: Number(round.prizePool || 0) + paymentAmount,
+        });
 
         await storage.markPaymentProcessed(payment.id);
         console.log(
@@ -254,16 +259,22 @@ export class GameManager {
         Math.floor(elapsed / DRAW_INTERVAL_MS),
       );
 
-      while (round.drawnNumbers.length < expectedCount) {
-        const nextNum = getDeterministicDraw(
-          round.serverSeed,
-          round.drawnNumbers,
-        );
-        if (nextNum === null) break;
-        round.drawnNumbers.push(nextNum);
-        await storage.updateRound(round.id, {
-          drawnNumbers: round.drawnNumbers,
-        });
+      if (round.drawnNumbers.length < expectedCount) {
+        const newDrawn = [...round.drawnNumbers];
+        while (newDrawn.length < expectedCount) {
+          const nextNum = getDeterministicDraw(
+            round.serverSeed,
+            newDrawn,
+          );
+          if (nextNum === null) break;
+          newDrawn.push(nextNum);
+        }
+        
+        if (newDrawn.length !== round.drawnNumbers.length) {
+          await storage.updateRound(round.id, {
+            drawnNumbers: newDrawn,
+          });
+        }
       }
     }
   }
