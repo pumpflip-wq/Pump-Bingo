@@ -156,8 +156,7 @@ export async function registerRoutes(
       FROM participants p
       LEFT JOIN users u ON p.user_id = u.id
       WHERE p.round_id = ${roundId} 
-        AND p.tx_signature IS NOT NULL 
-        AND p.tx_signature != '' 
+        AND (p.tx_signature IS NOT NULL OR ${PROTOCOL_CONFIG.IS_TEST_MODE} = true)
       ORDER BY p.joined_at ASC
     `);
     const roundParticipants = (roundParticipantsRaw as any).rows || [];

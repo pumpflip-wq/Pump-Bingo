@@ -216,7 +216,7 @@ export class DatabaseStorage implements IStorage {
       .select({ count: sql<string>`count(DISTINCT user_id)` })
       .from(participants)
       .where(
-        sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`,
+        sql`${participants.roundId} = ${roundId} AND (${participants.txSignature} IS NOT NULL OR ${PROTOCOL_CONFIG.IS_TEST_MODE} = true)`,
       );
     return parseInt(result.count || "0", 10);
   }
