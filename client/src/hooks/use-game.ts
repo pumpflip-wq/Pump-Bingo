@@ -34,7 +34,7 @@ export function useRound(id: number) {
       const data = query.state.data as any;
       if (!data) return 500;
       
-      // Real-time synchronization: Poll aggressively in all active states
+      // Aggressive polling for Replit environment to ensure real-time feel
       if (data.round.status === 'OPEN') return 500;
       if (data.round.status === 'STARTING') return 300;
       if (data.round.status === 'IN_GAME') return 500;
@@ -43,6 +43,7 @@ export function useRound(id: number) {
     },
     staleTime: 0, 
     gcTime: 0,
+    refetchOnWindowFocus: true,
   });
 }
 

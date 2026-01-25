@@ -52,14 +52,20 @@ export function useGameState() {
   useEffect(() => {
     if (latestRound?.id) {
       const interval = setInterval(() => {
-        // Just invalidate, useRound handles the timing
-        // Using refetchInterval: 0 and manual invalidation to prevent stale cache
-        queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, latestRound.id], exact: true });
-        queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
+        // Force invalidate with refetch to ensure no stale data remains in cache
+        queryClient.invalidateQueries({ 
+          queryKey: [api.rounds.get.path, latestRound.id], 
+          exact: true,
+          refetchType: 'active'
+        });
+        queryClient.invalidateQueries({ 
+          queryKey: [api.rounds.list.path],
+          refetchType: 'active'
+        });
       }, 1000); 
       return () => clearInterval(interval);
     }
-  }, [latestRound?.id]);
+  }, [latestRound?.id, queryClient]);
 
   const { data: userTransactions } = useQuery<Transaction[]>({
     queryKey: ["/api/auth/me/transactions", user?.id],

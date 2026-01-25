@@ -16,6 +16,7 @@ export class GameManager {
 
   start() {
     if (this.loopInterval) return;
+    // Standard 1s tick for high-resolution state management
     this.loopInterval = setInterval(() => this.tick(), 1000);
   }
 
