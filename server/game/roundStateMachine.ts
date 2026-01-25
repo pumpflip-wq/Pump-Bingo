@@ -43,7 +43,9 @@ export async function handleStateTransitions(round: Round, participantCount: num
       await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME, startTime: new Date() });
     }
   } else if (round.status === ROUND_STATUS.IN_GAME) {
-    const isOver = round.winnerId || (round.drawnNumbers || []).length >= 75;
+    // Only allow the round to finish if a winner has been declared.
+    // We remove the condition that automatically ends the game when 75 numbers are drawn.
+    const isOver = !!round.winnerId;
     if (isOver) {
       if (!round.completedAt) {
         // Mark completion time if not already set
@@ -54,15 +56,6 @@ export async function handleStateTransitions(round: Round, participantCount: num
       if (now.getTime() - completedTime >= POST_WIN_DELAY_MS) {
         // Transition to FINISHED
         await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
-        // Create NEW round immediately so people don't join the old one
-        console.log(`[Round ${round.id}] Game finished. Creating new round.`);
-        await storage.createRound({
-          status: ROUND_STATUS.OPEN,
-          price: round.price,
-          prizePool: 0,
-          drawnNumbers: [],
-          startTime: null
-        });
       }
     }
   }

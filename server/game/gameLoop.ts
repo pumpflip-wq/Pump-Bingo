@@ -141,16 +141,6 @@ export class GameManager {
       drawnNumbers: round.drawnNumbers, // Persist final drawn numbers state
     });
 
-    // Create NEW round immediately so people don't join the old one
-    console.log(`[Round ${roundId}] Winner declared. Creating new round.`);
-    await storage.createRound({
-      status: ROUND_STATUS.OPEN,
-      price: round.price,
-      prizePool: 0,
-      drawnNumbers: [],
-      startTime: null
-    });
-
     return !!(updated && updated.winnerId === userId);
   }
 

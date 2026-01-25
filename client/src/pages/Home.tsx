@@ -209,6 +209,7 @@ const calculateWinProbLocal = (card: number[][], drawn: number[]) => {
 
   const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];
+    // Ensure we have all unique participants by their database ID or userId
     return (roundData.participants as any[]).map(p => ({
       ...p,
       prob: p.finalWinProb || calculateWinProbLocal(p.card, roundData.round.drawnNumbers || [])
@@ -216,6 +217,9 @@ const calculateWinProbLocal = (card: number[][], drawn: number[]) => {
   }, [roundData?.participants, roundData?.round?.drawnNumbers]);
 
   const sortedParticipants = useMemo(() => {
+    // Grouping by username might be causing issues if multiple "players" have same username/wallet
+    // But usually in this app 1 wallet = 1 player. 
+    // If two players deposited, they should be two separate entries in the participants table.
     return [...participantsList].sort((a, b) => b.prob - a.prob);
   }, [participantsList]);
 
@@ -240,12 +244,7 @@ const calculateWinProbLocal = (card: number[][], drawn: number[]) => {
               
             <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
               <PlayerList 
-                participants={[
-                  ...(walletAddress && participantsList.some(p => p.username === walletAddress) 
-                    ? [] 
-                    : (walletAddress && (participant || foundParticipant) ? [{ id: 'me', username: walletAddress, prob: 0 }] : [])),
-                  ...participantsList
-                ]}
+                participants={participantsList}
                 walletAddress={walletAddress}
                 formatAddress={formatAddress}
                 roundStatus={roundData.round.status}
