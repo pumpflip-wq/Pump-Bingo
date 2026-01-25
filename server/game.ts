@@ -274,6 +274,7 @@ export class GameManager {
           await storage.updateRound(round.id, {
             drawnNumbers: newDrawn,
           });
+          console.log(`[GameManager] Round #${round.id} updated drawn numbers: ${newDrawn.length}`);
         }
       }
     }
