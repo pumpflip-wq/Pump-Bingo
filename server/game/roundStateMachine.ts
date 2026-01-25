@@ -11,13 +11,17 @@ export async function handleStateTransitions(round: Round, participantCount: num
     if (participantCount >= 2) {
       if (!round.startTime) {
         // Initialize countdown: 60 seconds from now
-        await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
-      } else if (now.getTime() >= new Date(round.startTime).getTime()) {
-        // Move to STARTING state: 5 second delay
-        await storage.updateRound(round.id, {
-          status: ROUND_STATUS.STARTING,
-          startTime: new Date(now.getTime() + 5000)
-        });
+        const startTime = new Date(now.getTime() + 60000);
+        await storage.updateRound(round.id, { startTime });
+      } else {
+        const remaining = Math.ceil((new Date(round.startTime).getTime() - now.getTime()) / 1000);
+        if (remaining <= 0) {
+          // Move to STARTING state: 5 second delay
+          await storage.updateRound(round.id, {
+            status: ROUND_STATUS.STARTING,
+            startTime: new Date(now.getTime() + 5000)
+          });
+        }
       }
     } else {
       // Less than 2 players: Ensure startTime is null to signify "Waiting for players"

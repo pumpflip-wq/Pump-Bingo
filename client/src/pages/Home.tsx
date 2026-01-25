@@ -59,7 +59,7 @@ export default function Home() {
   }, [roundData?.round?.id, roundData?.isWaitingForPlayers]);
 
   // Stabilize completion time to prevent restarts on refetch
-  if (roundData?.round.winnerId && roundData.round.completedAt) {
+  if (roundData?.round?.winnerId && roundData.round.completedAt) {
     if (completionTimeRef.current?.roundId !== roundData.round.id) {
       completionTimeRef.current = {
         roundId: roundData.round.id,
@@ -73,7 +73,7 @@ export default function Home() {
 
 // Player statistics calculated on frontend for real-time differentiation, 
 // though the final win prob is stored in the database.
-const calculateWinProb = (card: number[][], drawn: number[]) => {
+const calculateWinProbLocal = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);
     drawnSet.add(0); // Free space
     
@@ -137,11 +137,11 @@ const calculateWinProb = (card: number[][], drawn: number[]) => {
   const [lastWinKey, setLastWinKey] = useState<string | null>(null);
 
   const overlayState = useMemo(() => {
-    const hasWinner = !!roundData?.round.winnerId;
+    const hasWinner = !!roundData?.round?.winnerId;
     const winnerDeclaredAt = completionTimeRef.current?.time;
-    const currentRoundId = roundData?.round.id;
+    const currentRoundId = roundData?.round?.id;
     
-    const isMe = roundData?.round.winnerId === user?.id;
+    const isMe = roundData?.round?.winnerId === user?.id;
     
     // Check if I was a participant in this round
     const amIParticipant = isParticipant;
@@ -163,23 +163,23 @@ const calculateWinProb = (card: number[][], drawn: number[]) => {
       return null;
     }
 
-    const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
-    const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
+    const winner = roundData?.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
+    const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData?.round?.winnerId?.toString() || "Unknown"));
     
     return {
       show: true,
       username: winnerUsername,
-      prize: roundData.round.prizePool || 0,
+      prize: roundData?.round?.prizePool || 0,
       isWinner: isMe,
       isParticipant: amIParticipant,
-      txHash: roundData.round.payoutSignature ? `https://explorer.solana.com/tx/${roundData.round.payoutSignature}?cluster=${PROTOCOL_CONFIG.NETWORK}` : undefined,
+      txHash: roundData?.round?.payoutSignature ? `https://explorer.solana.com/tx/${roundData.round.payoutSignature}?cluster=${PROTOCOL_CONFIG.NETWORK}` : undefined,
       timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
       currentRoundId: currentRoundId
     };
   }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime, isParticipant]);
 
   useEffect(() => {
-    const completedAtRaw = roundData?.round.completedAt;
+    const completedAtRaw = roundData?.round?.completedAt;
     if (completedAtRaw) {
       const winnerDeclaredAt = new Date(completedAtRaw).getTime();
       const elapsed = currentTime - winnerDeclaredAt;
@@ -187,10 +187,10 @@ const calculateWinProb = (card: number[][], drawn: number[]) => {
         setHasManuallyClosed(true);
       }
     }
-  }, [roundData?.round.completedAt, currentTime, hasManuallyClosed]);
+  }, [roundData?.round?.completedAt, currentTime, hasManuallyClosed]);
 
   const nextRoundTimer = useMemo(() => {
-    if (roundData?.round.status === 'FINISHED' || roundData?.round.winnerId) {
+    if (roundData?.round?.status === 'FINISHED' || roundData?.round?.winnerId) {
       const completionTime = completionTimeRef.current?.time;
       if (completionTime) {
         const elapsed = currentTime - completionTime;
@@ -198,15 +198,15 @@ const calculateWinProb = (card: number[][], drawn: number[]) => {
       }
     }
     return 0;
-  }, [roundData?.round.id, roundData?.round.status, roundData?.round.winnerId, currentTime]);
+  }, [roundData?.round?.id, roundData?.round?.status, roundData?.round?.winnerId, currentTime]);
 
   const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];
-    return roundData.participants.map(p => ({
+    return (roundData.participants as any[]).map(p => ({
       ...p,
-      prob: (p as any).finalWinProb || calculateWinProb(p.card, roundData.round.drawnNumbers || [])
+      prob: p.finalWinProb || calculateWinProbLocal(p.card, roundData.round.drawnNumbers || [])
     }));
-  }, [roundData?.participants, roundData?.round.drawnNumbers]);
+  }, [roundData?.participants, roundData?.round?.drawnNumbers]);
 
   const sortedParticipants = useMemo(() => {
     return [...participantsList].sort((a, b) => b.prob - a.prob);
@@ -341,20 +341,20 @@ const calculateWinProb = (card: number[][], drawn: number[]) => {
                           </div>
                         </div>
                       </div>
-                          {isParticipant && currentCard && roundData.round.status !== 'FINISHED' && !roundData.round.winnerId ? (
+                          {isParticipant && currentCard && roundData?.round?.status !== 'FINISHED' && !roundData?.round?.winnerId ? (
                             <div className="relative space-y-4 flex flex-col items-center flex-1 min-h-0 justify-center w-full">
                                 <BingoCard 
                                 card={currentCard} 
-                                drawnNumbers={roundData.round.drawnNumbers || []} 
+                                drawnNumbers={roundData?.round?.drawnNumbers || []} 
                                 className="w-full max-w-[520px] scale-100"
                               />
                               <div className="flex justify-center w-full max-w-[520px] shrink-0">
                                 <BingoClaimButton 
-                                  roundId={roundData.round.id} 
+                                  roundId={roundData?.round?.id || 0} 
                                   userId={user?.id || 0} 
                                   card={currentCard}
-                                  drawnNumbers={roundData.round.drawnNumbers || []}
-                                  status={roundData.round.status}
+                                  drawnNumbers={roundData?.round?.drawnNumbers || []}
+                                  status={roundData?.round?.status || ROUND_STATUS.OPEN}
                                   isBingoed={(participant as any)?.hasBingo || false}
                                   className="w-full h-16 text-3xl font-black italic tracking-tighter"
                                 />
@@ -365,10 +365,10 @@ const calculateWinProb = (card: number[][], drawn: number[]) => {
                               <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
                               <div className="text-center space-y-4 relative z-10">
                                 <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
-                                  <Globe className="w-3 h-3 animate-spin-slow" /> {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? 'ROUND COMPLETED' : 'Live Feed Active'}
+                                  <Globe className="w-3 h-3 animate-spin-slow" /> {roundData?.round?.winnerId || roundData?.round?.status === 'FINISHED' ? 'ROUND COMPLETED' : 'Live Feed Active'}
                                 </div>
                                 <h2 className="text-5xl md:text-7xl font-black font-display italic text-white tracking-tighter uppercase">
-                                  {roundData.round.winnerId || roundData.round.status === 'FINISHED' ? (
+                                  {roundData?.round?.winnerId || roundData?.round?.status === 'FINISHED' ? (
                                     <div className="flex flex-col items-center gap-6">
                                       <span className="text-primary animate-pulse text-5xl md:text-7xl">BINGO! ROUND WON</span>
                                       <div className="bg-primary/10 border border-primary/30 rounded-[2rem] p-8 w-full max-w-3xl shadow-[0_0_50px_rgba(34,197,94,0.1)]">
@@ -377,18 +377,18 @@ const calculateWinProb = (card: number[][], drawn: number[]) => {
                                           <div className="flex flex-col items-center gap-2">
                                             <span className="text-sm text-white uppercase font-black tracking-widest">🏆 WINNING PLAYER</span>
                                             <span className="text-4xl md:text-6xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                                              {formatAddress(roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId)?.username || "Unknown")}
+                                              {formatAddress(roundData?.participants?.find((p: any) => p.userId === roundData?.round?.winnerId || p.id === roundData?.round?.winnerId)?.username || "Unknown")}
                                             </span>
                                           </div>
                                           <div className="flex flex-col items-center gap-2">
                                             <span className="text-sm text-white uppercase font-black tracking-widest">💰 TOTAL REWARD</span>
                                             <span className="text-5xl md:text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_30px_rgba(34,197,94,0.5)]">
-                                              {formatCurrency(roundData.round.prizePool || 0)} <span className="text-3xl ml-2">{PROTOCOL_CONFIG.SYMBOL}</span>
+                                              {formatCurrency(roundData?.round?.prizePool || 0)} <span className="text-3xl ml-2">{PROTOCOL_CONFIG.SYMBOL}</span>
                                             </span>
                                           </div>
                                         </div>
                                       </div>
-                                      {roundData.round.completedAt && (
+                                      {roundData?.round?.completedAt && (
                                         <div className="flex flex-col items-center gap-2">
                                           <span className="text-white font-black text-2xl uppercase tracking-[0.4em] animate-pulse">NEXT ROUND IN {nextRoundTimer}S</span>
                                           <div className="w-64 h-1 bg-white/10 rounded-full overflow-hidden">
@@ -403,7 +403,7 @@ const calculateWinProb = (card: number[][], drawn: number[]) => {
                                     </div>
                                   ) : 'WATCHING LIVE'}
                                 </h2>
-                                  {!roundData.round.winnerId && roundData.round.status !== 'FINISHED' && (
+                                  {!roundData?.round?.winnerId && roundData?.round?.status !== 'FINISHED' && (
                                   <div className="flex flex-col w-full max-w-xl mx-auto mt-4 h-[450px]">
                                     <div className="flex flex-col items-center shrink-0 mb-6">
                                       <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
