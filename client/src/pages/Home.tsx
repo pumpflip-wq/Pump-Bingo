@@ -225,19 +225,19 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                    <div className="py-6 px-10 bg-black/60 rounded-[2.5rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto min-h-[190px] flex flex-col justify-center">
+                    <div className="py-4 px-8 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto flex flex-col justify-center">
                       <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-                      <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-3 font-mono">
+                      <p className="text-white text-sm uppercase font-black tracking-[0.2em] mb-1 font-mono">
                         {roundData.round.status === 'STARTING' ? 'SECURING GAME PROTOCOL...' : 
                          roundData.participantsCount < 2 ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
                       </p>
                       <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={(roundData as any).isWaitingForPlayers || roundData.participantsCount < 2} />
                       {roundData.participantsCount < 2 && (
-                        <div className="space-y-1 mt-4">
-                          <p className="text-primary text-lg uppercase font-black animate-pulse tracking-[0.15em] font-display">
+                        <div className="space-y-0 mt-2">
+                          <p className="text-primary text-base uppercase font-black animate-pulse tracking-[0.15em] font-display">
                             Waiting for Players...
                           </p>
-                          <p className="text-[13px] text-white uppercase font-black tracking-[0.1em] opacity-90">
+                          <p className="text-[11px] text-white uppercase font-black tracking-[0.1em] opacity-90">
                             Minimum 2 participants required to start
                           </p>
                         </div>
