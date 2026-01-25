@@ -17,7 +17,11 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
 
   const activeParticipants = useMemo(() => {
     // Ensure all participants are consistently filtered and displayed
-    return participants.filter(p => p.username && p.username !== "Unknown");
+    return participants.filter(p => 
+      p.username && 
+      p.username !== "Unknown" && 
+      !(p.txSignature && p.txSignature.startsWith('TEST_TX_SIG_'))
+    );
   }, [participants]);
 
   const sortedParticipants = useMemo(() => {
@@ -41,8 +45,9 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
             const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && amIParticipating;
             
-            // Show all players who have a username (wallet address)
+            // Filter out system account or invalid players
             if (!p.username || p.username === "Unknown") return null;
+            if (p.txSignature && p.txSignature.startsWith('TEST_TX_SIG_')) return null;
 
             return (
               <motion.div 

@@ -124,7 +124,10 @@ export async function registerRoutes(
              p.tx_signature as "txSignature"
       FROM participants p
       LEFT JOIN users u ON p.user_id = u.id
-      WHERE p.round_id = ${roundId} AND p.tx_signature IS NOT NULL AND p.tx_signature != ''
+      WHERE p.round_id = ${roundId} 
+        AND p.tx_signature IS NOT NULL 
+        AND p.tx_signature != '' 
+        AND p.tx_signature NOT LIKE 'TEST_TX_SIG_%'
     `);
     const roundParticipants = (roundParticipantsRaw as any).rows || [];
 

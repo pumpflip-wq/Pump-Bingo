@@ -90,10 +90,12 @@ export default function Home() {
 
   const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];
-    return (roundData.participants as any[]).map(p => ({
-      ...p,
-      prob: p.finalWinProb || calculateWinProbLocal(p.card, roundData.round.drawnNumbers || [])
-    }));
+    return (roundData.participants as any[])
+      .filter(p => !p.txSignature?.startsWith('TEST_TX_SIG_'))
+      .map(p => ({
+        ...p,
+        prob: p.finalWinProb || calculateWinProbLocal(p.card, roundData.round.drawnNumbers || [])
+      }));
   }, [roundData?.participants, roundData?.round?.drawnNumbers]);
 
   const sortedParticipants = useMemo(() => {
@@ -201,25 +203,13 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                    <div className="relative z-10 scale-110 py-12">
+                    <div className="relative z-10 scale-150 py-12 flex flex-col items-center">
+                      <h2 className="text-7xl font-black text-primary italic tracking-tighter uppercase font-display mb-8 drop-shadow-[0_0_15px_rgba(34,197,94,0.4)]">WAITING</h2>
+                      <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.5em] mb-12">FOR CHALLENGERS</p>
                       <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={roundData.isWaitingForPlayers} />
                     </div>
                     <div className="w-full max-w-xl space-y-8 relative z-10 pb-8">
                       <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
-                      <div className="flex items-center justify-between px-12 bg-white/5 py-4 rounded-3xl border border-white/10">
-                        <div className="flex flex-col items-start">
-                          <p className="text-xs text-white/40 uppercase font-black tracking-[0.3em] mb-1">Entry Fee</p>
-                          <p className="text-3xl font-black text-primary italic font-display leading-none">{formatCurrency(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE)} {PROTOCOL_CONFIG.SYMBOL}</p>
-                        </div>
-                        <div className="h-12 w-px bg-white/10" />
-                        <div className="flex flex-col items-end">
-                          <p className="text-xs text-white/40 uppercase font-black tracking-[0.3em] mb-1">Status</p>
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                            <p className="text-3xl font-black text-white italic font-display leading-none uppercase">Live</p>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -279,7 +269,7 @@ export default function Home() {
                               <Users className="w-3 h-3 text-primary/40" />
                             </div>
                             <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2 custom-scrollbar">
-                              {sortedParticipants.slice(0, 5).map((p, idx) => (
+                              {sortedParticipants.filter(p => !p.txSignature?.startsWith('TEST_TX_SIG_')).slice(0, 5).map((p, idx) => (
                                 <div key={p.id} className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 group hover:border-primary/20 transition-all">
                                   <div className="flex items-center gap-3">
                                     <span className="w-6 h-6 rounded-lg bg-black/40 flex items-center justify-center text-[10px] font-black text-primary/60 group-hover:text-primary">{idx + 1}</span>

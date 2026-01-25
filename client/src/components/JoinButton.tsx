@@ -38,10 +38,22 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     // Start wallet process immediately to prevent double-click and improve speed
     setIsWalleting(true);
 
-    if (!publicKey || !userId) {
+    if (!connected || !publicKey) {
+      // In Solana, the WalletMultiButton handles this, but for UX we can show a toast
       toast({
-        title: "Authentication Required",
-        description: "Please connect your wallet first.",
+        title: "Connection Required",
+        description: "Please connect your wallet first using the top-right button.",
+        variant: "destructive",
+      });
+      setIsWalleting(false);
+      return;
+    }
+
+    if (!userId) {
+      // This shouldn't happen if user is logged in
+      toast({
+        title: "Authentication Failed",
+        description: "Please refresh the page and try again.",
         variant: "destructive",
       });
       setIsWalleting(false);
@@ -133,21 +145,8 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         {
           onSuccess: (data) => {
             setIsWalleting(false);
-            // Update cache with real data immediately
-            queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
-              if (!old) return old;
-              // Remove the optimistic participant and add the real one
-              const participants = (old.participants || []).filter((p: any) => !p.id?.toString().startsWith('optimistic-'));
-              const exists = participants.some((p: any) => p.username === publicKey.toBase58());
-              if (!exists && data.participant) {
-                participants.push(data.participant);
-              }
-              return {
-                ...old,
-                participants,
-                participantsCount: participants.length
-              };
-            });
+            // Invalidate queries to get fresh data including correct participants
+            queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             
             toast({
               title: "Successfully Joined",
@@ -156,7 +155,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           },
           onError: (error: Error) => {
             setIsWalleting(false);
-            // Remove optimistic update on error
+            // Invalidate queries on error to clean up UI
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             toast({
               title: "Join Process Initiated",
