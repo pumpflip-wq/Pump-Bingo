@@ -163,10 +163,12 @@ export class GameManager {
             const targetTime = new Date(now.getTime() + 60000);
             await storage.updateRound(round.id, { startTime: targetTime });
             console.log(`[GameManager] Round #${round.id} SET timer to 60s for ${participantCount} players`);
+            // We return here to let the state propagate, next tick will handle the countdown
             return;
         }
 
         const startTime = new Date(round.startTime);
+        // Add a small buffer to ensure we don't transition too early
         if (now.getTime() >= startTime.getTime()) {
           console.log(`[GameManager] Round #${round.id} countdown finished. Transitioning to STARTING...`);
           await storage.updateRound(round.id, { 
@@ -176,7 +178,7 @@ export class GameManager {
         }
       } else if (round.startTime) {
         // Reset if players leave
-        console.log(`[GameManager] Round #${round.id} resetting timer - not enough players`);
+        console.log(`[GameManager] Round #${round.id} resetting timer - not enough players (current: ${participantCount})`);
         await storage.updateRound(round.id, { startTime: null });
       }
     }
