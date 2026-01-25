@@ -418,35 +418,30 @@ export default function Home() {
                             <Trophy className="w-6 h-6 text-primary" />
                           </div>
                           <div>
-                            <p className="text-[12px] text-white uppercase font-black tracking-widest">
+                            <p className="text-[16px] text-white uppercase font-black tracking-widest">
                               Prize Pool
                             </p>
-                            <p className="text-2xl font-black text-primary italic font-display">
+                            <p className="text-3xl font-black text-primary italic font-display leading-none">
                               {formatCurrency(roundData.round.prizePool)} {PROTOCOL_CONFIG.SYMBOL}
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase animate-pulse">
-                            <div className="w-2 h-2 rounded-full bg-primary" /> LIVE
+                        <div className="flex items-center gap-4">
+                          <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-center">
+                            <p className="text-[16px] text-white uppercase font-black tracking-[0.2em] mb-1">
+                              Room
+                            </p>
+                            <p className="text-3xl font-black text-white font-display italic leading-none">
+                              #{roundData.round.id}
+                            </p>
                           </div>
-                          <div className="flex gap-4">
-                            <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-center">
-                              <p className="text-[12px] text-white uppercase font-black tracking-[0.2em] mb-1">
-                                Room
-                              </p>
-                              <p className="text-2xl font-black text-white font-display italic leading-none">
-                                #{roundData.round.id}
-                              </p>
-                            </div>
-                            <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-center">
-                              <p className="text-[12px] text-white uppercase font-black tracking-[0.2em] mb-1">
-                                Players
-                              </p>
-                              <p className="text-2xl font-black text-white font-display italic leading-none">
-                                {roundData.participantsCount}
-                              </p>
-                            </div>
+                          <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-center">
+                            <p className="text-[16px] text-white uppercase font-black tracking-[0.2em] mb-1">
+                              Players
+                            </p>
+                            <p className="text-3xl font-black text-white font-display italic leading-none">
+                              {roundData.participantsCount}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -507,7 +502,7 @@ export default function Home() {
                                     className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 group hover:border-primary/20 transition-all"
                                   >
                                     <div className="flex items-center gap-3">
-                                      <span className="w-6 h-6 rounded-lg bg-black/40 flex items-center justify-center text-[10px] font-black text-primary/60 group-hover:text-primary">
+                                      <span className="w-7 h-7 rounded-lg bg-black/40 flex items-center justify-center text-[12px] font-black text-primary drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]">
                                         {idx + 1}
                                       </span>
                                       <span className="text-base font-black text-white group-hover:text-primary transition-colors truncate max-w-[120px]">
@@ -522,7 +517,7 @@ export default function Home() {
                                           className="h-full bg-primary shadow-[0_0_10px_rgba(34,197,94,0.4)]"
                                         />
                                       </div>
-                                      <span className="text-sm font-mono font-black text-primary min-w-[3ch] drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">
+                                      <span className="text-lg font-mono font-black text-primary drop-shadow-[0_0_15px_rgba(34,197,94,0.6)]">
                                         {Math.round(p.prob || 0)}%
                                       </span>
                                     </div>

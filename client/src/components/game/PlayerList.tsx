@@ -41,12 +41,9 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
   }, [participants]);
 
   const sortedParticipants = useMemo(() => {
-    if (roundStatus !== 'IN_GAME' && roundStatus !== 'FINISHED') {
-      // In OPEN or STARTING state, we also want to show the participants in the order they joined or joined status
-      return activeParticipants;
-    }
-    return [...activeParticipants].sort((a, b) => (b.prob || 0) - (a.prob || 0));
-  }, [activeParticipants, roundStatus]);
+    // Always show in joined order for Active Players sidebar
+    return activeParticipants;
+  }, [activeParticipants]);
 
   return (
     <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[750px] overflow-hidden bg-black/20">
@@ -60,7 +57,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
-            const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED');
+            const showStats = false; // Always show simple list in Active Players sidebar
             
             // Filter out system account or invalid players
             if (!p.username || p.username === "Unknown") return null;
