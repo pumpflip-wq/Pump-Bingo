@@ -1,5 +1,6 @@
 import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
+import { PROTOCOL_CONFIG } from "../shared/config";
 import {
   users,
   rounds,
