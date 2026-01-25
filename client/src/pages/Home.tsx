@@ -225,11 +225,41 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                    <div className="relative z-10 scale-150 py-12 flex flex-col items-center">
+                    <div className="py-6 px-10 bg-black/60 rounded-[2.5rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto min-h-[190px] flex flex-col justify-center">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
+                      <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-3 font-mono">
+                        {roundData.round.status === 'STARTING' ? 'SECURING GAME PROTOCOL...' : 
+                         roundData.participantsCount < 2 ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
+                      </p>
                       <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={roundData.isWaitingForPlayers} />
+                      {roundData.participantsCount < 2 && (
+                        <div className="space-y-1 mt-4">
+                          <p className="text-primary text-lg uppercase font-black animate-pulse tracking-[0.15em] font-display">
+                            Waiting for Players...
+                          </p>
+                          <p className="text-[13px] text-white uppercase font-black tracking-[0.1em] opacity-90">
+                            Minimum 2 participants required to start
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    <div className="w-full max-w-xl space-y-8 relative z-10 pb-8">
-                      <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                    <div className="w-full max-w-2xl mx-auto mb-2">
+                      {!connected ? (
+                        <div className="space-y-6">
+                          <p className="text-white text-sm uppercase font-black tracking-widest italic">Connect Wallet to Start</p>
+                          <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-16 !px-10 !text-xl !rounded-2xl !w-full !font-black !italic !tracking-tighter !text-black shadow-lg" />
+                        </div>
+                      ) : isParticipant ? (
+                        <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-[2rem] shadow-[0_0_30px_rgba(34,197,94,0.1)] w-full">
+                          <p className="text-primary font-black text-3xl italic tracking-tighter mb-3 uppercase text-center">YOU'RE IN THE GAME!</p>
+                          <p className="text-sm text-white uppercase font-black tracking-widest text-center opacity-90">CARD ACTIVATES AUTOMATICALLY ON START</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                          <p className="text-[12px] text-white uppercase font-black tracking-[0.2em] text-center opacity-80">JOIN BEFORE GAME STARTS</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.div>
@@ -325,7 +355,10 @@ export default function Home() {
               />
             )}
           </main>
-          <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
+          <aside className="lg:col-span-3 flex flex-col h-[750px]">
+            <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 bg-black/40 border-primary/20 mb-4">
+              <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
+            </div>
             <GameHistory 
               historyRounds={historyRounds} 
               historyLoading={historyLoading} 
