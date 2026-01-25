@@ -77,21 +77,28 @@ Key schema design decisions:
 - **esbuild**: Fast server bundling for production
 - **Replit plugins**: Runtime error overlay, cartographer, dev banner
 
-## Recent Changes (Jan 24, 2026)
+## Recent Changes (Jan 25, 2026)
 
-### Code Optimization
+### Payment Queue System
+- Added `/api/payments/pending/:userId` endpoint to check for pending deposits
+- JoinButton now checks for pending payments before allowing new deposits (prevents double-charging)
+- When a round has started, new deposits are automatically queued for the next round
+- Payment queue has unique constraint on txSignature to prevent duplicate records
+
+### Bug Fixes
+- Fixed txHash URL duplication bug in WinnerOverlay component
+- Fixed TypeScript null check in transaction verification (getMasterPublicKey)
+- Winner announcement shows immediately after bingo claim, payment proof link appears once transaction is confirmed (non-blocking)
+
+### Previous Changes (Jan 24, 2026)
+
+#### Code Optimization
 - Removed unused `attached_assets` folder with old screenshots
 - Removed unused `ProbabilityFeed` component from `client/src/components/game/`
-- Cleaned up unused imports in `Home.tsx`:
-  - Removed unused lucide icons (Trophy, History, ShieldCheck, Copy, ExternalLink)
-  - Removed unused hooks (useRounds, useRound, useParticipant imports - still used via useGameState)
-  - Removed unused `Link` from wouter
-  - Removed unused `format` from date-fns
-  - Removed unused type imports (User, Transaction)
-  - Removed unused `useToast` hook
+- Cleaned up unused imports in `Home.tsx`
 - Removed empty `moveLateJoinsToNextRound` function from `server/game.ts`
 - Removed noisy "Stuck round detected" console log
 
-### Security Fix
+#### Security Fix
 - Server seed is now properly hidden during OPEN, STARTING, and IN_GAME phases
 - Only revealed when round status is FINISHED (provably fair security)
