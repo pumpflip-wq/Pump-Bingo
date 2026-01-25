@@ -5,13 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Loader2, Trophy, History, ShieldCheck, ChevronLeft, ChevronRight, ExternalLink, Copy, Search, Users, Hash } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { format } from "date-fns";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { useRound } from "@/hooks/use-game";
 
 function RoundDetailsModal({ roundId }: { roundId: number }) {
@@ -59,27 +59,55 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
       <div className="space-y-3">
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
         <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2 custom-scrollbar">
-          {details.participants.map((p: any) => (
-            <div key={p.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
-              <div className="flex items-center gap-3">
-                <div>
-                  <p className="text-sm font-black text-white">{p.username.slice(0, 6)}...{p.username.slice(-4)}</p>
-                  <div className="flex flex-col gap-1 mt-1">
-                    <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
-                    {p.winRate !== null && p.winRate !== undefined && (
-                      <span className="text-[10px] font-black text-primary uppercase tracking-widest">Final Chance: {p.winRate}%</span>
-                    )}
+          {[...details.participants]
+            .sort((a: any, b: any) => {
+              if (details.round.winnerId === a.id) return -1;
+              if (details.round.winnerId === b.id) return 1;
+              return (b.winRate || 0) - (a.winRate || 0);
+            })
+            .map((p: any) => (
+              <div 
+                key={p.id} 
+                className={cn(
+                  "flex items-center justify-between p-4 rounded-xl border transition-all",
+                  details.round.winnerId === p.id 
+                    ? "bg-primary/10 border-primary shadow-[0_0_15px_rgba(34,197,94,0.1)]" 
+                    : "bg-white/5 border-white/10"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <p className={cn(
+                        "text-sm font-black",
+                        details.round.winnerId === p.id ? "text-primary" : "text-white"
+                      )}>
+                        {p.username.slice(0, 6)}...{p.username.slice(-4)}
+                      </p>
+                      {details.round.winnerId === p.id && (
+                        <Trophy className="w-4 h-4 text-primary animate-pulse" />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1 mt-1">
+                      <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
+                      {p.winRate !== null && p.winRate !== undefined && (
+                        <span className={cn(
+                          "text-[10px] font-black uppercase tracking-widest",
+                          details.round.winnerId === p.id ? "text-primary" : "text-primary/70"
+                        )}>
+                          Final Chance: {p.winRate}%
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
+                {details.round.winnerId === p.id && (
+                  <div className="px-3 py-1.5 rounded bg-primary text-black flex items-center gap-2 shadow-[0_0_10px_rgba(34,197,94,0.3)]">
+                    <span className="text-[10px] font-black uppercase tracking-tighter">WINNER</span>
+                  </div>
+                )}
               </div>
-              {details.round.winnerId === p.id && (
-                <div className="px-3 py-1.5 rounded bg-primary/20 border border-primary/20 flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-black uppercase text-primary">Winner</span>
-                </div>
-              )}
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>
