@@ -108,6 +108,31 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         txSignature: signature
       }).catch(console.error);
 
+      // OPTIMISTIC UI UPDATE: Immediately add user to the list
+      if (publicKey) {
+        queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
+          if (!old) return old;
+          // Check if already in list to avoid duplicates
+          const exists = old.participants?.some((p: any) => p.username === publicKey.toBase58());
+          if (exists) return old;
+
+          const newParticipant = {
+            id: 'optimistic-' + Date.now(),
+            userId: userId,
+            username: publicKey.toBase58(),
+            joinedAt: new Date().toISOString(),
+            card: [], // Card will be fetched from server on next poll
+            txSignature: signature
+          };
+
+          return {
+            ...old,
+            participantsCount: (old.participantsCount || 0) + 1,
+            participants: [...(old.participants || []), newParticipant]
+          };
+        });
+      }
+
       // Join round
       joinRound(
         { roundId, userId, txSignature: signature },
