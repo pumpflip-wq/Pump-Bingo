@@ -227,7 +227,7 @@ export class GameManager {
         }
 
         // Draw one number every 3 seconds for balanced gameplay
-        const startTime = new Date(round.startTime!).getTime() + 5000;
+        const startTime = new Date(round.startTime!).getTime();
         const elapsed = now.getTime() - startTime;
         // Granular draw timing
         const expectedNumbersCount = Math.max(0, Math.min(75, Math.floor(elapsed / 3000)));

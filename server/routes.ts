@@ -127,7 +127,7 @@ export async function registerRoutes(
         p.tx_signature as "txSignature"
       FROM participants p
       LEFT JOIN users u ON p.user_id = u.id
-      WHERE p.round_id = ${roundId} AND p.tx_signature IS NOT NULL AND p.tx_signature != '' AND p.tx_signature != 'admin_bypass'
+      WHERE p.round_id = ${roundId} AND p.tx_signature IS NOT NULL AND p.tx_signature != ''
     `);
     
     // Handle both Drizzle result formats (rows array or direct array)
