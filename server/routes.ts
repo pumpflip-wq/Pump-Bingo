@@ -158,6 +158,7 @@ export async function registerRoutes(
       WHERE p.round_id = ${roundId} 
         AND p.tx_signature IS NOT NULL 
         AND p.tx_signature != '' 
+      ORDER BY p.joined_at ASC
     `);
     const roundParticipants = (roundParticipantsRaw as any).rows || [];
 

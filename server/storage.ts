@@ -213,7 +213,7 @@ export class DatabaseStorage implements IStorage {
   async getRoundParticipantsCount(roundId: number): Promise<number> {
     if (!roundId || isNaN(roundId)) return 0;
     const [result] = await db
-      .select({ count: sql<string>`count(*)` })
+      .select({ count: sql<string>`count(DISTINCT user_id)` })
       .from(participants)
       .where(
         sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`,

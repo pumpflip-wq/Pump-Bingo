@@ -156,7 +156,17 @@ export default function Home() {
 
   const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];
-    return (roundData.participants as any[])
+    
+    // De-duplicate: If we have an optimistic entry AND a real entry for same userId, keep the real one
+    const seen = new Set();
+    const list = [...roundData.participants].reverse(); // Latest first to prioritize real over optimistic
+    const filtered = list.filter(p => {
+      if (seen.has(p.userId)) return false;
+      seen.add(p.userId);
+      return true;
+    }).reverse();
+
+    return filtered
       .filter(
         (p) =>
           !p.txSignature?.startsWith("TEST_TX_SIG_") &&

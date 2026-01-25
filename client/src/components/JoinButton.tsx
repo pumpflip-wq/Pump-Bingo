@@ -112,8 +112,8 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       if (publicKey) {
         queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
           if (!old) return old;
-          // Check if already in list to avoid duplicates
-          const exists = old.participants?.some((p: any) => p.username === publicKey.toBase58());
+          // Check if already in list to avoid duplicates (by userId)
+          const exists = old.participants?.some((p: any) => p.userId === userId || p.username === publicKey.toBase58());
           if (exists) return old;
 
           const newParticipant = {
@@ -121,8 +121,9 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             userId: userId,
             username: publicKey.toBase58(),
             joinedAt: new Date().toISOString(),
-            card: [], // Card will be fetched from server on next poll
-            txSignature: signature
+            card: [], 
+            txSignature: signature,
+            isOptimistic: true // Tag it to keep it stable during polling
           };
 
           return {
