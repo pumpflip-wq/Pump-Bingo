@@ -248,20 +248,36 @@ export class DatabaseStorage implements IStorage {
       .select({ count: sql<number>`count(*)` })
       .from(rounds)
       .where(eq(rounds.status, ROUND_STATUS.FINISHED));
+    
+    // Explicitly select columns to avoid potential issues with result mapping
     const results = await db
-      .select({ round: rounds, winnerUsername: users.username })
+      .select({ 
+        id: rounds.id,
+        status: rounds.status,
+        startTime: rounds.startTime,
+        price: rounds.price,
+        prizePool: rounds.prizePool,
+        winnerId: rounds.winnerId,
+        serverSeed: rounds.serverSeed,
+        publicHash: rounds.publicHash,
+        drawnNumbers: rounds.drawnNumbers,
+        completedAt: rounds.completedAt,
+        createdAt: rounds.createdAt,
+        winnerUsername: users.username 
+      })
       .from(rounds)
       .leftJoin(users, eq(rounds.winnerId, users.id))
       .where(eq(rounds.status, ROUND_STATUS.FINISHED))
       .orderBy(sql`${rounds.id} DESC`)
       .limit(limit)
       .offset(offset);
+
     return {
       total: Number(countResult.count),
       rounds: results.map((r) => ({
-        ...r.round,
+        ...r,
         winnerUsername: r.winnerUsername,
-      })),
+      } as any)),
     };
   }
 

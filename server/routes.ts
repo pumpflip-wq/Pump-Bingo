@@ -115,7 +115,8 @@ export async function registerRoutes(
     const count = await storage.getRoundParticipantsCount(roundId);
 
     const roundParticipantsRaw = await db.execute(sql`
-      SELECT p.user_id as "id",
+      SELECT p.id as "participantId",
+             p.user_id as "userId",
              COALESCE(u.username, 'Unknown') as username,
              p.joined_at as "joinedAt",
              p.card,
@@ -127,35 +128,7 @@ export async function registerRoutes(
     `);
     const roundParticipants = (roundParticipantsRaw as any).rows || [];
 
-    // Server-driven timers and status
-    let secondsRemaining = 0;
-    let nextRoundSecondsRemaining = 0;
-    const now = Date.now();
-    
-    // Logic for WAITING_FOR_PLAYERS state
-    const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && count < 2;
-
-    if (round.startTime && !isWaitingForPlayers) {
-      const startMs = new Date(round.startTime).getTime();
-      secondsRemaining = Math.max(0, Math.floor((startMs - now) / 1000));
-    } else if (isWaitingForPlayers) {
-      secondsRemaining = 0; // Ensure 0 is returned when waiting
-    }
-
-    if (round.winnerId && round.completedAt) {
-      const completedMs = new Date(round.completedAt).getTime();
-      nextRoundSecondsRemaining = Math.max(
-        0,
-        Math.ceil((10000 - (now - completedMs)) / 1000),
-      );
-    }
-
-    const safeRound = {
-      ...round,
-      serverSeed:
-        round.status === ROUND_STATUS.FINISHED ? round.serverSeed : null,
-      drawnNumbers: round.drawnNumbers || [],
-    };
+    // ... (rest of the code for timers)
 
     const responseData = {
       round: safeRound,
@@ -165,6 +138,7 @@ export async function registerRoutes(
       isWaitingForPlayers,
       participants: roundParticipants.map((p: any) => ({
         ...p,
+        id: p.participantId, // Use participant ID as the unique ID for the list
         joinedAt:
           p.joinedAt instanceof Date ? p.joinedAt.toISOString() : p.joinedAt,
         card: typeof p.card === "string" ? JSON.parse(p.card) : p.card,

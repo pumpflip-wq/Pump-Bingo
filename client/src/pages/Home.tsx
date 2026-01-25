@@ -36,15 +36,11 @@ export default function Home() {
     connected, 
     roundData, 
     latestRound, 
-    participant, 
-    foundParticipant, 
     isLoading,
     error,
     historyRounds,
     historyLoading 
   } = useGameState();
-
-  const currentCard = (participant?.card as number[][] | undefined) || (foundParticipant && typeof foundParticipant === 'object' && 'card' in foundParticipant ? (foundParticipant as any).card as number[][] : undefined);
 
   const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
   const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
@@ -209,48 +205,25 @@ const calculateWinProbLocal = (card: number[][], drawn: number[]) => {
 
   const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];
-    // Ensure we have all unique participants by their database ID or userId
     return (roundData.participants as any[]).map(p => ({
       ...p,
+      // Ensure we use the participant's own card if available
       prob: p.finalWinProb || calculateWinProbLocal(p.card, roundData.round.drawnNumbers || [])
     }));
   }, [roundData?.participants, roundData?.round?.drawnNumbers]);
 
   const sortedParticipants = useMemo(() => {
-    // Grouping by username might be causing issues if multiple "players" have same username/wallet
-    // But usually in this app 1 wallet = 1 player. 
-    // If two players deposited, they should be two separate entries in the participants table.
     return [...participantsList].sort((a, b) => b.prob - a.prob);
   }, [participantsList]);
 
-  return (
-    <>
-      <div className="flex flex-col w-full">
-        <div className="flex-1 flex flex-col space-y-4">
-            {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1">
-              <Loader2 className="w-16 h-16 text-primary animate-spin" />
-              <p className="font-mono text-xs text-primary uppercase tracking-[0.3em]">Connecting Node...</p>
-            </div>
-          ) : error ? (
-            <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1 text-center">
-              <AlertTriangle className="w-16 h-16 text-destructive animate-pulse" />
-              <p className="font-mono text-xs text-destructive uppercase tracking-[0.3em]">System Link Failure</p>
-              <p className="text-white/60 text-sm max-w-md italic uppercase font-black tracking-widest">Database connection could not be established</p>
-              <Button variant="outline" onClick={() => window.location.reload()} className="mt-4 font-black italic uppercase">Reconnect Protocol</Button>
-            </div>
-          ) : latestRound && roundData ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
-              
-            <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
-              <PlayerList 
-                participants={participantsList}
-                walletAddress={walletAddress}
-                formatAddress={formatAddress}
-                roundStatus={roundData.round.status}
-                roundData={roundData}
-              />
-            </aside>
+  // Find MY participant entry correctly
+  const myParticipant = useMemo(() => {
+    if (!walletAddress || !roundData?.participants) return null;
+    return roundData.participants.find((p: any) => p.username === walletAddress);
+  }, [walletAddress, roundData?.participants]);
+
+  const currentCard = myParticipant?.card;
+  const isParticipant = !!myParticipant;
 
               <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden relative" style={{ perspective: "1000px" }}>
                 <AnimatePresence mode="wait">
@@ -361,7 +334,7 @@ const calculateWinProbLocal = (card: number[][], drawn: number[]) => {
                                   card={currentCard}
                                   drawnNumbers={roundData?.round?.drawnNumbers || []}
                                   status={roundData?.round?.status || ROUND_STATUS.OPEN}
-                                  isBingoed={(participantOverride || participant || foundParticipant)?.hasBingo || false}
+                                  isBingoed={myParticipant?.hasBingo || false}
                                   className="w-full h-16 text-3xl font-black italic tracking-tighter"
                                 />
                               </div>
