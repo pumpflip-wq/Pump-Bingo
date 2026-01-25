@@ -110,10 +110,12 @@ export async function registerRoutes(
     const round = await storage.getRound(roundId);
     if (!round) return res.status(404).json({ message: "Round not found" });
     
-    const count = await storage.getRoundParticipantsCount(roundId);
+    const countResult = await db.select({ count: sql`count(*)` })
+      .from(participants)
+      .where(sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL`);
+    const count = Number(countResult[0]?.count || 0);
     
-    // Fetch participants with usernames, cards, and finalWinProb
-    // Use LEFT JOIN to handle cases where user might not exist
+    // Fetch participants with usernames, cards, and finalWinProb who have truly joined
     const roundParticipants = await db.execute(sql`
       SELECT 
         p.user_id as "id", 
@@ -124,7 +126,7 @@ export async function registerRoutes(
         p.user_id as "userId"
       FROM participants p
       LEFT JOIN users u ON p.user_id = u.id
-      WHERE p.round_id = ${roundId}
+      WHERE p.round_id = ${roundId} AND p.tx_signature IS NOT NULL
     `);
     
     // Handle both Drizzle result formats (rows array or direct array)

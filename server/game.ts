@@ -1,5 +1,8 @@
 import { storage } from "./storage";
-import { type Round, ROUND_STATUS } from "@shared/schema";
+import { db } from "./db";
+import { participants, rounds, transactions, users, type Round, type Participant } from "@shared/schema";
+import { eq, sql } from "drizzle-orm";
+import { type Round as RoundType, ROUND_STATUS } from "@shared/schema";
 import crypto from "crypto";
 import { PROTOCOL_CONFIG } from "@shared/config";
 
@@ -144,9 +147,14 @@ export class GameManager {
 
     // 1. OPEN -> STARTING
     if (round.status === ROUND_STATUS.OPEN) {
-      const participantCount = await storage.getRoundParticipantsCount(round.id);
+      // Fetch only participants who have a txSignature (truly joined)
+      const actualParticipants = await db.select()
+        .from(participants)
+        .where(sql`${participants.roundId} = ${round.id} AND ${participants.txSignature} IS NOT NULL`);
       
-      // Only allow the countdown to progress if we have at least 2 players
+      const participantCount = actualParticipants.length;
+      
+      // Only allow the countdown to progress if we have at least 2 real players
       if (participantCount >= 2) {
         if (!round.startTime) {
             // If we just reached 2 players and have no start time, set it to 60s from now
