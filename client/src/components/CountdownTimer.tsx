@@ -21,21 +21,11 @@ export function CountdownTimer({ secondsRemaining, status, participantCount, isW
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 
-  if (isWaitingForPlayers || (status === ROUND_STATUS.OPEN && participantCount < 2)) {
+  // Always show timer format - show 01:00 when waiting for players or timer not started
+  if (isWaitingForPlayers || (status === ROUND_STATUS.OPEN && participantCount < 2) || 
+      (status === ROUND_STATUS.OPEN && (secondsRemaining === 0 || !secondsRemaining))) {
     return (
-      <div className="flex flex-col items-center justify-center">
-        <h2 className="text-7xl font-black text-primary italic tracking-tighter uppercase font-display mb-8 drop-shadow-[0_0_15px_rgba(34,197,94,0.4)]">WAITING</h2>
-        <div className="text-[10px] text-white/40 uppercase font-black tracking-[0.5em] mb-12 text-center">
-          FOR CHALLENGERS
-        </div>
-      </div>
-    );
-  }
-
-  // Display 01:00 if timer hasn't started yet but we have enough players
-  if (status === ROUND_STATUS.OPEN && (secondsRemaining === 0 || !secondsRemaining)) {
-    return (
-      <div className="text-6xl md:text-8xl font-black font-mono text-white tracking-[0.4em] italic drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tabular-nums" data-testid="countdown-timer">
+      <div className="text-6xl md:text-8xl font-black font-mono text-white/50 tracking-[0.4em] italic drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] tabular-nums" data-testid="countdown-timer">
         01:00
       </div>
     );
@@ -75,14 +65,6 @@ export function CountdownTimer({ secondsRemaining, status, participantCount, isW
     return (
       <div className="text-6xl md:text-8xl font-black font-mono text-primary tracking-tighter">
         LIVE
-      </div>
-    );
-  }
-
-  if (participantCount < 2) {
-    return (
-      <div className="text-6xl md:text-8xl font-black font-mono text-white/30 tracking-tighter">
-        --:--
       </div>
     );
   }
