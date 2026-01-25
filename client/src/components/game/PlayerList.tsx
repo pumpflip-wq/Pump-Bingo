@@ -15,7 +15,7 @@ interface PlayerListProps {
 export function PlayerList({ participants, walletAddress, formatAddress, roundStatus, roundData }: PlayerListProps) {
   const amIParticipating = useMemo(() => participants.some(participant => participant.username === walletAddress), [participants, walletAddress]);
 
-  const activeParticipants = useMemo(() => {
+    const activeParticipants = useMemo(() => {
     if (!participants) return [];
     
     // De-duplicate: Keep real participants over optimistic ones
@@ -40,6 +40,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
 
   const sortedParticipants = useMemo(() => {
     if (roundStatus !== 'IN_GAME' && roundStatus !== 'FINISHED') {
+      // In OPEN or STARTING state, we also want to show the participants in the order they joined or joined status
       return activeParticipants;
     }
     return [...activeParticipants].sort((a, b) => (b.prob || 0) - (a.prob || 0));
