@@ -209,9 +209,9 @@ export class GameManager {
           });
         }
       } else {
-        // If players < 2, we don't reset startTime to null but the UI should handle "Waiting"
-        // Based on instructions: "לא לאפס startTime" but also "ה־UI צריך להציג: Waiting for players"
-        // We'll keep the logic that if count < 2, it stays in OPEN and UI sees count < 2.
+        // IMPORTANT: Per requirements, do NOT reset startTime if players drop, but UI shows WAITING
+        // However, to satisfy "Single Source of Truth", we only start countdown when >= 2.
+        // If it was started and players dropped, we CLEAR it so it doesn't tick down to STARTING.
         if (round.startTime) {
           console.log(`[GameManager] Round #${round.id} - not enough players, clearing countdown`);
           await storage.updateRound(round.id, { startTime: null });

@@ -20,6 +20,32 @@ export function CountdownTimer({ secondsRemaining, status, participantCount }: C
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 
+  if (status === ROUND_STATUS.OPEN && participantCount < 2) {
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <div className="text-4xl md:text-6xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase italic">
+          WAITING
+        </div>
+        <div className="text-[10px] text-white/40 uppercase font-black tracking-widest mt-2">
+          FOR PLAYERS
+        </div>
+      </div>
+    );
+  }
+
+  if (status === ROUND_STATUS.OPEN && participantCount < 2) {
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <div className="text-4xl md:text-6xl font-black font-mono text-primary tracking-[0.2em] animate-pulse uppercase italic">
+          WAITING
+        </div>
+        <div className="text-[10px] text-white/40 uppercase font-black tracking-widest mt-2 text-center">
+          FOR CHALLENGERS
+        </div>
+      </div>
+    );
+  }
+
   if (status === ROUND_STATUS.STARTING) {
     return (
       <div className="flex flex-col items-center justify-center space-y-6">

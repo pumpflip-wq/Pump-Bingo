@@ -188,13 +188,15 @@ export default function Home() {
   }, [roundData?.round.completedAt, currentTime, hasManuallyClosed]);
 
   const nextRoundTimer = useMemo(() => {
-    const completionTime = completionTimeRef.current?.time;
-    if (completionTime) {
-      const elapsed = currentTime - completionTime;
-      return Math.max(0, Math.ceil((10000 - elapsed) / 1000));
+    if (roundData?.round.status === 'FINISHED' || roundData?.round.winnerId) {
+      const completionTime = completionTimeRef.current?.time;
+      if (completionTime) {
+        const elapsed = currentTime - completionTime;
+        return Math.max(0, Math.ceil((10000 - elapsed) / 1000));
+      }
     }
     return 0;
-  }, [roundData?.round.id, currentTime]);
+  }, [roundData?.round.id, roundData?.round.status, roundData?.round.winnerId, currentTime]);
 
   const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];
@@ -277,7 +279,7 @@ export default function Home() {
                         </div>
                         <div className="py-6 px-10 bg-black/60 rounded-[2.5rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto min-h-[190px] flex flex-col justify-center">
                           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-                          <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-3 font-mono">
+                          <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-3 font-mono text-center">
                             {roundData.round.status === 'STARTING' ? 'SECURING GAME PROTOCOL...' : 
                              roundData.participantsCount < 2 ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
                           </p>
@@ -286,16 +288,6 @@ export default function Home() {
                             status={roundData.round.status}
                             participantCount={roundData.participantsCount}
                           />
-                          {roundData.participantsCount < 2 && (
-                            <div className="space-y-1 mt-4">
-                              <p className="text-primary text-lg uppercase font-black animate-pulse tracking-[0.15em] font-display">
-                                Waiting for Players...
-                              </p>
-                              <p className="text-[13px] text-white uppercase font-black tracking-[0.1em] opacity-90">
-                                Minimum 2 participants required to start
-                              </p>
-                            </div>
-                          )}
                         </div>
                         <div className="w-full max-w-2xl mx-auto mb-2">
                           {!connected ? (
