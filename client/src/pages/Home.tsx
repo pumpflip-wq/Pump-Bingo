@@ -42,16 +42,16 @@ export default function Home() {
     error,
     historyRounds,
     historyLoading,
+    refetch,
   } = useGameState();
 
-  // Force a refetch when the window regains focus to keep sync
+  // Force refetch every second to keep the server-driven timer moving
   useEffect(() => {
-    const handleFocus = () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
-    };
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
-  }, []);
+    const interval = setInterval(() => {
+      refetch();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [refetch]);
 
   // IMPORTANT: No local timer - use server-provided timing data
   const [showWinnerOverlay, setShowWinnerOverlay] = useState(false);

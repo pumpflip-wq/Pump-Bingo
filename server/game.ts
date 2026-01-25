@@ -191,19 +191,20 @@ export class GameManager {
         if (!round.startTime) {
           const target = new Date(now.getTime() + 60000);
           await storage.updateRound(round.id, { startTime: target });
-          console.log(
-            `[GameManager] Round #${round.id} timer set 60s for ${count} players`,
-          );
+          console.log(`[GameManager] Round #${round.id} timer set to 60s for ${count} players`);
           return;
         }
 
-        if (now.getTime() >= new Date(round.startTime).getTime()) {
+        const startTime = new Date(round.startTime);
+        if (now.getTime() >= startTime.getTime()) {
+          console.log(`[GameManager] Round #${round.id} timer reached. Transitioning to STARTING...`);
           await storage.updateRound(round.id, {
             status: ROUND_STATUS.STARTING,
             startTime: new Date(),
           });
         }
       } else if (round.startTime) {
+        console.log(`[GameManager] Round #${round.id} resetting timer - not enough players (current: ${count})`);
         await storage.updateRound(round.id, { startTime: null });
       }
     }
