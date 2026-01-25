@@ -143,6 +143,10 @@ export class GameManager {
         }
       }
     }
+
+    if (round.status === ROUND_STATUS.OPEN) {
+      await this.processPaymentQueue(round.id);
+    }
   }
 
   async claimBingo(roundId: number, userId: number, card: number[][]): Promise<boolean> {
