@@ -75,8 +75,6 @@ export default function Home() {
       ? ((foundParticipant as any).card as number[][])
       : undefined);
 
-  const isParticipant = (!!participant || !!foundParticipant) && !!currentCard;
-
   // Server-provided timer for next round
   const nextRoundSecondsRemaining =
     (roundData as any)?.nextRoundSecondsRemaining ?? 0;
@@ -211,6 +209,20 @@ export default function Home() {
     nextRoundSecondsRemaining,
     hasManuallyClosed,
   ]);
+
+  const isParticipant = (!!participant || !!foundParticipant) && !!currentCard;
+
+  const participantsList = useMemo(() => {
+    if (!roundData?.participants) return [];
+    return roundData.participants.map((p: any) => ({
+      ...p,
+      prob: calculateWinProb(p.card, roundData?.round?.drawnNumbers || []),
+    }));
+  }, [roundData?.participants, roundData?.round?.drawnNumbers]);
+
+  const sortedParticipants = useMemo(() => {
+    return [...participantsList].sort((a, b) => b.prob - a.prob);
+  }, [participantsList]);
 
   return (
     <>
@@ -547,50 +559,30 @@ export default function Home() {
                                               <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-xs font-black text-primary shrink-0">
                                                 {idx + 1}
                                               </div>
-                                              <span className="font-mono text-base text-white font-bold truncate max-w-[150px]">
-                                                {formatAddress(p.username)}
-                                              </span>
-                                            </div>
-                                            <div className="flex items-center gap-6 shrink-0">
-                                              <div className="w-32 h-2 bg-white/5 rounded-full overflow-hidden hidden sm:block border border-white/5">
-                                                <motion.div
-                                                  initial={{ width: 0 }}
-                                                  animate={{
-                                                    width: `${p.prob}%`,
-                                                  }}
-                                                  className="h-full bg-primary shadow-[0_0_15px_rgba(34,197,94,0.4)]"
-                                                />
+                                              <div className="flex flex-col min-w-0">
+                                                <span className="text-white font-black italic tracking-tighter truncate">
+                                                  {formatAddress(p.username)}
+                                                </span>
+                                                <span className="text-[10px] text-white/40 uppercase font-black tracking-widest">
+                                                  Challenger
+                                                </span>
                                               </div>
-                                              <span className="font-mono text-lg font-black text-primary w-[4ch] text-right">
-                                                {Math.round(p.prob)}%
-                                              </span>
+                                            </div>
+                                            <div className="text-right shrink-0">
+                                              <div className="text-primary font-black italic text-xl leading-none">
+                                                {p.prob}%
+                                              </div>
+                                              <div className="text-[10px] text-white/40 uppercase font-black tracking-widest mt-1">
+                                                Win Prob
+                                              </div>
                                             </div>
                                           </motion.div>
                                         ))}
                                       </AnimatePresence>
-
-                                      {sortedParticipants.length === 0 && (
-                                        <div className="flex flex-col items-center justify-center h-full py-12 opacity-20">
-                                          <Users className="w-12 h-12 mb-4" />
-                                          <p className="text-xs font-black uppercase tracking-widest">
-                                            Waiting for players...
-                                          </p>
-                                        </div>
-                                      )}
                                     </div>
                                   </div>
                                 </div>
                               )}
-                          </div>
-                          <div className="w-full max-w-md mx-auto mb-2">
-                            {(roundData.round.status === "OPEN" ||
-                              roundData.round.status === "STARTING") && (
-                              <JoinButton
-                                roundId={roundData.round.id}
-                                price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}
-                                userId={user?.id || 0}
-                              />
-                            )}
                           </div>
                         </div>
                       )}
@@ -599,18 +591,18 @@ export default function Home() {
                 </AnimatePresence>
               </main>
 
-              <aside className="lg:col-span-3 flex flex-col h-[750px]">
-                <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 bg-black/40 border-primary/20 mb-4">
-                  <LastCalledNumber
-                    numbers={roundData.round.drawnNumbers || []}
+              <aside className="lg:col-span-3 space-y-4 h-[750px] flex flex-col">
+                <LastCalledNumber
+                  numbers={roundData.round.drawnNumbers || []}
+                />
+                <div className="flex-1 overflow-hidden min-h-0">
+                  <GameHistory
+                    rounds={historyRounds}
+                    isLoading={historyLoading}
+                    formatCurrency={formatCurrency}
+                    formatAddress={formatAddress}
                   />
                 </div>
-                <GameHistory
-                  historyRounds={historyRounds}
-                  historyLoading={historyLoading}
-                  formatAddress={formatAddress}
-                  currentRoundHash={roundData?.round?.publicHash}
-                />
               </aside>
             </div>
           ) : null}
