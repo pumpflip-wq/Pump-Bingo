@@ -157,7 +157,7 @@ export async function registerRoutes(
       drawnNumbers: round.drawnNumbers || [],
     };
 
-    res.json({
+    const responseData = {
       round: safeRound,
       participantsCount: count,
       secondsRemaining,
@@ -172,7 +172,10 @@ export async function registerRoutes(
         finalWinProb: p.finalWinProb || 0,
       })),
       status: round.status,
-    });
+    };
+
+    console.log(`[API] Round ${roundId} status: ${round.status}, secondsRemaining: ${secondsRemaining}`);
+    res.json(responseData);
   });
 
   // ===== JOIN ROUND =====
@@ -320,8 +323,8 @@ export async function registerRoutes(
           const user = await storage.getUser(userId);
           await solanaManager
             .sendReward(user?.username || "", payout)
-            .then((sig: string | null) => {
-              if (sig) storage.updateRound(roundId, { payoutSignature: sig });
+            .then((sig: any) => {
+              if (sig) storage.updateRound(roundId, { payoutSignature: sig as string });
             })
             .catch(console.error);
 
