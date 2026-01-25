@@ -98,7 +98,7 @@ export class GameManager {
     
     // Default wait time is 60 seconds
     const now = Date.now();
-    const startTime = new Date(now + 65000); // Increased buffer to 5s (65000ms) to ensure sync with client countdown
+    const startTime = new Date(now + 65000); 
 
     await storage.createRound({
       id: nextId,
@@ -109,8 +109,8 @@ export class GameManager {
       price: this.price, 
       prizePool: 0,
       drawnNumbers: [],
-      completedAt: null, // Explicitly reset completedAt
-      winnerId: null // Explicitly reset winnerId
+      completedAt: null, 
+      winnerId: null 
     });
 
     // Process payment queue for the new round

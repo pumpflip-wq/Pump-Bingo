@@ -10,21 +10,41 @@ interface CountdownTimerProps {
 }
 
 export function CountdownTimer({ secondsRemaining, status, participantCount }: CountdownTimerProps) {
-  const [timeLeft, setTimeLeft] = useState({ minutes: 0, seconds: 0 });
+  const [displaySeconds, setDisplaySeconds] = useState(secondsRemaining);
+  const lastUpdateTime = useRef(Date.now());
+  const lastServerSeconds = useRef(secondsRemaining);
 
   useEffect(() => {
-    // If waiting for players or no remaining seconds yet, show 01:00 or --:--
+    // If waiting for players, show --:-- or 01:00
     if (participantCount < 2) {
-      setTimeLeft({ minutes: 1, seconds: 0 });
+      setDisplaySeconds(60);
+      lastServerSeconds.current = 60;
+      lastUpdateTime.current = Date.now();
       return;
     }
 
-    // Since secondsRemaining is provided by server, we just format it
-    const minutes = Math.floor(secondsRemaining / 60);
-    const seconds = secondsRemaining % 60;
-    
-    setTimeLeft({ minutes, seconds });
-  }, [secondsRemaining, participantCount]);
+    // Synchronize with server data when it changes
+    if (secondsRemaining !== lastServerSeconds.current) {
+      setDisplaySeconds(secondsRemaining);
+      lastServerSeconds.current = secondsRemaining;
+      lastUpdateTime.current = Date.now();
+    }
+
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - lastUpdateTime.current) / 1000);
+      const nextSeconds = Math.max(0, lastServerSeconds.current - elapsed);
+      if (nextSeconds !== displaySeconds) {
+        setDisplaySeconds(nextSeconds);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [secondsRemaining, participantCount, displaySeconds]);
+
+  const timeLeft = {
+    minutes: Math.floor(displaySeconds / 60),
+    seconds: displaySeconds % 60
+  };
 
   const formatNumber = (num: number) => num.toString().padStart(2, "0");
 
