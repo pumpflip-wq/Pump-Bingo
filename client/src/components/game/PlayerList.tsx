@@ -28,12 +28,12 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
 
     list.forEach(p => {
       const uId = p.userId || p.username;
-      // Filter out invalid players
       if (!uId || p.username === "Unknown" || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
       
-      // Use Map to ensure unique players, prioritizing those with txSignature
-      if (!map.has(uId) || (!map.get(uId).txSignature && p.txSignature)) {
-        map.set(uId, p);
+      // Use userId as the absolute stable key
+      const stableKey = Number(p.userId);
+      if (!map.has(stableKey) || (!map.get(stableKey).txSignature && p.txSignature)) {
+        map.set(stableKey, p);
       }
     });
 

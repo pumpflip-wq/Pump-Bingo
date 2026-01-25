@@ -469,8 +469,8 @@ export default function Home() {
                           </div>
                         </div>
                       ) : (
-                        <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-center space-y-8 relative overflow-hidden flex-1 w-full">
-                          <div className="text-center space-y-4 relative z-10">
+                        <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-start space-y-8 relative overflow-hidden flex-1 w-full pt-12">
+                          <div className="text-center space-y-4 relative z-10 shrink-0">
                             <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
                               <Globe className="w-3 h-3 animate-spin-slow" />{" "}
                               Live Feed Active
@@ -484,14 +484,14 @@ export default function Home() {
                               Mode Active
                             </div>
                           </div>
-                          <div className="w-full max-w-sm space-y-4 relative z-10">
-                            <div className="flex items-center justify-between px-2 mb-2">
+                          <div className="w-full max-w-sm space-y-4 relative z-10 flex-1 min-h-0 flex flex-col">
+                            <div className="flex items-center justify-between px-2 mb-2 shrink-0">
                               <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
                                 Live Player Rankings
                               </h4>
                               <Users className="w-3 h-3 text-primary/40" />
                             </div>
-                            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar flex-1">
                               {sortedParticipants
                                 .map((p, idx) => (
                                   <div
