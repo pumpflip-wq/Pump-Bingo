@@ -100,15 +100,12 @@ export default function Home() {
 
   // Handle the end of the overlay display
   useEffect(() => {
-    if (showWinnerOverlay) {
-      const timer = setTimeout(() => {
-        setShowWinnerOverlay(false);
-        // Refresh to see the new round after overlay is done
-        queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
-      }, 10000);
-      return () => clearTimeout(timer);
+    if (showWinnerOverlay && nextRoundSecondsRemaining <= 0) {
+      setShowWinnerOverlay(false);
+      // Refresh to see the new round after overlay is done
+      queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
     }
-  }, [showWinnerOverlay]);
+  }, [showWinnerOverlay, nextRoundSecondsRemaining]);
 
   const calculateWinProb = (card: number[][], drawn: number[]) => {
     const drawnSet = new Set(drawn);

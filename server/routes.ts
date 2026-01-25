@@ -142,7 +142,7 @@ export async function registerRoutes(
       if (round.startTime) {
         const targetTime = round.startTime instanceof Date ? round.startTime.getTime() : new Date(round.startTime).getTime();
         // Return actual remaining seconds, keeping it stable
-        secondsRemaining = Math.max(0, Math.ceil((targetTime - now) / 1000));
+        secondsRemaining = Math.max(0, Math.floor((targetTime - now) / 1000));
       } else {
         // If 2 players but no startTime yet, return 60
         secondsRemaining = count >= 2 ? 60 : 0;

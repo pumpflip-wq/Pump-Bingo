@@ -162,17 +162,15 @@ export class GameManager {
       const participantCount = actualParticipants.length;
       
       if (participantCount >= 2) {
-        // Force initialize if no startTime OR if the startTime is in the past while still in OPEN status
-        // We use a small buffer (2s) to avoid race conditions with updates
-        const startTimeTs = round.startTime ? new Date(round.startTime).getTime() : 0;
-        if (startTimeTs < now.getTime() - 2000) {
+        // Only initialize startTime if it's null
+        if (!round.startTime) {
             const targetTime = new Date(now.getTime() + 60000);
             await storage.updateRound(round.id, { startTime: targetTime });
-            console.log(`[GameManager] Round #${round.id} RESET timer to 60s for ${participantCount} players`);
+            console.log(`[GameManager] Round #${round.id} SET timer to 60s for ${participantCount} players`);
             return;
         }
 
-        const startTime = new Date(round.startTime!);
+        const startTime = new Date(round.startTime);
         if (now.getTime() >= startTime.getTime()) {
           console.log(`[GameManager] Round #${round.id} countdown finished. Transitioning to STARTING...`);
           await storage.updateRound(round.id, { 
