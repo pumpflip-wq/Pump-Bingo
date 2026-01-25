@@ -1,3 +1,4 @@
+import { api } from "@shared/routes";
 import { formatAddress, formatCurrency } from "@/lib/utils";
 import { ProbabilityFeed } from "@/components/game/ProbabilityFeed";
 import { PlayerList } from "@/components/game/PlayerList";
