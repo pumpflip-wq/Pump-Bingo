@@ -18,7 +18,6 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
     const activeParticipants = useMemo(() => {
     if (!participants) return [];
     
-    // De-duplicate: Keep real participants over optimistic ones
     const map = new Map();
     const list = [...participants].sort((a: any, b: any) => {
       if (a.txSignature && !b.txSignature) return 1;
@@ -27,8 +26,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
     });
 
     list.forEach(p => {
-      // Use userId as the absolute stable key
-      const uId = Number(p.userId);
+      const uId = p.userId ? Number(p.userId) : null;
       if (!uId || p.username === "Unknown" || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
       
       if (!map.has(uId) || (!map.get(uId).txSignature && p.txSignature)) {

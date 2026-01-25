@@ -157,29 +157,24 @@ export default function Home() {
   const sortedParticipants = useMemo(() => {
     if (!roundData?.participants) return [];
     
-    // De-duplicate: If we have an optimistic entry AND a real entry for same userId, keep the real one
-    const seen = new Set<number>();
+    const participantMap = new Map();
     
-    // Sort so that real participants (with txSignature) come last to override optimistic ones in the Map/Set logic
+    // Sort so that real participants (with txSignature) come last to override optimistic ones
     const list = [...roundData.participants].sort((a: any, b: any) => {
       if (a.txSignature && !b.txSignature) return 1;
       if (!a.txSignature && b.txSignature) return -1;
       return 0;
     });
 
-    const participantMap = new Map();
     list.forEach((p: any) => {
-      const uId = Number(p.userId);
+      const uId = p.userId ? Number(p.userId) : null;
+      if (!uId || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
       participantMap.set(uId, p);
     });
 
     const filtered = Array.from(participantMap.values());
 
     return filtered
-      .filter(
-        (p: any) =>
-          p.username !== PROTOCOL_CONFIG.ADMIN_WALLET,
-      )
       .map((p: any) => ({
         ...p,
         prob:
