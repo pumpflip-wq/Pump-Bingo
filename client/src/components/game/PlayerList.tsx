@@ -28,9 +28,11 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
 
     list.forEach(p => {
       const uId = p.userId || p.username;
-      // Show all participants that are in the roundData, regardless of txSignature
-      // This ensures they stay in the list throughout the round
-      if (uId && p.username !== "Unknown") {
+      // Filter out invalid players
+      if (!uId || p.username === "Unknown" || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
+      
+      // Use Map to ensure unique players, prioritizing those with txSignature
+      if (!map.has(uId) || (!map.get(uId).txSignature && p.txSignature)) {
         map.set(uId, p);
       }
     });
@@ -58,7 +60,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
-            const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && amIParticipating;
+            const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED');
             
             // Filter out system account or invalid players
             if (!p.username || p.username === "Unknown") return null;

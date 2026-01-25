@@ -493,13 +493,9 @@ export default function Home() {
                             </div>
                             <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                               {sortedParticipants
-                                .filter(
-                                  (p) =>
-                                    !p.txSignature?.startsWith("TEST_TX_SIG_"),
-                                )
                                 .map((p, idx) => (
                                   <div
-                                    key={p.id}
+                                    key={`${p.userId || p.id}-${idx}`}
                                     className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 group hover:border-primary/20 transition-all"
                                   >
                                     <div className="flex items-center gap-3">
@@ -514,12 +510,12 @@ export default function Home() {
                                       <div className="w-24 h-1.5 rounded-full bg-black/40 overflow-hidden">
                                         <motion.div
                                           initial={{ width: 0 }}
-                                          animate={{ width: `${p.prob}%` }}
-                                          className="h-full bg-primary"
+                                          animate={{ width: `${p.prob || 0}%` }}
+                                          className="h-full bg-primary shadow-[0_0_10px_rgba(34,197,94,0.4)]"
                                         />
                                       </div>
-                                      <span className="text-xs font-black text-primary font-mono">
-                                        {Math.round(p.prob)}%
+                                      <span className="text-[10px] font-mono font-black text-primary/80 min-w-[3ch]">
+                                        {Math.round(p.prob || 0)}%
                                       </span>
                                     </div>
                                   </div>
