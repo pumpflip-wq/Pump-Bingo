@@ -59,11 +59,11 @@ export default function Home() {
 
   // Recovery effect for stuck "INITIALIZING" state
   useEffect(() => {
-    if (roundData?.round?.status === 'OPEN' && !roundData.round.startTime && !roundData.isWaitingForPlayers) {
+    if (roundData?.round?.status === 'OPEN' && !roundData.round.startTime && !(roundData.round.status === 'OPEN' && roundData.participantsCount < 2)) {
       console.log("Stuck round detected, refreshing query...");
       queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundData.round.id] });
     }
-  }, [roundData?.round?.id, roundData?.isWaitingForPlayers]);
+  }, [roundData?.round?.id, roundData?.participantsCount]);
 
   // Stabilize completion time to prevent restarts on refetch
   if (roundData?.round?.winnerId && roundData.round.completedAt) {
@@ -289,13 +289,13 @@ const calculateWinProbLocal = (card: number[][], drawn: number[]) => {
                           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
                           <p className="text-white text-base uppercase font-black tracking-[0.2em] mb-3 font-mono text-center">
                             {roundData.round.status === 'STARTING' ? 'SECURING GAME PROTOCOL...' : 
-                             roundData.isWaitingForPlayers ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
+                             (roundData.round.status === 'OPEN' && roundData.participantsCount < 2) ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
                           </p>
                           <CountdownTimer 
                             secondsRemaining={roundData.secondsRemaining || 0} 
                             status={roundData.round.status}
                             participantCount={roundData.participantsCount}
-                            isWaitingForPlayers={roundData.isWaitingForPlayers}
+                            isWaitingForPlayers={roundData.round.status === 'OPEN' && roundData.participantsCount < 2}
                           />
                         </div>
                         <div className="w-full max-w-2xl mx-auto mb-2">
@@ -358,7 +358,6 @@ const calculateWinProbLocal = (card: number[][], drawn: number[]) => {
                                 <BingoClaimButton 
                                   roundId={roundData?.round?.id || 0} 
                                   userId={user?.id || 0} 
-                                  participantId={participantOverride?.id || participant?.id || foundParticipant?.id}
                                   card={currentCard}
                                   drawnNumbers={roundData?.round?.drawnNumbers || []}
                                   status={roundData?.round?.status || ROUND_STATUS.OPEN}

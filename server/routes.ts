@@ -320,7 +320,7 @@ export async function registerRoutes(
           const user = await storage.getUser(userId);
           await solanaManager
             .sendReward(user?.username || "", payout)
-            .then((sig) => {
+            .then((sig: string | null) => {
               if (sig) storage.updateRound(roundId, { payoutSignature: sig });
             })
             .catch(console.error);
