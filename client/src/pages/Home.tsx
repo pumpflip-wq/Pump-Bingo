@@ -34,34 +34,14 @@ export default function Home() {
     historyLoading 
   } = useGameState();
 
-  const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
-  const completionTimeRef = useRef<{ roundId: number; time: number } | null>(null);
-
-  // Recovery effect for stuck "INITIALIZING" state
-  useEffect(() => {
-    if (roundData?.round?.status === 'OPEN' && !roundData.round.startTime && !(roundData.round.status === 'OPEN' && roundData.participantsCount < 2)) {
-      queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundData.round.id] });
-    }
-  }, [roundData?.round?.id, roundData?.participantsCount]);
-
-  // Stabilize completion time to prevent restarts on refetch
-  if (roundData?.round?.winnerId && roundData.round.completedAt) {
-    if (completionTimeRef.current?.roundId !== roundData.round.id) {
-      completionTimeRef.current = {
-        roundId: roundData.round.id,
-        time: new Date(roundData.round.completedAt).getTime()
-      };
-      setHasManuallyClosed(false);
-    }
-  }
-
   // Find MY participant entry correctly
   const myParticipant = useMemo(() => {
     if (!walletAddress || !roundData?.participants) return null;
     return roundData.participants.find((p: any) => p.username === walletAddress);
   }, [walletAddress, roundData?.participants]);
 
-  const currentCard = myParticipant?.card;
+  const currentCard = (myParticipant?.card as number[][] | undefined);
+
   const isParticipant = !!myParticipant;
 
   const calculateWinProbLocal = (card: number[][], drawn: number[]) => {
@@ -116,16 +96,42 @@ export default function Home() {
     return [...participantsList].sort((a, b) => b.prob - a.prob);
   }, [participantsList]);
 
+  const overlayState = useMemo(() => {
+    const hasWinner = !!roundData?.round.winnerId;
+    const winnerDeclaredAt = completionTimeRef.current?.time;
+    const currentRoundId = roundData?.round.id;
+    const isMe = roundData?.round.winnerId === user?.id;
+    const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
+    const amIParticipant = isParticipant;
+
+    if (hasManuallyClosed || !winnerDeclaredAt || isFinished) return null;
+    const elapsed = currentTime - winnerDeclaredAt;
+    const totalDisplayTime = 10000; 
+    if (elapsed >= totalDisplayTime) return null;
+    if (!amIParticipant) return null;
+
+    const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
+    const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
+    
+    return {
+      show: true,
+      username: winnerUsername,
+      prize: roundData.round.prizePool || 0,
+      isWinner: isMe,
+      txHash: roundData.round.payoutSignature ? `https://explorer.solana.com/tx/${roundData.round.payoutSignature}?cluster=${PROTOCOL_CONFIG.NETWORK}` : undefined,
+      timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
+      currentRoundId: currentRoundId
+    };
+  }, [roundData, user?.id, walletAddress, hasManuallyClosed, currentTime, isParticipant]);
+
   const nextRoundTimer = useMemo(() => {
-    if (roundData?.round?.status === 'FINISHED' || roundData?.round?.winnerId) {
-      const completionTime = completionTimeRef.current?.time;
-      if (completionTime) {
-        const elapsed = currentTime - completionTime;
-        return Math.max(0, Math.ceil((10000 - elapsed) / 1000));
-      }
+    const completionTime = completionTimeRef.current?.time;
+    if (completionTime) {
+      const elapsed = currentTime - completionTime;
+      return Math.max(0, Math.ceil((10000 - elapsed) / 1000));
     }
     return 0;
-  }, [roundData?.round?.id, roundData?.round?.status, roundData?.round?.winnerId, currentTime]);
+  }, [roundData?.round?.id, currentTime]);
 
   const content = useMemo(() => {
     if (isLoading) {
@@ -161,37 +167,69 @@ export default function Home() {
           <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden relative" style={{ perspective: "1000px" }}>
             <AnimatePresence mode="wait">
               {roundData.round.status === 'OPEN' || roundData.round.status === 'STARTING' ? (
-                <motion.div key="lobby" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex-1 flex flex-col">
-                  <div className="glass-card neon-border rounded-[3rem] p-8 flex flex-col items-center justify-center space-y-12 relative overflow-hidden flex-1">
-                    <div className="space-y-4 text-center relative z-10">
-                      <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest animate-pulse">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" /> Network Live
+                <motion.div 
+                  key="waiting"
+                  initial={{ opacity: 0, rotateY: -90 }}
+                  animate={{ opacity: 1, rotateY: 0 }}
+                  exit={{ opacity: 0, rotateY: 90 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-between min-h-0 h-full relative overflow-hidden shrink-0"
+                >
+                  <div className="flex-1 flex flex-col items-center justify-between py-4 w-full h-full">
+                    <div className="w-full space-y-8">
+                      <div className="glass-card neon-border rounded-2xl p-8 bg-black/60 border-primary/30 flex flex-row items-center justify-center gap-24 w-full">
+                        <div className="flex flex-col text-center">
+                          <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Room</p>
+                          <p className="text-5xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
+                        </div>
+                        <div className="flex flex-col text-center scale-110">
+                          <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
+                          <div className="flex flex-col items-center">
+                            <span className="text-7xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">
+                              {formatCurrency(roundData.round.prizePool || 0)}
+                            </span>
+                            <span className="text-3xl text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                          <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Players</p>
+                          <p className="text-5xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
+                        </div>
                       </div>
-                      <h2 className="text-5xl md:text-7xl font-black text-white italic tracking-tighter uppercase font-display">Next Round <span className="text-primary block md:inline">Loading</span></h2>
                     </div>
-                    <div className="relative z-10 scale-110">
+                    <div className="relative z-10 scale-110 py-12">
                       <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={roundData.isWaitingForPlayers} />
                     </div>
-                    <div className="w-full max-w-sm space-y-6 relative z-10">
+                    <div className="w-full max-w-xl space-y-8 relative z-10 pb-8">
                       <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
-                      <div className="flex items-center justify-between px-4">
-                        <div className="flex flex-col">
-                          <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Entry Fee</p>
-                          <p className="text-lg font-black text-primary italic leading-none">{formatCurrency(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE)} {PROTOCOL_CONFIG.SYMBOL}</p>
+                      <div className="flex items-center justify-between px-12 bg-white/5 py-4 rounded-3xl border border-white/10">
+                        <div className="flex flex-col items-start">
+                          <p className="text-xs text-white/40 uppercase font-black tracking-[0.3em] mb-1">Entry Fee</p>
+                          <p className="text-3xl font-black text-primary italic font-display leading-none">{formatCurrency(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE)} {PROTOCOL_CONFIG.SYMBOL}</p>
                         </div>
-                        <div className="h-8 w-px bg-white/10" />
+                        <div className="h-12 w-px bg-white/10" />
                         <div className="flex flex-col items-end">
-                          <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">Players</p>
-                          <p className="text-lg font-black text-white italic leading-none">{roundData.participantsCount}</p>
+                          <p className="text-xs text-white/40 uppercase font-black tracking-[0.3em] mb-1">Status</p>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                            <p className="text-3xl font-black text-white italic font-display leading-none uppercase">Live</p>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </motion.div>
               ) : (
-                <motion.div key="game" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.05 }} className="flex-1 flex flex-col min-h-0">
-                  <div className="flex flex-col space-y-4 flex-1 min-h-0">
-                    <div className="glass-card neon-border rounded-[3rem] p-6 relative overflow-hidden bg-black/40 flex-1 flex flex-col min-h-0">
+                <motion.div 
+                  key="active-game"
+                  initial={{ opacity: 0, rotateY: 90 }}
+                  animate={{ opacity: 1, rotateY: 0 }}
+                  exit={{ opacity: 0, rotateY: -90 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  className="flex-1 flex flex-col min-h-0 h-full"
+                >
+                  <div className="flex flex-col space-y-4 flex-1 min-h-0 h-full">
+                    <div className="glass-card neon-border rounded-[3rem] p-6 relative overflow-hidden bg-black/40 flex-1 flex flex-col min-h-0 h-full">
                       <div className="flex items-center justify-between mb-8 shrink-0">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
@@ -260,6 +298,17 @@ export default function Home() {
                 </motion.div>
               )}
             </AnimatePresence>
+            {overlayState && (
+              <WinnerOverlay
+                isOpen={overlayState.show}
+                onClose={() => setHasManuallyClosed(true)}
+                winnerName={overlayState.username}
+                prizeAmount={overlayState.prize}
+                isWinner={overlayState.isWinner}
+                txHash={overlayState.txHash}
+                nextRoundTimer={nextRoundTimer}
+              />
+            )}
           </main>
           <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
             <GameHistory 
@@ -273,7 +322,7 @@ export default function Home() {
       );
     }
     return null;
-  }, [isLoading, error, latestRound, roundData, participantsList, sortedParticipants, isParticipant, currentCard, myParticipant, user, walletAddress, historyRounds, historyLoading, formatAddress, formatCurrency, nextRoundTimer]);
+  }, [isLoading, error, latestRound, roundData, participantsList, sortedParticipants, isParticipant, currentCard, myParticipant, user, walletAddress, historyRounds, historyLoading, formatAddress, formatCurrency, nextRoundTimer, overlayState, hasManuallyClosed]);
 
   return (
     <div className="flex flex-col w-full">

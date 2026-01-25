@@ -15,12 +15,17 @@ interface PlayerListProps {
 export function PlayerList({ participants, walletAddress, formatAddress, roundStatus, roundData }: PlayerListProps) {
   const amIParticipating = useMemo(() => participants.some(participant => participant.username === walletAddress), [participants, walletAddress]);
 
+  const activeParticipants = useMemo(() => {
+    // Ensure all participants are consistently filtered and displayed
+    return participants.filter(p => p.username && p.username !== "Unknown");
+  }, [participants]);
+
   const sortedParticipants = useMemo(() => {
-    if (!amIParticipating || (roundStatus !== 'IN_GAME' && roundStatus !== 'FINISHED')) {
-      return participants;
+    if (roundStatus !== 'IN_GAME' && roundStatus !== 'FINISHED') {
+      return activeParticipants;
     }
-    return [...participants].sort((a, b) => (b.prob || 0) - (a.prob || 0));
-  }, [participants, amIParticipating, roundStatus]);
+    return [...activeParticipants].sort((a, b) => (b.prob || 0) - (a.prob || 0));
+  }, [activeParticipants, roundStatus]);
 
   return (
     <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[750px] overflow-hidden bg-black/20">
