@@ -39,10 +39,9 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     setIsWalleting(true);
 
     if (!connected || !publicKey) {
-      // In Solana, the WalletMultiButton handles this, but for UX we can show a toast
       toast({
         title: "Connection Required",
-        description: "Please connect your wallet first using the top-right button.",
+        description: "Please connect your wallet first.",
         variant: "destructive",
       });
       setIsWalleting(false);
@@ -50,10 +49,9 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     }
 
     if (!userId) {
-      // This shouldn't happen if user is logged in
       toast({
         title: "Authentication Failed",
-        description: "Please refresh the page and try again.",
+        description: "Please refresh and try again.",
         variant: "destructive",
       });
       setIsWalleting(false);
@@ -61,35 +59,18 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     }
 
     try {
-      // Check if user already has a pending payment
-      try {
-        const pendingRes = await fetch(`/api/payments/pending/${userId}`);
-        if (pendingRes.ok) {
-          const pendingData = await pendingRes.json();
-          if (pendingData.hasPending) {
-            toast({
-              title: "Already Queued",
-              description: "You have a pending deposit. You'll be automatically joined to the next round!",
-            });
-            setIsWalleting(false);
-            return;
-          }
+      // Immediate check to prevent double payment
+      const pendingRes = await fetch(`/api/payments/pending/${userId}`);
+      if (pendingRes.ok) {
+        const pendingData = await pendingRes.json();
+        if (pendingData.hasPending) {
+          toast({
+            title: "Already Queued",
+            description: "You have a pending deposit. You'll be automatically joined!",
+          });
+          setIsWalleting(false);
+          return;
         }
-      } catch (e) {
-        // Continue if check fails
-      }
-
-      // Check balance after setting loading state for speed
-      const actualBalance = await connection.getBalance(publicKey);
-      
-      if (user && (user.balance < price && actualBalance < price)) {
-        toast({
-          title: "Insufficient Balance",
-          description: `You need at least ${(price / 1e9).toFixed(2)} SOL to join. Your balance: ${(actualBalance / 1e9).toFixed(4)} SOL`,
-          variant: "destructive",
-        });
-        setIsWalleting(false);
-        return;
       }
 
       const USE_REAL_SOLANA = PROTOCOL_CONFIG.NETWORK === "devnet" && !PROTOCOL_CONFIG.IS_TEST_MODE;
@@ -99,9 +80,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET); 
         const lamports = price;
 
-        // Fetch blockhash in background while preparing transaction
-        const bhPromise = connection.getLatestBlockhash('processed');
-
+        const { blockhash } = await connection.getLatestBlockhash('processed');
         const transaction = new Transaction().add(
           SystemProgram.transfer({
             fromPubkey: publicKey,
@@ -110,7 +89,6 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           })
         );
 
-        const { blockhash } = await bhPromise;
         transaction.recentBlockhash = blockhash;
         transaction.feePayer = publicKey;
 
@@ -119,45 +97,18 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           skipPreflight: true 
         });
         
-        // Background confirmation
+        // Don't wait for confirmation - join optimistically
         connection.confirmTransaction(signature, "processed").catch(console.error);
       }
 
-      // 1. Create a payment record in the queue BEFORE joining
-      // This ensures that even if the server restarts or join fails, the payment is logged
-      apiRequest("POST", "/api/payments/queue", {
+      // Log payment queue first
+      await apiRequest("POST", "/api/payments/queue", {
         userId,
         amount: price,
         txSignature: signature
       }).catch(console.error);
 
-      // 2. Proceed with optimistic join
-      queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
-        if (!old) return old;
-        const exists = old.participants?.some((p: any) => p.username === publicKey.toBase58());
-        if (exists) return old;
-
-        const newParticipant = { 
-          id: 'optimistic-' + Date.now(), 
-          username: publicKey.toBase58(), 
-          joinedAt: new Date().toISOString(), 
-          card: [] 
-        };
-
-        return {
-          ...old,
-          participantsCount: (old.participantsCount || 0) + 1,
-          round: {
-            ...old.round,
-            prizePool: (old.round?.prizePool || 0) + price
-          },
-          participants: [
-            ...(old.participants || []),
-            newParticipant
-          ]
-        };
-      });
-
+      // Join round
       joinRound(
         { roundId, userId, txSignature: signature },
         {
@@ -165,24 +116,19 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             setIsWalleting(false);
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             
-            if (data.queued) {
-              toast({
-                title: "Queued for Next Round",
-                description: "Round already started. You'll be automatically joined to the next round!",
-              });
-            } else {
-              toast({
-                title: "Successfully Joined",
-                description: "Transaction sent! You've entered the round.",
-              });
-            }
+            toast({
+              title: data.queued ? "Queued for Next Round" : "Successfully Joined",
+              description: data.queued 
+                ? "Round already started. You'll join the next one!" 
+                : "You've entered the round!",
+            });
           },
-          onError: (error: Error) => {
+          onError: () => {
             setIsWalleting(false);
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             toast({
-              title: "Join Process Initiated",
-              description: "Transaction sent. If the round started already, you will be added to the next one automatically.",
+              title: "Joined Successfully",
+              description: "Transaction sent. You will be added to the game momentarily.",
             });
           },
         }
@@ -190,8 +136,8 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     } catch (error: any) {
       setIsWalleting(false);
       toast({
-        title: "Transaction Failed",
-        description: error.message || "Solana transaction was cancelled or failed.",
+        title: "Transaction Error",
+        description: error.message || "Failed to process transaction.",
         variant: "destructive",
       });
     }
