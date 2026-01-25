@@ -44,6 +44,28 @@ export default function Home() {
   const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
   const completionTimeRef = useRef<{ roundId: number; time: number } | null>(null);
 
+  // Set completionTimeRef when a winner is declared
+  useEffect(() => {
+    const currentRoundId = roundData?.round?.id;
+    const hasWinner = !!roundData?.round?.winnerId;
+    const roundStatus = roundData?.round?.status;
+    
+    // When winner is declared (status COMPLETED or has winnerId), record the time
+    if (hasWinner && currentRoundId) {
+      // Only set if it's a new round or not yet set
+      if (!completionTimeRef.current || completionTimeRef.current.roundId !== currentRoundId) {
+        completionTimeRef.current = { roundId: currentRoundId, time: Date.now() };
+        setHasManuallyClosed(false); // Reset manual close for new round
+      }
+    }
+    
+    // Reset when moving to a new round that doesn't have a winner
+    if (currentRoundId && !hasWinner && completionTimeRef.current?.roundId !== currentRoundId) {
+      completionTimeRef.current = null;
+      setHasManuallyClosed(false);
+    }
+  }, [roundData?.round?.id, roundData?.round?.winnerId, roundData?.round?.status]);
+
   const currentCard = (myParticipant?.card as number[][] | undefined);
 
   const isParticipant = !!myParticipant;
@@ -110,11 +132,10 @@ export default function Home() {
     const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
     const amIParticipant = isParticipant;
 
-    if (hasManuallyClosed || !winnerDeclaredAt || isFinished) return null;
+    if (hasManuallyClosed || !winnerDeclaredAt) return null;
     const elapsed = currentTime - winnerDeclaredAt;
     const totalDisplayTime = 10000; 
     if (elapsed >= totalDisplayTime) return null;
-    if (!amIParticipant) return null;
 
     const winner = roundData.participants?.find((p: any) => p.userId === roundData.round.winnerId || p.id === roundData.round.winnerId);
     const winnerUsername = winner?.username || (isMe ? walletAddress : (roundData.round.winnerId?.toString() || "Unknown"));
@@ -124,6 +145,7 @@ export default function Home() {
       username: winnerUsername,
       prize: roundData.round.prizePool || 0,
       isWinner: isMe,
+      isParticipant: amIParticipant,
       txHash: roundData.round.payoutSignature ? `https://explorer.solana.com/tx/${roundData.round.payoutSignature}?cluster=${PROTOCOL_CONFIG.NETWORK}` : undefined,
       timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
       currentRoundId: currentRoundId
@@ -292,13 +314,14 @@ export default function Home() {
             </AnimatePresence>
             {overlayState && (
               <WinnerOverlay
-                isOpen={overlayState.show}
+                show={overlayState.show}
                 onClose={() => setHasManuallyClosed(true)}
-                winnerName={overlayState.username}
-                prizeAmount={overlayState.prize}
+                username={overlayState.username}
+                prize={overlayState.prize}
                 isWinner={overlayState.isWinner}
+                isParticipant={overlayState.isParticipant}
                 txHash={overlayState.txHash}
-                nextRoundTimer={nextRoundTimer}
+                timeLeft={overlayState.timeLeft}
               />
             )}
           </main>
