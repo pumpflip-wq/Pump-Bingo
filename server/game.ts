@@ -150,7 +150,8 @@ export class GameManager {
       if (participantCount >= 2) {
         if (!round.startTime) {
             // If we just reached 2 players and have no start time, set it to 60s from now
-            await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
+            const targetTime = new Date(now.getTime() + 60000);
+            await storage.updateRound(round.id, { startTime: targetTime });
             return;
         }
 
@@ -163,17 +164,17 @@ export class GameManager {
            return;
         }
 
-        if (now >= startTime) {
-          await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
+        if (now.getTime() >= startTime.getTime() - 1000) { // Slight buffer to ensure it starts
+          console.log(`[GameManager] Round #${round.id} starting...`);
+          await storage.updateRound(round.id, { 
+            status: ROUND_STATUS.STARTING,
+            startTime: new Date() // Reset startTime to mark beginning of STARTING phase
+          });
         }
       } else {
-        // Not enough players: strictly freeze the start time at 60s in the future
-        const sixtySecondsFromNow = new Date(now.getTime() + 61000);
-        
-        // Always ensure it's at least 60s away if under capacity
-        const currentStartTime = round.startTime ? new Date(round.startTime) : null;
-        if (!currentStartTime || currentStartTime.getTime() < sixtySecondsFromNow.getTime()) {
-           await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
+        // Not enough players: strictly freeze/reset the start time if it was set
+        if (round.startTime) {
+          await storage.updateRound(round.id, { startTime: null });
         }
       }
     }
