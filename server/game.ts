@@ -233,11 +233,10 @@ export class GameManager {
         const expectedNumbersCount = Math.max(0, Math.min(75, Math.floor(elapsed / 3000)));
 
         if (round.drawnNumbers.length < expectedNumbersCount) {
-            const available = Array.from({length: 75}, (_, i) => i + 1)
-                .filter(n => !round.drawnNumbers!.includes(n));
+            // Use provably fair deterministic draw based on server seed
+            const nextNum = getDeterministicDraw(round.serverSeed, round.drawnNumbers);
             
-            if (available.length > 0) {
-                const nextNum = available[Math.floor(Math.random() * available.length)];
+            if (nextNum !== null) {
                 const newNumbers = [...round.drawnNumbers, nextNum];
                 await storage.updateRound(round.id, { drawnNumbers: newNumbers });
             }

@@ -10,15 +10,24 @@ export function useGameState() {
   const { publicKey, connected } = useWallet();
   const walletAddress = publicKey?.toBase58();
 
+  const [userId, setUserId] = useState<number | null>(null);
+  
   const { data: user } = useQuery<User>({ 
-    queryKey: ["/api/auth/me"],
-    enabled: !!walletAddress
+    queryKey: ["/api/auth/me", userId],
+    queryFn: async () => {
+      if (!userId) return null;
+      const res = await fetch(`/api/auth/me/${userId}`);
+      if (!res.ok) return null;
+      return res.json();
+    },
+    enabled: !!userId
   });
 
   const { mutate: login } = useMutation({
     mutationFn: (address: string) => apiRequest("POST", "/api/auth/login", { username: address }).then(res => res.json()),
     onSuccess: (data) => {
-      queryClient.setQueryData(["/api/auth/me"], data);
+      setUserId(data.id);
+      queryClient.setQueryData(["/api/auth/me", data.id], data);
     }
   });
 
