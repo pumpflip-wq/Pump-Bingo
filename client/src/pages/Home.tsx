@@ -563,7 +563,6 @@ export default function Home() {
     error,
     latestRound,
     roundData,
-    participantsList,
     sortedParticipants,
     isParticipant,
     currentCard,
