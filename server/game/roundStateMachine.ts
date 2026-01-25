@@ -25,7 +25,8 @@ export async function handleStateTransitions(round: Round, participantCount: num
       }
     } else {
       // Less than 2 players: Ensure startTime is null to signify "Waiting for players"
-      if (round.startTime) {
+      // IMPORTANT: DO NOT continually reset startTime if it's already null
+      if (round.startTime !== null) {
         await storage.updateRound(round.id, { startTime: null });
       }
     }
