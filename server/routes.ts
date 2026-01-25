@@ -128,7 +128,35 @@ export async function registerRoutes(
     `);
     const roundParticipants = (roundParticipantsRaw as any).rows || [];
 
-    // ... (rest of the code for timers)
+    // Server-driven timers and status
+    let secondsRemaining = 0;
+    let nextRoundSecondsRemaining = 0;
+    const now = Date.now();
+    
+    // Logic for WAITING_FOR_PLAYERS state
+    const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && count < 2;
+
+    if (round.startTime && !isWaitingForPlayers) {
+      const startMs = new Date(round.startTime).getTime();
+      secondsRemaining = Math.max(0, Math.floor((startMs - now) / 1000));
+    } else if (isWaitingForPlayers) {
+      secondsRemaining = 0; // Ensure 0 is returned when waiting
+    }
+
+    if (round.winnerId && round.completedAt) {
+      const completedMs = new Date(round.completedAt).getTime();
+      nextRoundSecondsRemaining = Math.max(
+        0,
+        Math.ceil((10000 - (now - completedMs)) / 1000),
+      );
+    }
+
+    const safeRound = {
+      ...round,
+      serverSeed:
+        round.status === ROUND_STATUS.FINISHED ? round.serverSeed : null,
+      drawnNumbers: round.drawnNumbers || [],
+    };
 
     const responseData = {
       round: safeRound,
