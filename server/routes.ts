@@ -137,7 +137,7 @@ export async function registerRoutes(
     let secondsRemaining = 0;
     let nextRoundSecondsRemaining = 0;
     const now = Date.now();
-    if (round.status === ROUND_STATUS.OPEN && round.startTime) {
+    if ((round.status === ROUND_STATUS.OPEN || round.status === ROUND_STATUS.STARTING) && round.startTime) {
       const startMs =
         round.startTime instanceof Date
           ? round.startTime.getTime()

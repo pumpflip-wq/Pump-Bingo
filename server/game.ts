@@ -200,7 +200,6 @@ export class GameManager {
           console.log(`[GameManager] Round #${round.id} timer reached. Transitioning to STARTING...`);
           await storage.updateRound(round.id, {
             status: ROUND_STATUS.STARTING,
-            startTime: new Date(),
           });
         }
       } else if (round.startTime) {
