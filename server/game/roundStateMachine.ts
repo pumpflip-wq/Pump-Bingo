@@ -40,7 +40,12 @@ export async function handleStateTransitions(round: Round, participantCount: num
   } else if (round.status === ROUND_STATUS.IN_GAME) {
     const isOver = round.winnerId || (round.drawnNumbers || []).length >= 75;
     if (isOver) {
-      const completedTime = round.completedAt ? new Date(round.completedAt).getTime() : now.getTime();
+      if (!round.completedAt) {
+        // Mark completion time if not already set
+        await storage.updateRound(round.id, { completedAt: new Date() });
+        return;
+      }
+      const completedTime = new Date(round.completedAt).getTime();
       if (now.getTime() - completedTime >= POST_WIN_DELAY_MS) {
         await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
       }

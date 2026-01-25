@@ -32,7 +32,8 @@ export class GameManager {
     try {
       const latestRound = await storage.getLatestRound();
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
-        if (!latestRound || (latestRound.completedAt && Date.now() - new Date(latestRound.completedAt).getTime() > 1000)) {
+        const canCreate = !latestRound || (latestRound.status === ROUND_STATUS.FINISHED && latestRound.completedAt && Date.now() - new Date(latestRound.completedAt).getTime() > 2000);
+        if (canCreate) {
           await this.createNewRound();
         }
         return;

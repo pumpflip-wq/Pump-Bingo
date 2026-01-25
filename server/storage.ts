@@ -133,10 +133,6 @@ export class DatabaseStorage implements IStorage {
       .update(rounds)
       .set({
         ...updates,
-        completedAt:
-          updates.status === ROUND_STATUS.FINISHED
-            ? new Date()
-            : updates.completedAt || null,
       })
       .where(eq(rounds.id, id))
       .returning();
