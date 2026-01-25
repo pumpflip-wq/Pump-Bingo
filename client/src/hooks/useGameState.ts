@@ -67,7 +67,7 @@ export function useGameState() {
 
   const historyRounds = historyData?.rounds || [];
 
-  const participant = roundData?.participants?.find((p: any) => p.username === walletAddress);
+  const participant = roundData?.participants?.find((p: any) => p.userId === userId);
   const foundParticipant = participant; 
   
   return {

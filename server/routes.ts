@@ -127,7 +127,6 @@ export async function registerRoutes(
       WHERE p.round_id = ${roundId} 
         AND p.tx_signature IS NOT NULL 
         AND p.tx_signature != '' 
-        AND p.tx_signature NOT LIKE 'TEST_TX_SIG_%'
     `);
     const roundParticipants = (roundParticipantsRaw as any).rows || [];
 
