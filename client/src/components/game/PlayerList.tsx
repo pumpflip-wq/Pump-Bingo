@@ -19,18 +19,21 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
     if (!participants) return [];
     
     const map = new Map();
+    // Sort to prioritize confirmed players over optimistic ones
     const list = [...participants].sort((a: any, b: any) => {
-      if (a.txSignature && !b.txSignature) return 1;
-      if (!a.txSignature && b.txSignature) return -1;
-      return 0;
+      const aScore = a.txSignature ? 2 : 1;
+      const bScore = b.txSignature ? 2 : 1;
+      return aScore - bScore;
     });
 
     list.forEach(p => {
-      const uId = p.userId ? Number(p.userId) : null;
-      if (!uId || p.username === "Unknown" || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
+      // Use userId if available, fallback to username
+      const key = p.userId ? Number(p.userId) : p.username;
+      if (!key || p.username === "Unknown" || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
       
-      if (!map.has(uId) || (!map.get(uId).txSignature && p.txSignature)) {
-        map.set(uId, p);
+      // Update map if key doesn't exist or we found a confirmed version
+      if (!map.has(key) || (!map.get(key).txSignature && p.txSignature)) {
+        map.set(key, p);
       }
     });
 

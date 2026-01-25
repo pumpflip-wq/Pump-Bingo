@@ -159,17 +159,20 @@ export default function Home() {
     
     const participantMap = new Map();
     
-    // Sort so that real participants (with txSignature) come last to override optimistic ones
+    // Sort to prioritize confirmed players (txSignature)
     const list = [...roundData.participants].sort((a: any, b: any) => {
-      if (a.txSignature && !b.txSignature) return 1;
-      if (!a.txSignature && b.txSignature) return -1;
-      return 0;
+      const aScore = a.txSignature ? 2 : 1;
+      const bScore = b.txSignature ? 2 : 1;
+      return aScore - bScore;
     });
 
     list.forEach((p: any) => {
-      const uId = p.userId ? Number(p.userId) : null;
-      if (!uId || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
-      participantMap.set(uId, p);
+      const key = p.userId ? Number(p.userId) : p.username;
+      if (!key || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
+      
+      if (!participantMap.has(key) || (!participantMap.get(key).txSignature && p.txSignature)) {
+        participantMap.set(key, p);
+      }
     });
 
     const filtered = Array.from(participantMap.values());
@@ -486,7 +489,7 @@ export default function Home() {
                               </h4>
                               <Users className="w-3 h-3 text-primary/40" />
                             </div>
-                            <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-0">
+                            <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-0 max-h-[400px]">
                               {sortedParticipants
                                 .map((p, idx) => (
                                   <div
