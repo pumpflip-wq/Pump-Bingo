@@ -106,7 +106,7 @@ export class GameManager {
       serverSeed: seed,
       publicHash: hash,
       startTime: startTime,
-      price: this.price, 
+      price: PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE, 
       prizePool: 0,
       drawnNumbers: [],
       completedAt: null, 
@@ -127,7 +127,9 @@ export class GameManager {
         // Add to prize pool
         const round = await storage.getRound(roundId);
         if (round) {
-          await storage.updateRound(roundId, { prizePool: round.prizePool + payment.amount });
+          const currentPrize = Number(round.prizePool || 0);
+          const paymentAmount = Number(payment.amount || 0);
+          await storage.updateRound(roundId, { prizePool: currentPrize + paymentAmount });
         }
 
         await storage.markPaymentProcessed(payment.id);

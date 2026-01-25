@@ -195,7 +195,9 @@ export async function registerRoutes(
       }
 
       // Update prize pool for display immediately
-      const updatedPrize = Number(round.prizePool) + Number(round.price);
+      const currentPrize = Number(round.prizePool || 0);
+      const entryPrice = Number(round.price || 0);
+      const updatedPrize = currentPrize + entryPrice;
       await storage.updateRound(roundId, { prizePool: updatedPrize });
 
       // Create participant and return immediately
