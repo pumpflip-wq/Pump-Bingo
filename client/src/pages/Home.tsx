@@ -45,6 +45,14 @@ export default function Home() {
     historyLoading,
   } = useGameState();
 
+  // Sync effect to handle state transitions immediately
+  useEffect(() => {
+    if (roundData?.round?.status) {
+      // Invalidate list to ensure sidebar is also fresh
+      queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
+    }
+  }, [roundData?.round?.status, roundData?.participantsCount]);
+
   // Find MY participant entry correctly
   const myParticipant = useMemo(() => {
     if (!walletAddress || !roundData?.participants) return null;
@@ -167,7 +175,7 @@ export default function Home() {
     });
 
     list.forEach((p: any) => {
-      const key = p.userId ? Number(p.userId) : p.username;
+      const key = p.userId ? String(p.userId) : p.username;
       if (!key || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
       
       if (!participantMap.has(key) || (!participantMap.get(key).txSignature && p.txSignature)) {

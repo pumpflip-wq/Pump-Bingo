@@ -18,6 +18,8 @@ export function useRounds() {
 
 // GET /api/rounds/:id
 export function useRound(id: number) {
+  const queryClient = useQueryClient();
+  
   return useQuery({
     queryKey: [api.rounds.get.path, id],
     queryFn: async () => {
@@ -32,20 +34,15 @@ export function useRound(id: number) {
       const data = query.state.data as any;
       if (!data) return 500;
       
-      // Faster polling when waiting for players to ensure instant list updates
-      if (data.round.status === 'OPEN' && data.participantsCount < 2) return 500;
-      // Faster polling when countdown is about to end (for instant transition)
-      if (data.round.status === 'OPEN' && data.secondsRemaining <= 5) return 300;
-      // Faster polling during STARTING phase
+      // Real-time synchronization: Poll aggressively in all active states
+      if (data.round.status === 'OPEN') return 500;
       if (data.round.status === 'STARTING') return 300;
-      // Standard polling for active games
-      if (data.round.status === 'IN_GAME') return 800;
-      // Slower polling for finished rounds to allow overlay to show
+      if (data.round.status === 'IN_GAME') return 500;
       if (data.round.status === 'FINISHED') return 2000;
-      // Default
       return 1000;
     },
-    staleTime: 500,
+    staleTime: 0, 
+    gcTime: 0,
   });
 }
 

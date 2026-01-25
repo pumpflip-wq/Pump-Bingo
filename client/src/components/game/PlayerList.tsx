@@ -28,7 +28,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
 
     list.forEach(p => {
       // Use userId if available, fallback to username
-      const key = p.userId ? Number(p.userId) : p.username;
+      const key = p.userId ? String(p.userId) : p.username;
       if (!key || p.username === "Unknown" || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
       
       // Update map if key doesn't exist or we found a confirmed version
