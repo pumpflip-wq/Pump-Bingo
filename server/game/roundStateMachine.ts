@@ -52,7 +52,17 @@ export async function handleStateTransitions(round: Round, participantCount: num
       }
       const completedTime = new Date(round.completedAt).getTime();
       if (now.getTime() - completedTime >= POST_WIN_DELAY_MS) {
+        // Transition to FINISHED
         await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
+        // Create NEW round immediately so people don't join the old one
+        console.log(`[Round ${round.id}] Game finished. Creating new round.`);
+        await storage.createRound({
+          status: ROUND_STATUS.OPEN,
+          price: round.price,
+          prizePool: 0,
+          drawnNumbers: [],
+          startTime: null
+        });
       }
     }
   }
