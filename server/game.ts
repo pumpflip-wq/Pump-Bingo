@@ -156,6 +156,7 @@ export class GameManager {
     // 1. OPEN -> STARTING
     if (round.status === ROUND_STATUS.OPEN) {
       const participantCount = await storage.getRoundParticipantsCount(round.id);
+      console.log(`[GameManager] Round #${round.id} status: OPEN, participants: ${participantCount}, startTime: ${round.startTime}`);
       
       if (participantCount >= 2) {
         // Only initialize startTime if it's null
@@ -163,12 +164,10 @@ export class GameManager {
             const targetTime = new Date(now.getTime() + 60000);
             await storage.updateRound(round.id, { startTime: targetTime });
             console.log(`[GameManager] Round #${round.id} SET timer to 60s for ${participantCount} players`);
-            // We return here to let the state propagate, next tick will handle the countdown
             return;
         }
 
         const startTime = new Date(round.startTime);
-        // Add a small buffer to ensure we don't transition too early
         if (now.getTime() >= startTime.getTime()) {
           console.log(`[GameManager] Round #${round.id} countdown finished. Transitioning to STARTING...`);
           await storage.updateRound(round.id, { 
