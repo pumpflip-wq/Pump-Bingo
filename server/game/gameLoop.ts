@@ -114,7 +114,6 @@ export class GameManager {
         }
       } else {
         // Less than 2 players: Ensure startTime is null to signify "Waiting for players"
-        // But do NOT reset the round or status, just keep it OPEN with no startTime
         if (round.startTime) {
           await storage.updateRound(round.id, { startTime: null });
         }
