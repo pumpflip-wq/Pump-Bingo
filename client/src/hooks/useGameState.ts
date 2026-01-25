@@ -20,19 +20,26 @@ export function useGameState() {
       if (!res.ok) return null;
       return res.json();
     },
-    enabled: !!userId
+    enabled: !!userId,
+    staleTime: 0 // Always fetch fresh user data on mount
   });
 
   const { mutate: login } = useMutation({
     mutationFn: (address: string) => apiRequest("POST", "/api/auth/login", { username: address }).then(res => res.json()),
     onSuccess: (data) => {
       setUserId(data.id);
+      localStorage.setItem("pb_user_id", data.id.toString());
       queryClient.setQueryData(["/api/auth/me", data.id], data);
     }
   });
 
   useEffect(() => {
-    if (connected && walletAddress && !user) {
+    const stored = localStorage.getItem("pb_user_id");
+    if (stored) setUserId(Number(stored));
+  }, []);
+
+  useEffect(() => {
+    if (connected && walletAddress && (!user || user.username !== walletAddress)) {
       login(walletAddress);
     }
   }, [connected, walletAddress, login, user]);
