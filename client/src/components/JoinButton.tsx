@@ -108,7 +108,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         txSignature: signature
       }).catch(console.error);
 
-      // Join round
+      // Join round - ONLY call this after wallet confirmation
       joinRound(
         { roundId, userId, txSignature: signature },
         {
@@ -133,32 +133,6 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           },
         }
       );
-
-      // OPTIMISTIC UI UPDATE: Immediately add user to the list
-      if (publicKey) {
-        queryClient.setQueryData([api.rounds.get.path, roundId], (old: any) => {
-          if (!old) return old;
-          // Check if already in list to avoid duplicates (by userId)
-          const exists = old.participants?.some((p: any) => Number(p.userId) === Number(userId));
-          if (exists) return old;
-
-          const newParticipant = {
-            id: 'optimistic-' + Date.now(),
-            userId: userId,
-            username: publicKey.toBase58(),
-            joinedAt: new Date().toISOString(),
-            card: [], 
-            txSignature: signature,
-            isOptimistic: true // Tag it to keep it stable during polling
-          };
-
-          return {
-            ...old,
-            participantsCount: (old.participantsCount || 0) + 1,
-            participants: [...(old.participants || []), newParticipant]
-          };
-        });
-      }
     } catch (error: any) {
       setIsWalleting(false);
       toast({
