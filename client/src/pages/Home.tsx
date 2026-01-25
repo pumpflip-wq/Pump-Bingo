@@ -140,12 +140,12 @@ export default function Home() {
     const currentRoundId = roundData?.round.id;
     
     const isMe = roundData?.round.winnerId === user?.id;
-    const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
     
     // Check if I was a participant in this round
     const amIParticipant = isParticipant;
 
-    if (hasManuallyClosed || !winnerDeclaredAt || isFinished) {
+    // Don't show if manually closed or no winner declared yet
+    if (hasManuallyClosed || !winnerDeclaredAt || !hasWinner) {
       return null;
     }
 
@@ -156,7 +156,7 @@ export default function Home() {
       return null;
     }
 
-    // Only show overlay for active participants
+    // Show overlay for all participants (winners and losers)
     if (!amIParticipant) {
       return null;
     }
@@ -169,11 +169,12 @@ export default function Home() {
       username: winnerUsername,
       prize: roundData.round.prizePool || 0,
       isWinner: isMe,
+      isParticipant: amIParticipant,
       txHash: roundData.round.payoutSignature ? `https://explorer.solana.com/tx/${roundData.round.payoutSignature}?cluster=${PROTOCOL_CONFIG.NETWORK}` : undefined,
       timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
       currentRoundId: currentRoundId
     };
-  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime]);
+  }, [roundData, user?.id, walletAddress, hasManuallyClosed, lastOverlayRoundId, currentTime, isParticipant]);
 
   useEffect(() => {
     const completedAtRaw = roundData?.round.completedAt;
@@ -512,6 +513,7 @@ export default function Home() {
           username={overlayState.username || "Unknown"} 
           prize={overlayState.prize}
           isWinner={overlayState.isWinner}
+          isParticipant={overlayState.isParticipant}
           timeLeft={overlayState.timeLeft}
           txHash={overlayState.txHash}
           onClose={() => setHasManuallyClosed(true)}
