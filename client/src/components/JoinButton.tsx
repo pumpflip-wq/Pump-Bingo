@@ -22,7 +22,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
   const { mutate: joinRound, isPending } = useJoinRound();
   const { toast } = useToast();
   const { connection } = useConnection();
-  const { publicKey, sendTransaction } = useWallet();
+  const { publicKey, sendTransaction, connected } = useWallet();
 
   // Single useGameState call - avoid duplicate hook calls
   const { roundData, user } = useGameState();
