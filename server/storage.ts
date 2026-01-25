@@ -41,6 +41,7 @@ export interface IStorage {
     roundId: number,
     userId: number,
   ): Promise<Participant | undefined>;
+  getParticipantById(id: number): Promise<Participant | undefined>;
   getRoundParticipantsCount(roundId: number): Promise<number>;
   getRecentFinishedRounds(): Promise<
     (Round & { winnerUsername: string | null })[]
@@ -178,6 +179,25 @@ export class DatabaseStorage implements IStorage {
       return undefined;
     const res = await db.execute(
       sql`SELECT id, round_id, user_id, card, has_bingo, joined_at, tx_signature, final_win_prob FROM participants WHERE round_id = ${roundId} AND user_id = ${userId}`,
+    );
+    const row = res.rows?.[0] as any;
+    if (!row) return undefined;
+    return {
+      id: row.id,
+      roundId: row.round_id,
+      userId: row.user_id,
+      card: row.card,
+      hasBingo: row.has_bingo,
+      joinedAt: row.joined_at,
+      txSignature: row.tx_signature,
+      finalWinProb: row.final_win_prob || 0,
+    } as Participant;
+  }
+
+  async getParticipantById(id: number): Promise<Participant | undefined> {
+    if (!id || isNaN(id)) return undefined;
+    const res = await db.execute(
+      sql`SELECT id, round_id, user_id, card, has_bingo, joined_at, tx_signature, final_win_prob FROM participants WHERE id = ${id}`,
     );
     const row = res.rows?.[0] as any;
     if (!row) return undefined;

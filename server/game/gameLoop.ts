@@ -137,7 +137,6 @@ export class GameManager {
     const updated = await storage.updateRound(roundId, {
       winnerId: userId,
       completedAt: new Date(),
-      drawnNumbers: round.drawnNumbers, // Explicitly save the final drawn numbers
     });
     return !!(updated && updated.winnerId === userId);
   }
