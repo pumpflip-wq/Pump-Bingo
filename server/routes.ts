@@ -112,7 +112,7 @@ export async function registerRoutes(
     
     const countResult = await db.select({ count: sql`count(*)` })
       .from(participants)
-      .where(sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL`);
+      .where(sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`);
     const count = Number(countResult[0]?.count || 0);
     
     // Fetch participants with usernames, cards, and finalWinProb who have truly joined
@@ -126,7 +126,7 @@ export async function registerRoutes(
         p.user_id as "userId"
       FROM participants p
       LEFT JOIN users u ON p.user_id = u.id
-      WHERE p.round_id = ${roundId} AND p.tx_signature IS NOT NULL
+      WHERE p.round_id = ${roundId} AND p.tx_signature IS NOT NULL AND p.tx_signature != ''
     `);
     
     // Handle both Drizzle result formats (rows array or direct array)

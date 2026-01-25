@@ -150,7 +150,7 @@ export class GameManager {
       // Fetch only participants who have a txSignature (truly joined)
       const actualParticipants = await db.select()
         .from(participants)
-        .where(sql`${participants.roundId} = ${round.id} AND ${participants.txSignature} IS NOT NULL`);
+        .where(sql`${participants.roundId} = ${round.id} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`);
       
       const participantCount = actualParticipants.length;
       
