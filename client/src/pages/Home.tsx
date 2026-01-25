@@ -516,7 +516,38 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                "WATCHING LIVE"
+                                <div className="flex flex-col items-center justify-center space-y-8">
+                                  <div className="relative w-48 h-48">
+                                    <div className="absolute inset-0 rounded-full border-4 border-primary/20 animate-ping" />
+                                    <div className="absolute inset-0 rounded-full border-t-4 border-primary animate-spin" />
+                                    <div className="absolute inset-4 rounded-full bg-black/40 flex items-center justify-center overflow-hidden">
+                                      <div className="flex flex-col items-center">
+                                        <div className="flex gap-1">
+                                          {[1, 2, 3].map((i) => (
+                                            <motion.div
+                                              key={i}
+                                              animate={{
+                                                y: [0, -10, 0],
+                                                scale: [1, 1.2, 1],
+                                              }}
+                                              transition={{
+                                                duration: 1.5,
+                                                repeat: Infinity,
+                                                delay: i * 0.2,
+                                              }}
+                                              className="w-4 h-4 rounded-full bg-primary/40 flex items-center justify-center text-[8px] text-white font-bold"
+                                            >
+                                              {Math.floor(Math.random() * 75) + 1}
+                                            </motion.div>
+                                          ))}
+                                        </div>
+                                        <p className="text-[10px] text-primary font-black uppercase tracking-tighter mt-2 animate-pulse">
+                                          Shuffling...
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                               )}
                             </h2>
                             {!roundData.round.winnerId &&
@@ -525,14 +556,14 @@ export default function Home() {
                                   <div className="flex flex-col items-center shrink-0 mb-6">
                                     <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
                                       <Globe className="w-3 h-3 animate-spin-slow" />{" "}
-                                      SPECTATOR MODE ACTIVE
+                                      LIVE PLAYER FEED
                                     </div>
                                   </div>
 
                                   <div className="flex flex-col flex-1 min-h-0 bg-black/20 rounded-2xl border border-white/5 p-4">
                                     <div className="flex items-center justify-between mb-4 px-2 shrink-0">
                                       <p className="text-white text-xs font-black uppercase tracking-[0.3em]">
-                                        Live Player Rankings
+                                        Challengers Status
                                       </p>
                                       <Users className="w-4 h-4 text-primary/40" />
                                     </div>
