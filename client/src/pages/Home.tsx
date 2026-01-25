@@ -158,21 +158,22 @@ export default function Home() {
     if (!roundData?.participants) return [];
     
     // De-duplicate: If we have an optimistic entry AND a real entry for same userId, keep the real one
-    const seen = new Set();
+    const seen = new Set<number>();
     const list = [...roundData.participants].reverse(); // Latest first to prioritize real over optimistic
-    const filtered = list.filter(p => {
-      if (seen.has(p.userId)) return false;
-      seen.add(p.userId);
+    const filtered = list.filter((p: any) => {
+      const uId = Number(p.userId);
+      if (seen.has(uId)) return false;
+      seen.add(uId);
       return true;
     }).reverse();
 
     return filtered
       .filter(
-        (p) =>
-          !p.txSignature?.startsWith("TEST_TX_SIG_") &&
+        (p: any) =>
+          (!p.txSignature?.startsWith("TEST_TX_SIG_") || p.isOptimistic) &&
           p.username !== PROTOCOL_CONFIG.ADMIN_WALLET,
       )
-      .map((p) => ({
+      .map((p: any) => ({
         ...p,
         prob:
           p.finalWinProb ||

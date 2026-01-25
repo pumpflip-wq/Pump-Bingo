@@ -43,6 +43,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
+            const isOptimistic = p.isOptimistic;
             const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && amIParticipating;
             
             // Filter out system account or invalid players
@@ -66,7 +67,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                 }}
                 className={cn(
                   "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
-                  isMe ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5"
+                  isMe ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5",
+                  isOptimistic && "opacity-70 border-dashed animate-pulse"
                 )}
               >
                 <div className="flex flex-col flex-1">
