@@ -5,10 +5,10 @@ import { eq } from "drizzle-orm";
 import { calculateWinProb, validateBingo, generateBingoCard } from "./bingoLogic";
 import { getDeterministicDraw } from "./provablyFair";
 import { PROTOCOL_CONFIG } from "@shared/config";
+import { handleStateTransitions } from "./roundStateMachine";
 import crypto from "crypto";
 
 const DRAW_INTERVAL_MS = 3000;
-const POST_WIN_DELAY_MS = 10000;
 
 export class GameManager {
   private loopInterval: NodeJS.Timeout | null = null;
@@ -100,42 +100,9 @@ export class GameManager {
     const now = new Date();
     const count = await storage.getRoundParticipantsCount(round.id);
 
-    if (round.status === ROUND_STATUS.OPEN) {
-      if (count >= 2) {
-        if (!round.startTime) {
-          // Initialize countdown: 60 seconds from now
-          await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
-        } else if (now.getTime() >= new Date(round.startTime).getTime()) {
-          // Move to STARTING state: 5 second delay
-          await storage.updateRound(round.id, {
-            status: ROUND_STATUS.STARTING,
-            startTime: new Date(now.getTime() + 5000)
-          });
-        }
-      } else {
-        // Less than 2 players: Ensure startTime is null to signify "Waiting for players"
-        if (round.startTime) {
-          await storage.updateRound(round.id, { startTime: null });
-        }
-      }
-    } else if (round.status === ROUND_STATUS.STARTING) {
-      if (count < 2) {
-        // Fallback to OPEN if players leave during starting delay
-        await storage.updateRound(round.id, { status: ROUND_STATUS.OPEN, startTime: null });
-      } else if (now.getTime() >= new Date(round.startTime!).getTime()) {
-        // Move to IN_GAME
-        await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME, startTime: new Date() });
-      }
-    } else if (round.status === ROUND_STATUS.IN_GAME) {
-      if (round.winnerId) {
-        const completedTime = round.completedAt ? new Date(round.completedAt).getTime() : now.getTime();
-        if (now.getTime() - completedTime >= POST_WIN_DELAY_MS) {
-          await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
-          await this.createNewRound();
-        }
-        return;
-      }
+    await handleStateTransitions(round, count);
 
+    if (round.status === ROUND_STATUS.IN_GAME && !round.winnerId) {
       const elapsed = now.getTime() - new Date(round.startTime!).getTime();
       const expectedCount = Math.min(75, Math.floor(elapsed / DRAW_INTERVAL_MS));
       if ((round.drawnNumbers || []).length < expectedCount) {
