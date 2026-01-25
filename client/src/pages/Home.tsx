@@ -491,11 +491,11 @@ export default function Home() {
                               </h4>
                               <Users className="w-3 h-3 text-primary/40" />
                             </div>
-                            <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar flex-1">
+                            <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-0">
                               {sortedParticipants
                                 .map((p, idx) => (
                                   <div
-                                    key={`${p.userId || p.id}-${idx}`}
+                                    key={`ranking-${p.userId || p.id}-${idx}`}
                                     className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 group hover:border-primary/20 transition-all"
                                   >
                                     <div className="flex items-center gap-3">

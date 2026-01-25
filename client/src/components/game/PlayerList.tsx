@@ -27,13 +27,12 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
     });
 
     list.forEach(p => {
-      const uId = p.userId || p.username;
+      // Use userId as the absolute stable key
+      const uId = Number(p.userId);
       if (!uId || p.username === "Unknown" || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
       
-      // Use userId as the absolute stable key
-      const stableKey = Number(p.userId);
-      if (!map.has(stableKey) || (!map.get(stableKey).txSignature && p.txSignature)) {
-        map.set(stableKey, p);
+      if (!map.has(uId) || (!map.get(uId).txSignature && p.txSignature)) {
+        map.set(uId, p);
       }
     });
 
