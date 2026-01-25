@@ -292,34 +292,16 @@ export async function registerRoutes(
       // Only update hasBingo after validation
       await db
         .update(participants)
-        .set({ has_bingo: true })
+        .set({ hasBingo: true })
         .where(
           sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${userId}`,
         );
 
-      // Process payouts & finalWinProb in background
+      // Process payouts in background (Stats are already persisted in gameManager.claimBingo)
       (async () => {
         try {
           const round = await storage.getRound(roundId);
           if (!round) return;
-          const allParticipants = await db
-            .select({ id: participants.id, userId: participants.userId, card: participants.card })
-            .from(participants)
-            .where(eq(participants.roundId, roundId));
-          const drawnNumbers = round.drawnNumbers || [];
-
-          for (const p of allParticipants) {
-            const prob = gameManager.calculateWinProb(
-              p.card as number[][],
-              drawnNumbers,
-            );
-            await db
-              .update(participants)
-              .set({ final_win_prob: prob })
-              .where(
-                sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${p.userId}`,
-              );
-          }
 
           const fee = Math.max(
             0,
@@ -344,7 +326,7 @@ export async function registerRoutes(
             roundId,
           });
         } catch (err) {
-          console.error("Background claim processing error:", err);
+          console.error("Background payout processing error:", err);
         }
       })();
 

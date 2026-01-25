@@ -245,10 +245,10 @@ export class GameManager {
       if (round.winnerId) {
         const completedTime = round.completedAt ? new Date(round.completedAt).getTime() : now.getTime();
         if (now.getTime() - completedTime >= POST_WIN_DELAY_MS) {
+          // Statistics are already saved in claimBingo, so we just finish.
           await storage.updateRound(round.id, {
             status: ROUND_STATUS.FINISHED,
           });
-          // Statistics are already saved in claimBingo, so we just finish.
           await this.createNewRound();
         }
         return;
@@ -298,10 +298,29 @@ export class GameManager {
     const valid = this.validateBingo(card, round.drawnNumbers || []);
     if (!valid) return false;
 
+    // Calculate win probs for ALL participants and persist them BEFORE declaring winner
+    try {
+      const allParticipants = await db
+        .select()
+        .from(participants)
+        .where(eq(participants.roundId, roundId));
+      
+      const drawnNumbers = round.drawnNumbers || [];
+      for (const p of allParticipants) {
+        const prob = this.calculateWinProb(p.card as number[][], drawnNumbers);
+        await db
+          .update(participants)
+          .set({ finalWinProb: prob })
+          .where(eq(participants.id, p.id));
+      }
+    } catch (err) {
+      console.error("Error persisting final win probs:", err);
+    }
+
     // Atomic update
     const updated = await storage.updateRound(roundId, {
       winnerId: userId,
-      status: ROUND_STATUS.FINISHED,
+      status: ROUND_STATUS.IN_GAME, // Keep IN_GAME until POST_WIN_DELAY_MS
       completedAt: new Date(),
     });
 
