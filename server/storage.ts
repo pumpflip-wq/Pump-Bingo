@@ -349,6 +349,8 @@ export class DatabaseStorage implements IStorage {
         END IF;
       END $$;
     `);
+    // After truncate, let's explicitly reset the rounds identity just to be safe
+    await db.execute(sql`ALTER SEQUENCE rounds_id_seq RESTART WITH 1;`);
   }
 }
 
