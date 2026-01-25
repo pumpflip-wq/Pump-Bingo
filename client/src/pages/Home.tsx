@@ -3,7 +3,14 @@ import { PlayerList } from "@/components/game/PlayerList";
 import { GameHistory } from "@/components/game/GameHistory";
 import { LastCalledNumber } from "@/components/LastCalledNumber";
 import { WinnerOverlay } from "@/components/WinnerOverlay";
-import { Users, Loader2, Globe, AlertTriangle, Trophy, Coins } from "lucide-react";
+import {
+  Users,
+  Loader2,
+  Globe,
+  AlertTriangle,
+  Trophy,
+  Coins,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { PROTOCOL_CONFIG } from "@shared/config";
@@ -69,8 +76,8 @@ export default function Home() {
       : undefined);
 
   // Server-provided timer for next round
-  const nextRoundSecondsRemaining = (roundData as any)?.nextRoundSecondsRemaining ?? 0;
-
+  const nextRoundSecondsRemaining =
+    (roundData as any)?.nextRoundSecondsRemaining ?? 0;
 
   // Stabilize completion time to prevent restarts on refetch
   if (roundData?.round?.winnerId && roundData?.round?.completedAt) {
@@ -82,21 +89,6 @@ export default function Home() {
       setHasManuallyClosed(false);
     }
   }
-
-  useEffect(() => {
-    if (
-      roundData?.round?.winnerId &&
-      roundData.round.id !== lastOverlayRoundId
-    ) {
-      setShowWinnerOverlay(true);
-      setLastOverlayRoundId(roundData.round.id);
-      setHasManuallyClosed(false);
-
-      // We do NOT invalidate here anymore to prevent the "flip" to loser state
-      // The overlay relies on the data of the round that just ended.
-      // We will only allow the UI to transition to a new round after the overlay finishes.
-    }
-  }, [roundData?.round?.winnerId, roundData?.round?.id, lastOverlayRoundId]);
 
   // Handle the end of the overlay display
   useEffect(() => {
@@ -176,7 +168,7 @@ export default function Home() {
 
     // Determine if we should show the overlay
     // It should only show for participants of the actual round that just finished
-    if (!showWinnerOverlay || !winnerDeclaredAt || hasManuallyClosed) {
+    if (!winnerDeclaredAt || hasManuallyClosed) {
       return null;
     }
 
@@ -477,7 +469,8 @@ export default function Home() {
                                     <div className="space-y-10">
                                       <div className="flex flex-col items-center gap-2">
                                         <span className="text-sm text-white uppercase font-black tracking-widest flex items-center gap-2">
-                                          <Trophy className="w-4 h-4" /> WINNING PLAYER
+                                          <Trophy className="w-4 h-4" /> WINNING
+                                          PLAYER
                                         </span>
                                         <span className="text-4xl md:text-6xl font-black text-white italic tracking-tighter truncate max-w-full px-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                                           {formatAddress(
@@ -493,7 +486,8 @@ export default function Home() {
                                       </div>
                                       <div className="flex flex-col items-center gap-2">
                                         <span className="text-sm text-white uppercase font-black tracking-widest flex items-center gap-2">
-                                          <Coins className="w-4 h-4" /> TOTAL REWARD
+                                          <Coins className="w-4 h-4" /> TOTAL
+                                          REWARD
                                         </span>
                                         <span className="text-5xl md:text-7xl font-black text-primary italic leading-none drop-shadow-[0_0_30_rgba(34,197,94,0.5)]">
                                           {formatCurrency(

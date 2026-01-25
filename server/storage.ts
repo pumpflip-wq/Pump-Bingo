@@ -1,11 +1,19 @@
-
 import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
-import { 
-  users, rounds, participants, transactions, paymentQueue,
-  type User, type Round, type Participant, type Transaction, type CreateUserRequest,
-  type PaymentQueue, type InsertPaymentQueue,
-  ROUND_STATUS
+import {
+  users,
+  rounds,
+  participants,
+  transactions,
+  paymentQueue,
+  type User,
+  type Round,
+  type Participant,
+  type Transaction,
+  type CreateUserRequest,
+  type PaymentQueue,
+  type InsertPaymentQueue,
+  ROUND_STATUS,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -13,7 +21,7 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: CreateUserRequest): Promise<User>;
-  updateUserBalance(id: number, amount: number): Promise<User>; // amount can be negative
+  updateUserBalance(id: number, amount: number): Promise<User>;
 
   // Round
   getRound(id: number): Promise<Round | undefined>;
@@ -21,14 +29,30 @@ export interface IStorage {
   getOpenRounds(): Promise<Round[]>;
   createRound(round: Partial<Round>): Promise<Round>;
   updateRound(id: number, updates: Partial<Round>): Promise<Round>;
-  
+
   // Participant
-  joinRound(roundId: number, userId: number, card: number[][], txSignature?: string): Promise<Participant>;
-  getParticipant(roundId: number, userId: number): Promise<Participant | undefined>;
+  joinRound(
+    roundId: number,
+    userId: number,
+    card: number[][],
+    txSignature?: string,
+  ): Promise<Participant>;
+  getParticipant(
+    roundId: number,
+    userId: number,
+  ): Promise<Participant | undefined>;
   getRoundParticipantsCount(roundId: number): Promise<number>;
-  getRecentFinishedRounds(): Promise<(Round & { winnerUsername: string | null })[]>;
-  getFinishedRoundsPaginated(page: number, limit: number): Promise<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>;
-  
+  getRecentFinishedRounds(): Promise<
+    (Round & { winnerUsername: string | null })[]
+  >;
+  getFinishedRoundsPaginated(
+    page: number,
+    limit: number,
+  ): Promise<{
+    rounds: (Round & { winnerUsername: string | null })[];
+    total: number;
+  }>;
+
   // Transactions
   createTransaction(tx: Partial<Transaction>): Promise<Transaction>;
 
@@ -46,21 +70,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
     return user;
   }
 
   async createUser(user: CreateUserRequest): Promise<User> {
-    const [newUser] = await db.insert(users).values({
-      ...user,
-      balance: 1000000 // Grant starting balance for testing
-    }).returning();
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        ...user,
+        balance: 1000000,
+      })
+      .returning();
     return newUser;
   }
 
   async updateUserBalance(id: number, amount: number | string): Promise<User> {
-    const numericAmount = typeof amount === "string" ? parseInt(amount, 10) : amount;
-    const [updated] = await db.update(users)
+    const numericAmount =
+      typeof amount === "string" ? parseInt(amount, 10) : amount;
+    const [updated] = await db
+      .update(users)
       .set({ balance: sql`${users.balance} + ${numericAmount}` })
       .where(eq(users.id, id))
       .returning();
@@ -74,41 +106,51 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getLatestRound(): Promise<Round | undefined> {
-    const [round] = await db.select().from(rounds)
+    const [round] = await db
+      .select()
+      .from(rounds)
       .orderBy(sql`${rounds.id} DESC`)
       .limit(1);
     return round;
   }
 
   async getOpenRounds(): Promise<Round[]> {
-    // Return only the most recent round, regardless of status
     const latest = await this.getLatestRound();
     return latest ? [latest] : [];
   }
 
   async createRound(round: Partial<Round>): Promise<Round> {
-    const [newRound] = await db.insert(rounds).values(round as any).returning();
+    const [newRound] = await db
+      .insert(rounds)
+      .values(round as any)
+      .returning();
     return newRound;
   }
 
   async updateRound(id: number, updates: Partial<Round>): Promise<Round> {
-    const [updated] = await db.update(rounds)
+    const [updated] = await db
+      .update(rounds)
       .set({
         ...updates,
-        completedAt: updates.status === ROUND_STATUS.FINISHED ? new Date() : (updates.completedAt || null)
+        completedAt:
+          updates.status === ROUND_STATUS.FINISHED
+            ? new Date()
+            : updates.completedAt || null,
       })
       .where(eq(rounds.id, id))
       .returning();
     return updated;
   }
 
-  async joinRound(roundId: number, userId: number, card: number[][], txSignature?: string): Promise<Participant> {
-    // Check if user already joined this round
-    const existingParticipant = await this.getParticipant(roundId, userId);
-    if (existingParticipant) {
-      return existingParticipant; // Return existing participation instead of creating duplicate
-    }
-    
+  async joinRound(
+    roundId: number,
+    userId: number,
+    card: number[][],
+    txSignature?: string,
+  ): Promise<Participant> {
+    const existing = await this.getParticipant(roundId, userId);
+    if (existing) return existing;
+
     const cardJson = JSON.stringify(card);
     const res = await db.execute(sql`
       INSERT INTO participants (round_id, user_id, card, tx_signature, final_win_prob) 
@@ -124,18 +166,21 @@ export class DatabaseStorage implements IStorage {
       hasBingo: row.has_bingo,
       finalWinProb: row.final_win_prob || 0,
       joinedAt: row.joined_at,
-      txSignature: row.tx_signature
+      txSignature: row.tx_signature,
     } as Participant;
   }
 
-  async getParticipant(roundId: number, userId: number): Promise<Participant | undefined> {
-    if (!roundId || isNaN(roundId) || !userId || isNaN(userId)) return undefined;
-    
-    // Explicitly handling possible schema mismatch by selecting only known columns
-    const res = await db.execute(sql`SELECT id, round_id, user_id, card, has_bingo, joined_at, tx_signature, final_win_prob FROM participants WHERE round_id = ${roundId} AND user_id = ${userId}`);
+  async getParticipant(
+    roundId: number,
+    userId: number,
+  ): Promise<Participant | undefined> {
+    if (!roundId || isNaN(roundId) || !userId || isNaN(userId))
+      return undefined;
+    const res = await db.execute(
+      sql`SELECT id, round_id, user_id, card, has_bingo, joined_at, tx_signature, final_win_prob FROM participants WHERE round_id = ${roundId} AND user_id = ${userId}`,
+    );
     const row = res.rows?.[0] as any;
     if (!row) return undefined;
-    
     return {
       id: row.id,
       roundId: row.round_id,
@@ -144,94 +189,114 @@ export class DatabaseStorage implements IStorage {
       hasBingo: row.has_bingo,
       joinedAt: row.joined_at,
       txSignature: row.tx_signature,
-      finalWinProb: row.final_win_prob || 0
+      finalWinProb: row.final_win_prob || 0,
     } as Participant;
   }
 
   async getRoundParticipantsCount(roundId: number): Promise<number> {
     if (!roundId || isNaN(roundId)) return 0;
-    const [result] = await db.select({ count: sql<string>`count(*)` })
-        .from(participants)
-        .where(sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`);
+    const [result] = await db
+      .select({ count: sql<string>`count(*)` })
+      .from(participants)
+      .where(
+        sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`,
+      );
     return parseInt(result.count || "0", 10);
   }
 
-  async getRecentFinishedRounds(): Promise<(Round & { winnerUsername: string | null })[]> {
-    const results = await db.select({
-      round: rounds,
-      winnerUsername: users.username
-    })
-    .from(rounds)
-    .leftJoin(users, eq(rounds.winnerId, users.id))
-    .where(eq(rounds.status, ROUND_STATUS.FINISHED))
-    .orderBy(sql`${rounds.id} DESC`)
-    .limit(10);
-    
-    return results.map(r => ({
+  async getRecentFinishedRounds(): Promise<
+    (Round & { winnerUsername: string | null })[]
+  > {
+    const results = await db
+      .select({ round: rounds, winnerUsername: users.username })
+      .from(rounds)
+      .leftJoin(users, eq(rounds.winnerId, users.id))
+      .where(eq(rounds.status, ROUND_STATUS.FINISHED))
+      .orderBy(sql`${rounds.id} DESC`)
+      .limit(10);
+    return results.map((r) => ({
       ...r.round,
-      winnerUsername: r.winnerUsername
+      winnerUsername: r.winnerUsername,
     }));
   }
 
-  async getFinishedRoundsPaginated(page: number, limit: number): Promise<{ rounds: (Round & { winnerUsername: string | null })[], total: number }> {
+  async getFinishedRoundsPaginated(
+    page: number,
+    limit: number,
+  ): Promise<{
+    rounds: (Round & { winnerUsername: string | null })[];
+    total: number;
+  }> {
     const offset = (page - 1) * limit;
-    
-    const [countResult] = await db.select({ count: sql<number>`count(*)` })
+    const [countResult] = await db
+      .select({ count: sql<number>`count(*)` })
       .from(rounds)
       .where(eq(rounds.status, ROUND_STATUS.FINISHED));
-    
-    const results = await db.select({
-      round: rounds,
-      winnerUsername: users.username
-    })
-    .from(rounds)
-    .leftJoin(users, eq(rounds.winnerId, users.id))
-    .where(eq(rounds.status, ROUND_STATUS.FINISHED))
-    .orderBy(sql`${rounds.id} DESC`)
-    .limit(limit)
-    .offset(offset);
-    
+    const results = await db
+      .select({ round: rounds, winnerUsername: users.username })
+      .from(rounds)
+      .leftJoin(users, eq(rounds.winnerId, users.id))
+      .where(eq(rounds.status, ROUND_STATUS.FINISHED))
+      .orderBy(sql`${rounds.id} DESC`)
+      .limit(limit)
+      .offset(offset);
     return {
       total: Number(countResult.count),
-      rounds: results.map(r => ({
+      rounds: results.map((r) => ({
         ...r.round,
-        winnerUsername: r.winnerUsername
-      }))
+        winnerUsername: r.winnerUsername,
+      })),
     };
   }
 
   async getRoundTransactions(roundId: number): Promise<Transaction[]> {
     if (!roundId || isNaN(roundId)) return [];
-    return await db.select().from(transactions).where(eq(transactions.roundId, roundId));
+    return await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.roundId, roundId));
   }
 
   async getUserTransactions(userId: number): Promise<Transaction[]> {
     if (!userId || isNaN(userId)) return [];
-    return await db.select().from(transactions).where(eq(transactions.userId, userId)).orderBy(sql`${transactions.id} DESC`);
+    return await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.userId, userId))
+      .orderBy(sql`${transactions.id} DESC`);
   }
 
   async createTransaction(tx: Partial<Transaction>): Promise<Transaction> {
-    const [newTx] = await db.insert(transactions).values(tx as any).returning();
+    const [newTx] = await db
+      .insert(transactions)
+      .values(tx as any)
+      .returning();
     return newTx;
   }
 
   async getPendingPayments(): Promise<PaymentQueue[]> {
-    return await db.select().from(paymentQueue).where(eq(paymentQueue.status, "PENDING"));
+    return await db
+      .select()
+      .from(paymentQueue)
+      .where(eq(paymentQueue.status, "PENDING"));
   }
 
   async createPaymentQueue(payment: InsertPaymentQueue): Promise<PaymentQueue> {
-    const [newPayment] = await db.insert(paymentQueue).values(payment).returning();
+    const [newPayment] = await db
+      .insert(paymentQueue)
+      .values(payment)
+      .returning();
     return newPayment;
   }
 
   async markPaymentProcessed(id: number): Promise<void> {
-    await db.update(paymentQueue).set({ status: "PROCESSED" }).where(eq(paymentQueue.id, id));
+    await db
+      .update(paymentQueue)
+      .set({ status: "PROCESSED" })
+      .where(eq(paymentQueue.id, id));
   }
 
   async resetSystem(): Promise<void> {
-    // Drop all tables and recreate them to ensure a clean state
-    // Using double quotes to ensure exact match in Postgres
-    // Checking if payment_queue exists before truncating to avoid errors in environments where it's missing
     await db.execute(sql`
       DO $$ 
       BEGIN
