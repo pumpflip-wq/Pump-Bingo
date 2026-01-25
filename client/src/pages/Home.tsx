@@ -46,7 +46,7 @@ export default function Home() {
     return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  // IMPORTANT: No local timer - use server-provided timing data
   const [showWinnerOverlay, setShowWinnerOverlay] = useState(false);
   const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(
     null,
@@ -68,10 +68,8 @@ export default function Home() {
       ? ((foundParticipant as any).card as number[][])
       : undefined);
 
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // Server-provided timer for next round
+  const nextRoundSecondsRemaining = (roundData as any)?.nextRoundSecondsRemaining ?? 0;
 
 
   // Stabilize completion time to prevent restarts on refetch
@@ -185,10 +183,8 @@ export default function Home() {
       return null;
     }
 
-    const elapsed = currentTime - winnerDeclaredAt;
-    const totalDisplayTime = 10000; // Matched with server POST_WIN_DELAY_MS
-
-    if (elapsed >= totalDisplayTime) {
+    // Use server-provided timer - if 0, the overlay display time has expired
+    if (nextRoundSecondsRemaining <= 0) {
       return null;
     }
 
@@ -210,7 +206,7 @@ export default function Home() {
       isWinner: isMe,
       isParticipant: isParticipantOfRound,
       txHash: roundData?.round?.payoutSignature || undefined,
-      timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
+      timeLeft: nextRoundSecondsRemaining,
       currentRoundId: currentRoundId,
     };
   }, [
@@ -218,20 +214,14 @@ export default function Home() {
     user?.id,
     walletAddress,
     showWinnerOverlay,
-    currentTime,
+    nextRoundSecondsRemaining,
     hasManuallyClosed,
   ]);
 
   const isParticipant = !!participant || !!foundParticipant;
 
-  const nextRoundTimer = useMemo(() => {
-    const completionTime = completionTimeRef.current?.time;
-    if (completionTime) {
-      const elapsed = currentTime - completionTime;
-      return Math.max(0, Math.ceil((10000 - elapsed) / 1000));
-    }
-    return 0;
-  }, [roundData?.round?.id, currentTime]);
+  // Use server-provided timer - no local calculation
+  const nextRoundTimer = nextRoundSecondsRemaining;
 
   const participantsList = useMemo(() => {
     if (!roundData?.participants) return [];

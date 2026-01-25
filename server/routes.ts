@@ -135,8 +135,10 @@ export async function registerRoutes(
 
     // Calculate seconds remaining for countdown (server-side to avoid clock sync issues)
     let secondsRemaining = 0;
+    let nextRoundSecondsRemaining = 0;
+    const now = Date.now();
+    
     if (round.status === ROUND_STATUS.OPEN) {
-      const now = Date.now();
       if (round.startTime) {
         const targetTime = round.startTime instanceof Date ? round.startTime.getTime() : new Date(round.startTime).getTime();
         // Return actual remaining seconds, keeping it stable
@@ -145,6 +147,13 @@ export async function registerRoutes(
         // If 2 players but no startTime yet, return 60
         secondsRemaining = count >= 2 ? 60 : 0;
       }
+    }
+    
+    // Calculate time until next round (when game is finished/has winner)
+    if (round.winnerId && round.completedAt) {
+      const completedTime = round.completedAt instanceof Date ? round.completedAt.getTime() : new Date(round.completedAt).getTime();
+      const elapsed = now - completedTime;
+      nextRoundSecondsRemaining = Math.max(0, Math.ceil((10000 - elapsed) / 1000));
     }
     
     // PROVABLY FAIR: Only reveal serverSeed after the round is FINISHED
@@ -159,6 +168,7 @@ export async function registerRoutes(
       round: safeRound, 
       participantsCount: count,
       secondsRemaining,
+      nextRoundSecondsRemaining,
       participants: participantsData.map((p: any) => ({
         ...p,
         joinedAt: p.joinedAt instanceof Date ? p.joinedAt.toISOString() : p.joinedAt,
@@ -268,12 +278,11 @@ export async function registerRoutes(
       const participant = await storage.getParticipant(roundId, userId);
       if (!participant) return res.status(404).json({ message: "Participant not found" });
 
-      // Mark that this user won locally first to prevent race conditions in background
-      await db.update(participants).set({ hasBingo: true }).where(sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${userId}`);
-
       const result = await gameManager.claimBingo(roundId, userId, participant.card as number[][]);
       
       if (result) {
+          // Only mark hasBingo AFTER successful validation
+          await db.update(participants).set({ hasBingo: true }).where(sql`${participants.roundId} = ${roundId} AND ${participants.userId} = ${userId}`);
           // Process payout and probabilities in background to return SUCCESS immediately
           (async () => {
             try {

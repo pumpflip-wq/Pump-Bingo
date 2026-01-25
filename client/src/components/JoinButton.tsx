@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn, formatAddress, formatCurrency } from "@/lib/utils";
 import { useJoinRound } from "@/hooks/use-game";
 import { useGameState } from "@/hooks/useGameState";
@@ -24,10 +24,12 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
   const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
 
-  const { roundData } = useGameState();
+  // Single useGameState call - avoid duplicate hook calls
+  const { roundData, user } = useGameState();
   const isWinnerDeclared = !!roundData?.round.winnerId;
+  // Get server-provided next round timer
+  const nextRoundSecondsRemaining = (roundData as any)?.nextRoundSecondsRemaining ?? 0;
 
-  const { user } = useGameState();
   const [isWalleting, setIsWalleting] = useState(false);
 
   const handleJoin = async () => {
@@ -173,31 +175,13 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     }
   };
 
-  const [timeRemaining, setTimeRemaining] = useState(10);
-
-  useEffect(() => {
-    if (!isWinnerDeclared) return;
-    
-    // Find when the winner was declared
-    const winnerDeclaredAt = roundData?.round.completedAt ? new Date(roundData.round.completedAt).getTime() : Date.now();
-    
-    const updateTimer = () => {
-      const elapsed = Date.now() - winnerDeclaredAt;
-      const left = Math.max(0, Math.ceil((10000 - elapsed) / 1000));
-      setTimeRemaining(left);
-    };
-
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
-  }, [isWinnerDeclared, roundData?.round.completedAt]);
-
+  // IMPORTANT: No local timer - use server-provided nextRoundSecondsRemaining
   if (isWinnerDeclared) {
     return (
       <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-3xl w-full h-16 flex flex-col items-center justify-center">
         <p className="text-primary font-black text-2xl italic tracking-tighter mb-0 uppercase text-center">GAME OVER!</p>
         <p className="text-[10px] text-primary/70 uppercase font-black tracking-widest text-center whitespace-nowrap">
-          Next Round in {timeRemaining}s
+          Next Round in {nextRoundSecondsRemaining}s
         </p>
       </div>
     );
