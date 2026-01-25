@@ -255,6 +255,15 @@ export async function registerRoutes(
         });
       }
 
+      // Check for pending payment to prevent duplicates
+      const pending = await storage.getPendingPaymentByUser(Number(userId));
+      if (pending && pending.txSignature === txSignature) {
+        return res.json({ 
+          queued: true, 
+          message: "Transaction already processing. You will be joined automatically." 
+        });
+      }
+
       const card = gameManager.generateCard();
       const participant = await storage.joinRound(
         roundId,

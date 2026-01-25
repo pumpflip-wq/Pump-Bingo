@@ -15,7 +15,9 @@ export async function handleStateTransitions(round: Round, participantCount: num
         await storage.updateRound(round.id, { startTime });
         console.log(`[Round ${round.id}] Started countdown to ${startTime.toISOString()}`);
       } else {
-        const remaining = Math.ceil((new Date(round.startTime).getTime() - now.getTime()) / 1000);
+        const startTimeMs = new Date(round.startTime).getTime();
+        const remaining = Math.ceil((startTimeMs - now.getTime()) / 1000);
+        
         if (remaining <= 0) {
           // Move to STARTING state: 5 second delay
           const startingEndTime = new Date(now.getTime() + 5000);
@@ -28,7 +30,6 @@ export async function handleStateTransitions(round: Round, participantCount: num
       }
     } else {
       // Less than 2 players: Ensure startTime is null to signify "Waiting for players"
-      // This allows the UI to show "Waiting for challengers"
       if (round.startTime !== null) {
         await storage.updateRound(round.id, { startTime: null });
         console.log(`[Round ${round.id}] Resetting startTime (waiting for players)`);

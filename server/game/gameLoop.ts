@@ -31,13 +31,18 @@ export class GameManager {
     this.isProcessing = true;
     try {
       const latestRound = await storage.getLatestRound();
+      
+      // If no round exists, or the latest round is finished, create a new one
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
-        const canCreate = !latestRound || (latestRound.status === ROUND_STATUS.FINISHED && latestRound.completedAt && Date.now() - new Date(latestRound.completedAt).getTime() > 2000);
+        const completedAt = latestRound?.completedAt ? new Date(latestRound.completedAt).getTime() : 0;
+        const canCreate = !latestRound || (Date.now() - completedAt > 2000);
+        
         if (canCreate) {
           await this.createNewRound();
         }
         return;
       }
+      
       await this.processRound(latestRound);
     } catch (err) {
       console.error("Game Loop Error:", err);
