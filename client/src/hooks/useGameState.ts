@@ -4,6 +4,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useRounds, useRound, useParticipant } from './use-game';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { type User, type Round, type Transaction } from '@shared/schema';
+import { api } from "@shared/routes";
 
 export function useGameState() {
   const { publicKey, connected } = useWallet();

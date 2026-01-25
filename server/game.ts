@@ -138,7 +138,7 @@ export class GameManager {
         const round = await storage.getRound(roundId);
         if (round) {
           const currentPrize = Number(round.prizePool || 0);
-          const paymentAmount = Number(payment.price || payment.amount || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE);
+          const paymentAmount = Number((payment as any).amount || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE);
           await storage.updateRound(roundId, { prizePool: currentPrize + paymentAmount });
         }
 
