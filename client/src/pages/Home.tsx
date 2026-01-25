@@ -75,8 +75,8 @@ export default function Home() {
     const hasWinner = !!roundData?.round?.winnerId;
     const roundStatus = roundData?.round?.status;
 
-    // When winner is declared (status COMPLETED or has winnerId), record the time
-    if (hasWinner && currentRoundId) {
+    // When winner is declared (status FINISHED or has winnerId), record the time
+    if ((hasWinner || roundStatus === ROUND_STATUS.FINISHED) && currentRoundId) {
       // Only set if it's a new round or not yet set
       if (
         !completionTimeRef.current ||
@@ -203,12 +203,12 @@ export default function Home() {
     const isFinished = roundData?.round.status === ROUND_STATUS.FINISHED;
     const amIParticipant = isParticipant;
 
-    if (winnerDeclaredAt || !roundData) {
+    if (winnerDeclaredAt || !roundData || roundData?.round.status === ROUND_STATUS.FINISHED) {
       const elapsed = currentTime - (winnerDeclaredAt || 0);
       const totalDisplayTime = 10000;
       
-      // If winner is declared, show overlay for 10 seconds
-      if (winnerDeclaredAt && elapsed < totalDisplayTime && !hasManuallyClosed) {
+      // If winner is declared, show overlay for everyone
+      if ((winnerDeclaredAt || roundData?.round.winnerId) && elapsed < totalDisplayTime && !hasManuallyClosed) {
         const winner = roundData.participants?.find(
           (p: any) =>
             Number(p.userId) === Number(roundData.round.winnerId)
