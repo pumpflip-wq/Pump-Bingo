@@ -281,7 +281,7 @@ export default function Home() {
                              roundData.participantsCount < 2 ? 'WAITING FOR CHALLENGERS...' : 'GAME STARTING IN'}
                           </p>
                           <CountdownTimer 
-                            targetDate={roundData.round.startTime?.toString() || null} 
+                            secondsRemaining={roundData.secondsRemaining || 0} 
                             status={roundData.round.status}
                             participantCount={roundData.participantsCount}
                           />

@@ -115,7 +115,8 @@ export function BingoClaimButton({
               }
             };
           });
-          // Invalidate the rounds list to trigger updates
+          // Invalidate all round-related queries to trigger immediate updates
+          queryClient.invalidateQueries({ queryKey: ["/api/rounds/:id", roundId] });
           queryClient.invalidateQueries({ queryKey: ["/api/rounds"] });
           queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
         },
