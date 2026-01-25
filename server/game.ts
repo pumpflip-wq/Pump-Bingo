@@ -58,201 +58,180 @@ export class GameManager {
     this.isProcessing = true;
 
     try {
-      const round = await storage.getLatestRound();
+      // Find the LATEST round
+      const latestRound = await storage.getLatestRound();
       
-      // CRITICAL: Always process pending payments even if no round exists
-      if (round && round.status === ROUND_STATUS.OPEN) {
-        await this.processPendingPayments(round.id);
-      }
-
-      if (!round || round.status === ROUND_STATUS.FINISHED) {
-        await this.maybeCreateNextRound(round || null);
+      // If no round exists OR the latest is FINISHED
+      if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
+        // Only create if we haven't already just created one (prevents race condition)
+        if (!latestRound || (latestRound.completedAt && Date.now() - new Date(latestRound.completedAt).getTime() > 1000)) {
+           await this.createNewRound();
+        }
         return;
       }
 
-      // Stall recovery
-      if (
-        round.status === ROUND_STATUS.IN_GAME &&
-        round.startTime &&
-        Date.now() - new Date(round.startTime).getTime() > STALL_RECOVERY_MS &&
-        !round.winnerId
-      ) {
-        await storage.updateRound(round.id, {
-          status: ROUND_STATUS.FINISHED,
-          completedAt: new Date(),
-        });
-        await this.createNewRound();
-        return;
+      // Recovery: If a round is IN_GAME but hasn't drawn numbers for a while, it might have stalled
+      if (latestRound.status === ROUND_STATUS.IN_GAME) {
+          const lastUpdate = latestRound.startTime ? new Date(latestRound.startTime).getTime() : 0;
+          const stallThreshold = 10 * 60 * 1000; // 10 minutes for recovery
+          if (Date.now() - lastUpdate > stallThreshold && !latestRound.winnerId) {
+              await storage.updateRound(latestRound.id, { status: ROUND_STATUS.FINISHED, completedAt: new Date() });
+              await this.createNewRound();
+              return;
+          }
       }
 
-      switch (round.status) {
-        case ROUND_STATUS.OPEN:
-          await this.handleOpen(round);
-          break;
-        case ROUND_STATUS.STARTING:
-          await this.handleStarting(round);
-          break;
-        case ROUND_STATUS.IN_GAME:
-          await this.handleInGame(round);
-          break;
-      }
+      await this.processRound(latestRound);
+    } catch (err) {
+      console.error("Game Loop Error:", err);
     } finally {
       this.isProcessing = false;
     }
   }
 
-  /* ======================
-        Round Creation
-  ====================== */
-  private async maybeCreateNextRound(latest: Round | null) {
-    if (latest?.completedAt) {
-      if (
-        Date.now() - new Date(latest.completedAt).getTime() <
-        POST_WIN_DELAY_MS
-      )
-        return;
-    }
-    // Double check we don't already have an open round before creating
-    const existingOpen = await storage.getLatestRound();
-    if (existingOpen && existingOpen.status === ROUND_STATUS.OPEN) return;
-    
-    await this.createNewRound();
-  }
-
   private async createNewRound() {
-    const latest = await storage.getLatestRound();
-    const nextId = latest ? latest.id + 1 : 1;
+    const latestRound = await storage.getLatestRound();
+    const nextId = latestRound ? latestRound.id + 1 : 1;
 
-    const serverSeed = crypto.randomBytes(32).toString("hex");
-    const publicHash = crypto
-      .createHash("sha256")
-      .update(serverSeed)
-      .digest("hex");
+    const seed = crypto.randomBytes(32).toString('hex').toLowerCase();
+    const hash = crypto.createHash('sha256').update(seed).digest('hex').toLowerCase();
+    
+    // Default wait time is 60 seconds
+    const now = Date.now();
+    const startTime = new Date(now + 65000); // Increased buffer to 5s (65000ms) to ensure sync with client countdown
 
     await storage.createRound({
       id: nextId,
       status: ROUND_STATUS.OPEN,
-      serverSeed,
-      publicHash,
-      startTime: null,
-      price: PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE,
+      serverSeed: seed,
+      publicHash: hash,
+      startTime: startTime,
+      price: this.price, 
       prizePool: 0,
       drawnNumbers: [],
-      completedAt: null,
-      winnerId: null,
+      completedAt: null, // Explicitly reset completedAt
+      winnerId: null // Explicitly reset winnerId
     });
 
-    await this.processPendingPayments(nextId);
+    // Process payment queue for the new round
+    await this.processPaymentQueue(nextId);
   }
 
-  /* ======================
-        OPEN
-  ====================== */
-  private async handleOpen(round: Round) {
-    const updatedCount = await storage.getRoundParticipantsCount(round.id);
+  private async processPaymentQueue(roundId: number) {
+    const pending = await storage.getPendingPayments();
+    for (const payment of pending) {
+      try {
+        const card = this.generateCard();
+        await storage.joinRound(roundId, payment.userId, card, payment.txSignature);
+        
+        // Add to prize pool
+        const round = await storage.getRound(roundId);
+        if (round) {
+          await storage.updateRound(roundId, { prizePool: round.prizePool + payment.amount });
+        }
 
-    if (updatedCount < 2) {
-      if (round.startTime) {
-        await storage.updateRound(round.id, { startTime: null });
-        console.log(`[GameManager] Round #${round.id} reset countdown - not enough players.`);
+        await storage.markPaymentProcessed(payment.id);
+      } catch (err) {
+        console.error("Error processing queued payment:", err);
       }
-      return;
-    }
-
-    const now = Date.now();
-    
-    if (!round.startTime) {
-      const countdownTime = 60_000;
-      const targetTime = new Date(Date.now() + countdownTime);
-      // Wait for the storage update to complete before continuing
-      await storage.updateRound(round.id, {
-        startTime: targetTime, 
-      });
-      console.log(`[GameManager] Round #${round.id} countdown started. Target: ${targetTime.toISOString()}`);
-      // Return immediately so the next tick starts the countdown logic
-      return;
-    }
-
-    const targetDate = new Date(round.startTime);
-    const target = targetDate.getTime();
-    
-    // Check if the target time is realistic (within the next 70 seconds)
-    // If it's in the past or too far in the future, reset it
-    if (target < now - 5000 || target > now + 70000) {
-      console.log(`[GameManager] Round #${round.id} timer out of sync. Resetting.`);
-      const countdownTime = 60_000;
-      const targetTime = new Date(now + countdownTime);
-      await storage.updateRound(round.id, { startTime: targetTime });
-      return;
-    }
-    
-    if (now >= target) { 
-      console.log(`[GameManager] Round #${round.id} starting transition...`);
-      await storage.updateRound(round.id, {
-        status: ROUND_STATUS.STARTING,
-        startTime: new Date(),
-      });
     }
   }
 
-  /* ======================
-        STARTING
-  ====================== */
-  private async handleStarting(round: Round) {
-    const elapsed = Date.now() - round.startTime!.getTime();
-    const count = await storage.getRoundParticipantsCount(round.id);
+  private async processRound(round: Round) {
+    const now = new Date();
 
-    if (count < 2) {
-      await storage.updateRound(round.id, {
-        status: ROUND_STATUS.OPEN,
-        startTime: null,
-      });
-      return;
-    }
+    // 1. OPEN -> STARTING
+    if (round.status === ROUND_STATUS.OPEN) {
+      const participantCount = await storage.getRoundParticipantsCount(round.id);
+      
+      // Only allow the countdown to progress if we have at least 2 players
+      if (participantCount >= 2) {
+        if (!round.startTime) {
+            // If we just reached 2 players and have no start time, set it to 60s from now
+            await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
+            return;
+        }
 
-    if (elapsed >= STARTING_MS) {
-      console.log(`[GameManager] Round #${round.id} GOING LIVE!`);
-      await storage.updateRound(round.id, {
-        status: ROUND_STATUS.IN_GAME,
-        startTime: new Date(),
-      });
-    }
-  }
+        const startTime = new Date(round.startTime);
+        const diff = startTime.getTime() - now.getTime();
+        
+        // If the start time is too far in the future (>60s), reset it to exactly 60s
+        if (diff > 60000) {
+           await storage.updateRound(round.id, { startTime: new Date(now.getTime() + 60000) });
+           return;
+        }
 
-  /* ======================
-        IN GAME
-  ====================== */
-  private async handleInGame(round: Round) {
-    if (round.winnerId) {
-      if (
-        round.completedAt &&
-        Date.now() - new Date(round.completedAt).getTime() >= POST_WIN_DELAY_MS
-      ) {
-        await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
-        await this.createNewRound();
+        if (now >= startTime) {
+          await storage.updateRound(round.id, { status: ROUND_STATUS.STARTING });
+        }
+      } else {
+        // Not enough players: strictly freeze the start time at 60s in the future
+        const sixtySecondsFromNow = new Date(now.getTime() + 61000);
+        
+        // Always ensure it's at least 60s away if under capacity
+        const currentStartTime = round.startTime ? new Date(round.startTime) : null;
+        if (!currentStartTime || currentStartTime.getTime() < sixtySecondsFromNow.getTime()) {
+           await storage.updateRound(round.id, { startTime: sixtySecondsFromNow });
+        }
       }
-      return;
     }
 
-    const elapsed = Date.now() - new Date(round.startTime!).getTime();
-    const expectedDraws = Math.min(75, Math.floor(elapsed / DRAW_INTERVAL_MS));
-    const drawnNumbers = round.drawnNumbers || [];
+    // 2. STARTING -> IN_GAME
+    else if (round.status === ROUND_STATUS.STARTING) {
+        // 5 second "Starting" hype phase
+        const elapsed = now.getTime() - (round.startTime?.getTime() || 0);
+        const participantCount = await storage.getRoundParticipantsCount(round.id);
 
-    if (drawnNumbers.length >= expectedDraws) return;
-
-    const newDrawn = [...drawnNumbers];
-    while (newDrawn.length < expectedDraws) {
-      const next = getDeterministicDraw(round.serverSeed, newDrawn);
-      if (!next) break;
-      newDrawn.push(next);
+        if (participantCount < 2) {
+            // Revert if players leave during the hype phase
+            await storage.updateRound(round.id, { 
+                status: ROUND_STATUS.OPEN,
+                startTime: new Date(Date.now() + 60 * 1000) 
+            });
+        } else if (elapsed > 5000) {
+            await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME });
+        }
     }
 
-    await storage.updateRound(round.id, {
-      drawnNumbers: newDrawn,
-    });
-    
-    // Explicitly notify that we updated
-    console.log(`[GameManager] Round #${round.id} updated drawn numbers: ${newDrawn.length}`);
+    // 3. IN_GAME -> Draw Numbers
+    else if (round.status === ROUND_STATUS.IN_GAME) {
+        if (!round.drawnNumbers) round.drawnNumbers = [];
+        
+        // Check if winner was already declared (e.g. via claim route)
+        if (round.winnerId) {
+            // Wait exactly 10 seconds post-win before moving to FINISHED
+            const winnerDeclaredAt = round.completedAt ? new Date(round.completedAt).getTime() : Date.now();
+            
+            if (Date.now() - winnerDeclaredAt >= 10000) {
+                await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
+                await this.createNewRound();
+            }
+            return;
+        }
+
+        // AUTO-FINISH disabled per user request - only finish when Bingo claimed
+        if (round.drawnNumbers.length >= 75 && !round.winnerId) {
+            // Keep drawing loop active but don't finish
+            return;
+        }
+
+        // Draw one number every 3 seconds for balanced gameplay
+        const startTime = new Date(round.startTime!).getTime() + 5000;
+        const elapsed = now.getTime() - startTime;
+        // Granular draw timing
+        const expectedNumbersCount = Math.max(0, Math.min(75, Math.floor(elapsed / 3000)));
+
+        if (round.drawnNumbers.length < expectedNumbersCount) {
+            const available = Array.from({length: 75}, (_, i) => i + 1)
+                .filter(n => !round.drawnNumbers!.includes(n));
+            
+            if (available.length > 0) {
+                const nextNum = available[Math.floor(Math.random() * available.length)];
+                const newNumbers = [...round.drawnNumbers, nextNum];
+                await storage.updateRound(round.id, { drawnNumbers: newNumbers });
+            }
+        }
+    }
   }
 
   /* ======================
