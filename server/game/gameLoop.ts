@@ -63,6 +63,37 @@ export class GameManager {
       completedAt: null,
       winnerId: null,
     });
+
+    await this.processPaymentQueue(nextId);
+  }
+
+  private async processPaymentQueue(roundId: number) {
+    const pending = await storage.getPendingPayments();
+    for (const payment of pending) {
+      try {
+        const round = await storage.getRound(roundId);
+        if (!round || round.status !== ROUND_STATUS.OPEN) continue;
+
+        const existing = await storage.getParticipant(roundId, payment.userId);
+        if (existing) {
+          await storage.markPaymentProcessed(payment.id);
+          continue;
+        }
+
+        const card = generateBingoCard();
+        await storage.joinRound(roundId, payment.userId, card, payment.txSignature);
+
+        const paymentAmount = Number(payment.amount || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE);
+        await storage.updateRound(roundId, {
+          prizePool: Number(round.prizePool || 0) + paymentAmount,
+        });
+
+        await storage.markPaymentProcessed(payment.id);
+        console.log(`[GameManager] Auto-joined queued player ${payment.userId} to round #${roundId}`);
+      } catch (err) {
+        console.error("Error processing queued payment:", err);
+      }
+    }
   }
 
   private async processRound(round: Round) {

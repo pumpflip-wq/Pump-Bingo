@@ -53,7 +53,11 @@ export function useGameState() {
     }
   }, [latestRound?.id]);
 
-  const participant = roundData?.participants?.find((p: any) => p.id === user?.id || p.username === walletAddress);
+  const { data: userTransactions } = useQuery<Transaction[]>({
+    queryKey: ["/api/auth/me/transactions", user?.id],
+    enabled: !!user?.id,
+    refetchInterval: 2000 
+  });
 
   const { data: historyRounds, isLoading: historyLoading } = useQuery<{ rounds: (Round & { winnerUsername: string | null })[], total: number }>({
     queryKey: ["/api/rounds/history", 1],
@@ -61,13 +65,8 @@ export function useGameState() {
     refetchInterval: 2000 
   });
 
-  const { data: userTransactions } = useQuery<Transaction[]>({
-    queryKey: ["/api/auth/me/transactions", user?.id],
-    enabled: !!user?.id,
-    refetchInterval: 2000 
-  });
-
-  const foundParticipant = roundData?.participants?.find((p: any) => p.username === walletAddress);
+  const participant = roundData?.participants?.find((p: any) => p.username === walletAddress);
+  const foundParticipant = participant; 
   
   return {
     user,
@@ -84,7 +83,6 @@ export function useGameState() {
     userTransactions,
     refetch: () => {
       refetchRound();
-      refetchParticipant();
     }
   };
 }
