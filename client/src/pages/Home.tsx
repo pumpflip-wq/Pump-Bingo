@@ -170,7 +170,6 @@ export default function Home() {
     return filtered
       .filter(
         (p: any) =>
-          (!p.txSignature?.startsWith("TEST_TX_SIG_") || p.isOptimistic) &&
           p.username !== PROTOCOL_CONFIG.ADMIN_WALLET,
       )
       .map((p: any) => ({

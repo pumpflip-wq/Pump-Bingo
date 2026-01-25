@@ -43,19 +43,17 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
-            const isOptimistic = p.isOptimistic;
             const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && amIParticipating;
             
             // Filter out system account or invalid players
             if (!p.username || p.username === "Unknown") return null;
             // Never show the system/master wallet in the player list
             if (p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return null;
-            if (p.txSignature && p.txSignature.startsWith('TEST_TX_SIG_')) return null;
 
             return (
               <motion.div 
                 layout
-                key={p.id}
+                key={p.userId || p.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
@@ -67,8 +65,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                 }}
                 className={cn(
                   "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
-                  isMe ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5",
-                  isOptimistic && "opacity-70 border-dashed animate-pulse"
+                  isMe ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5"
                 )}
               >
                 <div className="flex flex-col flex-1">
