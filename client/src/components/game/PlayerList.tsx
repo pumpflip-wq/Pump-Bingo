@@ -36,6 +36,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
             const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && amIParticipating;
             
+            if (!p.username || p.username === "Unknown") return null;
+
             return (
               <motion.div 
                 layout

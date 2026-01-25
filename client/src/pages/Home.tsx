@@ -280,10 +280,7 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
               <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
                 <PlayerList
-                  participants={participantsList.map((p) => ({
-                    ...p,
-                    id: p.id || p.username,
-                  }))}
+                  participants={participantsList}
                   walletAddress={walletAddress}
                   formatAddress={formatAddress}
                   roundStatus={roundData.round.status}
