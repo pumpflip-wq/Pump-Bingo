@@ -320,7 +320,7 @@ export default function Home() {
                     </div>
                     <div className="py-8 px-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto flex flex-col justify-center items-center">
                       <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-                      <p className="text-white text-sm uppercase font-black tracking-[0.2em] mb-4 font-mono">
+                      <p className="text-white text-lg uppercase font-black tracking-[0.2em] mb-4 font-mono">
                         {roundData.round.status === "STARTING"
                           ? "SECURING GAME PROTOCOL..."
                           : "GAME STARTING IN"}
@@ -335,8 +335,8 @@ export default function Home() {
                         }
                       />
                       {roundData.participantsCount < 2 && (
-                        <div className="space-y-1 mt-6 text-center">
-                          <p className="text-primary text-M uppercase font-black animate-pulse tracking-[0.15em] font-display">
+                        <div className="space-y-4 mt-6 text-center">
+                          <p className="text-primary text-xl uppercase font-black animate-pulse tracking-[0.15em] font-display">
                             Waiting for Players...
                           </p>
                           <p className="text-[15px] text-white uppercase font-black tracking-[0.1em] opacity-90">
