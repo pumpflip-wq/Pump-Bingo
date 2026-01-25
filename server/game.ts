@@ -150,7 +150,7 @@ export class GameManager {
       // Fetch only participants who have a txSignature (truly joined)
       const actualParticipants = await db.select()
         .from(participants)
-        .where(sql`${participants.roundId} = ${round.id} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != '' AND ${participants.txSignature} != 'admin_bypass'`);
+        .where(sql`${participants.roundId} = ${round.id} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`);
       
       const participantCount = actualParticipants.length;
       
@@ -172,7 +172,7 @@ export class GameManager {
            return;
         }
 
-        if (now.getTime() >= startTime.getTime() - 1000) { // Slight buffer to ensure it starts
+        if (now.getTime() >= startTime.getTime()) {
           console.log(`[GameManager] Round #${round.id} starting...`);
           await storage.updateRound(round.id, { 
             status: ROUND_STATUS.STARTING,

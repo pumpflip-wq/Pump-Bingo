@@ -112,7 +112,7 @@ export async function registerRoutes(
     
     const countResult = await db.select({ count: sql`count(*)` })
       .from(participants)
-      .where(sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != '' AND ${participants.txSignature} != 'admin_bypass'`);
+      .where(sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL AND ${participants.txSignature} != ''`);
     const count = Number(countResult[0]?.count || 0);
     
     // Fetch participants with usernames, cards, and finalWinProb who have truly joined
