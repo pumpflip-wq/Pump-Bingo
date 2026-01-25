@@ -133,12 +133,15 @@ export async function registerRoutes(
     `);
     const roundParticipants = (roundParticipantsRaw as any).rows || [];
 
-    // Server-driven timers
+    // Server-driven timers and status
     let secondsRemaining = 0;
     let nextRoundSecondsRemaining = 0;
     const now = Date.now();
     
-    if (round.startTime) {
+    // Logic for WAITING_FOR_PLAYERS state
+    const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && count < 2;
+
+    if (round.startTime && !isWaitingForPlayers) {
       const startMs = new Date(round.startTime).getTime();
       secondsRemaining = Math.max(0, Math.floor((startMs - now) / 1000));
     }
@@ -163,6 +166,7 @@ export async function registerRoutes(
       participantsCount: count,
       secondsRemaining,
       nextRoundSecondsRemaining,
+      isWaitingForPlayers,
       participants: roundParticipants.map((p: any) => ({
         ...p,
         joinedAt:
@@ -171,7 +175,7 @@ export async function registerRoutes(
         winRate: p.finalWinProb || 0,
         finalWinProb: p.finalWinProb || 0,
       })),
-      status: round.status, // Explicit status for UI state machine
+      status: round.status,
     });
   });
 
