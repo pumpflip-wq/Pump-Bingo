@@ -40,6 +40,10 @@ export default function Home() {
     return roundData.participants.find((p: any) => p.username === walletAddress);
   }, [walletAddress, roundData?.participants]);
 
+  const [hasManuallyClosed, setHasManuallyClosed] = useState(false);
+  const [lastOverlayRoundId, setLastOverlayRoundId] = useState<number | null>(null);
+  const completionTimeRef = useRef<{ roundId: number; time: number } | null>(null);
+
   const currentCard = (myParticipant?.card as number[][] | undefined);
 
   const isParticipant = !!myParticipant;
