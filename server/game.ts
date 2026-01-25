@@ -164,10 +164,11 @@ export class GameManager {
       
       // Only allow the countdown to progress if we have at least 2 real players
       if (participantCount >= 2) {
-        if (!round.startTime) {
-            // If we just reached 2 players and have no start time, set it to 60s from now
+        if (!round.startTime || new Date(round.startTime).getTime() < now.getTime() - 2000) {
+            // If we just reached 2 players OR the previous startTime is in the past, set it to 60s from now
             const targetTime = new Date(now.getTime() + 60000);
             await storage.updateRound(round.id, { startTime: targetTime });
+            console.log(`[GameManager] Round #${round.id} timer initialized to 60s for ${participantCount} players`);
             return;
         }
 
