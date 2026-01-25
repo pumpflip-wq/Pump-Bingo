@@ -36,8 +36,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
             const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
             const showStats = (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && amIParticipating;
             
-            // Strictly hide "Unknown" or players without username or without txSignature
-            if (!p.username || p.username === "Unknown" || !p.txSignature) return null;
+            // Strictly hide "Unknown" or players without username or without txSignature or admin_bypass
+            if (!p.username || p.username === "Unknown" || !p.txSignature || p.txSignature === 'admin_bypass') return null;
 
             return (
               <motion.div 
