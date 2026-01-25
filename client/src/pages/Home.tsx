@@ -154,18 +154,26 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  const participantsList = useMemo(() => {
+  const sortedParticipants = useMemo(() => {
     if (!roundData?.participants) return [];
     
     // De-duplicate: If we have an optimistic entry AND a real entry for same userId, keep the real one
     const seen = new Set<number>();
-    const list = [...roundData.participants].reverse(); // Latest first to prioritize real over optimistic
-    const filtered = list.filter((p: any) => {
+    
+    // Sort so that real participants (with txSignature) come last to override optimistic ones in the Map/Set logic
+    const list = [...roundData.participants].sort((a: any, b: any) => {
+      if (a.txSignature && !b.txSignature) return 1;
+      if (!a.txSignature && b.txSignature) return -1;
+      return 0;
+    });
+
+    const participantMap = new Map();
+    list.forEach((p: any) => {
       const uId = Number(p.userId);
-      if (seen.has(uId)) return false;
-      seen.add(uId);
-      return true;
-    }).reverse();
+      participantMap.set(uId, p);
+    });
+
+    const filtered = Array.from(participantMap.values());
 
     return filtered
       .filter(
@@ -177,12 +185,9 @@ export default function Home() {
         prob:
           p.finalWinProb ||
           calculateWinProbLocal(p.card, roundData.round.drawnNumbers || []),
-      }));
+      }))
+      .sort((a, b) => b.prob - a.prob);
   }, [roundData?.participants, roundData?.round?.drawnNumbers]);
-
-  const sortedParticipants = useMemo(() => {
-    return [...participantsList].sort((a, b) => b.prob - a.prob);
-  }, [participantsList]);
 
   const overlayState = useMemo(() => {
     const hasWinner = !!roundData?.round.winnerId;
@@ -271,7 +276,7 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
           <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
             <PlayerList
-              participants={participantsList}
+              participants={sortedParticipants}
               walletAddress={walletAddress}
               formatAddress={formatAddress}
               roundStatus={roundData.round.status}

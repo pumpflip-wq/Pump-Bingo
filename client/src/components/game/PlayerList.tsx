@@ -16,12 +16,24 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
   const amIParticipating = useMemo(() => participants.some(participant => participant.username === walletAddress), [participants, walletAddress]);
 
   const activeParticipants = useMemo(() => {
-    // Ensure all participants are consistently filtered and displayed
-    return participants.filter(p => 
-      p.username && 
-      p.username !== "Unknown" && 
-      !(p.txSignature && p.txSignature.startsWith('TEST_TX_SIG_'))
-    );
+    if (!participants) return [];
+    
+    // De-duplicate: Keep real participants over optimistic ones
+    const map = new Map();
+    const list = [...participants].sort((a: any, b: any) => {
+      if (a.txSignature && !b.txSignature) return 1;
+      if (!a.txSignature && b.txSignature) return -1;
+      return 0;
+    });
+
+    list.forEach(p => {
+      const uId = p.userId || p.username;
+      if (uId && p.username !== "Unknown") {
+        map.set(uId, p);
+      }
+    });
+
+    return Array.from(map.values());
   }, [participants]);
 
   const sortedParticipants = useMemo(() => {
