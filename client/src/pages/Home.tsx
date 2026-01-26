@@ -476,27 +476,59 @@ export default function Home() {
                       ) : (
                         <div className="glass-card neon-border rounded-[3rem] p-8 min-h-[500px] flex flex-col items-center justify-start space-y-8 relative overflow-hidden flex-1 w-full pt-6">
                           <div className="text-center space-y-4 relative z-10 shrink-0">
-                            <h2 className="text-7xl font-black text-white italic tracking-tighter uppercase font-display leading-none">
-                              Watching{" "}
-                              <span className="text-primary">Live</span>
-                            </h2>
-                            <div className="flex flex-col items-center gap-2">
-                              <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white text-[12px] font-black uppercase tracking-[0.2em]">
-                                <ShieldCheck className="w-4 h-4" /> Spectator
-                                Mode Active
-                              </div>
-                            </div>
+                            {roundData?.round?.winnerId ? (
+                              <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="space-y-4"
+                              >
+                                <h2 className="text-6xl font-black text-primary italic tracking-tighter uppercase font-display leading-none">
+                                  ROUND OVER!
+                                </h2>
+                                <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-[2rem] shadow-[0_0_30px_rgba(34,197,94,0.1)] w-full max-w-md mx-auto">
+                                  <p className="text-white text-sm uppercase font-black tracking-widest mb-1">Winner</p>
+                                  <p className="text-3xl font-black text-primary italic tracking-tighter mb-4 uppercase">
+                                    {sortedParticipants.find(p => Number(p.userId || p.id) === Number(roundData.round.winnerId))?.username 
+                                      ? formatAddress(sortedParticipants.find(p => Number(p.userId || p.id) === Number(roundData.round.winnerId))?.username)
+                                      : "Unknown"}
+                                  </p>
+                                  <div className="flex flex-col items-center gap-1">
+                                    <p className="text-white text-xs uppercase font-black tracking-widest">Prize Pool</p>
+                                    <p className="text-2xl font-black text-primary italic">
+                                      {formatCurrency(roundData.round.prizePool)} {PROTOCOL_CONFIG.SYMBOL}
+                                    </p>
+                                  </div>
+                                  <div className="mt-4 pt-4 border-t border-primary/20">
+                                    <p className="text-white/60 text-[10px] uppercase font-black tracking-widest">Next Round Starting In</p>
+                                    <p className="text-2xl font-black text-white italic">{nextRoundTimer}s</p>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            ) : (
+                              <>
+                                <h2 className="text-7xl font-black text-white italic tracking-tighter uppercase font-display leading-none">
+                                  Watching{" "}
+                                  <span className="text-primary">Live</span>
+                                </h2>
+                                <div className="flex flex-col items-center gap-2">
+                                  <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white text-[12px] font-black uppercase tracking-[0.2em]">
+                                    <ShieldCheck className="w-4 h-4" /> Spectator
+                                    Mode Active
+                                  </div>
+                                </div>
+                              </>
+                            )}
                           </div>
-                          <div className="w-full max-w-sm space-y-4 relative z-10 flex-1 min-h-0 flex-col flex">
-                            <div className="flex items-center justify-between px-2 mb-2 shrink-0">
-                              <h4 className="text-[12px] font-black uppercase tracking-[0.3em] text-white">
-                                Live Player Rankings
-                              </h4>
-                              <Users className="w-4 h-4 text-primary" />
-                            </div>
-                            <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-0 max-h-[400px]">
-                              {sortedParticipants
-                                .map((p, idx) => (
+                          {!roundData?.round?.winnerId && (
+                            <div className="w-full max-w-sm space-y-4 relative z-10 flex-1 min-h-0 flex-col flex">
+                              <div className="flex items-center justify-between px-2 mb-2 shrink-0">
+                                <h4 className="text-[12px] font-black uppercase tracking-[0.3em] text-white">
+                                  Live Player Rankings
+                                </h4>
+                                <Users className="w-4 h-4 text-primary" />
+                              </div>
+                              <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-0 max-h-[400px]">
+                                {sortedParticipants.map((p, idx) => (
                                   <div
                                     key={`ranking-${p.userId || p.id}-${idx}`}
                                     className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 group hover:border-primary/20 transition-all"
@@ -523,8 +555,9 @@ export default function Home() {
                                     </div>
                                   </div>
                                 ))}
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       )}
                     </div>

@@ -116,9 +116,13 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             setIsWalleting(false);
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             
+            // Only show "Queued" if the round is actually IN_GAME or FINISHED
+            const isActuallyStarted = roundData?.round?.status === "IN_GAME" || roundData?.round?.status === "FINISHED";
+            const showQueued = data.queued && isActuallyStarted;
+
             toast({
-              title: data.queued ? "Queued for Next Round" : "Successfully Joined",
-              description: data.queued 
+              title: showQueued ? "Queued for Next Round" : "Successfully Joined",
+              description: showQueued 
                 ? "You've been added to the queue for the next game!" 
                 : "You've successfully entered the round!",
             });
