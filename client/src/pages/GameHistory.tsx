@@ -62,13 +62,16 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
           {[...details.participants]
             .sort((a: any, b: any) => {
               const winnerId = Number(details.round.winnerId);
-              if (Number(a.userId || a.id) === winnerId) return -1;
-              if (Number(b.userId || b.id) === winnerId) return 1;
+              const aId = Number(a.userId || a.id);
+              const bId = Number(b.userId || b.id);
+              if (aId === winnerId) return -1;
+              if (bId === winnerId) return 1;
               return (b.winRate || 0) - (a.winRate || 0);
             })
             .map((p: any) => {
               const winnerId = Number(details.round.winnerId);
-              const isWinner = Number(p.userId || p.id) === winnerId;
+              const pId = Number(p.userId || p.id);
+              const isWinner = pId === winnerId && winnerId > 0;
               return (
                 <div 
                   key={p.id} 
@@ -108,7 +111,7 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                   {isWinner && (
                     <div className="px-4 py-2 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
                       <Trophy className="w-3.5 h-3.5" />
-                      <span className="text-xs font-black uppercase tracking-tighter">CHAMPION</span>
+                      <span className="text-xs font-black uppercase tracking-tighter">WINNER</span>
                     </div>
                   )}
                 </div>

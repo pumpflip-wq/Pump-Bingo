@@ -482,33 +482,39 @@ export default function Home() {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="space-y-4"
                               >
-                                <h2 className="text-8xl font-black text-primary italic tracking-tighter uppercase font-display leading-none mb-8">
+                                <h2 className="text-6xl font-black text-primary italic tracking-tighter uppercase font-display leading-none mb-4">
                                   ROUND OVER!
                                 </h2>
-                                <div className="p-10 bg-primary/10 border-2 border-primary/30 rounded-[3rem] shadow-[0_0_50px_rgba(34,197,94,0.15)] w-full max-w-2xl mx-auto backdrop-blur-md">
-                                  <div className="flex flex-col items-center gap-2 mb-6">
-                                    <Trophy className="w-16 h-16 text-primary animate-bounce mb-2" />
-                                    <p className="text-white text-xl uppercase font-black tracking-[0.3em] opacity-80">Winner</p>
-                                    <p className="text-6xl font-black text-primary italic tracking-tighter uppercase font-display">
+                                <div className="p-8 bg-primary/10 border-2 border-primary/30 rounded-[2.5rem] shadow-[0_0_40px_rgba(34,197,94,0.15)] w-full max-w-xl mx-auto backdrop-blur-md">
+                                  <div className="flex flex-col items-center gap-2 mb-4">
+                                    <Trophy className="w-12 h-12 text-primary animate-bounce mb-1" />
+                                    <p className="text-white text-lg uppercase font-black tracking-[0.2em] opacity-80">Winner</p>
+                                    <p className="text-5xl font-black text-primary italic tracking-tighter uppercase font-display">
                                       {(() => {
                                         const winnerId = Number(roundData.round.winnerId);
-                                        const winner = roundData.participants?.find((p: any) => 
+                                        // Look in both current round participants and all participants to be safe
+                                        const winner = (roundData.participants || sortedParticipants)?.find((p: any) => 
                                           Number(p.userId || p.id) === winnerId
                                         );
-                                        return winner?.username ? formatAddress(winner.username) : "Unknown";
+                                        if (winner?.username) return formatAddress(winner.username);
+                                        
+                                        // Fallback: check roundData.round.winnerUsername if available from server
+                                        if (roundData.round.winnerUsername) return formatAddress(roundData.round.winnerUsername);
+                                        
+                                        return "Unknown";
                                       })()}
                                     </p>
                                   </div>
-                                  <div className="grid grid-cols-2 gap-8 py-8 border-y border-primary/20">
+                                  <div className="grid grid-cols-2 gap-6 py-6 border-y border-primary/20">
                                     <div className="flex flex-col items-center">
-                                      <p className="text-white text-sm uppercase font-black tracking-widest opacity-60 mb-2">Total Prize</p>
-                                      <p className="text-4xl font-black text-primary italic font-display">
+                                      <p className="text-white text-xs uppercase font-black tracking-widest opacity-60 mb-1">Total Prize</p>
+                                      <p className="text-3xl font-black text-primary italic font-display">
                                         {formatCurrency(roundData.round.prizePool)} {PROTOCOL_CONFIG.SYMBOL}
                                       </p>
                                     </div>
                                     <div className="flex flex-col items-center">
-                                      <p className="text-white text-sm uppercase font-black tracking-widest opacity-60 mb-2">Next Round In</p>
-                                      <p className="text-4xl font-black text-white italic font-display">
+                                      <p className="text-white text-xs uppercase font-black tracking-widest opacity-60 mb-1">Next Round In</p>
+                                      <p className="text-3xl font-black text-white italic font-display">
                                         {nextRoundTimer}s
                                       </p>
                                     </div>
