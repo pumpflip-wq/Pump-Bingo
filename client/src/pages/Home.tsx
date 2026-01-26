@@ -482,25 +482,36 @@ export default function Home() {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="space-y-4"
                               >
-                                <h2 className="text-6xl font-black text-primary italic tracking-tighter uppercase font-display leading-none">
+                                <h2 className="text-8xl font-black text-primary italic tracking-tighter uppercase font-display leading-none mb-8">
                                   ROUND OVER!
                                 </h2>
-                                <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-[2rem] shadow-[0_0_30px_rgba(34,197,94,0.1)] w-full max-w-md mx-auto">
-                                  <p className="text-white text-sm uppercase font-black tracking-widest mb-1">Winner</p>
-                                  <p className="text-3xl font-black text-primary italic tracking-tighter mb-4 uppercase">
-                                    {sortedParticipants.find(p => Number(p.userId || p.id) === Number(roundData.round.winnerId))?.username 
-                                      ? formatAddress(sortedParticipants.find(p => Number(p.userId || p.id) === Number(roundData.round.winnerId))?.username)
-                                      : "Unknown"}
-                                  </p>
-                                  <div className="flex flex-col items-center gap-1">
-                                    <p className="text-white text-xs uppercase font-black tracking-widest">Prize Pool</p>
-                                    <p className="text-2xl font-black text-primary italic">
-                                      {formatCurrency(roundData.round.prizePool)} {PROTOCOL_CONFIG.SYMBOL}
+                                <div className="p-10 bg-primary/10 border-2 border-primary/30 rounded-[3rem] shadow-[0_0_50px_rgba(34,197,94,0.15)] w-full max-w-2xl mx-auto backdrop-blur-md">
+                                  <div className="flex flex-col items-center gap-2 mb-6">
+                                    <Trophy className="w-16 h-16 text-primary animate-bounce mb-2" />
+                                    <p className="text-white text-xl uppercase font-black tracking-[0.3em] opacity-80">Winner</p>
+                                    <p className="text-6xl font-black text-primary italic tracking-tighter uppercase font-display">
+                                      {(() => {
+                                        const winnerId = Number(roundData.round.winnerId);
+                                        const winner = roundData.participants?.find((p: any) => 
+                                          Number(p.userId || p.id) === winnerId
+                                        );
+                                        return winner?.username ? formatAddress(winner.username) : "Unknown";
+                                      })()}
                                     </p>
                                   </div>
-                                  <div className="mt-4 pt-4 border-t border-primary/20">
-                                    <p className="text-white/60 text-[10px] uppercase font-black tracking-widest">Next Round Starting In</p>
-                                    <p className="text-2xl font-black text-white italic">{nextRoundTimer}s</p>
+                                  <div className="grid grid-cols-2 gap-8 py-8 border-y border-primary/20">
+                                    <div className="flex flex-col items-center">
+                                      <p className="text-white text-sm uppercase font-black tracking-widest opacity-60 mb-2">Total Prize</p>
+                                      <p className="text-4xl font-black text-primary italic font-display">
+                                        {formatCurrency(roundData.round.prizePool)} {PROTOCOL_CONFIG.SYMBOL}
+                                      </p>
+                                    </div>
+                                    <div className="flex flex-col items-center">
+                                      <p className="text-white text-sm uppercase font-black tracking-widest opacity-60 mb-2">Next Round In</p>
+                                      <p className="text-4xl font-black text-white italic font-display">
+                                        {nextRoundTimer}s
+                                      </p>
+                                    </div>
                                   </div>
                                 </div>
                               </motion.div>
