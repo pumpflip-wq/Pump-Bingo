@@ -251,6 +251,30 @@ export default function Home() {
   }, [roundData?.round?.id, currentTime]);
 
   const content = useMemo(() => {
+    // Show waiting screen if Mainnet is active but CA is missing
+    if (PROTOCOL_CONFIG.NETWORK === "mainnet-beta" && !PROTOCOL_CONFIG.MINT_ADDRESS) {
+      return (
+        <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1 text-center">
+          <div className="relative">
+            <Globe2 className="w-20 h-20 text-primary animate-pulse" />
+            <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-ping" />
+          </div>
+          <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase font-display">
+            Mainnet Protocol Initializing
+          </h1>
+          <p className="font-mono text-xs text-primary uppercase tracking-[0.3em] max-w-md">
+            Waiting for Token Smart Contract Deployment...
+          </p>
+          <div className="glass-card neon-border p-6 rounded-2xl bg-black/40 border-primary/20 max-w-lg">
+            <p className="text-white/70 text-sm uppercase font-black tracking-widest leading-relaxed">
+              The $PUMP BINGO engine is primed for Mainnet launch. 
+              The system will automatically activate once the Token CA is linked.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     if (isLoading) {
       return (
         <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1">

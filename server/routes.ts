@@ -103,6 +103,9 @@ export async function registerRoutes(
       const { username } = api.auth.login.input.parse(req.body);
       let user = await storage.getUserByUsername(username);
       if (!user) user = await storage.createUser({ username });
+      
+      // In Mainnet/SPL mode, check if user has token account if needed
+      // For now, we just return the user object
       res.status(200).json(user);
     } catch (err) {
       res.status(400).json({ message: "Invalid request" });
