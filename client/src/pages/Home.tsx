@@ -492,13 +492,13 @@ export default function Home() {
                                     <p className="text-5xl font-black text-primary italic tracking-tighter uppercase font-display">
                                       {(() => {
                                         const winnerId = Number(roundData.round.winnerId);
-                                        // Look in both current round participants and all participants to be safe
-                                        const winner = (roundData.participants || sortedParticipants)?.find((p: any) => 
+                                        // Try to find the winner in participants list
+                                        const winner = (roundData.participants || sortedParticipants || [])?.find((p: any) => 
                                           Number(p.userId || p.id) === winnerId
                                         );
                                         if (winner?.username) return formatAddress(winner.username);
                                         
-                                        // Fallback: check roundData.round.winnerUsername if available from server
+                                        // Critical fix for spectators: if participant not found, use the winnerUsername from the round object
                                         if (roundData.round.winnerUsername) return formatAddress(roundData.round.winnerUsername);
                                         
                                         return "Unknown";
