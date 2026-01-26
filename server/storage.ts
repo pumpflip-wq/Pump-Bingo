@@ -138,6 +138,10 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(rounds.id, id))
       .returning();
+    
+    if (!updated) {
+      throw new Error(`Failed to update round ${id}: Round not found`);
+    }
     return updated;
   }
 

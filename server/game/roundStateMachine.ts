@@ -50,7 +50,8 @@ export async function handleStateTransitions(round: Round, participantCount: num
     if (isOver) {
       if (!round.completedAt) {
         // Mark completion time if not already set
-        await storage.updateRound(round.id, { completedAt: new Date() });
+        const completedAt = new Date();
+        await storage.updateRound(round.id, { completedAt });
         return;
       }
       const completedTime = new Date(round.completedAt).getTime();

@@ -142,11 +142,14 @@ export class GameManager {
 
     const allParticipants = await db.select().from(participants).where(eq(participants.roundId, roundId));
     console.log(`[GameManager] Calculating win probs for ${allParticipants.length} players in round #${roundId}`);
-    for (const p of allParticipants) {
-      const prob = calculateWinProb(p.card as number[][], round.drawnNumbers || []);
-      console.log(`[GameManager] Player ${p.userId} final prob: ${prob}%`);
-      await db.update(participants).set({ finalWinProb: prob }).where(eq(participants.id, p.id));
-    }
+    
+    // Efficiently update probabilities using a transaction or batch
+    await db.transaction(async (tx) => {
+      for (const p of allParticipants) {
+        const prob = calculateWinProb(p.card as number[][], round.drawnNumbers || []);
+        await tx.update(participants).set({ finalWinProb: prob }).where(eq(participants.id, p.id));
+      }
+    });
 
     const updated = await storage.updateRound(roundId, {
       winnerId: userId,
