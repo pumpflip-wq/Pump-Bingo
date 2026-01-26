@@ -85,17 +85,20 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                       : "bg-white/5 border-white/10"
                   )}
                 >
-                  {isWinner && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-2xl" />
-                  )}
                   <div className="flex items-center gap-4">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
+                        {isWinner && (
+                          <span className="text-sm font-black text-primary font-mono shrink-0 drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]">
+                            1
+                          </span>
+                        )}
                         <p className={cn(
                           "text-base font-black uppercase tracking-tighter",
                           isWinner ? "text-primary text-lg" : "text-white"
                         )}>
                           {p.username ? p.username.length > 15 ? `${p.username.slice(0, 6)}...${p.username.slice(-4)}` : p.username : "Unknown"}
+                          {isWinner && <span className="text-[10px] text-primary font-black ml-1">(WINNER)</span>}
                         </p>
                         {isWinner && (
                           <Trophy className="w-5 h-5 text-primary animate-pulse" />
@@ -108,7 +111,7 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                             "text-[10px] font-black uppercase tracking-widest",
                             isWinner ? "text-primary" : "text-primary/70"
                           )}>
-                            Final Chance: {p.winRate}%
+                            Final Chance: {Math.round(p.winRate)}%
                           </span>
                         )}
                       </div>

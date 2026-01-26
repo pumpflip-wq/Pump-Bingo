@@ -493,6 +493,7 @@ export default function Home() {
                                       {(() => {
                                         const winnerKey = roundData.round.winnerUsername?.toLowerCase() || null;
                                         
+                                        // Also normalize participants list for comparison
                                         const participants = (roundData.participants || sortedParticipants || [])
                                           .map((p: any) => ({
                                             ...p,
@@ -505,6 +506,13 @@ export default function Home() {
                                         
                                         if (winner?.username) return formatAddress(winner.username);
                                         if (roundData.round.winnerUsername) return formatAddress(roundData.round.winnerUsername);
+                                        
+                                        // Extra safety: check winnerUserId as last resort if username match failed
+                                        const winnerUserId = Number(roundData.round.winnerUserId || 0);
+                                        if (winnerUserId > 0) {
+                                          const winnerById = participants.find(p => Number(p.userId || p.id) === winnerUserId);
+                                          if (winnerById?.username) return formatAddress(winnerById.username);
+                                        }
                                         
                                         if (roundData.round.status === "FINISHED") {
                                           return "NO WINNER";
