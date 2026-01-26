@@ -111,15 +111,15 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                           "text-[10px] font-black uppercase tracking-widest",
                           isWinner ? "text-primary" : "text-primary"
                         )}>
-                          Chance: {Math.round(p.winRate || p.prob || 0)}%
+                          Final Chance: {Math.round(p.winRate || p.prob || 0)}%
                         </span>
                       </div>
                     </div>
                   </div>
                   {isWinner && (
-                    <div className="px-3 py-1 rounded-lg bg-primary text-black flex items-center gap-1.5 shadow-[0_0_10px_rgba(34,197,94,0.3)]">
-                      <Trophy className="w-3 h-3" />
-                      <span className="text-[10px] font-black uppercase tracking-tighter">WINNER</span>
+                    <div className="px-5 py-2.5 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
+                      <Trophy className="w-4 h-4" />
+                      <span className="text-xs font-black uppercase tracking-tighter">WINNER</span>
                     </div>
                   )}
                 </div>
