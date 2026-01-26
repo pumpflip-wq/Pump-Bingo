@@ -29,6 +29,13 @@ export class GameManager {
 
   private async tick() {
     if (this.isProcessing) return;
+    
+    // Safety check: Don't start rounds if MINT_ADDRESS is missing for Mainnet
+    if (PROTOCOL_CONFIG.NETWORK === "mainnet-beta" && !PROTOCOL_CONFIG.MINT_ADDRESS) {
+      console.log("[GameManager] Mainnet active but MINT_ADDRESS is missing. Waiting for configuration...");
+      return;
+    }
+
     this.isProcessing = true;
     try {
       // Use a database advisory lock to ensure only one server processes the game loop at a time

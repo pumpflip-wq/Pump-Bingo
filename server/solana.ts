@@ -9,8 +9,22 @@ export class SolanaManager {
   private masterKeypair: Keypair | null = null;
 
   constructor() {
-    this.connection = new Connection(PROTOCOL_CONFIG.RPC_URL, "confirmed");
+    this.connection = new Connection(PROTOCOL_CONFIG.RPC_URL, {
+      commitment: "confirmed",
+      confirmTransactionInitialTimeout: 60000
+    });
     this.initializeWallet();
+    this.setupBackupConnection();
+  }
+
+  private setupBackupConnection() {
+    // Try to ping the primary RPC, if it fails, we have the backup URL ready for failover logic
+    this.connection.getSlot().catch(() => {
+      if (PROTOCOL_CONFIG.BACKUP_RPC_URL) {
+        console.warn("[SolanaManager] Primary RPC failed, prepared to switch to backup");
+        this.connection = new Connection(PROTOCOL_CONFIG.BACKUP_RPC_URL, "confirmed");
+      }
+    });
   }
 
   private initializeWallet() {
