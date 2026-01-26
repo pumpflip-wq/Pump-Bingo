@@ -86,12 +86,6 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <span className={cn(
-                      "text-xs font-black font-mono w-4",
-                      isWinner ? "text-primary" : "text-white/30"
-                    )}>
-                      {idx + 1}
-                    </span>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
                         <p className={cn(
