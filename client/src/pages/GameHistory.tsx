@@ -70,7 +70,7 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
               .sort((a: any, b: any) => {
                 if (winnerKey && a._key === winnerKey) return -1;
                 if (winnerKey && b._key === winnerKey) return 1;
-                return (b.winRate || 0) - (a.winRate || 0);
+                return 0;
               });
 
             return participants.map((p: any, idx: number) => {
@@ -102,18 +102,9 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                         </p>
                         {isWinner && <Trophy className="w-4 h-4 text-primary animate-pulse" />}
                       </div>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60">
-                          {format(new Date(p.joinedAt), "HH:mm:ss")}
-                        </p>
-                        <span className="text-[10px] text-white/20">•</span>
-                        <span className={cn(
-                          "text-[10px] font-black uppercase tracking-widest",
-                          isWinner ? "text-primary" : "text-primary"
-                        )}>
-                          Final Chance: {Math.round(p.winRate || p.prob || 0)}%
-                        </span>
-                      </div>
+                      <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60 mt-0.5">
+                        {format(new Date(p.joinedAt), "HH:mm:ss")}
+                      </p>
                     </div>
                   </div>
                   {isWinner && (
