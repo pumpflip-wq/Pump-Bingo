@@ -491,17 +491,21 @@ export default function Home() {
                                     <p className="text-white text-lg uppercase font-black tracking-[0.2em] opacity-80">Winner</p>
                                     <p className="text-5xl font-black text-primary italic tracking-tighter uppercase font-display">
                                       {(() => {
-                                        const winnerUserId = Number(roundData.round.winnerUserId || roundData.round.winnerId);
-                                        const winnerUsername = roundData.round.winnerUsername;
+                                        const winnerUserId = Number(roundData.round.winnerUserId || 0);
+                                        const winnerUsernameFromRound = roundData.round.winnerUsername;
                                         
-                                        // Try to find the winner in participants list by userId OR username
-                                        const winner = (roundData.participants || sortedParticipants || [])?.find((p: any) => 
-                                          (Number(p.userId) === winnerUserId && winnerUserId > 0) ||
-                                          (winnerUsername && p.username === winnerUsername)
+                                        const participants = (roundData.participants || sortedParticipants || [])
+                                          .map((p: any) => ({
+                                            ...p,
+                                            _userId: Number(p.userId ?? p.id),
+                                          }));
+
+                                        const winner = participants.find((p: any) => 
+                                          p._userId === winnerUserId && winnerUserId > 0
                                         );
                                         
                                         if (winner?.username) return formatAddress(winner.username);
-                                        if (winnerUsername) return formatAddress(winnerUsername);
+                                        if (winnerUsernameFromRound) return formatAddress(winnerUsernameFromRound);
                                         
                                         if (roundData.round.status === "FINISHED") {
                                           return "NO WINNER";

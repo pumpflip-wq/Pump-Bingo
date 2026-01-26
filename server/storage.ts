@@ -235,7 +235,7 @@ export class DatabaseStorage implements IStorage {
     return results.map((r) => ({
       ...r.round,
       winnerUsername: r.winnerUsername,
-      winnerUserId: r.round.winnerId,
+      winnerUserId: r.round.winnerId ? Number(r.round.winnerId) : null,
     }));
   }
 
@@ -280,7 +280,7 @@ export class DatabaseStorage implements IStorage {
       rounds: results.map((r) => ({
         ...r,
         winnerUsername: r.winnerUsername,
-        winnerUserId: r.winnerId,
+        winnerUserId: r.winnerId ? Number(r.winnerId) : null,
       } as any)),
     };
   }

@@ -60,72 +60,66 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {(() => {
-            const winnerUserId = Number(details.round.winnerUserId || details.round.winnerId);
-            const winnerUsername = details.round.winnerUsername;
+            const winnerUserId = Number(details.round.winnerUserId || 0);
             
-            return [...details.participants]
+            const participants = details.participants
+              .map((p: any) => ({
+                ...p,
+                _userId: Number(p.userId ?? p.id),
+              }))
               .sort((a: any, b: any) => {
-                const aUserId = Number(a.userId);
-                const bUserId = Number(b.userId);
-                const aUsername = a.username;
-                const bUsername = b.username;
-                
-                const isAWinner = (aUserId === winnerUserId && winnerUserId > 0) || (winnerUsername && aUsername === winnerUsername);
-                const isBWinner = (bUserId === winnerUserId && winnerUserId > 0) || (winnerUsername && bUsername === winnerUsername);
-                
-                if (isAWinner) return -1;
-                if (isBWinner) return 1;
+                if (a._userId === winnerUserId && winnerUserId > 0) return -1;
+                if (b._userId === winnerUserId && winnerUserId > 0) return 1;
                 return (b.winRate || 0) - (a.winRate || 0);
-              })
-              .map((p: any) => {
-                const pUserId = Number(p.userId);
-                const pUsername = p.username;
-                const isWinner = (pUserId === winnerUserId && winnerUserId > 0) || (winnerUsername && pUsername === winnerUsername);
-                return (
-                  <div 
-                    key={p.id} 
-                    className={cn(
-                      "flex items-center justify-between p-5 rounded-2xl border transition-all",
-                      isWinner 
-                        ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(34,197,94,0.15)] ring-1 ring-primary/30" 
-                        : "bg-white/5 border-white/10"
-                    )}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <p className={cn(
-                            "text-base font-black uppercase tracking-tighter",
-                            isWinner ? "text-primary text-lg" : "text-white"
+              });
+
+            return participants.map((p: any) => {
+              const isWinner = p._userId === winnerUserId && winnerUserId > 0;
+              return (
+                <div 
+                  key={`${roundId}-${p._userId}`} 
+                  className={cn(
+                    "flex items-center justify-between p-5 rounded-2xl border transition-all",
+                    isWinner 
+                      ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(34,197,94,0.15)] ring-1 ring-primary/30" 
+                      : "bg-white/5 border-white/10"
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <p className={cn(
+                          "text-base font-black uppercase tracking-tighter",
+                          isWinner ? "text-primary text-lg" : "text-white"
+                        )}>
+                          {p.username ? p.username.length > 15 ? `${p.username.slice(0, 6)}...${p.username.slice(-4)}` : p.username : "Unknown"}
+                        </p>
+                        {isWinner && (
+                          <Trophy className="w-5 h-5 text-primary animate-pulse" />
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1 mt-1">
+                        <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
+                        {p.winRate !== null && p.winRate !== undefined && (
+                          <span className={cn(
+                            "text-[10px] font-black uppercase tracking-widest",
+                            isWinner ? "text-primary" : "text-primary/70"
                           )}>
-                            {p.username ? `${p.username.slice(0, 6)}...${p.username.slice(-4)}` : "Unknown"}
-                          </p>
-                          {isWinner && (
-                            <Trophy className="w-5 h-5 text-primary animate-pulse" />
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-1 mt-1">
-                          <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
-                          {p.winRate !== null && p.winRate !== undefined && (
-                            <span className={cn(
-                              "text-[10px] font-black uppercase tracking-widest",
-                              isWinner ? "text-primary" : "text-primary/70"
-                            )}>
-                              Final Chance: {p.winRate}%
-                            </span>
-                          )}
-                        </div>
+                            Final Chance: {p.winRate}%
+                          </span>
+                        )}
                       </div>
                     </div>
-                    {isWinner && (
-                      <div className="px-4 py-2 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
-                        <Trophy className="w-3.5 h-3.5" />
-                        <span className="text-xs font-black uppercase tracking-tighter">WINNER</span>
-                      </div>
-                    )}
                   </div>
-                );
-              });
+                  {isWinner && (
+                    <div className="px-4 py-2 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
+                      <Trophy className="w-3.5 h-3.5" />
+                      <span className="text-xs font-black uppercase tracking-tighter">WINNER</span>
+                    </div>
+                  )}
+                </div>
+              );
+            });
           })()}
         </div>
       </div>

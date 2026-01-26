@@ -41,14 +41,34 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
   }, [participants]);
 
   const sortedParticipants = useMemo(() => {
-    // Players (active participants) see sorted list with probabilities
-    // Spectators see fixed join order (handled inside the return loop or via simple return)
+    if (!activeParticipants || activeParticipants.length === 0) return [];
+    
+    const winnerUserId = Number(roundData?.round?.winnerUserId || 0);
+
+    const normalized = activeParticipants.map(p => ({
+      ...p,
+      _userId: Number(p.userId ?? p.id)
+    }));
+
     if (amIParticipating && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED')) {
-      return [...activeParticipants].sort((a, b) => (b.prob || 0) - (a.prob || 0));
+      return normalized.sort((a, b) => {
+        if (a._userId === winnerUserId && winnerUserId > 0) return -1;
+        if (b._userId === winnerUserId && winnerUserId > 0) return 1;
+        return (b.prob || 0) - (a.prob || 0);
+      });
     }
-    // Default/Spectator: Joined order
-    return activeParticipants;
-  }, [activeParticipants, roundStatus, amIParticipating]);
+    
+    // Default/Spectator: Joined order but still prioritize winner if game finished
+    if (roundStatus === 'FINISHED') {
+       return normalized.sort((a, b) => {
+        if (a._userId === winnerUserId && winnerUserId > 0) return -1;
+        if (b._userId === winnerUserId && winnerUserId > 0) return 1;
+        return 0; 
+      });
+    }
+
+    return normalized;
+  }, [activeParticipants, roundStatus, amIParticipating, roundData?.round?.winnerUserId]);
 
   return (
     <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[750px] overflow-hidden bg-black/20">
@@ -61,7 +81,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
         <AnimatePresence mode="popLayout">
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
-            const isWinner = roundData?.round.winnerId === p.id || roundData?.round.winnerId === p.userId;
+            const winnerUserId = Number(roundData?.round?.winnerUserId || 0);
+            const isWinner = p._userId === winnerUserId && winnerUserId > 0;
             
             // SHOW probabilities and ranking numbers ONLY for players during active game
             const showStats = amIParticipating && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED');
