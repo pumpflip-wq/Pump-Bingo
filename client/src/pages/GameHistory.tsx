@@ -41,14 +41,14 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
 
       <div className="space-y-3">
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Draw Sequence</h3>
-        <div className="flex flex-wrap gap-2 p-4 rounded-2xl bg-black/40 border border-white/5 max-h-[160px] overflow-y-auto custom-scrollbar">
+        <div className="flex flex-wrap gap-1.5 p-3 rounded-2xl bg-black/40 border border-white/5 max-h-[140px] overflow-y-auto custom-scrollbar">
           {details.round.drawnNumbers?.map((num: number, i: number) => (
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: i * 0.02 }}
+              transition={{ delay: i * 0.01 }}
               key={i}
-              className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-black text-primary border border-primary/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]"
+              className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary border border-primary/20 shadow-[0_0_8px_rgba(34,197,94,0.1)]"
             >
               {num}
             </motion.div>
@@ -79,47 +79,47 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                 <div 
                   key={`${roundId}-${p._key}-${idx}`} 
                   className={cn(
-                    "flex items-center justify-between p-5 rounded-2xl border transition-all relative",
+                    "flex items-center justify-between p-3 rounded-xl border transition-all relative",
                     isWinner 
-                      ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(34,197,94,0.15)] ring-1 ring-primary/30" 
+                      ? "bg-primary/10 border-primary/50 shadow-[0_0_15px_rgba(34,197,94,0.1)]" 
                       : "bg-white/5 border-white/10"
                   )}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className={cn(
+                      "text-xs font-black font-mono w-4",
+                      isWinner ? "text-primary" : "text-white/30"
+                    )}>
+                      {idx + 1}
+                    </span>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                        <span className={cn(
-                          "text-sm font-black font-mono shrink-0 drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]",
-                          isWinner ? "text-primary" : "text-white/40"
-                        )}>
-                          {idx + 1}
-                        </span>
                         <p className={cn(
-                          "text-base font-black uppercase tracking-tighter",
-                          isWinner ? "text-primary text-lg" : "text-white"
+                          "text-sm font-black uppercase tracking-tighter",
+                          isWinner ? "text-primary" : "text-white"
                         )}>
                           {p.username ? p.username.length > 15 ? `${p.username.slice(0, 6)}...${p.username.slice(-4)}` : p.username : "Unknown"}
-                          {isWinner && <span className="text-[10px] text-primary font-black ml-1">(WINNER)</span>}
                         </p>
-                        {isWinner && (
-                          <Trophy className="w-5 h-5 text-primary animate-pulse" />
-                        )}
+                        {isWinner && <Trophy className="w-4 h-4 text-primary animate-pulse" />}
                       </div>
-                      <div className="flex flex-col gap-1 mt-1">
-                        <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-[9px] text-white font-black uppercase tracking-widest opacity-40">
+                          {format(new Date(p.joinedAt), "HH:mm:ss")}
+                        </p>
+                        <span className="text-[9px] text-white/20">•</span>
                         <span className={cn(
-                          "text-[10px] font-black uppercase tracking-widest",
-                          isWinner ? "text-primary" : "text-primary/70"
+                          "text-[9px] font-black uppercase tracking-widest",
+                          isWinner ? "text-primary" : "text-primary/60"
                         )}>
-                          Final Chance: {Math.round(p.winRate || p.prob || 0)}%
+                          Chance: {Math.round(p.winRate || p.prob || 0)}%
                         </span>
                       </div>
                     </div>
                   </div>
                   {isWinner && (
-                    <div className="px-4 py-2 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.4)]">
-                      <Trophy className="w-3.5 h-3.5" />
-                      <span className="text-xs font-black uppercase tracking-tighter">WINNER</span>
+                    <div className="px-3 py-1 rounded-lg bg-primary text-black flex items-center gap-1.5 shadow-[0_0_10px_rgba(34,197,94,0.3)]">
+                      <Trophy className="w-3 h-3" />
+                      <span className="text-[10px] font-black uppercase tracking-tighter">WINNER</span>
                     </div>
                   )}
                 </div>
@@ -241,7 +241,7 @@ export default function GameHistory() {
                                       <span className="text-xs font-black uppercase tracking-widest">Details</span>
                                     </Button>
                                   </DialogTrigger>
-                                  <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white max-w-2xl w-[90vw] max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[2rem] mt-12">
+                                  <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white max-w-2xl w-[90vw] max-h-[80vh] overflow-hidden flex flex-col p-0 rounded-[2rem] mt-4">
                                     <DialogHeader className="p-6 pb-2 shrink-0">
                                       <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase flex items-center gap-2">
                                         <History className="w-8 h-8 text-primary" />
