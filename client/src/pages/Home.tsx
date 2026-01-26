@@ -491,12 +491,12 @@ export default function Home() {
                                     <p className="text-white text-lg uppercase font-black tracking-[0.2em] opacity-80">Winner</p>
                                     <p className="text-5xl font-black text-primary italic tracking-tighter uppercase font-display">
                                       {(() => {
-                                        const winnerId = Number(roundData.round.winnerId);
+                                        const winnerUserId = Number(roundData.round.winnerUserId || roundData.round.winnerId);
                                         const winnerUsername = roundData.round.winnerUsername;
                                         
-                                        // Try to find the winner in participants list by ID or Username
+                                        // Try to find the winner in participants list by userId only
                                         const winner = (roundData.participants || sortedParticipants || [])?.find((p: any) => 
-                                          Number(p.userId || p.id) === winnerId || (winnerUsername && p.username === winnerUsername)
+                                          Number(p.userId) === winnerUserId && winnerUserId > 0
                                         );
                                         
                                         if (winner?.username) return formatAddress(winner.username);

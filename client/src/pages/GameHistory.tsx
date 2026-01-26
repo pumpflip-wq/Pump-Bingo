@@ -60,24 +60,22 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {(() => {
-            const winnerId = Number(details.round.winnerId);
-            const winnerUsername = details.round.winnerUsername;
+            const winnerUserId = Number(details.round.winnerUserId || details.round.winnerId);
             
             return [...details.participants]
               .sort((a: any, b: any) => {
-                const aId = Number(a.userId || a.id);
-                const bId = Number(b.userId || b.id);
+                const aUserId = Number(a.userId);
+                const bUserId = Number(b.userId);
                 
-                const isAWinner = (aId === winnerId && winnerId > 0) || (winnerUsername && a.username === winnerUsername);
-                const isBWinner = (bId === winnerId && winnerId > 0) || (winnerUsername && b.username === winnerUsername);
+                const isAWinner = aUserId === winnerUserId && winnerUserId > 0;
+                const isBWinner = bUserId === winnerUserId && winnerUserId > 0;
                 
                 if (isAWinner) return -1;
                 if (isBWinner) return 1;
                 return (b.winRate || 0) - (a.winRate || 0);
               })
               .map((p: any) => {
-                const pId = Number(p.userId || p.id);
-                const isWinner = (pId === winnerId && winnerId > 0) || (winnerUsername && p.username === winnerUsername);
+                const isWinner = Number(p.userId) === winnerUserId && winnerUserId > 0;
                 return (
                   <div 
                     key={p.id} 

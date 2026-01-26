@@ -192,7 +192,10 @@ export async function registerRoutes(
     };
 
     const responseData = {
-      round: safeRound,
+      round: {
+        ...safeRound,
+        winnerUserId: round.winnerId,
+      },
       participantsCount: count,
       secondsRemaining,
       nextRoundSecondsRemaining,

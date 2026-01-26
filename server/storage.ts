@@ -45,13 +45,13 @@ export interface IStorage {
   getParticipantById(id: number): Promise<Participant | undefined>;
   getRoundParticipantsCount(roundId: number): Promise<number>;
   getRecentFinishedRounds(): Promise<
-    (Round & { winnerUsername: string | null })[]
+    (Round & { winnerUsername: string | null; winnerUserId: number | null })[]
   >;
   getFinishedRoundsPaginated(
     page: number,
     limit: number,
   ): Promise<{
-    rounds: (Round & { winnerUsername: string | null })[];
+    rounds: (Round & { winnerUsername: string | null; winnerUserId: number | null })[];
     total: number;
   }>;
 
@@ -223,7 +223,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRecentFinishedRounds(): Promise<
-    (Round & { winnerUsername: string | null })[]
+    (Round & { winnerUsername: string | null; winnerUserId: number | null })[]
   > {
     const results = await db
       .select({ round: rounds, winnerUsername: users.username })
@@ -235,6 +235,7 @@ export class DatabaseStorage implements IStorage {
     return results.map((r) => ({
       ...r.round,
       winnerUsername: r.winnerUsername,
+      winnerUserId: r.round.winnerId,
     }));
   }
 
@@ -242,7 +243,7 @@ export class DatabaseStorage implements IStorage {
     page: number,
     limit: number,
   ): Promise<{
-    rounds: (Round & { winnerUsername: string | null })[];
+    rounds: (Round & { winnerUsername: string | null; winnerUserId: number | null })[];
     total: number;
   }> {
     const offset = (page - 1) * limit;
@@ -279,6 +280,7 @@ export class DatabaseStorage implements IStorage {
       rounds: results.map((r) => ({
         ...r,
         winnerUsername: r.winnerUsername,
+        winnerUserId: r.winnerId,
       } as any)),
     };
   }
