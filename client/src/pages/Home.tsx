@@ -207,8 +207,8 @@ export default function Home() {
       const elapsed = currentTime - (winnerDeclaredAt || 0);
       const totalDisplayTime = 10000;
       
-      // If winner is declared, show overlay for everyone
-      if ((winnerDeclaredAt || roundData?.round?.winnerId) && elapsed < totalDisplayTime && !hasManuallyClosed) {
+      // If winner is declared, show overlay ONLY for participants
+      if (amIParticipant && (winnerDeclaredAt || roundData?.round?.winnerId) && elapsed < totalDisplayTime && !hasManuallyClosed) {
         const winner = roundData?.participants?.find(
           (p: any) =>
             Number(p.userId || p.id) === Number(roundData.round.winnerId)
