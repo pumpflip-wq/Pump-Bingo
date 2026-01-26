@@ -61,6 +61,7 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {(() => {
             const winnerUserId = Number(details.round.winnerUserId || 0);
+            const hasWinner = Number.isFinite(winnerUserId) && winnerUserId > 0;
             
             const participants = details.participants
               .map((p: any) => ({
@@ -68,13 +69,13 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                 _userId: Number(p.userId ?? p.id),
               }))
               .sort((a: any, b: any) => {
-                if (a._userId === winnerUserId && winnerUserId > 0) return -1;
-                if (b._userId === winnerUserId && winnerUserId > 0) return 1;
+                if (hasWinner && a._userId === winnerUserId) return -1;
+                if (hasWinner && b._userId === winnerUserId) return 1;
                 return (b.winRate || 0) - (a.winRate || 0);
               });
 
             return participants.map((p: any) => {
-              const isWinner = p._userId === winnerUserId && winnerUserId > 0;
+              const isWinner = hasWinner && p._userId === winnerUserId;
               return (
                 <div 
                   key={`${roundId}-${p._userId}`} 

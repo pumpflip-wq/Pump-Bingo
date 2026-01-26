@@ -493,6 +493,7 @@ export default function Home() {
                                       {(() => {
                                         const winnerUserId = Number(roundData.round.winnerUserId || 0);
                                         const winnerUsernameFromRound = roundData.round.winnerUsername;
+                                        const hasWinner = Number.isFinite(winnerUserId) && winnerUserId > 0;
                                         
                                         const participants = (roundData.participants || sortedParticipants || [])
                                           .map((p: any) => ({
@@ -501,7 +502,7 @@ export default function Home() {
                                           }));
 
                                         const winner = participants.find((p: any) => 
-                                          p._userId === winnerUserId && winnerUserId > 0
+                                          hasWinner && p._userId === winnerUserId
                                         );
                                         
                                         if (winner?.username) return formatAddress(winner.username);

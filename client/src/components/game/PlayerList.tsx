@@ -44,6 +44,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
     if (!activeParticipants || activeParticipants.length === 0) return [];
     
     const winnerUserId = Number(roundData?.round?.winnerUserId || 0);
+    const hasWinner = Number.isFinite(winnerUserId) && winnerUserId > 0;
 
     const normalized = activeParticipants.map(p => ({
       ...p,
@@ -52,8 +53,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
 
     if (amIParticipating && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED')) {
       return normalized.sort((a, b) => {
-        if (a._userId === winnerUserId && winnerUserId > 0) return -1;
-        if (b._userId === winnerUserId && winnerUserId > 0) return 1;
+        if (hasWinner && a._userId === winnerUserId) return -1;
+        if (hasWinner && b._userId === winnerUserId) return 1;
         return (b.prob || 0) - (a.prob || 0);
       });
     }
@@ -61,8 +62,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
     // Default/Spectator: Joined order but still prioritize winner if game finished
     if (roundStatus === 'FINISHED') {
        return normalized.sort((a, b) => {
-        if (a._userId === winnerUserId && winnerUserId > 0) return -1;
-        if (b._userId === winnerUserId && winnerUserId > 0) return 1;
+        if (hasWinner && a._userId === winnerUserId) return -1;
+        if (hasWinner && b._userId === winnerUserId) return 1;
         return 0; 
       });
     }
@@ -82,7 +83,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
             const winnerUserId = Number(roundData?.round?.winnerUserId || 0);
-            const isWinner = p._userId === winnerUserId && winnerUserId > 0;
+            const hasWinner = Number.isFinite(winnerUserId) && winnerUserId > 0;
+            const isWinner = hasWinner && p._userId === winnerUserId;
             
             // SHOW probabilities and ranking numbers ONLY for players during active game
             const showStats = amIParticipating && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED');
