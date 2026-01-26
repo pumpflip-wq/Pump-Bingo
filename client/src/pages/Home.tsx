@@ -494,15 +494,20 @@ export default function Home() {
                                         const winnerUserId = Number(roundData.round.winnerUserId || roundData.round.winnerId);
                                         const winnerUsername = roundData.round.winnerUsername;
                                         
-                                        // Try to find the winner in participants list by userId only
+                                        // Try to find the winner in participants list by userId OR username
                                         const winner = (roundData.participants || sortedParticipants || [])?.find((p: any) => 
-                                          Number(p.userId) === winnerUserId && winnerUserId > 0
+                                          (Number(p.userId) === winnerUserId && winnerUserId > 0) ||
+                                          (winnerUsername && p.username === winnerUsername)
                                         );
                                         
                                         if (winner?.username) return formatAddress(winner.username);
                                         if (winnerUsername) return formatAddress(winnerUsername);
                                         
-                                        return "Unknown";
+                                        if (roundData.round.status === "FINISHED") {
+                                          return "NO WINNER";
+                                        }
+                                        
+                                        return "UNKNOWN";
                                       })()}
                                     </p>
                                   </div>
