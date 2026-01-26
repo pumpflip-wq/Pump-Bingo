@@ -88,11 +88,12 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                   <div className="flex items-center gap-4">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                        {isWinner && (
-                          <span className="text-sm font-black text-primary font-mono shrink-0 drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]">
-                            1
-                          </span>
-                        )}
+                        <span className={cn(
+                          "text-sm font-black font-mono shrink-0 drop-shadow-[0_0_8px_rgba(34,197,94,0.6)]",
+                          isWinner ? "text-primary" : "text-white/40"
+                        )}>
+                          {idx + 1}
+                        </span>
                         <p className={cn(
                           "text-base font-black uppercase tracking-tighter",
                           isWinner ? "text-primary text-lg" : "text-white"
@@ -106,14 +107,12 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                       </div>
                       <div className="flex flex-col gap-1 mt-1">
                         <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60">Joined {format(new Date(p.joinedAt), "HH:mm:ss")}</p>
-                        {p.winRate !== null && p.winRate !== undefined && (
-                          <span className={cn(
-                            "text-[10px] font-black uppercase tracking-widest",
-                            isWinner ? "text-primary" : "text-primary/70"
-                          )}>
-                            Final Chance: {Math.round(p.winRate)}%
-                          </span>
-                        )}
+                        <span className={cn(
+                          "text-[10px] font-black uppercase tracking-widest",
+                          isWinner ? "text-primary" : "text-primary/70"
+                        )}>
+                          Final Chance: {Math.round(p.winRate || p.prob || 0)}%
+                        </span>
                       </div>
                     </div>
                   </div>
