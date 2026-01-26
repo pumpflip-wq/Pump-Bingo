@@ -41,14 +41,14 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
 
       <div className="space-y-3">
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Draw Sequence</h3>
-        <div className="flex flex-wrap gap-1.5 p-3 rounded-2xl bg-black/40 border border-white/5 max-h-[140px] overflow-y-auto custom-scrollbar">
+        <div className="flex flex-wrap gap-2 p-4 rounded-2xl bg-black/40 border border-white/5 max-h-[120px] overflow-y-auto custom-scrollbar">
           {details.round.drawnNumbers?.map((num: number, i: number) => (
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: i * 0.01 }}
               key={i}
-              className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary border border-primary/20 shadow-[0_0_8px_rgba(34,197,94,0.1)]"
+              className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-black text-primary border border-primary/20 shadow-[0_0_8px_rgba(34,197,94,0.1)]"
             >
               {num}
             </motion.div>
@@ -103,13 +103,13 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                         {isWinner && <Trophy className="w-4 h-4 text-primary animate-pulse" />}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-[9px] text-white font-black uppercase tracking-widest opacity-40">
+                        <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60">
                           {format(new Date(p.joinedAt), "HH:mm:ss")}
                         </p>
-                        <span className="text-[9px] text-white/20">•</span>
+                        <span className="text-[10px] text-white/20">•</span>
                         <span className={cn(
-                          "text-[9px] font-black uppercase tracking-widest",
-                          isWinner ? "text-primary" : "text-primary/60"
+                          "text-[10px] font-black uppercase tracking-widest",
+                          isWinner ? "text-primary" : "text-primary"
                         )}>
                           Chance: {Math.round(p.winRate || p.prob || 0)}%
                         </span>
