@@ -191,6 +191,10 @@ export async function registerRoutes(
       drawnNumbers: round.drawnNumbers || [],
     };
 
+    const [winner] = round.winnerId 
+      ? await db.select().from(users).where(eq(users.id, round.winnerId)).limit(1)
+      : [null];
+
     const responseData = {
       round: {
         ...safeRound,
