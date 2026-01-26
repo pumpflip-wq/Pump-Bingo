@@ -195,6 +195,7 @@ export async function registerRoutes(
       round: {
         ...safeRound,
         winnerUserId: round.winnerId ? Number(round.winnerId) : null,
+        winnerUsername: winner?.username || null,
       },
       participantsCount: count,
       secondsRemaining,

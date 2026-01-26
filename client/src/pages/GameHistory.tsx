@@ -62,6 +62,13 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
           {(() => {
             const winnerKey = details.round.winnerUsername?.toLowerCase() || null;
             
+            // Debug logs to identify why it's not matching
+            console.log("Round Details Debug:", {
+              roundId: details.round.id,
+              winnerKey,
+              participants: details.participants.map((p: any) => p.username?.toLowerCase())
+            });
+
             const participants = details.participants
               .map((p: any) => ({
                 ...p,
