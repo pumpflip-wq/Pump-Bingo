@@ -491,22 +491,20 @@ export default function Home() {
                                     <p className="text-white text-lg uppercase font-black tracking-[0.2em] opacity-80">Winner</p>
                                     <p className="text-5xl font-black text-primary italic tracking-tighter uppercase font-display">
                                       {(() => {
-                                        const winnerUserId = Number(roundData.round.winnerUserId || 0);
-                                        const winnerUsernameFromRound = roundData.round.winnerUsername;
-                                        const hasWinner = Number.isFinite(winnerUserId) && winnerUserId > 0;
+                                        const winnerKey = roundData.round.winnerUsername?.toLowerCase() || null;
                                         
                                         const participants = (roundData.participants || sortedParticipants || [])
                                           .map((p: any) => ({
                                             ...p,
-                                            _userId: Number(p.userId ?? p.id),
+                                            _key: (p.username || "").toLowerCase(),
                                           }));
 
                                         const winner = participants.find((p: any) => 
-                                          hasWinner && p._userId === winnerUserId
+                                          winnerKey && p._key === winnerKey
                                         );
                                         
                                         if (winner?.username) return formatAddress(winner.username);
-                                        if (winnerUsernameFromRound) return formatAddress(winnerUsernameFromRound);
+                                        if (roundData.round.winnerUsername) return formatAddress(roundData.round.winnerUsername);
                                         
                                         if (roundData.round.status === "FINISHED") {
                                           return "NO WINNER";

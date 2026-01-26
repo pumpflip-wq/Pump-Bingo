@@ -60,32 +60,34 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {(() => {
-            const winnerUserId = Number(details.round.winnerUserId || 0);
-            const hasWinner = Number.isFinite(winnerUserId) && winnerUserId > 0;
+            const winnerKey = details.round.winnerUsername?.toLowerCase() || null;
             
             const participants = details.participants
               .map((p: any) => ({
                 ...p,
-                _userId: Number(p.userId ?? p.id),
+                _key: (p.username || "").toLowerCase(),
               }))
               .sort((a: any, b: any) => {
-                if (hasWinner && a._userId === winnerUserId) return -1;
-                if (hasWinner && b._userId === winnerUserId) return 1;
+                if (winnerKey && a._key === winnerKey) return -1;
+                if (winnerKey && b._key === winnerKey) return 1;
                 return (b.winRate || 0) - (a.winRate || 0);
               });
 
-            return participants.map((p: any) => {
-              const isWinner = hasWinner && p._userId === winnerUserId;
+            return participants.map((p: any, idx: number) => {
+              const isWinner = Boolean(winnerKey && p._key === winnerKey);
               return (
                 <div 
-                  key={`${roundId}-${p._userId}`} 
+                  key={`${roundId}-${p._key}-${idx}`} 
                   className={cn(
-                    "flex items-center justify-between p-5 rounded-2xl border transition-all",
+                    "flex items-center justify-between p-5 rounded-2xl border transition-all relative",
                     isWinner 
                       ? "bg-primary/15 border-primary shadow-[0_0_20px_rgba(34,197,94,0.15)] ring-1 ring-primary/30" 
                       : "bg-white/5 border-white/10"
                   )}
                 >
+                  {isWinner && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-2xl" />
+                  )}
                   <div className="flex items-center gap-4">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
