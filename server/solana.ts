@@ -28,15 +28,16 @@ export class SolanaManager {
   }
 
   private initializeWallet() {
-    // In production, this would load from a secure environment variable/secret
-    // For now, we'll provide a way to load it but keep it null to stay in "free/test" mode
     const secretKey = process.env.SOLANA_MASTER_WALLET_KEY;
     if (secretKey) {
       try {
         this.masterKeypair = Keypair.fromSecretKey(bs58.decode(secretKey));
+        console.log("[SolanaManager] Master wallet initialized:", this.masterKeypair.publicKey.toBase58());
       } catch (err) {
         console.error("Failed to initialize Solana Master Wallet:", err);
       }
+    } else {
+      console.warn("[SolanaManager] SOLANA_MASTER_WALLET_KEY missing. System in standby.");
     }
   }
 

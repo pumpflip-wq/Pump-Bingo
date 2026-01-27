@@ -73,8 +73,8 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         }
       }
 
-      const USE_REAL_SOLANA = PROTOCOL_CONFIG.NETWORK === "devnet" && !PROTOCOL_CONFIG.IS_TEST_MODE;
-      let signature = "TEST_TX_SIG_" + Date.now();
+      const USE_REAL_SOLANA = PROTOCOL_CONFIG.NETWORK === "mainnet-beta";
+      let signature = "TX_SIG_" + Date.now();
 
       if (USE_REAL_SOLANA) {
         const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET); 
