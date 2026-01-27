@@ -251,30 +251,6 @@ export default function Home() {
   }, [roundData?.round?.id, currentTime]);
 
   const content = useMemo(() => {
-    // Show waiting screen if Mainnet is active but CA is missing
-    if (PROTOCOL_CONFIG.NETWORK === "mainnet-beta" && !PROTOCOL_CONFIG.MINT_ADDRESS) {
-      return (
-        <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1 text-center">
-          <div className="relative">
-            <Globe2 className="w-20 h-20 text-primary animate-pulse" />
-            <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-ping" />
-          </div>
-          <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase font-display">
-            Mainnet Protocol Initializing
-          </h1>
-          <p className="font-mono text-xs text-primary uppercase tracking-[0.3em] max-w-md">
-            Waiting for Token Smart Contract Deployment...
-          </p>
-          <div className="glass-card neon-border p-6 rounded-2xl bg-black/40 border-primary/20 max-w-lg">
-            <p className="text-white/70 text-sm uppercase font-black tracking-widest leading-relaxed">
-              The $PUMP BINGO engine is primed for Mainnet launch. 
-              The system will automatically activate once the Token CA is linked.
-            </p>
-          </div>
-        </div>
-      );
-    }
-
     if (isLoading) {
       return (
         <div className="flex flex-col items-center justify-center py-32 space-y-6 flex-1">
@@ -306,6 +282,8 @@ export default function Home() {
       );
     }
     if (latestRound && roundData) {
+      const isWaitingForCA = PROTOCOL_CONFIG.NETWORK === "mainnet-beta" && !PROTOCOL_CONFIG.MINT_ADDRESS;
+
       return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
           <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
@@ -366,33 +344,51 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                    <div className="py-8 px-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto flex flex-col justify-center items-center">
-                      <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-                      <p className="text-white text-lg uppercase font-black tracking-[0.2em] mb-4 font-mono">
-                        {roundData.round.status === "STARTING"
-                          ? "SECURING GAME PROTOCOL..."
-                          : "GAME STARTING IN"}
-                      </p>
-                      <CountdownTimer
-                        secondsRemaining={roundData.secondsRemaining}
-                        status={roundData.round.status}
-                        participantCount={roundData.participantsCount}
-                        isWaitingForPlayers={
-                          (roundData as any).isWaitingForPlayers ||
-                          roundData.participantsCount < 2
-                        }
-                      />
-                      {roundData.participantsCount < 2 && (
-                        <div className="space-y-4 mt-6 text-center">
-                          <p className="text-primary text-xl uppercase font-black animate-pulse tracking-[0.15em] font-display">
-                            Waiting for Players...
-                          </p>
-                          <p className="text-[15px] text-white uppercase font-black tracking-[0.1em] opacity-90">
-                            Minimum 2 participants required to start
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                    
+                    {isWaitingForCA ? (
+                      <div className="py-8 px-10 bg-black/60 rounded-[2rem] border border-primary/30 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto flex flex-col justify-center items-center">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-primary animate-pulse" />
+                        <Globe2 className="w-16 h-16 text-primary animate-pulse mb-4" />
+                        <h2 className="text-3xl font-black text-white italic tracking-tighter uppercase font-display mb-2">
+                          PROTOCOL INITIALIZING
+                        </h2>
+                        <p className="text-primary text-sm uppercase font-black tracking-[0.2em] font-mono animate-pulse">
+                          Waiting for Token CA Deployment...
+                        </p>
+                        <p className="text-white/60 text-xs uppercase font-bold tracking-widest mt-4 max-w-md">
+                          The game engine is ready and will activate automatically once the contract is linked.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="py-8 px-10 bg-black/60 rounded-[2rem] border border-white/10 backdrop-blur-2xl shadow-2xl relative overflow-hidden w-full max-w-2xl my-auto flex flex-col justify-center items-center">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
+                        <p className="text-white text-lg uppercase font-black tracking-[0.2em] mb-4 font-mono">
+                          {roundData.round.status === "STARTING"
+                            ? "SECURING GAME PROTOCOL..."
+                            : "GAME STARTING IN"}
+                        </p>
+                        <CountdownTimer
+                          secondsRemaining={roundData.secondsRemaining}
+                          status={roundData.round.status}
+                          participantCount={roundData.participantsCount}
+                          isWaitingForPlayers={
+                            (roundData as any).isWaitingForPlayers ||
+                            roundData.participantsCount < 2
+                          }
+                        />
+                        {roundData.participantsCount < 2 && (
+                          <div className="space-y-4 mt-6 text-center">
+                            <p className="text-primary text-xl uppercase font-black animate-pulse tracking-[0.15em] font-display">
+                              Waiting for Players...
+                            </p>
+                            <p className="text-[15px] text-white uppercase font-black tracking-[0.1em] opacity-90">
+                              Minimum 2 participants required to start
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <div className="w-full max-w-2xl mx-auto mb-2">
                       {!connected ? (
                         <div className="space-y-6">
@@ -400,6 +396,12 @@ export default function Home() {
                             Connect Wallet to Start
                           </p>
                           <WalletMultiButton className="!bg-primary !hover:bg-primary/90 !h-16 !px-10 !text-xl !rounded-2xl !w-full !font-black !italic !tracking-tighter !text-black shadow-lg" />
+                        </div>
+                      ) : isWaitingForCA ? (
+                        <div className="p-6 bg-white/5 border border-white/10 rounded-[2rem] w-full">
+                          <p className="text-white/40 font-black text-2xl italic tracking-tighter uppercase text-center">
+                            LOBBY STANDBY MODE
+                          </p>
                         </div>
                       ) : isParticipant ? (
                         <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-[2rem] shadow-[0_0_30px_rgba(34,197,94,0.1)] w-full">
