@@ -315,27 +315,35 @@ export default function Home() {
                     <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={roundData.participantsCount < 2} />
                   </div>
 
-                  <div className="w-full">
-                    {!connected ? <WalletMultiButton className="!bg-primary !h-14 !w-full !text-black !font-black !rounded-xl" /> : isParticipant ? (
+                  <div className="w-full mt-auto">
+                    {!connected ? (
+                      <div className="flex justify-center w-full">
+                        <WalletMultiButton className="!bg-primary !h-14 !w-full !text-black !font-black !rounded-xl" />
+                      </div>
+                    ) : isParticipant ? (
                       <div className="p-4 bg-primary/10 border border-primary/30 rounded-xl text-center">
                         <p className="text-primary font-black uppercase text-sm">IN GAME STANDBY</p>
                       </div>
-                    ) : <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />}
+                    ) : (
+                      <div className="flex justify-center w-full">
+                        <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col space-y-3 overflow-hidden">
-                  <div className="glass-card neon-border rounded-2xl p-3 bg-black/40 shrink-0">
+                  <div className="glass-card neon-border rounded-2xl p-2 lg:p-3 bg-black/40 shrink-0">
                     <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
                   </div>
-                  <div className="glass-card neon-border rounded-2xl p-3 bg-black/40 flex-1 flex flex-col items-center justify-center min-h-0">
+                  <div className="glass-card neon-border rounded-2xl p-3 bg-black/40 flex-1 flex flex-col items-center justify-center min-h-0 relative">
                     {isParticipant && currentCard ? (
-                      <>
-                        <BingoCard card={currentCard} drawnNumbers={roundData.round.drawnNumbers || []} className="scale-[0.85] origin-center w-full" />
-                        <div className="w-full mt-2">
-                          <BingoClaimButton roundId={roundData.round.id} userId={user?.id || 0} card={currentCard} drawnNumbers={roundData.round.drawnNumbers || []} status={roundData.round.status} isBingoed={(myParticipant as any)?.hasBingo} className="h-14 text-xl font-black" />
+                      <div className="flex flex-col items-center justify-center w-full h-full relative">
+                        <BingoCard card={currentCard} drawnNumbers={roundData.round.drawnNumbers || []} className="scale-[0.75] sm:scale-[0.85] origin-center w-full mb-auto" />
+                        <div className="w-full mt-auto">
+                          <BingoClaimButton roundId={roundData.round.id} userId={user?.id || 0} card={currentCard} drawnNumbers={roundData.round.drawnNumbers || []} status={roundData.round.status} isBingoed={(myParticipant as any)?.hasBingo} className="h-12 lg:h-14 text-lg lg:text-xl font-black" />
                         </div>
-                      </>
+                      </div>
                     ) : (
                       <div className="text-center space-y-4">
                         <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto" />

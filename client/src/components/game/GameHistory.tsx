@@ -13,7 +13,7 @@ interface GameHistoryProps {
 
 export function GameHistory({ historyRounds, historyLoading, formatAddress, currentRoundHash }: GameHistoryProps) {
   return (
-    <div className="glass-card neon-border rounded-2xl p-4 lg:p-6 flex flex-col h-full lg:flex-1 overflow-hidden bg-black/20">
+    <div className="glass-card neon-border rounded-2xl p-4 lg:p-6 flex flex-col h-full lg:h-auto overflow-hidden bg-black/20">
       <div className="flex items-center justify-between mb-4 lg:mb-6">
         <h3 className="text-lg lg:text-[22px] text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
           <History className="w-5 h-5 lg:w-6 lg:h-6 text-primary" /> Game History

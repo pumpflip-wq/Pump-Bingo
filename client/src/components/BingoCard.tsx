@@ -45,7 +45,7 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
 
   return (
     <div className={cn(
-      "grid grid-cols-5 gap-1.5 sm:gap-3 p-3 sm:p-6 bg-black/60 backdrop-blur-2xl rounded-2xl border-2 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group transition-all duration-500",
+      "grid grid-cols-5 gap-1 lg:gap-3 p-1.5 lg:p-6 bg-black/60 backdrop-blur-2xl rounded-xl lg:rounded-2xl border-2 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group transition-all duration-500",
       isNearWin ? "border-primary shadow-[0_0_30px_rgba(57,255,20,0.3)] scale-[1.01]" : "border-white/5",
       className
     )}>

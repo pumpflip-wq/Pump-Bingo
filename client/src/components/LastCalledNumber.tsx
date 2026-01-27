@@ -8,12 +8,12 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
   const lastNumber = numbers.length > 0 ? numbers[numbers.length - 1] : null;
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-3">
+    <div className="flex flex-col items-center justify-center space-y-3 lg:mt-0">
       <div className="flex items-center gap-3">
-        <span className="text-[22px] text-white uppercase font-black tracking-widest font-display">Live Feed</span>
+        <span className="text-lg lg:text-[22px] text-white uppercase font-black tracking-widest font-display">Live Feed</span>
       </div>
 
-      <div className="relative w-32 h-32 flex items-center justify-center">
+      <div className="relative w-24 h-24 lg:w-32 lg:h-32 flex items-center justify-center">
         {/* Professional Gaming Ring Effects */}
         <motion.div 
             animate={{ rotate: 360 }}
