@@ -4,10 +4,10 @@ export const PROTOCOL_CONFIG = {
    * Paste your SPL Token Mint Address here when ready.
    * Example: "EPjFW36Rc7H1iYv5vp59dqHozsnd8d6LxhkPiSS35pt"
    */
-  MINT_ADDRESS: null, // <--- PASTE CA HERE
-  
+  MINT_ADDRESS: "CJbxcY3h4m2QgFtP8f3mMEa6MCnpDi3J4A4h6tMFpump", // <--- PASTE CA HERE
+
   SYMBOL: "$PUMP",
-  DECIMALS: 9, 
+  DECIMALS: 9,
 
   // Game Settings
   DEFAULT_ENTRY_PRICE: 1000 * 1e9, // Default entry price (updated for SPL token context)
@@ -21,7 +21,8 @@ export const PROTOCOL_CONFIG = {
 
   // Mainnet Configuration
   NETWORK: "mainnet-beta",
-  RPC_URL: "https://mainnet.helius-rpc.com/?api-key=dd4d0f55-719e-4f2e-b8b8-2f686bc7d2bf",
+  RPC_URL:
+    "https://mainnet.helius-rpc.com/?api-key=dd4d0f55-719e-4f2e-b8b8-2f686bc7d2bf",
   BACKUP_RPC_URL: "https://api.mainnet-beta.solana.com",
   IS_TEST_MODE: false, // REAL TRANSACTIONS ENABLED
 
