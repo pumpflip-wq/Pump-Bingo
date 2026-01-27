@@ -46,8 +46,7 @@ export async function registerRoutes(
         masterWalletBalance: walletBalance,
         masterWalletPublicKey: solanaManager.getMasterPublicKey(),
         masterWalletSymbol: PROTOCOL_CONFIG.SYMBOL,
-        isTestMode:
-          PROTOCOL_CONFIG.IS_TEST_MODE && !process.env.SOLANA_MASTER_WALLET_KEY,
+        isTestMode: !process.env.SOLANA_MASTER_WALLET_KEY,
       });
     } catch (err) {
       console.error("Admin stats error:", err);
@@ -159,7 +158,7 @@ export async function registerRoutes(
       FROM participants p
       LEFT JOIN users u ON p.user_id = u.id
       WHERE p.round_id = ${roundId} 
-        AND (p.tx_signature IS NOT NULL OR ${PROTOCOL_CONFIG.IS_TEST_MODE} = true)
+        AND p.tx_signature IS NOT NULL
       ORDER BY p.joined_at ASC
     `);
     const roundParticipants = (roundParticipantsRaw as any).rows || [];

@@ -84,7 +84,6 @@ export class SolanaManager {
           )
         );
       } else {
-        // Native SOL transfer for DEVNET or SOL mode
         console.log(`[SolanaManager] Sending SOL reward: ${amount} lamports to ${toAddress}`);
         
         transaction = new Transaction().add(
@@ -123,7 +122,7 @@ export class SolanaManager {
       }
     } catch (e) {}
 
-    // Attempt 2: Minimal parsing loop (max 10s for better devnet reliability)
+    // Attempt 2: Minimal parsing loop (max 10s)
     for (let i = 0; i < 10; i++) {
       try {
         const tx = await conn.getParsedTransaction(signature, { 
@@ -131,8 +130,6 @@ export class SolanaManager {
           maxSupportedTransactionVersion: 0 
         });
         if (tx && !tx.meta?.err) {
-          // In a real production scenario, we'd verify the recipient and amount here
-          // For devnet launch, seeing the transaction exists is a strong signal
           return true;
         }
       } catch (e) {}

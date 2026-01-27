@@ -1,30 +1,21 @@
 export const PROTOCOL_CONFIG = {
-  /**
-   * CONTRACT ADDRESS (CA)
-   * Paste your SPL Token Mint Address here when ready.
-   * Example: "EPjFW36Rc7H1iYv5vp59dqHozsnd8d6LxhkPiSS35pt"
-   */
-  MINT_ADDRESS: "CJbxcY3h4m2QgFtP8f3mMEa6MCnpDi3J4A4h6tMFpump", // <--- PASTE CA HERE
-
-  SYMBOL: "$PUMP",
+  MINT_ADDRESS: "CJbxcY3h4m2QgFtP8f3mMEa6MCnpDi3J4A4h6tMFpump",
+  SYMBOL: "$PBINGO",
   DECIMALS: 9,
 
   // Game Settings
-  DEFAULT_ENTRY_PRICE: 1000 * 1e9, // Default entry price (updated for SPL token context)
-  FEE_PERCENTAGE: 0, // No fees as requested
+  DEFAULT_ENTRY_PRICE: 1000 * 1e9,
+  FEE_PERCENTAGE: 0,
 
   // Links
   PUMP_FUN_URL: "https://pump.fun/",
   DEXSCANNER_URL: "https://dexscreener.com/solana/",
-  TWITTER_URL: "https://x.com/pumpbingo",
-  TELEGRAM_URL: "https://t.me/pumpbingo",
+  TWITTER_URL: "https://x.com/Pump_Bingo",
 
   // Mainnet Configuration
   NETWORK: "mainnet-beta",
-  RPC_URL:
-    "https://mainnet.helius-rpc.com/?api-key=dd4d0f55-719e-4f2e-b8b8-2f686bc7d2bf",
+  RPC_URL: "https://mainnet.helius-rpc.com/?api-key=dd4d0f55-719e-4f2e-b8b8-2f686bc7d2bf",
   BACKUP_RPC_URL: "https://api.mainnet-beta.solana.com",
-  IS_TEST_MODE: false, // REAL TRANSACTIONS ENABLED
 
   // Admin wallet address
   ADMIN_WALLET: "23caHs1DUE8Qh5G2fLtKGUtEicahB4roGhiedp7zWg4Z",
