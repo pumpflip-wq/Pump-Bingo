@@ -136,7 +136,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-black text-white italic">
-              {formatCurrency(stats?.masterWalletBalance || 0, false)} <span className="text-sm">{PROTOCOL_CONFIG.SYMBOL}</span>
+              {formatCurrency((stats?.masterWalletBalance || 0) * Math.pow(10, PROTOCOL_CONFIG.DECIMALS), false)} <span className="text-sm">{PROTOCOL_CONFIG.SYMBOL}</span>
             </p>
           </CardContent>
         </Card>
