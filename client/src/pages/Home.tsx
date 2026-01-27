@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { api } from "@shared/routes";
 import { formatAddress, formatCurrency } from "@/lib/utils";
 import { PlayerList } from "@/components/game/PlayerList";
