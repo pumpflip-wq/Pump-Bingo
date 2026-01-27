@@ -1,10 +1,10 @@
 export const PROTOCOL_CONFIG = {
   MINT_ADDRESS: "CJbxcY3h4m2QgFtP8f3mMEa6MCnpDi3J4A4h6tMFpump",
   SYMBOL: "$PBINGO",
-  DECIMALS: 9,
+  DECIMALS: 6,
 
   // Game Settings
-  DEFAULT_ENTRY_PRICE: 0 * 1e9,
+  DEFAULT_ENTRY_PRICE: 0 * 1e6,
   FEE_PERCENTAGE: 0,
 
   // Links

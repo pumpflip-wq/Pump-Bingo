@@ -153,7 +153,7 @@ export class SolanaManager {
         return Number(account.amount) / Math.pow(10, PROTOCOL_CONFIG.DECIMALS);
       } else {
         const balance = await this.connection.getBalance(this.masterKeypair.publicKey);
-        return balance / 1e9;
+        return balance / 1e6;
       }
     } catch {
       return 0;

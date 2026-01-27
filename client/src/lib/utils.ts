@@ -1,16 +1,18 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+import { PROTOCOL_CONFIG } from "@shared/config";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 export function formatCurrency(amount: number | string, useSmartFormatting: boolean = true): string {
   const numericAmount = typeof amount === "string" ? parseInt(amount, 10) : amount;
-  if (!numericAmount || numericAmount === 0 || numericAmount < 1000) return "0";
+  if (!numericAmount || numericAmount === 0) return "0";
   
-  // Convert lamports to SOL for display
-  const val = numericAmount / 1e9;
+  const decimals = PROTOCOL_CONFIG.DECIMALS || 6;
+  const val = numericAmount / Math.pow(10, decimals);
 
   if (useSmartFormatting) {
     if (val >= 1000000) {
@@ -19,13 +21,12 @@ export function formatCurrency(amount: number | string, useSmartFormatting: bool
     if (val >= 1000) {
       return (val / 1000).toFixed(1).replace(/\.?0+$/, "") + "K";
     }
-    // For small SOL amounts, if it's less than 0.1 SOL, show more precision, otherwise round nicely
     if (val < 1) {
       return val.toFixed(3).replace(/\.?0+$/, "");
     }
-    return Math.floor(val).toString();
+    return Math.floor(val).toLocaleString("en-US");
   }
-  return val.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 9 });
+  return val.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: decimals });
 }
 
 export function formatAddress(address: string) {
