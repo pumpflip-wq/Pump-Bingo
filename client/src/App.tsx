@@ -15,6 +15,7 @@ import { SolanaProvider } from "./components/SolanaProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
 import { History, ShieldCheck, Twitter, Settings } from "lucide-react";
+import { SiX } from "react-icons/si";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { useAuth } from "./hooks/use-auth";
 
@@ -142,10 +143,10 @@ function AppContent() {
                       href={PROTOCOL_CONFIG.TWITTER_URL} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="w-[52px] h-[44px] rounded-xl bg-white/[0.15] hover:bg-white/[0.25] transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-white/20 shadow-sm text-white hover:text-[#1DA1F2]"
+                      className="w-[52px] h-[44px] rounded-xl bg-white/[0.15] hover:bg-white/[0.25] transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-white/20 shadow-sm text-white hover:text-primary"
                       title="Follow on X"
                     >
-                      <Twitter className="w-6 h-6 fill-current" />
+                      <SiX className="w-5 h-5" />
                     </a>
                   </div>
                   <WalletMultiButton className="!bg-primary !text-black !h-11 !px-8 !text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />

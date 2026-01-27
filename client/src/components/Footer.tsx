@@ -1,4 +1,5 @@
 import { ShieldCheck, Zap, Globe, ShoppingCart, Twitter, History } from "lucide-react";
+import { SiX } from "react-icons/si";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { Link } from "wouter";
 
@@ -56,10 +57,10 @@ export function Footer() {
                 href={PROTOCOL_CONFIG.TWITTER_URL} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20 shadow-sm text-white hover:text-[#1DA1F2]"
+                className="w-10 h-10 rounded-lg bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20 shadow-sm text-white hover:text-primary"
                 title="Follow on X"
               >
-                <Twitter className="w-5 h-5 fill-current" />
+                <SiX className="w-4 h-4" />
               </a>
             </div>
           </div>

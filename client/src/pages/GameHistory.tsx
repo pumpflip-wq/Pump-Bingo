@@ -60,12 +60,12 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {(() => {
-            const winnerKey = details.round.winnerUsername?.toLowerCase() || null;
+            const winnerKey = details.round.winnerId ? String(details.round.winnerId) : null;
             
-            const participants = details.participants
+            const participants = (details.participants || [])
               .map((p: any) => ({
                 ...p,
-                _key: (p.username || "").toLowerCase(),
+                _key: String(p.userId || ""),
               }))
               .sort((a: any, b: any) => {
                 if (winnerKey && a._key === winnerKey) return -1;
