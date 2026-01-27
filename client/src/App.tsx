@@ -90,16 +90,16 @@ function AppContent() {
               <Link href="/" className="flex items-center gap-2 lg:gap-4 group cursor-pointer hover:opacity-90 transition-opacity shrink-0">
                 <motion.div
                   whileHover={{ rotate: 15, scale: 1.1 }}
-                  className="w-10 h-10 lg:w-20 lg:h-20 rounded-full p-0 transition-all"
+                  className="w-14 h-14 lg:w-20 lg:h-20 rounded-full p-0 transition-all"
                 >
                   <img 
                     src={logoPng} 
                     alt="PUMP BINGO" 
-                    className="w-full h-full rounded-full object-cover"
+                    className="w-full h-full rounded-full object-cover shadow-[0_0_15px_rgba(34,197,94,0.3)]"
                   />
                 </motion.div>
                 <div className="flex flex-col">
-                  <h1 className="text-xl lg:text-4xl font-black font-display tracking-tighter text-white italic leading-none">
+                  <h1 className="text-2xl lg:text-4xl font-black font-display tracking-tighter text-white italic leading-none">
                     PUMP <span className="text-primary">BINGO</span>
                   </h1>
                 </div>
@@ -120,7 +120,7 @@ function AppContent() {
                   )}
                 </nav>
                 <div className="flex items-center gap-1 lg:gap-4">
-                  <div className="flex items-center gap-1 lg:gap-3 bg-black/40 p-1 rounded-xl border border-white/5">
+                  <div className="hidden lg:flex items-center gap-1 lg:gap-3 bg-black/40 p-1 rounded-xl border border-white/5">
                     <a 
                       href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                       target="_blank" 
@@ -149,7 +149,7 @@ function AppContent() {
                       <SiX className="w-3 h-3 lg:w-5 lg:h-5" />
                     </a>
                   </div>
-                  <div className="scale-75 lg:scale-100 origin-right">
+                  <div className="hidden sm:block scale-75 lg:scale-100 origin-right">
                     <WalletMultiButton className="!bg-primary !text-black !h-10 lg:!h-11 !px-4 lg:!px-8 !text-xs lg:!text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
                   </div>
                 </div>

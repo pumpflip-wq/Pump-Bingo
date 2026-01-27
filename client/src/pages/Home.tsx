@@ -370,16 +370,39 @@ export default function Home() {
         </AnimatePresence>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-black/80 border-t border-white/10 p-2 z-[60] flex items-center justify-around">
-        <Button variant={activeTab === "game" ? "default" : "ghost"} onClick={() => setActiveTab("game")} className="flex flex-col items-center gap-1 h-14 w-full">
-          <Gamepad2 className="w-5 h-5" /> <span className="text-[10px] font-black uppercase">Game</span>
-        </Button>
-        <Button variant={activeTab === "players" ? "default" : "ghost"} onClick={() => setActiveTab("players")} className="flex flex-col items-center gap-1 h-14 w-full">
-          <Users className="w-5 h-5" /> <span className="text-[10px] font-black uppercase">Players</span>
-        </Button>
-        <Button variant={activeTab === "history" ? "default" : "ghost"} onClick={() => setActiveTab("history")} className="flex flex-col items-center gap-1 h-14 w-full">
-          <History className="w-5 h-5" /> <span className="text-[10px] font-black uppercase">History</span>
-        </Button>
+      <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10 p-2 z-[60] pb-safe">
+        <div className="flex items-center justify-around max-w-md mx-auto">
+          <Button variant={activeTab === "game" ? "default" : "ghost"} onClick={() => setActiveTab("game")} className="flex flex-col items-center gap-1 h-14 w-full rounded-xl">
+            <Gamepad2 className="w-6 h-6" /> <span className="text-[10px] font-black uppercase">Game</span>
+          </Button>
+          <Button variant={activeTab === "players" ? "default" : "ghost"} onClick={() => setActiveTab("players")} className="flex flex-col items-center gap-1 h-14 w-full rounded-xl">
+            <Users className="w-6 h-6" /> <span className="text-[10px] font-black uppercase">Players</span>
+          </Button>
+          <div className="flex flex-col items-center justify-center w-full">
+            <WalletMultiButton className="!bg-primary !text-black !h-12 !w-12 !min-w-0 !p-0 !rounded-full !font-black !shadow-[0_0_15px_rgba(34,197,94,0.4)] !border-none flex items-center justify-center overflow-hidden">
+               <span className="text-[8px] leading-none text-center">CONNECT</span>
+            </WalletMultiButton>
+          </div>
+          <Button variant={activeTab === "history" ? "default" : "ghost"} onClick={() => setActiveTab("history")} className="flex flex-col items-center gap-1 h-14 w-full rounded-xl">
+            <History className="w-6 h-6" /> <span className="text-[10px] font-black uppercase">History</span>
+          </Button>
+          <Link href="/verify" className="w-full">
+            <Button variant="ghost" className="flex flex-col items-center gap-1 h-14 w-full rounded-xl">
+              <ShieldCheck className="w-6 h-6" /> <span className="text-[10px] font-black uppercase">Verify</span>
+            </Button>
+          </Link>
+        </div>
+        <div className="flex items-center justify-center gap-6 mt-2 pt-2 border-t border-white/5">
+          <a href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} target="_blank" rel="noopener noreferrer">
+            <img src="https://pump.fun/favicon.ico" className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity" alt="Pump" />
+          </a>
+          <a href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} target="_blank" rel="noopener noreferrer">
+            <img src="https://dexscreener.com/favicon.png" className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity" alt="Dex" />
+          </a>
+          <a href={PROTOCOL_CONFIG.TWITTER_URL} target="_blank" rel="noopener noreferrer">
+            <SiX className="w-4 h-4 text-white opacity-60 hover:opacity-100 transition-opacity" />
+          </a>
+        </div>
       </div>
     </div>
   );
