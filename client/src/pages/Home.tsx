@@ -424,6 +424,7 @@ export default function Home() {
             txHash={overlayState.txHash || ""}
             onClose={() => setHasManuallyClosed(true)}
             timeLeft={overlayState.timeLeft}
+            currentRoundId={overlayState.currentRoundId || 0}
           />
         )}
       </AnimatePresence>
