@@ -13,51 +13,85 @@ interface GameHistoryProps {
 
 export function GameHistory({ historyRounds, historyLoading, formatAddress, currentRoundHash }: GameHistoryProps) {
   return (
-    <div className="glass-card neon-border rounded-2xl p-4 lg:p-6 flex flex-col h-full lg:h-auto overflow-hidden bg-black/20">
-      <div className="flex items-center justify-between mb-4 lg:mb-6">
-        <h3 className="text-lg lg:text-[22px] text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
-          <History className="w-5 h-5 lg:w-6 lg:h-6 text-primary" /> Game History
-        </h3>
-        <Link href="/history" className="text-[10px] font-black text-primary/60 hover:text-primary uppercase tracking-widest underline transition-colors">Full View</Link>
-      </div>
-      <div className="flex-1 overflow-y-auto space-y-3 lg:space-y-4 pr-1 lg:pr-2 custom-scrollbar">
-        <div className="space-y-4">
+    <div className="flex flex-col h-full gap-4">
+      {/* Live Feed Integrated */}
+      <div className="glass-card neon-border rounded-2xl p-4 lg:p-6 bg-black/20 border-primary/20 flex flex-col min-h-[250px]">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            Live Feed
+          </h3>
+        </div>
+        <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar">
           {historyLoading ? (
-            <div className="flex justify-center py-10">
-              <Loader2 className="w-6 h-6 text-primary animate-spin" />
+            <div className="flex justify-center py-4">
+              <Loader2 className="w-5 h-5 text-primary animate-spin" />
             </div>
           ) : historyRounds?.rounds?.length ? (
-            historyRounds.rounds.slice(0, 10).map((hr: any) => (
-              <HistoryItem 
-                key={hr.id}
-                id={hr.id} 
-                winner={hr.winnerUsername || "No Winner"} 
-                prize={hr.prizePool} 
-                formatAddress={formatAddress}
-                completedAt={hr.completedAt ? hr.completedAt.toString() : null}
-              />
+            historyRounds.rounds.slice(0, 5).map((hr: any) => (
+              <div key={`feed-${hr.id}`} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-white/40 font-black uppercase">Round #{hr.id}</span>
+                  <span className="text-xs font-black text-white italic">@{formatAddress(hr.winnerUsername || "Anon")}</span>
+                </div>
+                <span className="text-xs font-black text-primary">+{formatCurrency(hr.prizePool, false)}</span>
+              </div>
             ))
           ) : (
-            <div className="text-center py-10 opacity-30">
-              <p className="text-[10px] uppercase font-black tracking-widest text-white">No history yet</p>
+            <div className="text-center py-4 opacity-30">
+              <p className="text-[10px] uppercase font-black tracking-widest text-white">No activity</p>
             </div>
           )}
         </div>
       </div>
-      {/* Current Room Hash Integrated into the same frame */}
-      <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-primary/60">
-            <span>Current Room Hash</span>
-            <Link href="/verify" className="underline hover:text-primary transition-colors">Verify</Link>
-          </div>
-          <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
-            <p className="text-[10px] font-mono text-primary truncate flex-1">
-              {currentRoundHash || "..."}
-            </p>
+
+      {/* Game History */}
+      <div className="glass-card neon-border rounded-2xl p-4 lg:p-6 flex flex-col flex-1 overflow-hidden bg-black/20">
+        <div className="flex items-center justify-between mb-4 lg:mb-6">
+          <h3 className="text-lg lg:text-[22px] text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
+            <History className="w-5 h-5 lg:w-6 lg:h-6 text-primary" /> Game History
+          </h3>
+          <Link href="/history" className="text-[10px] font-black text-primary/60 hover:text-primary uppercase tracking-widest underline transition-colors">Full View</Link>
+        </div>
+        <div className="flex-1 overflow-y-auto space-y-3 lg:space-y-4 pr-1 lg:pr-2 custom-scrollbar">
+          <div className="space-y-4">
+            {historyLoading ? (
+              <div className="flex justify-center py-10">
+                <Loader2 className="w-6 h-6 text-primary animate-spin" />
+              </div>
+            ) : historyRounds?.rounds?.length ? (
+              historyRounds.rounds.slice(0, 10).map((hr: any) => (
+                <HistoryItem 
+                  key={hr.id}
+                  id={hr.id} 
+                  winner={hr.winnerUsername || "No Winner"} 
+                  prize={hr.prizePool} 
+                  formatAddress={formatAddress}
+                  completedAt={hr.completedAt ? hr.completedAt.toString() : null}
+                />
+              ))
+            ) : (
+              <div className="text-center py-10 opacity-30">
+                <p className="text-[10px] uppercase font-black tracking-widest text-white">No history yet</p>
+              </div>
+            )}
           </div>
         </div>
-        <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
+        {/* Current Room Hash Integrated into the same frame */}
+        <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-primary/60">
+              <span>Current Room Hash</span>
+              <Link href="/verify" className="underline hover:text-primary transition-colors">Verify</Link>
+            </div>
+            <div className="flex items-center gap-2 bg-black/40 p-2 rounded border border-primary/10">
+              <p className="text-[10px] font-mono text-primary truncate flex-1">
+                {currentRoundHash || "..."}
+              </p>
+            </div>
+          </div>
+          <p className="text-[10px] text-center text-primary uppercase font-black tracking-widest font-mono">PROVABLY FAIR SYSTEM ACTIVE</p>
+        </div>
       </div>
     </div>
   );

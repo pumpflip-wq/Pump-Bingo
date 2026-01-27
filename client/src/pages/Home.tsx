@@ -271,7 +271,12 @@ export default function Home() {
       </main>
       <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
         <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
-        <GameHistory historyRounds={historyRounds || []} historyLoading={historyLoading} formatAddress={formatAddress} currentRoundHash={latestRound.provableHash} />
+        <GameHistory 
+          historyRounds={historyRounds || []} 
+          historyLoading={historyLoading} 
+          formatAddress={formatAddress} 
+          currentRoundHash={roundData.round.publicHash} 
+        />
       </aside>
     </div>
   );
@@ -290,7 +295,7 @@ export default function Home() {
         </Button>
       </div>
 
-      <div className="flex-1 relative overflow-hidden p-3">
+      <div className="flex-1 relative overflow-hidden p-3 lg:p-0">
         <AnimatePresence mode="wait">
           {activeTab === "game" && (
             <motion.div key="game" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="h-full flex flex-col space-y-3">
@@ -363,8 +368,15 @@ export default function Home() {
           )}
 
           {activeTab === "history" && (
-            <motion.div key="history" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="h-full">
-              <GameHistory historyRounds={historyRounds || []} historyLoading={historyLoading} formatAddress={formatAddress} currentRoundHash={latestRound.provableHash} />
+            <motion.div key="history" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="h-full overflow-y-auto">
+              <div className="space-y-4 pb-20">
+                <GameHistory 
+                  historyRounds={historyRounds || []} 
+                  historyLoading={historyLoading} 
+                  formatAddress={formatAddress} 
+                  currentRoundHash={roundData.round.publicHash} 
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
