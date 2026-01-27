@@ -1,8 +1,13 @@
 export const PROTOCOL_CONFIG = {
-  // Replace with your actual Token Mint Address (CA)
-  MINT_ADDRESS: null, // Set to null for SOL mode, or provide CA for SPL token
+  /**
+   * CONTRACT ADDRESS (CA)
+   * Paste your SPL Token Mint Address here when ready.
+   * Example: "EPjFW36Rc7H1iYv5vp59dqHozsnd8d6LxhkPiSS35pt"
+   */
+  MINT_ADDRESS: null, // <--- PASTE CA HERE
+  
   SYMBOL: "$PUMP",
-  DECIMALS: 9, // Standard SPL/SOL decimals
+  DECIMALS: 9, 
 
   // Game Settings
   DEFAULT_ENTRY_PRICE: 1000 * 1e9, // Default entry price (updated for SPL token context)
