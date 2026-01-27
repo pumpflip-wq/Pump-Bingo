@@ -64,7 +64,9 @@ export function GameHistory({ historyRounds, historyLoading, formatAddress, curr
 }
 
 function HistoryItem({ id, winner, prize, formatAddress, completedAt }: { id: number, winner: string, prize: number, formatAddress: (addr: string) => string, completedAt?: string | null }) {
-  const explorerUrl = `https://explorer.solana.com/address/${PROTOCOL_CONFIG.MINT_ADDRESS}?cluster=${PROTOCOL_CONFIG.NETWORK}`;
+  const explorerUrl = PROTOCOL_CONFIG.MINT_ADDRESS 
+    ? `https://solscan.io/token/${PROTOCOL_CONFIG.MINT_ADDRESS}?cluster=${PROTOCOL_CONFIG.NETWORK}`
+    : `https://solscan.io/address/${PROTOCOL_CONFIG.ADMIN_WALLET}?cluster=${PROTOCOL_CONFIG.NETWORK}`;
   return (
     <a href={explorerUrl} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:border-primary/50 hover:bg-white/10 group relative">
       <div className="flex justify-between items-start mb-2">
