@@ -62,14 +62,14 @@ export function calculateWinProb(card: number[][], drawn: number[]): number {
 
   if (maxMarked === 5) return 100;
   if (totalMarked >= 1 && drawn.length > 0) {
-    const hitDensity = (totalMarked / 24) * 15;
+    const hitDensity = (totalMarked / 24) * 20; // Increased weight
     let baseLineProb = 0;
-    if (maxMarked === 2) baseLineProb = 5;
-    else if (maxMarked === 3) baseLineProb = 20;
-    else if (maxMarked === 4) baseLineProb = 50;
+    if (maxMarked === 2) baseLineProb = 10;
+    else if (maxMarked === 3) baseLineProb = 30;
+    else if (maxMarked === 4) baseLineProb = 60;
 
-    const proximityBonus = potentialLines * 12;
-    const gameProgress = (drawn.length / 75) * 10;
+    const proximityBonus = potentialLines * 15;
+    const gameProgress = (drawn.length / 75) * 15;
 
     return Math.max(1, Math.min(99, Math.floor(baseLineProb + hitDensity + proximityBonus + gameProgress)));
   }

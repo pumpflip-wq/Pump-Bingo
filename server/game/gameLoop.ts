@@ -66,7 +66,7 @@ export class GameManager {
 
   private async createNewRound() {
     const latestRound = await storage.getLatestRound();
-    const nextId = latestRound ? latestRound.id + 1 : 1;
+    const nextId = (latestRound?.id ?? 0) + 1;
     const seed = crypto.randomBytes(32).toString("hex").toLowerCase();
     const hash = crypto.createHash("sha256").update(seed).digest("hex").toLowerCase();
     

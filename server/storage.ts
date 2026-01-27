@@ -221,7 +221,7 @@ export class DatabaseStorage implements IStorage {
       .select({ count: sql<string>`count(DISTINCT user_id)` })
       .from(participants)
       .where(
-        sql`${participants.roundId} = ${roundId} AND ${participants.txSignature} IS NOT NULL`,
+        sql`${participants.roundId} = ${roundId}`
       );
     return parseInt(result.count || "0", 10);
   }
