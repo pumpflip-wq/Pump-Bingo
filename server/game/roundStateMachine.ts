@@ -6,9 +6,10 @@ const POST_WIN_DELAY_MS = 10000;
 
 export async function handleStateTransitions(round: Round, participantCount: number): Promise<void> {
   const now = new Date();
+  const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && participantCount < 2;
 
   if (round.status === ROUND_STATUS.OPEN) {
-    if (participantCount >= 2) {
+    if (!isWaitingForPlayers) {
       if (!round.startTime) {
         // Initialize countdown: 60 seconds from now
         const startTime = new Date(now.getTime() + 60000);
@@ -36,7 +37,7 @@ export async function handleStateTransitions(round: Round, participantCount: num
       }
     }
   } else if (round.status === ROUND_STATUS.STARTING) {
-    if (participantCount < 2) {
+    if (isWaitingForPlayers) {
       // Fallback to OPEN if players leave during starting delay
       await storage.updateRound(round.id, { status: ROUND_STATUS.OPEN, startTime: null });
     } else if (now.getTime() >= new Date(round.startTime!).getTime()) {
@@ -55,7 +56,7 @@ export async function handleStateTransitions(round: Round, participantCount: num
         return;
       }
       const completedTime = new Date(round.completedAt).getTime();
-      if (now.getTime() - completedTime >= POST_WIN_DELAY_MS) {
+      if (now.getTime() - completedTime >= PROTOCOL_CONFIG.POST_WIN_DELAY_MS) {
         // Transition to FINISHED
         await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
       }

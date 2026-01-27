@@ -182,7 +182,7 @@ export async function registerRoutes(
       const completedMs = new Date(round.completedAt).getTime();
       nextRoundSecondsRemaining = Math.max(
         0,
-        Math.ceil((10000 - (now - completedMs)) / 1000),
+        Math.ceil((PROTOCOL_CONFIG.POST_WIN_DELAY_MS - (now - completedMs)) / 1000),
       );
     }
 

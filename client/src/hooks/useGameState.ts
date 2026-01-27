@@ -55,14 +55,12 @@ export function useGameState() {
         // Force invalidate with refetch to ensure no stale data remains in cache
         queryClient.invalidateQueries({ 
           queryKey: [api.rounds.get.path, latestRound.id], 
-          exact: true,
-          refetchType: 'active'
+          exact: true
         });
         queryClient.invalidateQueries({ 
-          queryKey: [api.rounds.list.path],
-          refetchType: 'active'
+          queryKey: [api.rounds.list.path]
         });
-      }, 1000); 
+      }, 2000); 
       return () => clearInterval(interval);
     }
   }, [latestRound?.id, queryClient]);
