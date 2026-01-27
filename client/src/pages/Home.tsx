@@ -14,6 +14,8 @@ import {
   History,
   Gamepad2,
   ShieldCheck,
+  Menu,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo, useRef } from "react";
@@ -43,6 +45,7 @@ export default function Home() {
     historyLoading,
   } = useGameState();
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"game" | "players" | "history">("game");
 
   useEffect(() => {
@@ -381,30 +384,9 @@ export default function Home() {
           <Button variant={activeTab === "players" ? "default" : "ghost"} onClick={() => setActiveTab("players")} className="flex flex-col items-center gap-1 h-14 w-full rounded-xl">
             <Users className="w-6 h-6" /> <span className="text-[10px] font-black uppercase">Players</span>
           </Button>
-          <div className="flex flex-col items-center justify-center w-full">
-            <WalletMultiButton className="!bg-primary !text-black !h-12 !w-12 !min-w-0 !p-0 !rounded-full !font-black !shadow-[0_0_15px_rgba(34,197,94,0.4)] !border-none flex items-center justify-center overflow-hidden">
-               <span className="text-[8px] leading-none text-center">CONNECT</span>
-            </WalletMultiButton>
-          </div>
           <Button variant={activeTab === "history" ? "default" : "ghost"} onClick={() => setActiveTab("history")} className="flex flex-col items-center gap-1 h-14 w-full rounded-xl">
             <History className="w-6 h-6" /> <span className="text-[10px] font-black uppercase">History</span>
           </Button>
-          <Link href="/verify" className="w-full">
-            <Button variant="ghost" className="flex flex-col items-center gap-1 h-14 w-full rounded-xl">
-              <ShieldCheck className="w-6 h-6" /> <span className="text-[10px] font-black uppercase">Verify</span>
-            </Button>
-          </Link>
-        </div>
-        <div className="flex items-center justify-center gap-6 mt-2 pt-2 border-t border-white/5">
-          <a href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} target="_blank" rel="noopener noreferrer">
-            <img src="https://pump.fun/favicon.ico" className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity" alt="Pump" />
-          </a>
-          <a href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} target="_blank" rel="noopener noreferrer">
-            <img src="https://dexscreener.com/favicon.png" className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity" alt="Dex" />
-          </a>
-          <a href={PROTOCOL_CONFIG.TWITTER_URL} target="_blank" rel="noopener noreferrer">
-            <SiX className="w-4 h-4 text-white opacity-60 hover:opacity-100 transition-opacity" />
-          </a>
         </div>
       </div>
     </div>
