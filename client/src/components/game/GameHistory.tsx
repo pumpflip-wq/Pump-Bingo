@@ -78,7 +78,7 @@ function HistoryItem({ id, winner, prize, formatAddress, completedAt }: { id: nu
             </span>
           )}
         </div>
-        <span className="text-primary font-black font-display italic text-lg">+{formatCurrency(prize)} {PROTOCOL_CONFIG.SYMBOL}</span>
+        <span className="text-primary font-black font-display italic text-lg">+{formatCurrency(prize, false)} {PROTOCOL_CONFIG.SYMBOL}</span>
       </div>
       <div className="flex justify-between items-center">
         <span className="text-sm font-black text-white italic">@{formatAddress(winner)}</span>

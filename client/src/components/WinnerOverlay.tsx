@@ -110,7 +110,7 @@ export function WinnerOverlay({ show, username, prize, isWinner, isParticipant, 
                     <p className="text-5xl font-black text-primary italic leading-none drop-shadow-[0_0_20px_rgba(57,255,20,0.5)]">
                       {formatCurrency(prize, false)}
                     </p>
-                    <span className="text-[10px] font-black text-primary italic uppercase tracking-[0.3em] mt-2">{PROTOCOL_CONFIG.SYMBOL} TOKEN</span>
+                    <span className="text-[10px] font-black text-primary italic uppercase tracking-[0.3em] mt-2">{PROTOCOL_CONFIG.SYMBOL}</span>
                   </div>
                 </div>
                 {isWinner && explorerUrl && (

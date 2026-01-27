@@ -6,7 +6,7 @@ import { CyberButton } from "@/components/ui/CyberButton";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
 import { getAssociatedTokenAddress, createTransferCheckedInstruction, getAccount } from "@solana/spl-token";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -201,7 +201,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         <div className="flex items-center justify-center gap-4">
           <span>JOIN GAME -</span>
           <span className="text-3xl text-black font-black">
-            {formatCurrency(price)} {PROTOCOL_CONFIG.SYMBOL}
+            {formatCurrency(price, false)} {PROTOCOL_CONFIG.SYMBOL}
           </span>
         </div>
       )}
