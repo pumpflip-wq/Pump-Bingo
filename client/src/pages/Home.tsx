@@ -282,16 +282,16 @@ export default function Home() {
   );
 
   const mobileView = (
-    <div className="lg:hidden flex flex-col h-[calc(100dvh-140px)] w-full overflow-hidden relative">
-      <div className="flex items-center justify-between bg-black/40 border-b border-white/5 p-2 shrink-0">
-        <Button variant={activeTab === "game" ? "default" : "ghost"} onClick={() => setActiveTab("game")} className="flex-1 gap-2 h-10">
-          <Gamepad2 className="w-4 h-4" /> <span>Game</span>
+    <div className="lg:hidden flex flex-col h-[calc(100dvh-140px)] w-full overflow-hidden relative bg-black/40">
+      <div className="flex items-center justify-between bg-black/60 border-b border-white/10 p-1 shrink-0">
+        <Button variant={activeTab === "game" ? "default" : "ghost"} onClick={() => setActiveTab("game")} className="flex-1 gap-2 h-12 text-sm font-black uppercase italic">
+          <Gamepad2 className="w-5 h-5" /> <span>Game</span>
         </Button>
-        <Button variant={activeTab === "players" ? "default" : "ghost"} onClick={() => setActiveTab("players")} className="flex-1 gap-2 h-10">
-          <Users className="w-4 h-4" /> <span>Players</span>
+        <Button variant={activeTab === "players" ? "default" : "ghost"} onClick={() => setActiveTab("players")} className="flex-1 gap-2 h-12 text-sm font-black uppercase italic">
+          <Users className="w-5 h-5" /> <span>Players</span>
         </Button>
-        <Button variant={activeTab === "history" ? "default" : "ghost"} onClick={() => setActiveTab("history")} className="flex-1 gap-2 h-10">
-          <History className="w-4 h-4" /> <span>History</span>
+        <Button variant={activeTab === "history" ? "default" : "ghost"} onClick={() => setActiveTab("history")} className="flex-1 gap-2 h-12 text-sm font-black uppercase italic">
+          <History className="w-5 h-5" /> <span>History</span>
         </Button>
       </div>
 
@@ -300,19 +300,19 @@ export default function Home() {
           {activeTab === "game" && (
             <motion.div key="game" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="h-full flex flex-col space-y-3">
               {roundData.round.status === "OPEN" || roundData.round.status === "STARTING" ? (
-                <div className="glass-card neon-border rounded-[2rem] p-5 flex-1 flex flex-col items-center justify-between bg-black/40 overflow-hidden">
-                  <div className="w-full flex justify-between items-center px-2">
+                <div className="glass-card neon-border rounded-[2rem] p-5 flex-1 flex flex-col items-center justify-between bg-black/60 overflow-hidden">
+                  <div className="w-full flex justify-between items-center px-4 py-2 bg-white/5 rounded-2xl border border-white/10">
                     <div className="text-center">
-                      <p className="text-[10px] uppercase font-black text-white/60">Room</p>
-                      <p className="text-xl font-black text-white">#{roundData.round.id}</p>
+                      <p className="text-[12px] uppercase font-black text-white/80 tracking-widest">Room</p>
+                      <p className="text-2xl font-black text-white italic">#{roundData.round.id}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-[10px] uppercase font-black text-white/60">Prize</p>
-                      <p className="text-xl font-black text-primary">{formatCurrency(roundData.round.prizePool || 0)}</p>
+                      <p className="text-[12px] uppercase font-black text-white/80 tracking-widest">Prize</p>
+                      <p className="text-2xl font-black text-primary italic drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">{formatCurrency(roundData.round.prizePool || 0)}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-[10px] uppercase font-black text-white/60">Players</p>
-                      <p className="text-xl font-black text-white">{roundData.participantsCount}</p>
+                      <p className="text-[12px] uppercase font-black text-white/80 tracking-widest">Players</p>
+                      <p className="text-2xl font-black text-white italic">{roundData.participantsCount}</p>
                     </div>
                   </div>
 

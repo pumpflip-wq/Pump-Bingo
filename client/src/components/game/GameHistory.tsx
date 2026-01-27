@@ -13,38 +13,7 @@ interface GameHistoryProps {
 
 export function GameHistory({ historyRounds, historyLoading, formatAddress, currentRoundHash }: GameHistoryProps) {
   return (
-    <div className="flex flex-col h-full gap-4">
-      {/* Live Feed Integrated */}
-      <div className="glass-card neon-border rounded-2xl p-4 lg:p-6 bg-black/20 border-primary/20 flex flex-col min-h-[250px]">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Live Feed
-          </h3>
-        </div>
-        <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar">
-          {historyLoading ? (
-            <div className="flex justify-center py-4">
-              <Loader2 className="w-5 h-5 text-primary animate-spin" />
-            </div>
-          ) : historyRounds?.rounds?.length ? (
-            historyRounds.rounds.slice(0, 5).map((hr: any) => (
-              <div key={`feed-${hr.id}`} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                <div className="flex flex-col">
-                  <span className="text-[10px] text-white/40 font-black uppercase">Round #{hr.id}</span>
-                  <span className="text-xs font-black text-white italic">@{formatAddress(hr.winnerUsername || "Anon")}</span>
-                </div>
-                <span className="text-xs font-black text-primary">+{formatCurrency(hr.prizePool, false)}</span>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-4 opacity-30">
-              <p className="text-[10px] uppercase font-black tracking-widest text-white">No activity</p>
-            </div>
-          )}
-        </div>
-      </div>
-
+    <div className="flex flex-col h-full">
       {/* Game History */}
       <div className="glass-card neon-border rounded-2xl p-4 lg:p-6 flex flex-col flex-1 overflow-hidden bg-black/20">
         <div className="flex items-center justify-between mb-4 lg:mb-6">

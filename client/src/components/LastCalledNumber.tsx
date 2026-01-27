@@ -10,10 +10,10 @@ export function LastCalledNumber({ numbers }: LastCalledNumberProps) {
   return (
     <div className="flex flex-col items-center justify-center space-y-3 lg:mt-0">
       <div className="flex items-center gap-3">
-        <span className="text-lg lg:text-[22px] text-white uppercase font-black tracking-widest font-display">Live Feed</span>
+        <span className="text-xl lg:text-3xl text-white uppercase font-black tracking-widest font-display italic">Live Feed</span>
       </div>
 
-      <div className="relative w-24 h-24 lg:w-32 lg:h-32 flex items-center justify-center">
+      <div className="relative w-28 h-28 lg:w-40 lg:h-40 flex items-center justify-center">
         {/* Professional Gaming Ring Effects */}
         <motion.div 
             animate={{ rotate: 360 }}
