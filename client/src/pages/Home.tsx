@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { ROUND_STATUS } from "@shared/schema";
+import { SiX } from "react-icons/si";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { JoinButton } from "@/components/JoinButton";
 import { BingoClaimButton } from "@/components/BingoClaimButton";
@@ -420,7 +421,7 @@ export default function Home() {
             prize={overlayState.prize}
             isWinner={overlayState.isWinner}
             isParticipant={overlayState.isParticipant}
-            txHash={overlayState.txHash}
+            txHash={overlayState.txHash || ""}
             onClose={() => setHasManuallyClosed(true)}
             timeLeft={overlayState.timeLeft}
           />
