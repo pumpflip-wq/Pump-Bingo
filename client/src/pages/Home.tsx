@@ -282,19 +282,7 @@ export default function Home() {
   );
 
   const mobileView = (
-    <div className="lg:hidden flex flex-col h-[calc(100dvh-140px)] w-full overflow-hidden relative bg-black/40">
-      <div className="flex items-center justify-between bg-black/60 border-b border-white/10 p-1 shrink-0">
-        <Button variant={activeTab === "game" ? "default" : "ghost"} onClick={() => setActiveTab("game")} className="flex-1 gap-2 h-12 text-sm font-black uppercase italic">
-          <Gamepad2 className="w-5 h-5" /> <span>Game</span>
-        </Button>
-        <Button variant={activeTab === "players" ? "default" : "ghost"} onClick={() => setActiveTab("players")} className="flex-1 gap-2 h-12 text-sm font-black uppercase italic">
-          <Users className="w-5 h-5" /> <span>Players</span>
-        </Button>
-        <Button variant={activeTab === "history" ? "default" : "ghost"} onClick={() => setActiveTab("history")} className="flex-1 gap-2 h-12 text-sm font-black uppercase italic">
-          <History className="w-5 h-5" /> <span>History</span>
-        </Button>
-      </div>
-
+    <div className="lg:hidden flex flex-col h-[calc(100dvh-140px)] w-full overflow-hidden relative">
       <div className="flex-1 relative overflow-hidden p-3 lg:p-0">
         <AnimatePresence mode="wait">
           {activeTab === "game" && (
@@ -380,6 +368,18 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 bg-black/80 border-t border-white/10 p-2 z-[60] flex items-center justify-around">
+        <Button variant={activeTab === "game" ? "default" : "ghost"} onClick={() => setActiveTab("game")} className="flex flex-col items-center gap-1 h-14 w-full">
+          <Gamepad2 className="w-5 h-5" /> <span className="text-[10px] font-black uppercase">Game</span>
+        </Button>
+        <Button variant={activeTab === "players" ? "default" : "ghost"} onClick={() => setActiveTab("players")} className="flex flex-col items-center gap-1 h-14 w-full">
+          <Users className="w-5 h-5" /> <span className="text-[10px] font-black uppercase">Players</span>
+        </Button>
+        <Button variant={activeTab === "history" ? "default" : "ghost"} onClick={() => setActiveTab("history")} className="flex flex-col items-center gap-1 h-14 w-full">
+          <History className="w-5 h-5" /> <span className="text-[10px] font-black uppercase">History</span>
+        </Button>
       </div>
     </div>
   );
