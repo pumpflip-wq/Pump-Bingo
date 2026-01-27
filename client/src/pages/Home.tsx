@@ -211,21 +211,21 @@ export default function Home() {
       if (amIParticipant && (winnerDeclaredAt || roundData?.round?.winnerId) && elapsed < totalDisplayTime && !hasManuallyClosed) {
         const winner = roundData?.participants?.find(
           (p: any) =>
-            Number(p.userId || p.id) === Number(roundData.round.winnerId)
+            Number(p.userId || p.id) === Number(roundData?.round.winnerId)
         );
         const winnerUsername =
           winner?.username ||
           (isMe
             ? walletAddress
-            : roundData.round.winnerId?.toString() || "Unknown");
+            : roundData?.round.winnerId?.toString() || "Unknown");
 
         return {
           show: true,
           username: winnerUsername || "Unknown",
-          prize: roundData.round.prizePool || 0,
+          prize: roundData?.round.prizePool || 0,
           isWinner: isMe,
           isParticipant: amIParticipant,
-          txHash: roundData.round.payoutSignature || undefined,
+          txHash: roundData?.round.payoutSignature || undefined,
           timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
           currentRoundId: currentRoundId,
         };
@@ -517,30 +517,30 @@ export default function Home() {
                                     <p className="text-white text-lg uppercase font-black tracking-[0.2em] opacity-80">Winner</p>
                                     <p className="text-5xl font-black text-primary italic tracking-tighter uppercase font-display">
                                       {(() => {
-                                        const winnerKey = roundData.round.winnerUsername?.toLowerCase() || null;
+                                        const winnerKey = (roundData?.round as any)?.winnerUsername?.toLowerCase() || null;
                                         
                                         // Also normalize participants list for comparison
-                                        const participants = (roundData.participants || sortedParticipants || [])
+                                        const participantsList = (roundData?.participants || sortedParticipants || [])
                                           .map((p: any) => ({
                                             ...p,
                                             _key: (p.username || "").toLowerCase(),
                                           }));
 
-                                        const winner = participants.find((p: any) => 
+                                        const winner = participantsList.find((p: any) => 
                                           winnerKey && p._key === winnerKey
                                         );
                                         
                                         if (winner?.username) return formatAddress(winner.username);
-                                        if (roundData.round.winnerUsername) return formatAddress(roundData.round.winnerUsername);
+                                        if ((roundData?.round as any)?.winnerUsername) return formatAddress((roundData?.round as any).winnerUsername);
                                         
                                         // Extra safety: check winnerUserId as last resort if username match failed
-                                        const winnerUserId = Number(roundData.round.winnerUserId || 0);
+                                        const winnerUserId = Number((roundData?.round as any)?.winnerUserId || 0);
                                         if (winnerUserId > 0) {
-                                          const winnerById = participants.find(p => Number(p.userId || p.id) === winnerUserId);
+                                          const winnerById = participantsList.find((p: any) => Number(p.userId || p.id) === winnerUserId);
                                           if (winnerById?.username) return formatAddress(winnerById.username);
                                         }
                                         
-                                        if (roundData.round.status === "FINISHED") {
+                                        if (roundData?.round?.status === "FINISHED") {
                                           return "NO WINNER";
                                         }
                                         
@@ -552,7 +552,7 @@ export default function Home() {
                                     <div className="flex flex-col items-center">
                                       <p className="text-white text-xs uppercase font-black tracking-widest opacity-60 mb-1">Total Prize</p>
                                       <p className="text-3xl font-black text-primary italic font-display">
-                                        {formatCurrency(roundData.round.prizePool)} {PROTOCOL_CONFIG.SYMBOL}
+                                        {formatCurrency(roundData?.round?.prizePool || 0)} {PROTOCOL_CONFIG.SYMBOL}
                                       </p>
                                     </div>
                                     <div className="flex flex-col items-center">
@@ -640,13 +640,13 @@ export default function Home() {
           </main>
           <aside className="lg:col-span-3 flex flex-col h-[750px]">
             <div className="glass-card neon-border rounded-2xl p-6 flex flex-col shrink-0 bg-black/40 border-primary/20 mb-4">
-              <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
+              <LastCalledNumber numbers={roundData?.round?.drawnNumbers || []} />
             </div>
             <GameHistory
               historyRounds={historyRounds}
               historyLoading={historyLoading}
               formatAddress={formatAddress}
-              currentRoundHash={roundData.round.publicHash}
+              currentRoundHash={roundData?.round?.publicHash || ""}
             />
           </aside>
         </div>
