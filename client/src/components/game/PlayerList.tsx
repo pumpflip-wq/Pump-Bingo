@@ -71,13 +71,13 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
   }, [activeParticipants, roundStatus, amIParticipating, roundData?.round?.winnerUsername]);
 
   return (
-    <div className="glass-card neon-border rounded-2xl p-6 flex flex-col h-[750px] overflow-hidden bg-black/20">
-      <div className="flex items-center justify-between mb-6 shrink-0">
-        <h3 className="text-[22px] text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
-          <Users className="w-6 h-6 text-primary" /> Active Players
+    <div className="glass-card neon-border rounded-2xl p-4 lg:p-6 flex flex-col h-full lg:h-[750px] overflow-hidden bg-black/20">
+      <div className="flex items-center justify-between mb-4 lg:mb-6 shrink-0">
+        <h3 className="text-lg lg:text-[22px] text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
+          <Users className="w-5 h-5 lg:w-6 lg:h-6 text-primary" /> Active Players
         </h3>
       </div>
-      <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto space-y-2 pr-1 lg:pr-2 custom-scrollbar">
         <AnimatePresence mode="popLayout">
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
