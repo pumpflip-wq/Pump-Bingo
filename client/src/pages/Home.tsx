@@ -13,6 +13,7 @@ import {
   Globe2,
   History,
   Gamepad2,
+  ShieldCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo, useRef } from "react";
