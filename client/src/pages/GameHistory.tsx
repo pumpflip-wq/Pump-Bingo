@@ -102,9 +102,9 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                     </div>
                   </div>
                   {isWinner && (
-                    <div className="px-5 py-2.5 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
-                      <Trophy className="w-4 h-4" />
-                      <span className="text-xs font-black uppercase tracking-tighter italic font-display">WINNER</span>
+                    <div className="px-6 py-3 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_25px_rgba(34,197,94,0.6)] border border-white/20">
+                      <Trophy className="w-5 h-5" />
+                      <span className="text-sm font-black uppercase tracking-widest italic font-display">WINNER</span>
                     </div>
                   )}
                 </div>
