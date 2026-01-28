@@ -393,13 +393,13 @@ export default function Home() {
       <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10 p-2 z-[60] pb-safe">
         <div className="flex items-center justify-around max-w-md mx-auto">
           <Button variant={activeTab === "game" ? "default" : "ghost"} onClick={() => setActiveTab("game")} className="flex flex-col items-center gap-1 h-14 w-full rounded-xl" data-testid="button-nav-game">
-            <Gamepad2 className="w-6 h-6" /> <span className="text-[10px] font-black uppercase">Game</span>
+            <Gamepad2 className="w-6 h-6" /> <span className="text-xs font-black uppercase">Game</span>
           </Button>
           <Button variant={activeTab === "players" ? "default" : "ghost"} onClick={() => setActiveTab("players")} className="flex flex-col items-center gap-1 h-14 w-full rounded-xl" data-testid="button-nav-players">
-            <Users className="w-6 h-6" /> <span className="text-[10px] font-black uppercase">Players</span>
+            <Users className="w-6 h-6" /> <span className="text-xs font-black uppercase">Players</span>
           </Button>
           <Button variant={activeTab === "history" ? "default" : "ghost"} onClick={() => setActiveTab("history")} className="flex flex-col items-center gap-1 h-14 w-full rounded-xl" data-testid="button-nav-history">
-            <History className="w-6 h-6" /> <span className="text-[10px] font-black uppercase">History</span>
+            <History className="w-6 h-6" /> <span className="text-xs font-black uppercase">History</span>
           </Button>
         </div>
       </div>
