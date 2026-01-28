@@ -405,6 +405,7 @@ export default function Home() {
       <AnimatePresence>
         {overlayState?.show && (
           <WinnerOverlay
+            show={overlayState.show}
             username={overlayState.username}
             prize={overlayState.prize}
             isWinner={overlayState.isWinner}
@@ -412,7 +413,6 @@ export default function Home() {
             txHash={overlayState.txHash || ""}
             onClose={() => setHasManuallyClosed(true)}
             timeLeft={overlayState.timeLeft}
-            currentRoundId={overlayState.currentRoundId || 0}
           />
         )}
       </AnimatePresence>

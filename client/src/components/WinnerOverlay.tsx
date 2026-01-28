@@ -13,7 +13,7 @@ interface WinnerOverlayProps {
   isWinner: boolean;
   isParticipant?: boolean;
   timeLeft: number;
-  txHash?: string;
+  txHash: string;
   onClose: () => void;
 }
 
