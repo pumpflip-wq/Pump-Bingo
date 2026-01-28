@@ -72,14 +72,14 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
               });
 
             return participants.map((p: any, idx: number) => {
-              const isWinner = winnerId && Number(p.userId) === Number(winnerId);
+              const isWinner = winnerId && (String(p.userId) === String(winnerId) || String(p.id) === String(winnerId));
               return (
                 <div 
                   key={`${roundId}-${p.userId || p.id}-${idx}`} 
                   className={cn(
-                    "flex items-center justify-between p-3 rounded-xl border transition-all relative",
+                    "flex items-center justify-between p-3 rounded-xl border transition-all relative overflow-hidden",
                     isWinner 
-                      ? "bg-primary/10 border-primary shadow-[0_0_20px_rgba(34,197,94,0.2)]" 
+                      ? "bg-primary/20 border-primary shadow-[0_0_20px_rgba(34,197,94,0.3)] z-10" 
                       : "bg-white/5 border-white/10"
                   )}
                 >
@@ -88,11 +88,11 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                       <div className="flex items-center gap-2">
                         <p className={cn(
                           "text-sm font-black uppercase tracking-tighter",
-                          isWinner ? "text-primary" : "text-white"
+                          isWinner ? "text-primary drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]" : "text-white"
                         )}>
                           {p.username ? p.username.length > 15 ? `${p.username.slice(0, 6)}...${p.username.slice(-4)}` : p.username : "Unknown"}
                         </p>
-                        {isWinner && <Trophy className="w-4 h-4 text-primary animate-pulse" />}
+                        {isWinner && <Trophy className="w-4 h-4 text-primary animate-bounce" />}
                       </div>
                       <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60 mt-0.5">
                         {p.joinedAt ? format(new Date(p.joinedAt), "HH:mm:ss") : "--:--:--"}
@@ -100,9 +100,9 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                     </div>
                   </div>
                   {isWinner && (
-                    <div className="px-5 py-2.5 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_25px_rgba(34,197,94,0.5)] border border-white/20">
+                    <div className="px-5 py-2.5 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_25px_rgba(34,197,94,0.6)] border border-white/30">
                       <Trophy className="w-4 h-4" />
-                      <span className="text-xs font-black uppercase tracking-tighter">WINNER</span>
+                      <span className="text-xs font-black uppercase tracking-tighter italic">WINNER</span>
                     </div>
                   )}
                 </div>
