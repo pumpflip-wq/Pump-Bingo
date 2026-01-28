@@ -263,23 +263,23 @@ export default function GameHistory() {
                     {data?.rounds.map((round) => (
                       <div key={round.id} className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-4">
                         <div className="flex items-center justify-between">
-                          <span className="font-mono font-bold text-primary text-lg">#{round.id}</span>
-                          <span className="text-xs text-white font-bold opacity-80">
+                          <span className="font-mono font-bold text-primary text-xl">#{round.id}</span>
+                          <span className="text-sm text-white font-bold opacity-80">
                             {round.completedAt ? format(new Date(round.completedAt), "MMM d, HH:mm") : "-"}
                           </span>
                         </div>
                         
                         <div className="flex items-center justify-between">
                           <div className="space-y-1">
-                            <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-90">Winner</p>
-                            <div className="font-bold italic text-sm flex items-center gap-2">
-                              <Trophy className="w-3.5 h-3.5 text-primary" />
+                            <p className="text-xs text-white font-black uppercase tracking-widest opacity-90">Winner</p>
+                            <div className="font-bold italic text-base md:text-lg flex items-center gap-2">
+                              <Trophy className="w-5 h-5 text-primary" />
                               <span className="text-white">{round.winnerUsername ? formatAddress(round.winnerUsername) : "No Winner"}</span>
                             </div>
                           </div>
                           <div className="text-right space-y-1">
-                            <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-90">Prize</p>
-                            <p className="font-black text-primary text-base">
+                            <p className="text-xs text-white font-black uppercase tracking-widest opacity-90">Prize</p>
+                            <p className="font-black text-primary text-xl">
                               {formatCurrency(round.prizePool || 0, false)} {PROTOCOL_CONFIG.SYMBOL}
                             </p>
                           </div>
@@ -289,8 +289,8 @@ export default function GameHistory() {
                           <div className="flex items-center justify-between gap-2">
                             <Dialog>
                               <DialogTrigger asChild>
-                                <Button variant="outline" size="sm" className="flex-1 border-white/10 text-[10px] font-black uppercase tracking-widest">
-                                  <Search className="w-3.5 h-3.5 mr-1.5" /> Details
+                                <Button variant="outline" size="sm" className="flex-1 border-white/10 text-xs font-black uppercase tracking-widest py-5">
+                                  <Search className="w-4 h-4 mr-1.5" /> Details
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white max-w-2xl w-[95vw] max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[2rem]">
@@ -306,13 +306,13 @@ export default function GameHistory() {
                               </DialogContent>
                             </Dialog>
                             <Link href={`/verify?roundId=${round.id}`} className="flex-1">
-                              <Button variant="outline" size="sm" className="w-full border-white/10 text-[10px] font-black uppercase tracking-widest">
-                                <ShieldCheck className="w-3.5 h-3.5 mr-1.5" /> Verify
+                              <Button variant="outline" size="sm" className="w-full border-white/10 text-xs font-black uppercase tracking-widest py-5">
+                                <ShieldCheck className="w-4 h-4 mr-1.5" /> Verify
                               </Button>
                             </Link>
-                            <Button variant="outline" size="sm" className="w-10 border-white/10" asChild>
+                            <Button variant="outline" size="sm" className="w-12 h-10 border-white/10" asChild>
                               <a href={`https://explorer.solana.com/tx/${round.payoutSignature || ''}?cluster=${PROTOCOL_CONFIG.NETWORK}`} target="_blank" rel="noreferrer">
-                                <ExternalLink className="w-3.5 h-3.5" />
+                                <ExternalLink className="w-4 h-4" />
                               </a>
                             </Button>
                           </div>
@@ -329,7 +329,7 @@ export default function GameHistory() {
 
                   {/* Pagination */}
                   <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-4">
-                    <p className="text-[10px] md:text-sm text-white font-mono uppercase font-bold tracking-widest text-center md:text-left">
+                    <p className="text-xs md:text-sm text-white font-mono uppercase font-bold tracking-widest text-center md:text-left">
                       Showing {data?.rounds.length} of {data?.total} rounds
                     </p>
                     <div className="flex items-center gap-2 w-full md:w-auto justify-center">
@@ -338,11 +338,11 @@ export default function GameHistory() {
                         size="sm"
                         disabled={page === 1}
                         onClick={() => setPage(p => p - 1)}
-                        className="flex-none border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px] px-3 h-9"
+                        className="flex-none border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px] px-2 h-8"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </Button>
-                      <div className="flex items-center gap-1.5 overflow-x-auto max-w-[200px] md:max-w-none no-scrollbar py-1">
+                      <div className="flex items-center gap-2 overflow-x-auto max-w-[200px] md:max-w-none no-scrollbar py-1">
                         {[...Array(totalPages)].map((_, i) => (
                           <Button
                             key={i}
@@ -350,7 +350,7 @@ export default function GameHistory() {
                             size="sm"
                             onClick={() => setPage(i + 1)}
                             className={cn(
-                              "min-w-[36px] md:min-w-[40px] h-9 md:h-10 text-xs md:text-sm font-black transition-all",
+                              "min-w-[40px] md:min-w-[44px] h-10 md:h-11 text-sm md:text-base font-black transition-all",
                               page === i + 1 ? "bg-primary text-black scale-110 shadow-[0_0_15px_rgba(34,197,94,0.4)]" : "border-white/10 hover:bg-white/20 text-white"
                             )}
                           >
@@ -363,7 +363,7 @@ export default function GameHistory() {
                         size="sm"
                         disabled={page === totalPages}
                         onClick={() => setPage(p => p + 1)}
-                        className="flex-none border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px] px-3 h-9"
+                        className="flex-none border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px] px-2 h-8"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </Button>

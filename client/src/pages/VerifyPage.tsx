@@ -98,7 +98,60 @@ export default function VerifyPage() {
               <Search className="w-6 h-6 text-primary" /> Current Round
             </h2>
             
-            <div className="overflow-x-auto">
+            <div className="md:hidden space-y-4">
+              {rounds?.slice(0, 5).map((round) => (
+                <div key={round.id} className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono font-bold text-primary text-xl">#{round.id}</span>
+                    <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg w-fit shadow-lg ${
+                      round.status === 'FINISHED' ? 'bg-primary/20 text-primary border border-primary/20' : 
+                      round.status === 'IN_GAME' ? 'bg-orange-500/20 text-orange-500 border border-orange-500/20' :
+                      'bg-white/20 text-white border border-white/20'
+                    }`}>
+                      {round.status}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Drawn Numbers</p>
+                    <div className="flex flex-wrap gap-2">
+                      {round.drawnNumbers && round.drawnNumbers.length > 0 ? (
+                        round.drawnNumbers.map((num, i) => (
+                          <span key={i} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-black text-white border border-white/20">
+                            {num}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs font-black uppercase tracking-widest text-white/40">No draws yet</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-3 border-t border-white/5">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[10px] font-black uppercase text-white/40 shrink-0">Hash:</span>
+                      <span className="font-mono text-xs text-white font-black truncate flex-1">{round.publicHash}</span>
+                      <Copy className="w-4 h-4 text-white/60 cursor-pointer hover:text-primary transition-colors" onClick={() => {
+                        navigator.clipboard.writeText(round.publicHash);
+                        toast({ title: "Hash Copied" });
+                      }} />
+                    </div>
+                    {round.status === 'FINISHED' && round.serverSeed && (
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-[10px] font-black uppercase text-primary shrink-0">Seed:</span>
+                        <span className="font-mono text-xs text-primary font-black truncate flex-1">{round.serverSeed}</span>
+                        <Copy className="w-4 h-4 text-primary cursor-pointer hover:text-white transition-colors" onClick={() => {
+                          navigator.clipboard.writeText(round.serverSeed);
+                          toast({ title: "Seed Copied" });
+                        }} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-white/10">
