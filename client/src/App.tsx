@@ -121,12 +121,12 @@ function AppContent() {
                   )}
                 </nav>
                 <div className="flex items-center gap-1 lg:gap-4">
-                  <div className="hidden lg:flex items-center gap-1 lg:gap-3 bg-black/40 p-1 rounded-xl border border-white/5">
+                  <div className="hidden lg:flex items-center gap-1 lg:gap-3 p-1">
                     <a 
                       href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="w-8 h-8 lg:w-[52px] lg:h-[44px] rounded-lg lg:rounded-xl bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20"
+                      className="w-8 h-8 lg:w-[52px] lg:h-[44px] rounded-lg lg:rounded-xl bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
                       title="Trade on Pump.fun"
                     >
                       <img src="https://pump.fun/favicon.ico" className="w-4 h-4 lg:w-7 lg:h-7 object-contain" alt="Pump.fun" />
@@ -135,7 +135,7 @@ function AppContent() {
                       href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="w-8 h-8 lg:w-[52px] lg:h-[44px] rounded-lg lg:rounded-xl bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20"
+                      className="w-8 h-8 lg:w-[52px] lg:h-[44px] rounded-lg lg:rounded-xl bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
                       title="Chart on Dexscreener"
                     >
                       <img src="https://dexscreener.com/favicon.png" className="w-4 h-4 lg:w-7 lg:h-7 object-contain" alt="Dexscreener" />
@@ -144,7 +144,7 @@ function AppContent() {
                       href={PROTOCOL_CONFIG.TWITTER_URL} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="w-8 h-8 lg:w-[52px] lg:h-[44px] rounded-lg lg:rounded-xl bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20 text-white hover:text-primary"
+                      className="w-8 h-8 lg:w-[52px] lg:h-[44px] rounded-lg lg:rounded-xl bg-white/[0.15] hover:bg-white/[0.25] transition-all flex items-center justify-center border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.05)] text-white hover:text-primary"
                       title="Follow on X"
                     >
                       <SiX className="w-3 h-3 lg:w-5 lg:h-5" />
