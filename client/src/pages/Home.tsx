@@ -301,11 +301,7 @@ export default function Home() {
             <motion.div key="game" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="h-full flex flex-col space-y-3">
               {roundData.round.status === "OPEN" || roundData.round.status === "STARTING" ? (
                 <div className="glass-card neon-border rounded-[2rem] p-4 flex-1 flex flex-col items-center justify-between bg-black/60 overflow-hidden relative">
-                  <div className="absolute top-4 left-4 right-4 z-10">
-                    <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
-                  </div>
-                  
-                  <div className="w-full flex justify-between items-center px-4 py-2 bg-white/5 rounded-2xl border border-white/10 mt-16">
+                  <div className="w-full flex justify-between items-center px-4 py-2 bg-white/5 rounded-2xl border border-white/10 z-20 relative">
                     <div className="text-center">
                       <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Room</p>
                       <p className="text-xl font-black text-white italic">#{roundData.round.id}</p>
@@ -320,8 +316,13 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="flex-1 flex flex-col items-center justify-center py-2 max-h-[150px]">
-                    <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={roundData.participantsCount < 2} />
+                  <div className="flex-1 flex flex-col items-center justify-center py-2 w-full relative">
+                    <div className="flex flex-col items-center w-full px-4 mb-4">
+                      <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
+                    </div>
+                    <div className="mt-2">
+                      <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={roundData.participantsCount < 2} />
+                    </div>
                   </div>
 
                   <div className="w-full mt-auto">
