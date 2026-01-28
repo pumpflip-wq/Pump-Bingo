@@ -1,5 +1,5 @@
 import { History, Loader2, ExternalLink } from "lucide-react";
-import { formatAddress, formatCurrency } from "@/lib/utils";
+import { formatAddress, formatCurrency, cn } from "@/lib/utils";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import { PROTOCOL_CONFIG } from "@shared/config";
@@ -37,6 +37,7 @@ export function GameHistory({ historyRounds, historyLoading, formatAddress, curr
                   prize={hr.prizePool} 
                   formatAddress={formatAddress}
                   completedAt={hr.completedAt ? hr.completedAt.toString() : null}
+                  payoutSignature={hr.payoutSignature}
                 />
               ))
             ) : (
@@ -66,10 +67,13 @@ export function GameHistory({ historyRounds, historyLoading, formatAddress, curr
   );
 }
 
-function HistoryItem({ id, winner, prize, formatAddress, completedAt }: { id: number, winner: string, prize: number, formatAddress: (addr: string) => string, completedAt?: string | null }) {
-  const explorerUrl = PROTOCOL_CONFIG.MINT_ADDRESS 
-    ? `https://solscan.io/token/${PROTOCOL_CONFIG.MINT_ADDRESS}?cluster=${PROTOCOL_CONFIG.NETWORK}`
-    : `https://solscan.io/address/${PROTOCOL_CONFIG.ADMIN_WALLET}?cluster=${PROTOCOL_CONFIG.NETWORK}`;
+function HistoryItem({ id, winner, prize, formatAddress, completedAt, payoutSignature }: { id: number, winner: string, prize: number, formatAddress: (addr: string) => string, completedAt?: string | null, payoutSignature?: string | null }) {
+  const explorerUrl = payoutSignature 
+    ? `https://solscan.io/tx/${payoutSignature}?cluster=${PROTOCOL_CONFIG.NETWORK === 'mainnet-beta' ? '' : 'devnet'}`
+    : PROTOCOL_CONFIG.MINT_ADDRESS 
+      ? `https://solscan.io/token/${PROTOCOL_CONFIG.MINT_ADDRESS}?cluster=${PROTOCOL_CONFIG.NETWORK === 'mainnet-beta' ? '' : 'devnet'}`
+      : `https://solscan.io/address/${PROTOCOL_CONFIG.ADMIN_WALLET}?cluster=${PROTOCOL_CONFIG.NETWORK === 'mainnet-beta' ? '' : 'devnet'}`;
+  
   return (
     <a href={explorerUrl} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white/5 rounded-2xl border border-white/5 transition-all hover:border-primary/50 hover:bg-white/10 group relative">
       <div className="flex justify-between items-start mb-2">
@@ -86,7 +90,7 @@ function HistoryItem({ id, winner, prize, formatAddress, completedAt }: { id: nu
       <div className="flex justify-between items-center">
         <span className="text-sm font-black text-white italic">@{formatAddress(winner)}</span>
         <div className="flex items-center gap-2">
-          <ExternalLink className="w-4 h-4 text-primary/40 group-hover:text-primary transition-colors" />
+          <ExternalLink className={cn("w-4 h-4 transition-colors", payoutSignature ? "text-primary" : "text-primary/40 group-hover:text-primary")} />
         </div>
       </div>
     </a>

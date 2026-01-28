@@ -248,8 +248,8 @@ export default function GameHistory() {
                                   </Button>
                                 </Link>
                                 <Button variant="ghost" size="icon" className="h-10 w-10 hover:text-primary transition-colors" asChild>
-                                  <a href={`https://solscan.io/tx/${round.payoutSignature || ''}?cluster=${PROTOCOL_CONFIG.NETWORK === 'mainnet-beta' ? '' : 'devnet'}`} target="_blank" rel="noreferrer">
-                                    <ExternalLink className="w-5 h-5" />
+                                  <a href={round.payoutSignature ? `https://solscan.io/tx/${round.payoutSignature}?cluster=${PROTOCOL_CONFIG.NETWORK === 'mainnet-beta' ? '' : 'devnet'}` : "#"} target="_blank" rel="noreferrer" onClick={(e) => !round.payoutSignature && e.preventDefault()}>
+                                    <ExternalLink className={cn("w-5 h-5", !round.payoutSignature && "opacity-20")} />
                                   </a>
                                 </Button>
                               </div>
@@ -313,8 +313,8 @@ export default function GameHistory() {
                               </Button>
                             </Link>
                             <Button variant="outline" size="sm" className="w-10 h-9 border-white/10 p-0" asChild>
-                              <a href={`https://solscan.io/tx/${round.payoutSignature || ''}?cluster=${PROTOCOL_CONFIG.NETWORK === 'mainnet-beta' ? '' : 'devnet'}`} target="_blank" rel="noreferrer">
-                                <ExternalLink className="w-3.5 h-3.5" />
+                              <a href={round.payoutSignature ? `https://solscan.io/tx/${round.payoutSignature}?cluster=${PROTOCOL_CONFIG.NETWORK === 'mainnet-beta' ? '' : 'devnet'}` : "#"} target="_blank" rel="noreferrer" onClick={(e) => !round.payoutSignature && e.preventDefault()}>
+                                <ExternalLink className={cn("w-3.5 h-3.5", !round.payoutSignature && "opacity-20")} />
                               </a>
                             </Button>
                           </div>
