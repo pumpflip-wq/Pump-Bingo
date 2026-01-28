@@ -150,20 +150,21 @@ export default function GameHistory() {
             </p>
           </div>
 
-          <Card className="glass-card neon-border bg-black/40 border-primary/20">
-            <CardHeader>
-              <CardTitle className="text-xl font-black italic tracking-widest uppercase flex items-center gap-2">
+          <Card className="glass-card neon-border bg-black/40 border-primary/20 overflow-hidden">
+            <CardHeader className="px-4 py-6 md:p-6">
+              <CardTitle className="text-lg md:text-xl font-black italic tracking-widest uppercase flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-primary" /> All Completed Rounds
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 pb-6 md:p-6">
               {isLoading ? (
                 <div className="flex justify-center py-20">
                   <Loader2 className="w-10 h-10 text-primary animate-spin" />
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <div className="rounded-xl border border-white/10 overflow-hidden overflow-x-auto">
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block rounded-xl border border-white/10 overflow-hidden overflow-x-auto">
                     <Table>
                       <TableHeader className="bg-white/5">
                         <TableRow>
@@ -251,39 +252,105 @@ export default function GameHistory() {
                             </TableCell>
                           </TableRow>
                         ))}
-                        {data?.rounds.length === 0 && (
-                          <TableRow>
-                            <TableCell colSpan={6} className="text-center py-20 opacity-30 uppercase font-black tracking-widest">
-                              No games found
-                            </TableCell>
-                          </TableRow>
-                        )}
                       </TableBody>
                     </Table>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4">
-                    <p className="text-sm text-white font-mono uppercase font-bold tracking-widest">
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-4">
+                    {data?.rounds.map((round) => (
+                      <div key={round.id} className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono font-bold text-primary text-lg">#{round.id}</span>
+                          <span className="text-xs text-white/40 font-bold">
+                            {round.completedAt ? format(new Date(round.completedAt), "MMM d, HH:mm") : "-"}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Winner</p>
+                            <div className="font-bold italic text-sm flex items-center gap-2">
+                              <Trophy className="w-3.5 h-3.5 text-primary" />
+                              {round.winnerUsername ? formatAddress(round.winnerUsername) : "No Winner"}
+                            </div>
+                          </div>
+                          <div className="text-right space-y-1">
+                            <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Prize</p>
+                            <p className="font-black text-primary text-base">
+                              {formatCurrency(round.prizePool || 0, false)} {PROTOCOL_CONFIG.SYMBOL}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2 pt-2 border-t border-white/5">
+                          <div className="flex items-center justify-between gap-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="outline" size="sm" className="flex-1 border-white/10 text-[10px] font-black uppercase tracking-widest">
+                                  <Search className="w-3.5 h-3.5 mr-1.5" /> Details
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="glass-card neon-border border-primary/20 bg-black/95 text-white max-w-2xl w-[95vw] max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-[2rem]">
+                                <DialogHeader className="p-5 pb-2 shrink-0">
+                                  <DialogTitle className="text-2xl font-black italic tracking-tighter uppercase flex items-center gap-2">
+                                    <History className="w-6 h-6 text-primary" />
+                                    Round <span className="text-primary">#{round.id}</span>
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <div className="flex-1 overflow-y-auto custom-scrollbar px-5 pb-5">
+                                  <RoundDetailsModal roundId={round.id} />
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            <Link href={`/verify?roundId=${round.id}`} className="flex-1">
+                              <Button variant="outline" size="sm" className="w-full border-white/10 text-[10px] font-black uppercase tracking-widest">
+                                <ShieldCheck className="w-3.5 h-3.5 mr-1.5" /> Verify
+                              </Button>
+                            </Link>
+                            <Button variant="outline" size="sm" className="w-10 border-white/10" asChild>
+                              <a href={`https://explorer.solana.com/tx/${round.payoutSignature || ''}?cluster=${PROTOCOL_CONFIG.NETWORK}`} target="_blank" rel="noreferrer">
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {data?.rounds.length === 0 && (
+                    <div className="text-center py-20 opacity-30 uppercase font-black tracking-widest">
+                      No games found
+                    </div>
+                  )}
+
+                  {/* Pagination */}
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-4">
+                    <p className="text-[10px] md:text-sm text-white font-mono uppercase font-bold tracking-widest text-center md:text-left">
                       Showing {data?.rounds.length} of {data?.total} rounds
                     </p>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-full md:w-auto justify-center">
                       <Button
                         variant="outline"
                         size="sm"
                         disabled={page === 1}
                         onClick={() => setPage(p => p - 1)}
-                        className="border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px]"
+                        className="flex-1 md:flex-none border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px] px-3 h-9"
                       >
-                        <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+                        <ChevronLeft className="w-4 h-4 md:mr-1" /> <span className="hidden md:inline">Previous</span>
                       </Button>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 overflow-x-auto max-w-[150px] md:max-w-none no-scrollbar">
                         {[...Array(totalPages)].map((_, i) => (
                           <Button
                             key={i}
                             variant={page === i + 1 ? "default" : "outline"}
                             size="sm"
                             onClick={() => setPage(i + 1)}
-                            className={page === i + 1 ? "bg-primary text-black font-black" : "border-white/10 hover:bg-white/20 text-white font-black"}
+                            className={cn(
+                              "min-w-[32px] md:min-w-[36px] h-9 font-black",
+                              page === i + 1 ? "bg-primary text-black" : "border-white/10 hover:bg-white/20 text-white"
+                            )}
                           >
                             {i + 1}
                           </Button>
@@ -294,9 +361,9 @@ export default function GameHistory() {
                         size="sm"
                         disabled={page === totalPages}
                         onClick={() => setPage(p => p + 1)}
-                        className="border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px]"
+                        className="flex-1 md:flex-none border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px] px-3 h-9"
                       >
-                        Next <ChevronRight className="w-4 h-4 ml-1" />
+                        <span className="hidden md:inline text-nowrap">Next</span> <ChevronRight className="w-4 h-4 md:ml-1" />
                       </Button>
                     </div>
                   </div>
