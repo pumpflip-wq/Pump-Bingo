@@ -153,7 +153,9 @@ export default function GameHistory() {
           <Card className="glass-card neon-border bg-black/40 border-primary/20 overflow-hidden">
             <CardHeader className="px-4 py-6 md:p-6">
               <CardTitle className="text-lg md:text-xl font-black italic tracking-widest uppercase flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-primary" /> All Completed Rounds
+                <Trophy className="w-5 h-5 text-primary" /> 
+                <span className="md:hidden">Completed Rounds</span>
+                <span className="hidden md:inline">All Completed Rounds</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-6 md:p-6">
@@ -262,21 +264,21 @@ export default function GameHistory() {
                       <div key={round.id} className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-4">
                         <div className="flex items-center justify-between">
                           <span className="font-mono font-bold text-primary text-lg">#{round.id}</span>
-                          <span className="text-xs text-white/40 font-bold">
+                          <span className="text-xs text-white font-bold opacity-80">
                             {round.completedAt ? format(new Date(round.completedAt), "MMM d, HH:mm") : "-"}
                           </span>
                         </div>
                         
                         <div className="flex items-center justify-between">
                           <div className="space-y-1">
-                            <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Winner</p>
+                            <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-90">Winner</p>
                             <div className="font-bold italic text-sm flex items-center gap-2">
                               <Trophy className="w-3.5 h-3.5 text-primary" />
-                              {round.winnerUsername ? formatAddress(round.winnerUsername) : "No Winner"}
+                              <span className="text-white">{round.winnerUsername ? formatAddress(round.winnerUsername) : "No Winner"}</span>
                             </div>
                           </div>
                           <div className="text-right space-y-1">
-                            <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Prize</p>
+                            <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-90">Prize</p>
                             <p className="font-black text-primary text-base">
                               {formatCurrency(round.prizePool || 0, false)} {PROTOCOL_CONFIG.SYMBOL}
                             </p>
@@ -336,11 +338,11 @@ export default function GameHistory() {
                         size="sm"
                         disabled={page === 1}
                         onClick={() => setPage(p => p - 1)}
-                        className="flex-1 md:flex-none border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px] px-3 h-9"
+                        className="flex-none border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px] px-3 h-9"
                       >
-                        <ChevronLeft className="w-4 h-4 md:mr-1" /> <span className="hidden md:inline">Previous</span>
+                        <ChevronLeft className="w-4 h-4" />
                       </Button>
-                      <div className="flex items-center gap-1 overflow-x-auto max-w-[150px] md:max-w-none no-scrollbar">
+                      <div className="flex items-center gap-1.5 overflow-x-auto max-w-[200px] md:max-w-none no-scrollbar py-1">
                         {[...Array(totalPages)].map((_, i) => (
                           <Button
                             key={i}
@@ -348,8 +350,8 @@ export default function GameHistory() {
                             size="sm"
                             onClick={() => setPage(i + 1)}
                             className={cn(
-                              "min-w-[32px] md:min-w-[36px] h-9 font-black",
-                              page === i + 1 ? "bg-primary text-black" : "border-white/10 hover:bg-white/20 text-white"
+                              "min-w-[36px] md:min-w-[40px] h-9 md:h-10 text-xs md:text-sm font-black transition-all",
+                              page === i + 1 ? "bg-primary text-black scale-110 shadow-[0_0_15px_rgba(34,197,94,0.4)]" : "border-white/10 hover:bg-white/20 text-white"
                             )}
                           >
                             {i + 1}
@@ -361,9 +363,9 @@ export default function GameHistory() {
                         size="sm"
                         disabled={page === totalPages}
                         onClick={() => setPage(p => p + 1)}
-                        className="flex-1 md:flex-none border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px] px-3 h-9"
+                        className="flex-none border-white/10 hover:bg-white/20 text-white font-black uppercase tracking-widest text-[10px] px-3 h-9"
                       >
-                        <span className="hidden md:inline text-nowrap">Next</span> <ChevronRight className="w-4 h-4 md:ml-1" />
+                        <ChevronRight className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
