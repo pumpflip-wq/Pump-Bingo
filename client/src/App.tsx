@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { SolanaProvider } from "./components/SolanaProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
-import { History, ShieldCheck, Twitter, Settings, Menu } from "lucide-react";
+import { History, ShieldCheck, Twitter, Settings, Menu, Users } from "lucide-react";
 import { SiX } from "react-icons/si";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { useAuth } from "./hooks/use-auth";
