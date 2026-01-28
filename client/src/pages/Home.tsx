@@ -300,34 +300,34 @@ export default function Home() {
           {activeTab === "game" && (
             <motion.div key="game" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="h-full flex flex-col space-y-3">
               {roundData.round.status === "OPEN" || roundData.round.status === "STARTING" ? (
-                <div className="glass-card neon-border rounded-[2rem] p-5 flex-1 flex flex-col items-center justify-between bg-black/60 overflow-hidden">
+                <div className="glass-card neon-border rounded-[2rem] p-4 flex-1 flex flex-col items-center justify-between bg-black/60 overflow-hidden">
                   <div className="w-full flex justify-between items-center px-4 py-2 bg-white/5 rounded-2xl border border-white/10">
                     <div className="text-center">
-                      <p className="text-[12px] uppercase font-black text-white/80 tracking-widest">Room</p>
-                      <p className="text-2xl font-black text-white italic">#{roundData.round.id}</p>
+                      <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Room</p>
+                      <p className="text-xl font-black text-white italic">#{roundData.round.id}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-[12px] uppercase font-black text-white/80 tracking-widest">Prize</p>
-                      <p className="text-2xl font-black text-primary italic drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">{formatCurrency(roundData.round.prizePool || 0)}</p>
+                      <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Prize</p>
+                      <p className="text-xl font-black text-primary italic drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">{formatCurrency(roundData.round.prizePool || 0)}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-[12px] uppercase font-black text-white/80 tracking-widest">Players</p>
-                      <p className="text-2xl font-black text-white italic">{roundData.participantsCount}</p>
+                      <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Players</p>
+                      <p className="text-xl font-black text-white italic">{roundData.participantsCount}</p>
                     </div>
                   </div>
 
-                  <div className="flex-1 flex flex-col items-center justify-center py-4">
+                  <div className="flex-1 flex flex-col items-center justify-center py-2">
                     <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={roundData.participantsCount < 2} />
                   </div>
 
                   <div className="w-full mt-auto">
                     {!connected ? (
                       <div className="flex justify-center w-full">
-                        <WalletMultiButton className="!bg-primary !h-14 !w-full !text-black !font-black !rounded-xl" />
+                        <WalletMultiButton className="!bg-primary !h-12 !w-full !text-black !font-black !rounded-xl" />
                       </div>
                     ) : isParticipant ? (
-                      <div className="p-4 bg-primary/10 border border-primary/30 rounded-xl text-center">
-                        <p className="text-primary font-black uppercase text-sm">IN GAME STANDBY</p>
+                      <div className="p-3 bg-primary/10 border border-primary/30 rounded-xl text-center">
+                        <p className="text-primary font-black uppercase text-xs">IN GAME STANDBY</p>
                       </div>
                     ) : (
                       <div className="flex justify-center w-full">
@@ -338,13 +338,16 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col space-y-3 overflow-hidden">
-                  <div className="glass-card neon-border rounded-2xl p-2 lg:p-3 bg-black/40 shrink-0">
+                  <div className="hidden lg:block glass-card neon-border rounded-2xl p-2 lg:p-3 bg-black/40 shrink-0">
                     <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
                   </div>
                   <div className="glass-card neon-border rounded-2xl p-3 bg-black/40 flex-1 flex flex-col items-center justify-center min-h-0 relative">
+                    <div className="absolute top-3 left-3 right-3 z-10 pointer-events-none">
+                      <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
+                    </div>
                     {isParticipant && currentCard ? (
-                      <div className="flex flex-col items-center justify-center w-full h-full relative">
-                        <BingoCard card={currentCard} drawnNumbers={roundData.round.drawnNumbers || []} className="scale-[0.75] sm:scale-[0.85] origin-center w-full mb-auto" />
+                      <div className="flex flex-col items-center justify-center w-full h-full relative pt-16">
+                        <BingoCard card={currentCard} drawnNumbers={roundData.round.drawnNumbers || []} className="scale-[0.7] sm:scale-[0.8] origin-center w-full mb-auto" />
                         <div className="w-full mt-auto">
                           <BingoClaimButton roundId={roundData.round.id} userId={user?.id || 0} card={currentCard} drawnNumbers={roundData.round.drawnNumbers || []} status={roundData.round.status} isBingoed={(myParticipant as any)?.hasBingo} className="h-12 lg:h-14 text-lg lg:text-xl font-black" />
                         </div>
