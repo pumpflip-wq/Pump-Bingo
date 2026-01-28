@@ -60,24 +60,22 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {(() => {
-            const winnerKey = details.round.winnerUsername?.toLowerCase() || null;
+            const winnerId = details.round.winnerId;
             
             const participants = (details.participants || [])
-              .map((p: any) => ({
-                ...p,
-                _key: (p.username || "").toLowerCase(),
-              }))
               .sort((a: any, b: any) => {
-                if (winnerKey && a._key === winnerKey) return -1;
-                if (winnerKey && b._key === winnerKey) return 1;
+                const aIsWinner = winnerId && Number(a.userId) === Number(winnerId);
+                const bIsWinner = winnerId && Number(b.userId) === Number(winnerId);
+                if (aIsWinner) return -1;
+                if (bIsWinner) return 1;
                 return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
               });
 
             return participants.map((p: any, idx: number) => {
-              const isWinner = Boolean(winnerKey && p._key === winnerKey);
+              const isWinner = winnerId && Number(p.userId) === Number(winnerId);
               return (
                 <div 
-                  key={`${roundId}-${p._key}-${idx}`} 
+                  key={`${roundId}-${p.userId || idx}`} 
                   className={cn(
                     "flex items-center justify-between p-3 rounded-xl border transition-all relative overflow-hidden",
                     isWinner 
