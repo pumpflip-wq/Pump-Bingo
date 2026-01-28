@@ -26,11 +26,11 @@ export function Footer() {
 
           <div className="flex flex-wrap items-center justify-center gap-6 lg:gap-8">
             <nav className="flex items-center gap-4 lg:gap-6">
-              <Link href="/history" className="text-[10px] lg:text-[11px] font-black uppercase tracking-widest text-white hover:text-primary transition-colors flex items-center gap-2">
-                <History className="w-3.5 h-3.5 text-primary" /> History
+              <Link href="/history" className="text-xs sm:text-[10px] lg:text-[11px] font-black uppercase tracking-widest text-white hover:text-primary transition-colors flex items-center gap-2">
+                <History className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-primary" /> History
               </Link>
-              <Link href="/verify" className="text-[10px] lg:text-[11px] font-black uppercase tracking-widest text-white hover:text-primary transition-colors flex items-center gap-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-primary" /> Verify
+              <Link href="/verify" className="text-xs sm:text-[10px] lg:text-[11px] font-black uppercase tracking-widest text-white hover:text-primary transition-colors flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-primary" /> Verify
               </Link>
             </nav>
 
