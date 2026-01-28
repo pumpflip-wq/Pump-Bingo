@@ -271,15 +271,15 @@ export default function GameHistory() {
                         
                         <div className="flex flex-col gap-3">
                           <div className="flex flex-col gap-1">
-                            <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-90">Winner</p>
+                            <p className="text-[12px] text-white font-black uppercase tracking-widest opacity-90">Winner</p>
                             <div className="font-bold italic text-base flex items-center gap-2">
                               <Trophy className="w-4 h-4 text-primary" />
-                              <span className="text-white truncate max-w-[150px]">{round.winnerUsername ? formatAddress(round.winnerUsername) : "No Winner"}</span>
+                              <span className="text-white truncate max-w-[180px]">{round.winnerUsername ? formatAddress(round.winnerUsername) : "No Winner"}</span>
                             </div>
                           </div>
                           <div className="flex flex-col gap-1">
-                            <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-90">Prize</p>
-                            <p className="font-black text-primary text-2xl leading-tight">
+                            <p className="text-[12px] text-white font-black uppercase tracking-widest opacity-90">Prize</p>
+                            <p className="font-black text-primary text-xl leading-tight">
                               {formatCurrency(round.prizePool || 0, false)} {PROTOCOL_CONFIG.SYMBOL}
                             </p>
                           </div>
