@@ -294,14 +294,18 @@ export default function Home() {
   );
 
   const mobileView = (
-    <div className="lg:hidden flex flex-col h-[calc(100dvh-140px)] w-full overflow-hidden relative">
+    <div className="lg:hidden flex flex-col h-[calc(100dvh-140px)] w-full overflow-hidden relative max-h-[580px] my-auto">
       <div className="flex-1 relative overflow-hidden p-3 lg:p-0">
         <AnimatePresence mode="wait">
           {activeTab === "game" && (
             <motion.div key="game" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="h-full flex flex-col space-y-3">
               {roundData.round.status === "OPEN" || roundData.round.status === "STARTING" ? (
-                <div className="glass-card neon-border rounded-[2rem] p-4 flex-1 flex flex-col items-center justify-between bg-black/60 overflow-hidden">
-                  <div className="w-full flex justify-between items-center px-4 py-2 bg-white/5 rounded-2xl border border-white/10">
+                <div className="glass-card neon-border rounded-[2rem] p-4 flex-1 flex flex-col items-center justify-between bg-black/60 overflow-hidden relative">
+                  <div className="absolute top-4 left-4 right-4 z-10">
+                    <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
+                  </div>
+                  
+                  <div className="w-full flex justify-between items-center px-4 py-2 bg-white/5 rounded-2xl border border-white/10 mt-16">
                     <div className="text-center">
                       <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Room</p>
                       <p className="text-xl font-black text-white italic">#{roundData.round.id}</p>
@@ -316,7 +320,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="flex-1 flex flex-col items-center justify-center py-2">
+                  <div className="flex-1 flex flex-col items-center justify-center py-2 max-h-[150px]">
                     <CountdownTimer secondsRemaining={roundData.secondsRemaining} status={roundData.round.status} participantCount={roundData.participantsCount} isWaitingForPlayers={roundData.participantsCount < 2} />
                   </div>
 
