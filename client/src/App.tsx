@@ -162,60 +162,55 @@ function AppContent() {
                           <Menu className="w-7 h-7" />
                         </button>
                       </SheetTrigger>
-                      <SheetContent side="right" className="w-[280px] bg-background/95 backdrop-blur-2xl border-white/5 p-6 flex flex-col gap-6 rounded-l-[2rem]">
-                        <div className="flex flex-col gap-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Account</p>
+                      <SheetContent side="top" className="w-[280px] ml-auto mt-20 mr-4 bg-background/95 backdrop-blur-2xl border border-white/10 p-5 flex flex-col gap-5 rounded-2xl shadow-2xl transition-all duration-300 ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95" hideCloseButton>
+                        <div className="flex flex-col gap-3">
                           <div className="scale-100 origin-left">
-                            <WalletMultiButton className="!bg-primary !text-black !h-12 !px-6 !text-sm !rounded-xl !font-black !italic !w-full !justify-center !border-none shadow-lg" />
+                            <WalletMultiButton className="!bg-primary !text-black !h-11 !px-6 !text-sm !rounded-xl !font-black !italic !w-full !justify-center !border-none shadow-lg" />
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-3 mt-2">
-                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Navigation</p>
-                          <Link href="/history" className="flex items-center gap-3 text-base font-black italic uppercase text-white hover:text-primary transition-colors py-2.5 border-b border-white/5">
-                            <History className="w-5 h-5" /> History
+                        <div className="flex flex-col gap-2">
+                          <Link href="/history" className="flex items-center gap-3 text-sm font-black italic uppercase text-white hover:text-primary transition-colors py-2 border-b border-white/5">
+                            <History className="w-4 h-4" /> History
                           </Link>
-                          <Link href="/verify" className="flex items-center gap-3 text-base font-black italic uppercase text-white hover:text-primary transition-colors py-2.5 border-b border-white/5">
-                            <ShieldCheck className="w-5 h-5" /> Verify
+                          <Link href="/verify" className="flex items-center gap-3 text-sm font-black italic uppercase text-white hover:text-primary transition-colors py-2 border-b border-white/5">
+                            <ShieldCheck className="w-4 h-4" /> Verify
                           </Link>
                           {isAdmin && (
-                            <Link href="/admin" className="flex items-center gap-3 text-base font-black italic uppercase text-primary hover:text-white transition-colors py-2.5 border-b border-white/5">
-                              <Settings className="w-5 h-5" /> Admin
+                            <Link href="/admin" className="flex items-center gap-3 text-sm font-black italic uppercase text-primary hover:text-white transition-colors py-2">
+                              <Settings className="w-4 h-4" /> Admin
                             </Link>
                           )}
                         </div>
 
-                        <div className="mt-auto flex flex-col gap-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Connect</p>
-                          <div className="flex items-center gap-2">
-                            <a 
-                              href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="flex-1 h-11 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10"
-                              title="Pump.fun"
-                            >
-                              <img src="https://pump.fun/favicon.ico" className="w-5 h-5 object-contain" alt="Pump.fun" />
-                            </a>
-                            <a 
-                              href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="flex-1 h-11 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10"
-                              title="Dexscreener"
-                            >
-                              <img src="https://dexscreener.com/favicon.png" className="w-5 h-5 object-contain" alt="Dexscreener" />
-                            </a>
-                            <a 
-                              href={PROTOCOL_CONFIG.TWITTER_URL} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="flex-1 h-11 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10 text-white"
-                              title="X"
-                            >
-                              <SiX className="w-4 h-4" />
-                            </a>
-                          </div>
+                        <div className="flex items-center gap-2 pt-2 border-t border-white/10">
+                          <a 
+                            href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex-1 h-10 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10"
+                            title="Pump.fun"
+                          >
+                            <img src="https://pump.fun/favicon.ico" className="w-4 h-4 object-contain" alt="Pump.fun" />
+                          </a>
+                          <a 
+                            href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex-1 h-10 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10"
+                            title="Dexscreener"
+                          >
+                            <img src="https://dexscreener.com/favicon.png" className="w-4 h-4 object-contain" alt="Dexscreener" />
+                          </a>
+                          <a 
+                            href={PROTOCOL_CONFIG.TWITTER_URL} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex-1 h-10 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10 text-white"
+                            title="X"
+                          >
+                            <SiX className="w-4 h-4" />
+                          </a>
                         </div>
                       </SheetContent>
                     </Sheet>
