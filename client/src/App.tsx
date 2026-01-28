@@ -8,6 +8,7 @@ import Home from "@/pages/Home";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import VerifyPage from "@/pages/VerifyPage";
 import GameHistory from "@/pages/GameHistory";
+import ProfilePage from "@/pages/ProfilePage";
 import { Footer } from "./components/Footer";
 import { useEffect, useRef, useState } from "react";
 
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/verify" component={VerifyPage} />
       <Route path="/history" component={GameHistory} />
+      <Route path="/profile" component={ProfilePage} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -153,12 +155,9 @@ function AppContent() {
                   <div className="hidden sm:block scale-75 lg:scale-100 origin-right">
                     <div className="flex items-center gap-3">
                       {connected && user && (
-                        <div className="flex flex-col items-end mr-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Games: {user.totalGames || 0}</span>
-                            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Wins: {user.totalWins || 0}</span>
-                          </div>
-                        </div>
+                        <Link href="/profile" className="text-xs lg:text-sm font-black uppercase tracking-[0.15em] text-white hover:text-primary transition-all flex items-center gap-2 mr-2">
+                          <Users className="w-4 h-4" /> Profile
+                        </Link>
                       )}
                       <WalletMultiButton className="!bg-primary !text-black !h-10 lg:!h-11 !px-4 lg:!px-8 !text-xs lg:!text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
                     </div>
@@ -174,24 +173,17 @@ function AppContent() {
                       </SheetTrigger>
                       <SheetContent side="top" className="w-[300px] ml-auto mt-20 mr-4 bg-background/95 backdrop-blur-2xl border border-white/10 p-6 flex flex-col gap-6 rounded-2xl shadow-2xl transition-all duration-300 ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95" hideCloseButton>
                         <div className="flex flex-col gap-4">
-                          {connected && user && (
-                            <div className="flex items-center justify-between px-2 py-3 bg-white/5 rounded-xl border border-white/10">
-                              <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Total Games</span>
-                                <span className="text-lg font-black text-white italic">{user.totalGames || 0}</span>
-                              </div>
-                              <div className="flex flex-col items-end">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-primary/40">Total Wins</span>
-                                <span className="text-lg font-black text-primary italic">{user.totalWins || 0}</span>
-                              </div>
-                            </div>
-                          )}
                           <div className="scale-110 origin-left">
                             <WalletMultiButton className="!bg-primary !text-black !h-12 !px-6 !text-base !rounded-xl !font-black !italic !w-full !justify-center !border-none shadow-lg" />
                           </div>
                         </div>
 
                         <div className="flex flex-col gap-3">
+                          {connected && user && (
+                            <Link href="/profile" className="flex items-center gap-4 text-base font-black italic uppercase text-primary hover:text-white transition-colors py-3 border-b border-white/5">
+                              <Users className="w-5 h-5" /> My Profile
+                            </Link>
+                          )}
                           <Link href="/history" className="flex items-center gap-4 text-base font-black italic uppercase text-white hover:text-primary transition-colors py-3 border-b border-white/5">
                             <History className="w-5 h-5" /> History
                           </Link>
