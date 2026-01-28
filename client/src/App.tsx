@@ -96,7 +96,7 @@ function AppContent() {
                   <img 
                     src={logoPng} 
                     alt="PUMP BINGO" 
-                    className="w-full h-full rounded-full object-cover shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+                    className="w-full h-full rounded-full object-cover"
                   />
                 </motion.div>
                 <div className="flex flex-col">
@@ -158,26 +158,11 @@ function AppContent() {
                   <div className="sm:hidden">
                     <Sheet>
                       <SheetTrigger asChild>
-                        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white hover:text-primary transition-colors" data-testid="button-mobile-menu">
-                          <Menu className="w-6 h-6" />
+                        <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-primary text-black hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(34,197,94,0.4)]" data-testid="button-mobile-menu">
+                          <Menu className="w-7 h-7" />
                         </button>
                       </SheetTrigger>
-                      <SheetContent side="right" className="w-[300px] bg-background/95 backdrop-blur-2xl border-white/5 p-6 flex flex-col gap-8">
-                        <div className="flex flex-col gap-4 mt-8">
-                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Navigation</p>
-                          <Link href="/history" className="flex items-center gap-3 text-lg font-black italic uppercase text-white hover:text-primary transition-colors py-2 border-b border-white/5">
-                            <History className="w-5 h-5" /> History
-                          </Link>
-                          <Link href="/verify" className="flex items-center gap-3 text-lg font-black italic uppercase text-white hover:text-primary transition-colors py-2 border-b border-white/5">
-                            <ShieldCheck className="w-5 h-5" /> Verify
-                          </Link>
-                          {isAdmin && (
-                            <Link href="/admin" className="flex items-center gap-3 text-lg font-black italic uppercase text-primary hover:text-white transition-colors py-2 border-b border-white/5">
-                              <Settings className="w-5 h-5" /> Admin
-                            </Link>
-                          )}
-                        </div>
-
+                      <SheetContent side="right" className="w-[280px] bg-background/95 backdrop-blur-2xl border-white/5 p-6 flex flex-col gap-6 rounded-l-[2rem]">
                         <div className="flex flex-col gap-4">
                           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Account</p>
                           <div className="scale-100 origin-left">
@@ -185,32 +170,50 @@ function AppContent() {
                           </div>
                         </div>
 
+                        <div className="flex flex-col gap-3 mt-2">
+                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Navigation</p>
+                          <Link href="/history" className="flex items-center gap-3 text-base font-black italic uppercase text-white hover:text-primary transition-colors py-2.5 border-b border-white/5">
+                            <History className="w-5 h-5" /> History
+                          </Link>
+                          <Link href="/verify" className="flex items-center gap-3 text-base font-black italic uppercase text-white hover:text-primary transition-colors py-2.5 border-b border-white/5">
+                            <ShieldCheck className="w-5 h-5" /> Verify
+                          </Link>
+                          {isAdmin && (
+                            <Link href="/admin" className="flex items-center gap-3 text-base font-black italic uppercase text-primary hover:text-white transition-colors py-2.5 border-b border-white/5">
+                              <Settings className="w-5 h-5" /> Admin
+                            </Link>
+                          )}
+                        </div>
+
                         <div className="mt-auto flex flex-col gap-4">
                           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Connect</p>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
                             <a 
                               href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="flex-1 h-12 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10"
+                              className="flex-1 h-11 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10"
+                              title="Pump.fun"
                             >
-                              <img src="https://pump.fun/favicon.ico" className="w-6 h-6 object-contain" alt="Pump.fun" />
+                              <img src="https://pump.fun/favicon.ico" className="w-5 h-5 object-contain" alt="Pump.fun" />
                             </a>
                             <a 
                               href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="flex-1 h-12 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10"
+                              className="flex-1 h-11 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10"
+                              title="Dexscreener"
                             >
-                              <img src="https://dexscreener.com/favicon.png" className="w-6 h-6 object-contain" alt="Dexscreener" />
+                              <img src="https://dexscreener.com/favicon.png" className="w-5 h-5 object-contain" alt="Dexscreener" />
                             </a>
                             <a 
                               href={PROTOCOL_CONFIG.TWITTER_URL} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="flex-1 h-12 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10 text-white"
+                              className="flex-1 h-11 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10 text-white"
+                              title="X"
                             >
-                              <SiX className="w-5 h-5" />
+                              <SiX className="w-4 h-4" />
                             </a>
                           </div>
                         </div>
