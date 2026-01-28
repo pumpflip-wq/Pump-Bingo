@@ -56,7 +56,8 @@ export async function handleStateTransitions(round: Round, participantCount: num
         return;
       }
       const completedTime = new Date(round.completedAt).getTime();
-      if (now.getTime() - completedTime >= PROTOCOL_CONFIG.POST_WIN_DELAY_MS) {
+      const postWinDelay = PROTOCOL_CONFIG.POST_WIN_DELAY_MS || 10000;
+      if (now.getTime() - completedTime >= postWinDelay) {
         // Transition to FINISHED
         await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
       }

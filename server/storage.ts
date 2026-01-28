@@ -131,11 +131,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateRound(id: number, updates: Partial<Round>): Promise<Round> {
+    const cleanUpdates = { ...updates };
+    if (cleanUpdates.drawnNumbers) {
+      // Ensure it's stored as a simple array for Drizzle/PG
+      cleanUpdates.drawnNumbers = Array.isArray(cleanUpdates.drawnNumbers) ? cleanUpdates.drawnNumbers : [];
+    }
+    
     const [updated] = await db
       .update(rounds)
-      .set({
-        ...updates,
-      })
+      .set(cleanUpdates)
       .where(eq(rounds.id, id))
       .returning();
     

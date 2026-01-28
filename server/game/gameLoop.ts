@@ -122,7 +122,8 @@ export class GameManager {
     await handleStateTransitions(round, count);
 
     if (round.status === ROUND_STATUS.IN_GAME && !round.winnerId) {
-      const elapsed = now.getTime() - new Date(round.startTime!).getTime();
+      const startTime = round.startTime ? new Date(round.startTime) : now;
+      const elapsed = now.getTime() - startTime.getTime();
       const expectedCount = Math.min(75, Math.floor(elapsed / DRAW_INTERVAL_MS));
       if ((round.drawnNumbers || []).length < expectedCount) {
         const newDrawn = [...(round.drawnNumbers || [])];
