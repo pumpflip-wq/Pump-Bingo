@@ -60,22 +60,24 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {(() => {
-            const winnerId = details.round.winnerId;
+            const winnerKey = details.round.winnerUsername?.toLowerCase() || null;
             
             const participants = (details.participants || [])
+              .map((p: any) => ({
+                ...p,
+                _key: (p.username || "").toLowerCase(),
+              }))
               .sort((a: any, b: any) => {
-                const aIsWinner = winnerId && Number(a.userId) === Number(winnerId);
-                const bIsWinner = winnerId && Number(b.userId) === Number(winnerId);
-                if (aIsWinner) return -1;
-                if (bIsWinner) return 1;
+                if (winnerKey && a._key === winnerKey) return -1;
+                if (winnerKey && b._key === winnerKey) return 1;
                 return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
               });
 
             return participants.map((p: any, idx: number) => {
-              const isWinner = winnerId && (String(p.userId) === String(winnerId) || String(p.id) === String(winnerId));
+              const isWinner = Boolean(winnerKey && p._key === winnerKey);
               return (
                 <div 
-                  key={`${roundId}-${p.userId || p.id}-${idx}`} 
+                  key={`${roundId}-${p._key}-${idx}`} 
                   className={cn(
                     "flex items-center justify-between p-3 rounded-xl border transition-all relative overflow-hidden",
                     isWinner 
