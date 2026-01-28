@@ -56,30 +56,32 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
         </div>
       </div>
 
-      <div className="space-y-3">
+        <div className="space-y-3">
         <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">Winners & Participants</h3>
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {(() => {
-            const winnerId = details.round.winnerId;
+            const winnerKey = details.round.winnerUsername?.toLowerCase() || null;
             
-            const sortedParticipants = (details.participants || [])
+            const participants = (details.participants || [])
+              .map((p: any) => ({
+                ...p,
+                _key: (p.username || "").toLowerCase(),
+              }))
               .sort((a: any, b: any) => {
-                const aIsWinner = winnerId && Number(a.userId) === Number(winnerId);
-                const bIsWinner = winnerId && Number(b.userId) === Number(winnerId);
-                if (aIsWinner) return -1;
-                if (bIsWinner) return 1;
-                return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
+                if (winnerKey && a._key === winnerKey) return -1;
+                if (winnerKey && b._key === winnerKey) return 1;
+                return 0;
               });
 
-            return sortedParticipants.map((p: any, idx: number) => {
-              const isWinner = winnerId && Number(p.userId) === Number(winnerId);
+            return participants.map((p: any, idx: number) => {
+              const isWinner = Boolean(winnerKey && p._key === winnerKey);
               return (
                 <div 
-                  key={`${roundId}-${p.userId || idx}`} 
+                  key={`${roundId}-${p._key || idx}-${idx}`} 
                   className={cn(
                     "flex items-center justify-between p-3 rounded-xl border transition-all relative overflow-hidden",
                     isWinner 
-                      ? "bg-primary/20 border-primary shadow-[0_0_20px_rgba(34,197,94,0.3)] z-10" 
+                      ? "bg-primary/10 border-primary/50 shadow-[0_0_15px_rgba(34,197,94,0.1)] z-10" 
                       : "bg-white/5 border-white/10"
                   )}
                 >
@@ -92,7 +94,7 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                         )}>
                           {p.username ? p.username.length > 15 ? `${p.username.slice(0, 6)}...${p.username.slice(-4)}` : p.username : "Unknown"}
                         </p>
-                        {isWinner && <Trophy className="w-4 h-4 text-primary animate-bounce" />}
+                        {isWinner && <Trophy className="w-4 h-4 text-primary animate-pulse" />}
                       </div>
                       <p className="text-[10px] text-white font-black uppercase tracking-widest opacity-60 mt-0.5">
                         {p.joinedAt ? format(new Date(p.joinedAt), "HH:mm:ss") : "--:--:--"}
@@ -100,7 +102,7 @@ function RoundDetailsModal({ roundId }: { roundId: number }) {
                     </div>
                   </div>
                   {isWinner && (
-                    <div className="px-5 py-2.5 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_25px_rgba(34,197,94,0.6)] border border-white/30">
+                    <div className="px-5 py-2.5 rounded-xl bg-primary text-black flex items-center gap-2 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
                       <Trophy className="w-4 h-4" />
                       <span className="text-xs font-black uppercase tracking-tighter italic font-display">WINNER</span>
                     </div>
