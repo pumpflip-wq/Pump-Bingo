@@ -9,6 +9,8 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(), // Acts as "Wallet Address" for MVP
   balance: bigint("balance", { mode: "number" }).notNull().default(10000), // Starting fake PUMP tokens
+  totalGames: integer("total_games").notNull().default(0),
+  totalWins: integer("total_wins").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

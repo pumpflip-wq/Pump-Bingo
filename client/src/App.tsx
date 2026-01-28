@@ -151,7 +151,17 @@ function AppContent() {
                     </a>
                   </div>
                   <div className="hidden sm:block scale-75 lg:scale-100 origin-right">
-                    <WalletMultiButton className="!bg-primary !text-black !h-10 lg:!h-11 !px-4 lg:!px-8 !text-xs lg:!text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
+                    <div className="flex items-center gap-3">
+                      {connected && user && (
+                        <div className="hidden lg:flex flex-col items-end mr-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Games: {user.totalGames || 0}</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Wins: {user.totalWins || 0}</span>
+                          </div>
+                        </div>
+                      )}
+                      <WalletMultiButton className="!bg-primary !text-black !h-10 lg:!h-11 !px-4 lg:!px-8 !text-xs lg:!text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
+                    </div>
                   </div>
 
                   {/* Mobile Menu Trigger */}
