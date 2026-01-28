@@ -110,6 +110,11 @@ function AppContent() {
 
               <div className="flex items-center gap-2 lg:gap-4 ml-auto">
                 <nav className="hidden sm:flex items-center gap-4 lg:gap-8 mr-2 lg:mr-6">
+                  {connected && user && (
+                    <Link href="/profile" className="text-xs lg:text-sm font-black uppercase tracking-[0.15em] text-white hover:text-primary transition-all flex items-center gap-2">
+                      <Users className="w-4 h-4" /> Profile
+                    </Link>
+                  )}
                   <Link href="/history" className="text-xs lg:text-sm font-black uppercase tracking-[0.15em] text-white hover:text-primary transition-all flex items-center gap-2">
                     <History className="w-4 h-4" /> History
                   </Link>
@@ -154,11 +159,6 @@ function AppContent() {
                   </div>
                   <div className="hidden sm:block scale-75 lg:scale-100 origin-right">
                     <div className="flex items-center gap-3">
-                      {connected && user && (
-                        <Link href="/profile" className="text-xs lg:text-sm font-black uppercase tracking-[0.15em] text-white hover:text-primary transition-all flex items-center gap-2 mr-2">
-                          <Users className="w-4 h-4" /> Profile
-                        </Link>
-                      )}
                       <WalletMultiButton className="!bg-primary !text-black !h-10 lg:!h-11 !px-4 lg:!px-8 !text-xs lg:!text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
                     </div>
                   </div>
