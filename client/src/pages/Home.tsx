@@ -275,14 +275,20 @@ export default function Home() {
           )}
         </AnimatePresence>
       </main>
-      <aside className="lg:col-span-3 space-y-4 flex flex-col h-[750px]">
-        <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
-        <GameHistory 
-          historyRounds={historyRounds || []} 
-          historyLoading={historyLoading} 
-          formatAddress={formatAddress} 
-          currentRoundHash={roundData.round.publicHash} 
-        />
+      <aside className="lg:col-span-3 h-[750px] flex flex-col">
+        <div className="flex-1 h-full glass-card neon-border rounded-[2.5rem] bg-black/40 overflow-hidden p-6 flex flex-col">
+          <div className="flex-1 min-h-0 flex flex-col">
+            <LastCalledNumber numbers={roundData.round.drawnNumbers || []} />
+            <div className="mt-6 flex-1 min-h-0">
+              <GameHistory 
+                historyRounds={historyRounds || []} 
+                historyLoading={historyLoading} 
+                formatAddress={formatAddress} 
+                currentRoundHash={roundData.round.publicHash} 
+              />
+            </div>
+          </div>
+        </div>
       </aside>
     </div>
   );

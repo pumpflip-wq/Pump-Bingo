@@ -14,13 +14,14 @@ import { useEffect, useRef, useState } from "react";
 import { SolanaProvider } from "./components/SolanaProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion } from "framer-motion";
-import { History, ShieldCheck, Twitter, Settings } from "lucide-react";
+import { History, ShieldCheck, Twitter, Settings, Menu } from "lucide-react";
 import { SiX } from "react-icons/si";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { useAuth } from "./hooks/use-auth";
 
 import { TermsModal } from "./components/TermsModal";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const logoPng = "https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png";
 
@@ -151,6 +152,70 @@ function AppContent() {
                   </div>
                   <div className="hidden sm:block scale-75 lg:scale-100 origin-right">
                     <WalletMultiButton className="!bg-primary !text-black !h-10 lg:!h-11 !px-4 lg:!px-8 !text-xs lg:!text-sm !rounded-full !font-black !italic !tracking-tight !shadow-[0_0_20px_rgba(34,197,94,0.3)] !border-none" />
+                  </div>
+
+                  {/* Mobile Menu Trigger */}
+                  <div className="sm:hidden">
+                    <Sheet>
+                      <SheetTrigger asChild>
+                        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white hover:text-primary transition-colors" data-testid="button-mobile-menu">
+                          <Menu className="w-6 h-6" />
+                        </button>
+                      </SheetTrigger>
+                      <SheetContent side="right" className="w-[300px] bg-background/95 backdrop-blur-2xl border-white/5 p-6 flex flex-col gap-8">
+                        <div className="flex flex-col gap-4 mt-8">
+                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Navigation</p>
+                          <Link href="/history" className="flex items-center gap-3 text-lg font-black italic uppercase text-white hover:text-primary transition-colors py-2 border-b border-white/5">
+                            <History className="w-5 h-5" /> History
+                          </Link>
+                          <Link href="/verify" className="flex items-center gap-3 text-lg font-black italic uppercase text-white hover:text-primary transition-colors py-2 border-b border-white/5">
+                            <ShieldCheck className="w-5 h-5" /> Verify
+                          </Link>
+                          {isAdmin && (
+                            <Link href="/admin" className="flex items-center gap-3 text-lg font-black italic uppercase text-primary hover:text-white transition-colors py-2 border-b border-white/5">
+                              <Settings className="w-5 h-5" /> Admin
+                            </Link>
+                          )}
+                        </div>
+
+                        <div className="flex flex-col gap-4">
+                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Account</p>
+                          <div className="scale-100 origin-left">
+                            <WalletMultiButton className="!bg-primary !text-black !h-12 !px-6 !text-sm !rounded-xl !font-black !italic !w-full !justify-center !border-none shadow-lg" />
+                          </div>
+                        </div>
+
+                        <div className="mt-auto flex flex-col gap-4">
+                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Connect</p>
+                          <div className="flex items-center gap-3">
+                            <a 
+                              href={`${PROTOCOL_CONFIG.PUMP_FUN_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex-1 h-12 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10"
+                            >
+                              <img src="https://pump.fun/favicon.ico" className="w-6 h-6 object-contain" alt="Pump.fun" />
+                            </a>
+                            <a 
+                              href={`${PROTOCOL_CONFIG.DEXSCANNER_URL}${PROTOCOL_CONFIG.MINT_ADDRESS}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex-1 h-12 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10"
+                            >
+                              <img src="https://dexscreener.com/favicon.png" className="w-6 h-6 object-contain" alt="Dexscreener" />
+                            </a>
+                            <a 
+                              href={PROTOCOL_CONFIG.TWITTER_URL} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex-1 h-12 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] transition-all flex items-center justify-center border border-white/10 text-white"
+                            >
+                              <SiX className="w-5 h-5" />
+                            </a>
+                          </div>
+                        </div>
+                      </SheetContent>
+                    </Sheet>
                   </div>
                 </div>
               </div>
