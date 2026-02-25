@@ -87,7 +87,10 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
               throw new Error(`Insufficient ${PROTOCOL_CONFIG.SYMBOL} balance.`);
             }
           } catch (e: any) {
-            throw new Error(`Could not verify ${PROTOCOL_CONFIG.SYMBOL} balance. Make sure you have the tokens.`);
+            if (e.name === 'TokenAccountNotFoundError') {
+              throw new Error(`You don't have a ${PROTOCOL_CONFIG.SYMBOL} token account. Please make sure you have the tokens.`);
+            }
+            throw new Error(e.message || `Could not verify ${PROTOCOL_CONFIG.SYMBOL} balance. Make sure you have the tokens.`);
           }
 
           const { blockhash } = await connection.getLatestBlockhash('confirmed');

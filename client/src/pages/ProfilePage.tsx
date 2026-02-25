@@ -59,7 +59,6 @@ export default function ProfilePage() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -71,7 +70,7 @@ export default function ProfilePage() {
                 <Gamepad2 className="w-5 h-5 text-primary" /> Game Statistics
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4">
+            <CardContent className="grid grid-cols-1 gap-4">
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center space-y-2">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Total Games</p>
                 <p className="text-4xl font-black text-white italic leading-none">{user.totalGames || 0}</p>
@@ -83,38 +82,6 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card className="glass-card neon-border bg-black/40 border-primary/20 h-full">
-            <CardHeader>
-              <CardTitle className="text-xl font-black italic tracking-widest uppercase flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-primary" /> Earnings
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="p-8 rounded-2xl bg-black/60 border border-primary/10 flex flex-col items-center justify-center space-y-4 text-center">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Estimated Winnings</p>
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-5xl font-black text-primary italic drop-shadow-[0_0_20px_rgba(34,197,94,0.4)]">
-                      {formatCurrency(user.balance || 0, false)}
-                    </span>
-                    <span className="text-xl font-black text-primary uppercase">{PROTOCOL_CONFIG.SYMBOL}</span>
-                  </div>
-                </div>
-                <div className="w-full h-px bg-white/5" />
-                <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">
-                  Real-time blockchain balance sync
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
