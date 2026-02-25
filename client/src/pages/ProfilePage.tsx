@@ -1,4 +1,3 @@
-import { useGameState } from "@/hooks/useGameState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Gamepad2, User as UserIcon, Wallet, ArrowLeft } from "lucide-react";
 import { formatAddress, formatCurrency } from "@/lib/utils";
@@ -6,9 +5,13 @@ import { PROTOCOL_CONFIG } from "@shared/config";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function ProfilePage() {
-  const { user, walletAddress, connected, isLoading } = useGameState();
+  const { user, isLoading } = useAuth();
+  const { connected, publicKey } = useWallet();
+  const walletAddress = publicKey?.toBase58();
 
   if (isLoading) {
     return (
