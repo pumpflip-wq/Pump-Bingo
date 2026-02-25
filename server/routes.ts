@@ -366,18 +366,20 @@ export async function registerRoutes(
 
           const fee = Math.max(
             0,
-            Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 10),
+            Math.min(100, PROTOCOL_CONFIG.FEE_PERCENTAGE || 0),
           );
           const payoutMultiplier = (100 - fee) / 100;
           const payout = Math.floor(Number(round.prizePool) * payoutMultiplier);
 
           const user = await storage.getUser(userId);
-          await solanaManager
-            .sendReward(user?.username || "", payout)
-            .then((sig: any) => {
-              if (sig) storage.updateRound(roundId, { payoutSignature: sig as string });
-            })
-            .catch(console.error);
+          if (payout > 0) {
+            await solanaManager
+              .sendReward(user?.username || "", payout)
+              .then((sig: any) => {
+                if (sig) storage.updateRound(roundId, { payoutSignature: sig as string });
+              })
+              .catch(console.error);
+          }
 
           await storage.updateUserBalance(userId, payout);
           await storage.createTransaction({

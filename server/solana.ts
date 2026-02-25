@@ -144,18 +144,19 @@ export class SolanaManager {
     try {
       const mint = PROTOCOL_CONFIG.MINT_ADDRESS ? new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS) : null;
       if (mint) {
-        const account = await getOrCreateAssociatedTokenAccount(
+        const ata = await getOrCreateAssociatedTokenAccount(
           this.connection,
           this.masterKeypair,
           mint,
           this.masterKeypair.publicKey
         );
-        return Number(account.amount) / Math.pow(10, PROTOCOL_CONFIG.DECIMALS);
+        return Number(ata.amount) / Math.pow(10, PROTOCOL_CONFIG.DECIMALS);
       } else {
         const balance = await this.connection.getBalance(this.masterKeypair.publicKey);
-        return balance / 1e6;
+        return balance / 1e9; // Solana lamports to SOL
       }
-    } catch {
+    } catch (err) {
+      console.error("[SolanaManager] Failed to get balance:", err);
       return 0;
     }
   }

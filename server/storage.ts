@@ -85,7 +85,7 @@ export class DatabaseStorage implements IStorage {
       .insert(users)
       .values({
         ...user,
-        balance: 1000000,
+        balance: 0,
       })
       .returning();
     return newUser;
