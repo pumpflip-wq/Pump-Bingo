@@ -8,7 +8,6 @@ import Home from "@/pages/Home";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import VerifyPage from "@/pages/VerifyPage";
 import GameHistory from "@/pages/GameHistory";
-import ProfilePage from "@/pages/ProfilePage";
 import { Footer } from "./components/Footer";
 import { useEffect, useRef, useState } from "react";
 
@@ -33,7 +32,6 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/verify" component={VerifyPage} />
       <Route path="/history" component={GameHistory} />
-      <Route path="/profile" component={ProfilePage} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -118,11 +116,6 @@ function AppContent() {
 
               <div className="flex items-center gap-2 lg:gap-4 ml-auto">
                 <nav className="hidden sm:flex items-center gap-4 lg:gap-8 mr-2 lg:mr-6">
-                  {connected && user && (
-                    <Link href="/profile" className="text-xs lg:text-sm font-black uppercase tracking-[0.15em] text-white hover:text-primary transition-all flex items-center gap-2">
-                      <Users className="w-4 h-4" /> Profile
-                    </Link>
-                  )}
                   <Link href="/history" className="text-xs lg:text-sm font-black uppercase tracking-[0.15em] text-white hover:text-primary transition-all flex items-center gap-2">
                     <History className="w-4 h-4" /> History
                   </Link>
@@ -187,11 +180,6 @@ function AppContent() {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                          {connected && user && (
-                            <Link href="/profile" className="flex items-center gap-4 text-base font-black italic uppercase text-primary hover:text-white transition-colors py-3 border-b border-white/5">
-                              <Users className="w-5 h-5" /> My Profile
-                            </Link>
-                          )}
                           <Link href="/history" className="flex items-center gap-4 text-base font-black italic uppercase text-white hover:text-primary transition-colors py-3 border-b border-white/5">
                             <History className="w-5 h-5" /> History
                           </Link>

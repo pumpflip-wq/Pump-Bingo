@@ -26,9 +26,6 @@ export function Footer() {
 
           <div className="flex flex-wrap items-center justify-center gap-6 lg:gap-8">
             <nav className="flex items-center gap-4 lg:gap-6">
-              <Link href="/profile" className="text-xs sm:text-[10px] lg:text-[11px] font-black uppercase tracking-widest text-white hover:text-primary transition-colors flex items-center gap-2">
-                <Users className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-primary" /> Profile
-              </Link>
               <Link href="/history" className="text-xs sm:text-[10px] lg:text-[11px] font-black uppercase tracking-widest text-white hover:text-primary transition-colors flex items-center gap-2">
                 <History className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-primary" /> History
               </Link>
