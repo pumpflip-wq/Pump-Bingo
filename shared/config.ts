@@ -4,7 +4,7 @@ export const PROTOCOL_CONFIG = {
   DECIMALS: 6,
 
   // Game Settings
-  DEFAULT_ENTRY_PRICE: 10000 * 1e6, // Changed from 10000 to 100 for easier testing
+  DEFAULT_ENTRY_PRICE: 100 * 1e6, // Set entry price to 100 tokens
   FEE_PERCENTAGE: 0,
 
   // Links

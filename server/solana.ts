@@ -110,32 +110,25 @@ export class SolanaManager {
   }
 
   async verifyTransaction(signature: string, expectedAmount: number, recipient: string): Promise<boolean> {
-    if (signature.startsWith("MOCK_SIG_")) return true;
+    if (!signature || signature.startsWith("MOCK_SIG_")) return false;
     
     const conn = this.connection;
     
-    // Attempt 1: Check confirmation status
+    // For mainnet, we need real verification
     try {
-      const status = await conn.getSignatureStatus(signature);
+      const status = await conn.getSignatureStatus(signature, { searchTransactionHistory: true });
+      if (status?.value?.err) {
+        console.error(`[SolanaManager] Transaction ${signature} failed on-chain`);
+        return false;
+      }
+      
       if (status?.value?.confirmationStatus === 'confirmed' || status?.value?.confirmationStatus === 'finalized') {
         return true;
       }
-    } catch (e) {}
-
-    // Attempt 2: Minimal parsing loop (max 10s)
-    for (let i = 0; i < 10; i++) {
-      try {
-        const tx = await conn.getParsedTransaction(signature, { 
-          commitment: 'confirmed', 
-          maxSupportedTransactionVersion: 0 
-        });
-        if (tx && !tx.meta?.err) {
-          return true;
-        }
-      } catch (e) {}
-      await new Promise(r => setTimeout(r, 1000));
+    } catch (e) {
+      console.error(`[SolanaManager] Error verifying transaction ${signature}:`, e);
     }
-    
+
     return false; 
   }
 

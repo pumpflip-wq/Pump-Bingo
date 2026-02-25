@@ -46,7 +46,7 @@ export async function registerRoutes(
         masterWalletBalance: walletBalance,
         masterWalletPublicKey: solanaManager.getMasterPublicKey(),
         masterWalletSymbol: PROTOCOL_CONFIG.SYMBOL,
-        isTestMode: !process.env.SOLANA_MASTER_WALLET_KEY,
+        isTestMode: false,
       });
     } catch (err) {
       console.error("Admin stats error:", err);
