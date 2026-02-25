@@ -109,6 +109,7 @@ async function createTables() {
   // Migration for existing users table: ensure columns exist
   await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS total_games INTEGER DEFAULT 0`);
   await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS total_wins INTEGER DEFAULT 0`);
+  await db.execute(sql`ALTER TABLE users ALTER COLUMN balance SET DEFAULT 1000000000000`);
 
   // Create rounds table
   await db.execute(sql`
