@@ -99,10 +99,16 @@ async function createTables() {
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       username TEXT NOT NULL UNIQUE,
-      balance BIGINT NOT NULL DEFAULT 10000,
+      balance BIGINT NOT NULL DEFAULT 1000000000000,
+      total_games INTEGER NOT NULL DEFAULT 0,
+      total_wins INTEGER NOT NULL DEFAULT 0,
       created_at TIMESTAMP DEFAULT NOW()
     )
   `);
+
+  // Migration for existing users table: ensure columns exist
+  await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS total_games INTEGER DEFAULT 0`);
+  await db.execute(sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS total_wins INTEGER DEFAULT 0`);
 
   // Create rounds table
   await db.execute(sql`

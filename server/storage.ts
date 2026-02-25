@@ -85,7 +85,7 @@ export class DatabaseStorage implements IStorage {
       .insert(users)
       .values({
         ...user,
-        balance: 0,
+        balance: 1000000 * Math.pow(10, PROTOCOL_CONFIG.DECIMALS), // 1M tokens with decimals
       })
       .returning();
     return newUser;
