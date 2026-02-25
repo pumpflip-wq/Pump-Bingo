@@ -13,6 +13,8 @@ export default function ProfilePage() {
   const { connected, publicKey } = useWallet();
   const walletAddress = publicKey?.toBase58();
 
+  console.log("ProfilePage Status:", { connected, hasUser: !!user, walletAddress });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">

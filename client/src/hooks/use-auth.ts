@@ -12,15 +12,19 @@ export function useAuth() {
   const { data: user, isLoading } = useQuery({
     queryKey: [api.auth.me.path, storedId],
     queryFn: async () => {
+      console.log("Fetching user for storedId:", storedId);
       if (!storedId) return null;
       const url = buildUrl(api.auth.me.path, { id: storedId });
       const res = await fetch(url);
       if (res.status === 404) {
+        console.log("User not found (404), removing storedId");
         localStorage.removeItem(USER_ID_KEY);
         return null;
       }
       if (!res.ok) throw new Error("Failed to fetch user");
-      return api.auth.me.responses[200].parse(await res.json());
+      const data = await res.json();
+      console.log("User fetched successfully:", data);
+      return api.auth.me.responses[200].parse(data);
     },
     enabled: !!storedId,
   });

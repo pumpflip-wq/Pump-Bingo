@@ -44,9 +44,17 @@ function AppContent() {
   const scrollRef = useRef<HTMLElement>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const { connected, publicKey } = useWallet();
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   
   const walletAddress = publicKey?.toString();
+
+  useEffect(() => {
+    if (connected && walletAddress && (!user || user.username !== walletAddress)) {
+      console.log("Auto-logging in for address:", walletAddress);
+      login(walletAddress);
+    }
+  }, [connected, walletAddress, user, login]);
+
   const isAdmin = walletAddress === PROTOCOL_CONFIG.ADMIN_WALLET || user?.username === PROTOCOL_CONFIG.ADMIN_WALLET;
 
   useEffect(() => {
