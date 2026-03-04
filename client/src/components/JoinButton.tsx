@@ -25,8 +25,8 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
   const { connection } = useConnection();
   const { publicKey, sendTransaction, connected } = useWallet();
 
-  const { roundData, user, userId: gameStateUserId } = useGameState();
-  const effectiveUserId = userId || user?.id || gameStateUserId;
+  const { roundData, user } = useGameState();
+  const effectiveUserId = userId || user?.id;
   const isWinnerDeclared = !!roundData?.round.winnerId;
   const nextRoundSecondsRemaining = (roundData as any)?.nextRoundSecondsRemaining ?? 0;
 
@@ -203,7 +203,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
   return (
     <CyberButton
       onClick={handleJoin}
-      disabled={isPending || isWalleting || !effectiveUserId}
+      disabled={isPending || isWalleting || !connected}
       className={cn(
         "w-full h-16 text-3xl font-black italic tracking-tighter uppercase transition-all active:scale-95 active:brightness-90",
         className
