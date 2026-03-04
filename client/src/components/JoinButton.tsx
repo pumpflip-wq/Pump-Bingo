@@ -150,6 +150,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           onSuccess: (data: any) => {
             setIsWalleting(false);
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
+            queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
             
             const isActuallyStarted = roundData?.round?.status === "IN_GAME" || roundData?.round?.status === "FINISHED";
             const showQueued = data.queued && isActuallyStarted;
@@ -161,12 +162,17 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
                 : "You've successfully entered the round!",
             });
           },
-          onError: () => {
+          onError: (error: any) => {
             setIsWalleting(false);
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
+            
+            // If it's free mode and we get an error, it might be a race condition but the user might still be joined
+            // or the server might have already processed it.
+            // However, the specific issue was likely the missing return in routes.ts
             toast({
-              title: "Joined Successfully",
-              description: "Transaction sent. You will be added to the game momentarily.",
+              title: "Join Error",
+              description: error.message || "Failed to join the round. Please try again.",
+              variant: "destructive",
             });
           },
         }

@@ -296,7 +296,7 @@ export async function registerRoutes(
       });
 
       const user = await storage.getUser(Number(userId));
-      res.json({ participant, balance: Number(user?.balance || 0) });
+      return res.json({ participant, balance: Number(user?.balance || 0) });
 
       // Create transaction & update balance in background
       if (entryPrice > 0) {
