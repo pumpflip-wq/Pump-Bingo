@@ -174,7 +174,7 @@ export class DatabaseStorage implements IStorage {
     const cardJson = JSON.stringify(card);
     const res = await db.execute(sql`
       INSERT INTO participants (round_id, user_id, card, tx_signature, final_win_prob) 
-      VALUES (${roundId}, ${userId}, ${cardJson}::jsonb, ${txSignature || null}, 0)
+      VALUES (${roundId}, ${userId}, ${cardJson}::jsonb, ${txSignature}, 0)
       RETURNING id, round_id, user_id, card, has_bingo, joined_at, tx_signature, final_win_prob
     `);
     const row = res.rows?.[0] as any;

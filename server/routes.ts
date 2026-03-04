@@ -283,7 +283,7 @@ export async function registerRoutes(
         roundId,
         Number(userId),
         card,
-        isFreeMode ? "FREE_MODE" : txSignature,
+        isFreeMode ? `FREE_${userId}_${Date.now()}` : txSignature,
       );
 
       const currentPrize = Number(round.prizePool || 0);
