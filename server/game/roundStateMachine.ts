@@ -6,7 +6,9 @@ const POST_WIN_DELAY_MS = 10000;
 
 export async function handleStateTransitions(round: Round, participantCount: number): Promise<void> {
   const now = new Date();
-  const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && participantCount < 2;
+  const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
+  const minPlayers = isFreeMode ? 1 : 2;
+  const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && participantCount < minPlayers;
 
   if (round.status === ROUND_STATUS.OPEN) {
     if (!isWaitingForPlayers) {
@@ -40,7 +42,7 @@ export async function handleStateTransitions(round: Round, participantCount: num
     if (isWaitingForPlayers) {
       // Fallback to OPEN if players leave during starting delay
       await storage.updateRound(round.id, { status: ROUND_STATUS.OPEN, startTime: null });
-    } else if (now.getTime() >= new Date(round.startTime!).getTime()) {
+    } else if (round.startTime && now.getTime() >= new Date(round.startTime).getTime()) {
       // Move to IN_GAME
       await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME, startTime: new Date() });
     }

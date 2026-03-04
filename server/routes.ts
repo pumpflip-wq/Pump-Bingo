@@ -169,7 +169,9 @@ export async function registerRoutes(
     const now = Date.now();
     
     // Logic for WAITING_FOR_PLAYERS state
-    const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && count < 2;
+    const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
+    const minPlayers = isFreeMode ? 1 : 2;
+    const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && count < minPlayers;
 
     if (round.startTime && !isWaitingForPlayers) {
       const startMs = new Date(round.startTime).getTime();
@@ -239,6 +241,7 @@ export async function registerRoutes(
 
       const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
 
+      const minPlayers = isFreeMode ? 1 : 2;
       if (round.status !== ROUND_STATUS.OPEN) {
         if (txSignature && !isFreeMode) {
           await storage.createPaymentQueue({

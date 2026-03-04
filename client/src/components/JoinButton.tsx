@@ -58,9 +58,10 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
 
     try {
       const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
-      let signature = "TX_SIG_" + Date.now();
+      let signature = "";
 
       if (!isFreeMode) {
+        signature = "TX_SIG_" + Date.now();
         const pendingRes = await fetch(`/api/payments/pending/${userId}`);
         if (pendingRes.ok) {
           const pendingData = await pendingRes.json();
