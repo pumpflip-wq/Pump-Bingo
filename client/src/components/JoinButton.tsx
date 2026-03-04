@@ -25,7 +25,8 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
   const { connection } = useConnection();
   const { publicKey, sendTransaction, connected } = useWallet();
 
-  const { roundData, user } = useGameState();
+  const { roundData, user, userId: gameStateUserId } = useGameState();
+  const effectiveUserId = userId || user?.id || gameStateUserId;
   const isWinnerDeclared = !!roundData?.round.winnerId;
   const nextRoundSecondsRemaining = (roundData as any)?.nextRoundSecondsRemaining ?? 0;
 
@@ -61,8 +62,9 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       let signature = "";
 
       if (!isFreeMode) {
+        const joinUserId = Number(effectiveUserId);
         signature = "TX_SIG_" + Date.now();
-        const pendingRes = await fetch(`/api/payments/pending/${userId}`);
+        const pendingRes = await fetch(`/api/payments/pending/${joinUserId}`);
         if (pendingRes.ok) {
           const pendingData = await pendingRes.json();
           if (pendingData.hasPending) {
@@ -136,16 +138,16 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         }
 
         await apiRequest("POST", "/api/payments/queue", {
-          userId,
+          userId: joinUserId,
           amount: price,
           txSignature: signature
         }).catch(console.error);
       } else {
-        signature = "FREE_" + userId + "_" + Date.now();
+        signature = "FREE_" + effectiveUserId + "_" + Date.now();
       }
 
       joinRound(
-        { roundId, userId, txSignature: signature },
+        { roundId, userId: Number(effectiveUserId), txSignature: signature },
         {
           onSuccess: (data: any) => {
             setIsWalleting(false);
@@ -201,7 +203,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
   return (
     <CyberButton
       onClick={handleJoin}
-      disabled={isPending || isWalleting || !userId}
+      disabled={isPending || isWalleting || !effectiveUserId}
       className={cn(
         "w-full h-16 text-3xl font-black italic tracking-tighter uppercase transition-all active:scale-95 active:brightness-90",
         className
