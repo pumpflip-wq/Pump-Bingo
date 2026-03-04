@@ -23,7 +23,7 @@ import { TermsModal } from "./components/TermsModal";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-const logoPng = "https://i.ibb.co/mVmrS6b2/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png";
+const logoPng = "/logo.png";
 
 function Router() {
   return (
