@@ -155,8 +155,10 @@ export default function Home() {
       const elapsed = currentTime - winnerDeclaredAt;
       const totalDisplayTime = 10000; // 10 seconds
       
+      // We keep showing the overlay even if roundData changes to a new round, 
+      // as long as the 10s haven't passed and the user hasn't closed it.
       if (elapsed < totalDisplayTime && !hasManuallyClosed) {
-        const winnerId = roundData?.round.winnerId;
+        const winnerId = roundData?.round.winnerId || (roundData?.round.status === ROUND_STATUS.FINISHED ? roundData?.round.winnerUserId : null);
         const winner = roundData?.participants?.find((p: any) => Number(p.userId || p.id) === Number(winnerId));
         
         return {
@@ -167,7 +169,7 @@ export default function Home() {
           isParticipant: isParticipant,
           txHash: roundData?.round.payoutSignature || undefined,
           timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
-          currentRoundId: roundData?.round.id,
+          currentRoundId: completionTimeRef.current?.roundId,
         };
       }
     }

@@ -87,12 +87,20 @@ export function useGameState() {
         });
       }
 
+      // Check if we need to poll the next round if the current one just finished
+      // but latestRound hasn't updated yet in the list
+      if (latestRound?.status === "FINISHED") {
+         queryClient.invalidateQueries({ 
+           queryKey: [api.rounds.list.path]
+         });
+      }
+
       if (userId) {
         queryClient.invalidateQueries({ queryKey: ["/api/auth/me", userId] });
       }
     }, 400); // 400ms polling for maximum responsiveness
     return () => clearInterval(interval);
-  }, [latestRound?.id, queryClient, userId]);
+  }, [latestRound?.id, latestRound?.status, queryClient, userId]);
 
   const { data: userTransactions } = useQuery<Transaction[]>({
     queryKey: ["/api/auth/me/transactions", user?.id],
