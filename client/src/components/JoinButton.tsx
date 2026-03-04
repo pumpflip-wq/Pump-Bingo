@@ -48,6 +48,23 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     }
 
     if (!effectiveUserId) {
+      // If we don't have a userId yet, try to login/get user first
+      if (publicKey) {
+        try {
+          const res = await apiRequest("POST", "/api/auth/login", { username: publicKey.toString() });
+          const newUser = await res.json();
+          if (newUser && newUser.id) {
+            // Update cache so useGameState picks it up
+            queryClient.setQueryData(["/api/auth/me", newUser.id], newUser);
+            // Continue with the new ID
+            handleJoinWithId(newUser.id);
+            return;
+          }
+        } catch (e) {
+          console.error("Auto-login failed:", e);
+        }
+      }
+
       toast({
         title: "Authentication Failed",
         description: "Please refresh and try again.",
@@ -57,12 +74,15 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       return;
     }
 
+    handleJoinWithId(Number(effectiveUserId));
+  };
+
+  const handleJoinWithId = async (joinUserId: number) => {
     try {
       const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
       let signature = "";
 
       if (!isFreeMode) {
-        const joinUserId = Number(effectiveUserId);
         signature = "TX_SIG_" + Date.now();
         const pendingRes = await fetch(`/api/payments/pending/${joinUserId}`);
         if (pendingRes.ok) {
@@ -84,7 +104,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             const mint = new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS!);
             const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET);
             
-            const userATA = await getAssociatedTokenAddress(mint, publicKey);
+            const userATA = await getAssociatedTokenAddress(mint, publicKey!);
             const treasuryATA = await getAssociatedTokenAddress(mint, treasury);
 
             try {
@@ -105,14 +125,14 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
                 userATA,
                 mint,
                 treasuryATA,
-                publicKey,
+                publicKey!,
                 BigInt(price),
                 PROTOCOL_CONFIG.DECIMALS
               )
             );
 
             transaction.recentBlockhash = blockhash;
-            transaction.feePayer = publicKey;
+            transaction.feePayer = publicKey!;
 
             signature = await sendTransaction(transaction, connection, { 
               preflightCommitment: 'confirmed',
@@ -125,13 +145,13 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             const { blockhash } = await connection.getLatestBlockhash('confirmed');
             const transaction = new Transaction().add(
               SystemProgram.transfer({
-                fromPubkey: publicKey,
+                fromPubkey: publicKey!,
                 toPubkey: treasury,
                 lamports: price,
               })
             );
             transaction.recentBlockhash = blockhash;
-            transaction.feePayer = publicKey;
+            transaction.feePayer = publicKey!;
             signature = await sendTransaction(transaction, connection);
             await connection.confirmTransaction(signature, "confirmed");
           }
@@ -143,11 +163,11 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           txSignature: signature
         }).catch(console.error);
       } else {
-        signature = "FREE_" + effectiveUserId + "_" + Date.now();
+        signature = "FREE_" + joinUserId + "_" + Date.now();
       }
 
       joinRound(
-        { roundId, userId: Number(effectiveUserId), txSignature: signature },
+        { roundId, userId: joinUserId, txSignature: signature },
         {
           onSuccess: (data: any) => {
             setIsWalleting(false);
@@ -168,9 +188,6 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             setIsWalleting(false);
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
             
-            // If it's free mode and we get an error, it might be a race condition but the user might still be joined
-            // or the server might have already processed it.
-            // However, the specific issue was likely the missing return in routes.ts
             toast({
               title: "Join Error",
               description: error.message || "Failed to join the round. Please try again.",
