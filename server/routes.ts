@@ -99,24 +99,42 @@ export async function registerRoutes(
   // ===== AUTH =====
   app.post(api.auth.login.path, async (req, res) => {
     try {
-      const { username } = api.auth.login.input.parse(req.body);
+      console.log("[AUTH] Login request body:", req.body);
+      const parsed = api.auth.login.input.safeParse(req.body);
+      if (!parsed.success) {
+        console.error("[AUTH] Login validation failed:", parsed.error.format());
+        return res.status(400).json({ 
+          message: "Invalid request format", 
+          errors: parsed.error.errors,
+          received: req.body 
+        });
+      }
+      const { username } = parsed.data;
       let user = await storage.getUserByUsername(username);
-      if (!user) user = await storage.createUser({ username });
+      if (!user) {
+        console.log("[AUTH] Creating new user for:", username);
+        user = await storage.createUser({ username });
+      }
       
-      // In Mainnet/SPL mode, check if user has token account if needed
-      // For now, we just return the user object
+      console.log("[AUTH] Login successful for:", username, "ID:", user.id);
       res.status(200).json(user);
     } catch (err) {
-      res.status(400).json({ message: "Invalid request" });
+      console.error("[AUTH] Login error:", err);
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 
   app.get(api.auth.me.path, async (req, res) => {
-    const userId = Number(req.params.id);
-    if (isNaN(userId)) return res.status(400).json({ message: "Invalid ID" });
-    const user = await storage.getUser(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    res.json(user);
+    try {
+      const userId = Number(req.params.id);
+      if (isNaN(userId)) return res.status(400).json({ message: "Invalid ID" });
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+      res.json(user);
+    } catch (err) {
+      console.error("[AUTH] Get user error:", err);
+      res.status(500).json({ message: "Internal server error" });
+    }
   });
 
   // ===== ROUNDS =====
@@ -168,10 +186,9 @@ export async function registerRoutes(
     let nextRoundSecondsRemaining = 0;
     const now = Date.now();
     
-    // Logic for WAITING_FOR_PLAYERS state
+      // Logic for WAITING_FOR_PLAYERS state
     const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
-    const minPlayers = isFreeMode ? 1 : 2;
-    const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && count < minPlayers;
+    const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && count < (isFreeMode ? 1 : 2); // In free mode, we need at least 1 player to start the countdown
 
     if (round.startTime && !isWaitingForPlayers) {
       const startMs = new Date(round.startTime).getTime();

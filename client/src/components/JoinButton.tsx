@@ -49,25 +49,44 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
 
     if (!effectiveUserId) {
       // If we don't have a userId yet, try to login/get user first
-      if (publicKey) {
+      if (connected && publicKey) {
+        const username = publicKey.toString();
+        console.log("[DEBUG] Attempting auto-login for:", username);
         try {
-          const res = await apiRequest("POST", "/api/auth/login", { username: publicKey.toString() });
-          const newUser = await res.json();
-          if (newUser && newUser.id) {
-            // Update cache so useGameState picks it up
-            queryClient.setQueryData(["/api/auth/me", newUser.id], newUser);
-            // Continue with the new ID
-            handleJoinWithId(newUser.id);
-            return;
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({ username })
+          });
+          
+          if (res.ok) {
+            const newUser = await res.json();
+            console.log("[DEBUG] Auto-login success:", newUser);
+            if (newUser && newUser.id) {
+              // Sync both Query Cache and Local Storage
+              queryClient.setQueryData(["/api/auth/me", newUser.id], newUser);
+              queryClient.setQueryData(["/api/auth/me"], newUser);
+              localStorage.setItem("pb_user_id", newUser.id.toString());
+              
+              // Proceed immediately with the ID we just got
+              handleJoinWithId(newUser.id);
+              return;
+            }
+          } else {
+            const errorText = await res.text();
+            console.error("[DEBUG] Auto-login failed status:", res.status, "Body:", errorText);
           }
         } catch (e) {
-          console.error("Auto-login failed:", e);
+          console.error("[DEBUG] Auto-login fetch error:", e);
         }
       }
 
       toast({
         title: "Authentication Failed",
-        description: "Please refresh and try again.",
+        description: connected ? "User identification failed. Please refresh." : "Please connect your wallet.",
         variant: "destructive",
       });
       setIsWalleting(false);

@@ -64,7 +64,7 @@ export const api = {
     join: {
       method: 'POST' as const,
       path: '/api/rounds/:id/join',
-      input: z.object({ userId: z.number() }),
+      input: z.object({ userId: z.number(), txSignature: z.string().optional() }),
       responses: {
         200: z.union([
           z.object({

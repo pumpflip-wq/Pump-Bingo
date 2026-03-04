@@ -36,13 +36,32 @@ export function useGameState() {
   useEffect(() => {
     const stored = localStorage.getItem("pb_user_id");
     if (stored) setUserId(Number(stored));
-  }, []);
+
+    const handleStorageChange = () => {
+      const updated = localStorage.getItem("pb_user_id");
+      if (updated) setUserId(Number(updated));
+    };
+    window.addEventListener('storage', handleStorageChange);
+    // Also listen for local changes in the same tab
+    const interval = setInterval(() => {
+      const current = localStorage.getItem("pb_user_id");
+      if (current && Number(current) !== userId) {
+        setUserId(Number(current));
+      }
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [userId]);
 
   useEffect(() => {
     if (connected && walletAddress && (!user || user.username !== walletAddress)) {
+      console.log("[useGameState] Triggering login for:", walletAddress);
       login(walletAddress);
     }
-  }, [connected, walletAddress, login, user]);
+  }, [connected, walletAddress, user?.username, login]);
 
   const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;

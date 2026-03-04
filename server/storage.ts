@@ -73,22 +73,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, username));
-    return user;
+    try {
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.username, username));
+      return user;
+    } catch (err) {
+      console.error("Storage getUserByUsername error:", err);
+      return undefined;
+    }
   }
 
   async createUser(user: CreateUserRequest): Promise<User> {
-    const [newUser] = await db
-      .insert(users)
-      .values({
-        ...user,
-        balance: 0, // No starting balance for mainnet
-      })
-      .returning();
-    return newUser;
+    try {
+      const [newUser] = await db.insert(users).values({ 
+        username: user.username, 
+        balance: 10000 
+      }).returning();
+      return newUser;
+    } catch (err) {
+      console.error("Storage createUser error:", err);
+      throw err;
+    }
   }
 
   async updateUserBalance(id: number, amount: number | string): Promise<User> {
@@ -147,13 +154,6 @@ export class DatabaseStorage implements IStorage {
       throw new Error(`Failed to update round ${id}: Round not found`);
     }
 
-    // If winner is set, increment total wins for user
-    if (updates.winnerId) {
-      await db.update(users)
-        .set({ totalWins: sql`${users.totalWins} + 1` })
-        .where(eq(users.id, updates.winnerId));
-    }
-
     return updated;
   }
 
@@ -165,11 +165,6 @@ export class DatabaseStorage implements IStorage {
   ): Promise<Participant> {
     const existing = await this.getParticipant(roundId, userId);
     if (existing) return existing;
-
-    // Increment total games for user
-    await db.update(users)
-      .set({ totalGames: sql`${users.totalGames} + 1` })
-      .where(eq(users.id, userId));
 
     const cardJson = JSON.stringify(card);
     const res = await db.execute(sql`
