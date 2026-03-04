@@ -170,10 +170,12 @@ export class GameManager {
       }
     });
 
+    // Fetch the updated round to ensure we have the latest state before finishing
+    const currentRound = await storage.getRound(roundId);
     const updated = await storage.updateRound(roundId, {
       winnerId: userId,
       completedAt: new Date(),
-      drawnNumbers: round.drawnNumbers, // Persist final drawn numbers state
+      drawnNumbers: currentRound?.drawnNumbers || round.drawnNumbers, // Use latest drawn numbers
     });
 
     return !!(updated && updated.winnerId === userId);

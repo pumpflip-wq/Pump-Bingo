@@ -45,7 +45,10 @@ export async function handleStateTransitions(round: Round, participantCount: num
       const postWinDelay = 10000; // 10s delay to show winner
       if (now.getTime() - completedTime >= postWinDelay) {
         // Transition to FINISHED
-        await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
+        await storage.updateRound(round.id, { 
+          status: ROUND_STATUS.FINISHED,
+          completedAt: new Date() // Ensure it's strictly set for the next round logic
+        });
         console.log(`[Round ${round.id}] Post-win delay over. Transitioning to FINISHED.`);
       }
     }
