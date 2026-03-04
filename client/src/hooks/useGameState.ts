@@ -69,10 +69,11 @@ export function useGameState() {
   });
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
   const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number, {
-    refetchInterval: 1000, // Sync with rounds list polling
+    refetchInterval: 1000,
     staleTime: 0, 
     refetchOnWindowFocus: true,
-    refetchOnMount: true
+    refetchOnMount: true,
+    notifyOnChangeProps: 'all', // Ensure any change triggers a re-render
   });
 
   // Aggressive polling for round list and user state
@@ -80,27 +81,33 @@ export function useGameState() {
     const interval = setInterval(() => {
       // Force invalidate list to detect new rounds or status changes
       queryClient.invalidateQueries({ 
-        queryKey: [api.rounds.list.path]
+        queryKey: [api.rounds.list.path],
+        refetchType: 'all'
       });
       
       if (latestRound?.id) {
         // Also force refetch the specific round data
         queryClient.invalidateQueries({ 
-          queryKey: [api.rounds.get.path, latestRound.id]
+          queryKey: [api.rounds.get.path, latestRound.id],
+          refetchType: 'all'
         });
       }
 
       // If we are waiting for a new round (status FINISHED), invalidate list more often
       if (latestRound?.status === "FINISHED") {
          queryClient.invalidateQueries({ 
-           queryKey: [api.rounds.list.path]
+           queryKey: [api.rounds.list.path],
+           refetchType: 'all'
          });
       }
 
       if (userId) {
-        queryClient.invalidateQueries({ queryKey: ["/api/auth/me", userId] });
+        queryClient.invalidateQueries({ 
+          queryKey: ["/api/auth/me", userId],
+          refetchType: 'all'
+        });
       }
-    }, 1000); // Standardize to 1s to match server tick and avoid too many requests
+    }, 1000); 
     return () => clearInterval(interval);
   }, [latestRound?.id, latestRound?.status, queryClient, userId]);
 

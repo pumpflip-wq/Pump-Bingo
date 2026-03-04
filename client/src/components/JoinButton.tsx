@@ -188,19 +188,26 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       joinRound(
         { roundId, userId: joinUserId, txSignature: signature },
         {
-          onSuccess: (data: any) => {
+          onSuccess: async (data: any) => {
             setIsWalleting(false);
             // Immediate invalidation with refetch for instant UI update
-            queryClient.invalidateQueries({ 
-              queryKey: [api.rounds.get.path, roundId],
-              refetchType: 'all'
-            });
-            queryClient.invalidateQueries({ 
-              queryKey: [api.rounds.list.path],
-              refetchType: 'all'
-            });
-            if (joinUserId) {
+            await Promise.all([
               queryClient.invalidateQueries({ 
+                queryKey: [api.rounds.get.path, roundId],
+                refetchType: 'all'
+              }),
+              queryClient.invalidateQueries({ 
+                queryKey: [api.rounds.list.path],
+                refetchType: 'all'
+              }),
+              queryClient.invalidateQueries({ 
+                queryKey: ["/api/auth/me"],
+                refetchType: 'all'
+              })
+            ]);
+
+            if (joinUserId) {
+              await queryClient.invalidateQueries({ 
                 queryKey: ["/api/auth/me", joinUserId],
                 refetchType: 'all'
               });

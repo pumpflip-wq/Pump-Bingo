@@ -50,9 +50,18 @@ export default function Home() {
 
   useEffect(() => {
     if (roundData?.round?.status) {
-      queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
+      queryClient.invalidateQueries({ 
+        queryKey: [api.rounds.list.path],
+        refetchType: 'all'
+      });
+      if (roundData.round.id) {
+        queryClient.invalidateQueries({ 
+          queryKey: [api.rounds.get.path, roundData.round.id],
+          refetchType: 'all'
+        });
+      }
     }
-  }, [roundData?.round?.status, roundData?.participantsCount]);
+  }, [roundData?.round?.status, roundData?.participantsCount, roundData?.round?.id]);
 
   const myParticipant = useMemo(() => {
     if (!walletAddress || !roundData?.participants) return null;
