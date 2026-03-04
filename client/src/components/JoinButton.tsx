@@ -57,85 +57,91 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     }
 
     try {
-      const pendingRes = await fetch(`/api/payments/pending/${userId}`);
-      if (pendingRes.ok) {
-        const pendingData = await pendingRes.json();
-        if (pendingData.hasPending) {
-          toast({
-            title: "Already Queued",
-            description: "You have a pending deposit. You'll be automatically joined!",
-          });
-          setIsWalleting(false);
-          return;
-        }
-      }
-
-      const isSPLMode = !!PROTOCOL_CONFIG.MINT_ADDRESS;
+      const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
       let signature = "TX_SIG_" + Date.now();
 
-      if (PROTOCOL_CONFIG.NETWORK === "mainnet-beta") {
-        if (isSPLMode) {
-          const mint = new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS!);
-          const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET);
-          
-          const userATA = await getAssociatedTokenAddress(mint, publicKey);
-          const treasuryATA = await getAssociatedTokenAddress(mint, treasury);
-
-          try {
-            const account = await getAccount(connection, userATA);
-            if (Number(account.amount) < price) {
-              throw new Error(`Insufficient ${PROTOCOL_CONFIG.SYMBOL} balance.`);
-            }
-          } catch (e: any) {
-            if (e.name === 'TokenAccountNotFoundError') {
-              throw new Error(`You don't have a ${PROTOCOL_CONFIG.SYMBOL} token account. Please make sure you have the tokens.`);
-            }
-            throw new Error(e.message || `Could not verify ${PROTOCOL_CONFIG.SYMBOL} balance. Make sure you have the tokens.`);
+      if (!isFreeMode) {
+        const pendingRes = await fetch(`/api/payments/pending/${userId}`);
+        if (pendingRes.ok) {
+          const pendingData = await pendingRes.json();
+          if (pendingData.hasPending) {
+            toast({
+              title: "Already Queued",
+              description: "You have a pending deposit. You'll be automatically joined!",
+            });
+            setIsWalleting(false);
+            return;
           }
-
-          const { blockhash } = await connection.getLatestBlockhash('confirmed');
-          const transaction = new Transaction().add(
-            createTransferCheckedInstruction(
-              userATA,
-              mint,
-              treasuryATA,
-              publicKey,
-              BigInt(price),
-              PROTOCOL_CONFIG.DECIMALS
-            )
-          );
-
-          transaction.recentBlockhash = blockhash;
-          transaction.feePayer = publicKey;
-
-          signature = await sendTransaction(transaction, connection, { 
-            preflightCommitment: 'confirmed',
-          });
-          
-          await connection.confirmTransaction(signature, "confirmed");
-        } else {
-          // Fallback to SOL if no MINT_ADDRESS provided (safety)
-          const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET);
-          const { blockhash } = await connection.getLatestBlockhash('confirmed');
-          const transaction = new Transaction().add(
-            SystemProgram.transfer({
-              fromPubkey: publicKey,
-              toPubkey: treasury,
-              lamports: price,
-            })
-          );
-          transaction.recentBlockhash = blockhash;
-          transaction.feePayer = publicKey;
-          signature = await sendTransaction(transaction, connection);
-          await connection.confirmTransaction(signature, "confirmed");
         }
-      }
 
-      await apiRequest("POST", "/api/payments/queue", {
-        userId,
-        amount: price,
-        txSignature: signature
-      }).catch(console.error);
+        const isSPLMode = !!PROTOCOL_CONFIG.MINT_ADDRESS;
+
+        if (PROTOCOL_CONFIG.NETWORK === "mainnet-beta") {
+          if (isSPLMode) {
+            const mint = new PublicKey(PROTOCOL_CONFIG.MINT_ADDRESS!);
+            const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET);
+            
+            const userATA = await getAssociatedTokenAddress(mint, publicKey);
+            const treasuryATA = await getAssociatedTokenAddress(mint, treasury);
+
+            try {
+              const account = await getAccount(connection, userATA);
+              if (Number(account.amount) < price) {
+                throw new Error(`Insufficient ${PROTOCOL_CONFIG.SYMBOL} balance.`);
+              }
+            } catch (e: any) {
+              if (e.name === 'TokenAccountNotFoundError') {
+                throw new Error(`You don't have a ${PROTOCOL_CONFIG.SYMBOL} token account. Please make sure you have the tokens.`);
+              }
+              throw new Error(e.message || `Could not verify ${PROTOCOL_CONFIG.SYMBOL} balance. Make sure you have the tokens.`);
+            }
+
+            const { blockhash } = await connection.getLatestBlockhash('confirmed');
+            const transaction = new Transaction().add(
+              createTransferCheckedInstruction(
+                userATA,
+                mint,
+                treasuryATA,
+                publicKey,
+                BigInt(price),
+                PROTOCOL_CONFIG.DECIMALS
+              )
+            );
+
+            transaction.recentBlockhash = blockhash;
+            transaction.feePayer = publicKey;
+
+            signature = await sendTransaction(transaction, connection, { 
+              preflightCommitment: 'confirmed',
+            });
+            
+            await connection.confirmTransaction(signature, "confirmed");
+          } else {
+            // Fallback to SOL if no MINT_ADDRESS provided (safety)
+            const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET);
+            const { blockhash } = await connection.getLatestBlockhash('confirmed');
+            const transaction = new Transaction().add(
+              SystemProgram.transfer({
+                fromPubkey: publicKey,
+                toPubkey: treasury,
+                lamports: price,
+              })
+            );
+            transaction.recentBlockhash = blockhash;
+            transaction.feePayer = publicKey;
+            signature = await sendTransaction(transaction, connection);
+            await connection.confirmTransaction(signature, "confirmed");
+          }
+        }
+
+        await apiRequest("POST", "/api/payments/queue", {
+          userId,
+          amount: price,
+          txSignature: signature
+        }).catch(console.error);
+      } else {
+        signature = "FREE_" + userId + "_" + Date.now();
+      }
 
       joinRound(
         { roundId, userId, txSignature: signature },
@@ -198,14 +204,16 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       {isPending || isWalleting ? (
         <div className="flex items-center justify-center gap-2">
           <Loader2 className="w-6 h-6 animate-spin" />
-          <span>{isWalleting ? 'WAITING FOR WALLET...' : 'JOINING...'}</span>
+          <span>{isWalleting ? (Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0 ? 'JOINING...' : 'WAITING FOR WALLET...') : 'JOINING...'}</span>
         </div>
       ) : (
         <div className="flex items-center justify-center gap-4">
-          <span>JOIN GAME -</span>
-          <span className="text-3xl text-black font-black">
-            {formatCurrency(price, false)} {PROTOCOL_CONFIG.SYMBOL}
-          </span>
+          <span>{Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0 ? 'PLAY FOR FREE' : 'JOIN GAME -'}</span>
+          {Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) > 0 && (
+            <span className="text-3xl text-black font-black">
+              {formatCurrency(price, false)} {PROTOCOL_CONFIG.SYMBOL}
+            </span>
+          )}
         </div>
       )}
     </CyberButton>

@@ -223,7 +223,7 @@ export async function registerRoutes(
     res.json(responseData);
   });
 
-  // ===== JOIN ROUND =====
+      // ===== JOIN ROUND =====
   app.post(api.rounds.join.path, async (req, res) => {
     try {
       const roundId = Number(req.params.id);
@@ -237,8 +237,10 @@ export async function registerRoutes(
       const round = await storage.getRound(roundId);
       if (!round) return res.status(404).json({ message: "Round not found" });
 
+      const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
+
       if (round.status !== ROUND_STATUS.OPEN) {
-        if (txSignature) {
+        if (txSignature && !isFreeMode) {
           await storage.createPaymentQueue({
             userId: Number(userId),
             txSignature,
@@ -265,13 +267,15 @@ export async function registerRoutes(
         });
       }
 
-      // Check for pending payment to prevent duplicates
-      const pending = await storage.getPendingPaymentByUser(Number(userId));
-      if (pending && pending.txSignature === txSignature) {
-        return res.json({ 
-          queued: true, 
-          message: "Transaction already processing. You will be joined automatically." 
-        });
+      // Check for pending payment to prevent duplicates (only if not free)
+      if (!isFreeMode) {
+        const pending = await storage.getPendingPaymentByUser(Number(userId));
+        if (pending && pending.txSignature === txSignature) {
+          return res.json({ 
+            queued: true, 
+            message: "Transaction already processing. You will be joined automatically." 
+          });
+        }
       }
 
       const card = gameManager.generateCard();
@@ -279,7 +283,7 @@ export async function registerRoutes(
         roundId,
         Number(userId),
         card,
-        txSignature,
+        isFreeMode ? "FREE_MODE" : txSignature,
       );
 
       const currentPrize = Number(round.prizePool || 0);
@@ -292,25 +296,27 @@ export async function registerRoutes(
       res.json({ participant, balance: Number(user?.balance || 0) });
 
       // Create transaction & update balance in background
-      storage
-        .createTransaction({
-          userId,
-          amount: -entryPrice,
-          type: "BUY_IN",
-          roundId,
-        })
-        .catch(console.error);
-      storage.updateUserBalance(userId, entryPrice * -1).catch(console.error);
-
-      // Verify on Solana in background
-      const masterPubKey = solanaManager.getMasterPublicKey();
-      if (txSignature && masterPubKey) {
-        solanaManager
-          .verifyTransaction(txSignature, entryPrice, masterPubKey)
-          .then((valid) => {
-            if (!valid) console.error(`Transaction invalid: ${txSignature}`);
+      if (entryPrice > 0) {
+        storage
+          .createTransaction({
+            userId,
+            amount: -entryPrice,
+            type: "BUY_IN",
+            roundId,
           })
           .catch(console.error);
+        storage.updateUserBalance(userId, entryPrice * -1).catch(console.error);
+
+        // Verify on Solana in background
+        const masterPubKey = solanaManager.getMasterPublicKey();
+        if (txSignature && masterPubKey) {
+          solanaManager
+            .verifyTransaction(txSignature, entryPrice, masterPubKey)
+            .then((valid) => {
+              if (!valid) console.error(`Transaction invalid: ${txSignature}`);
+            })
+            .catch(console.error);
+        }
       }
     } catch (err) {
       console.error("Join round error:", err);

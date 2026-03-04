@@ -43,7 +43,16 @@ export class GameManager {
       // connected to the same database.
       await db.execute(sql`SELECT pg_advisory_xact_lock(12345)`);
       
-      const latestRound = await storage.getLatestRound();
+      let latestRound = await storage.getLatestRound();
+
+      // Check if current round price needs updating (e.g. admin changed config from 0 to >0 or vice-versa)
+      if (latestRound && latestRound.status === ROUND_STATUS.OPEN && Number(latestRound.price) !== Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE)) {
+        console.log(`[GameManager] Updating round ${latestRound.id} price from ${latestRound.price} to ${PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}`);
+        await storage.updateRound(latestRound.id, {
+          price: PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE
+        });
+        latestRound.price = PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE;
+      }
       
       // If no round exists, or the latest round is finished, create a new one
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
