@@ -148,16 +148,22 @@ export default function Home() {
 
   const overlayState = useMemo(() => {
     const winnerDeclaredAt = completionTimeRef.current?.time;
-    if (winnerDeclaredAt || !roundData || roundData?.round.status === ROUND_STATUS.FINISHED) {
-      const elapsed = currentTime - (winnerDeclaredAt || 0);
-      const totalDisplayTime = 10000;
-      if (isParticipant && (winnerDeclaredAt || roundData?.round?.winnerId) && elapsed < totalDisplayTime && !hasManuallyClosed) {
-        const winner = roundData?.participants?.find((p: any) => Number(p.userId || p.id) === Number(roundData?.round.winnerId));
+    // Check if the round is actually in a state that should show the winner
+    const isRoundOver = roundData?.round.status === ROUND_STATUS.FINISHED || !!roundData?.round.winnerId;
+    
+    if (isRoundOver && winnerDeclaredAt) {
+      const elapsed = currentTime - winnerDeclaredAt;
+      const totalDisplayTime = 10000; // 10 seconds
+      
+      if (elapsed < totalDisplayTime && !hasManuallyClosed) {
+        const winnerId = roundData?.round.winnerId;
+        const winner = roundData?.participants?.find((p: any) => Number(p.userId || p.id) === Number(winnerId));
+        
         return {
           show: true,
-          username: winner?.username || (roundData?.round.winnerId === user?.id ? walletAddress : roundData?.round.winnerId?.toString() || "Unknown"),
+          username: winner?.username || (winnerId === user?.id ? walletAddress : winnerId?.toString() || "Unknown"),
           prize: roundData?.round.prizePool || 0,
-          isWinner: roundData?.round.winnerId === user?.id,
+          isWinner: Number(winnerId) === Number(user?.id),
           isParticipant: isParticipant,
           txHash: roundData?.round.payoutSignature || undefined,
           timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),

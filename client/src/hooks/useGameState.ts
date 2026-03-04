@@ -66,30 +66,32 @@ export function useGameState() {
   const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
   const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number, {
-    refetchInterval: 500, // Reduced to 500ms for faster updates
+    refetchInterval: 300, // Faster polling for high-priority round data
     staleTime: 0, 
     refetchOnWindowFocus: true,
     refetchOnMount: true
   });
 
-  // Aggressive polling for round data and user state
+  // Aggressive polling for round list and user state
   useEffect(() => {
-    if (latestRound?.id) {
-      const interval = setInterval(() => {
-        // Force invalidate to ensure UI stays in sync
+    const interval = setInterval(() => {
+      // Force invalidate list to detect new rounds or status changes
+      queryClient.invalidateQueries({ 
+        queryKey: [api.rounds.list.path]
+      });
+      
+      if (latestRound?.id) {
         queryClient.invalidateQueries({ 
           queryKey: [api.rounds.get.path, latestRound.id], 
           exact: true
         });
-        queryClient.invalidateQueries({ 
-          queryKey: [api.rounds.list.path]
-        });
-        if (userId) {
-          queryClient.invalidateQueries({ queryKey: ["/api/auth/me", userId] });
-        }
-      }, 500); // 500ms polling for list and user state
-      return () => clearInterval(interval);
-    }
+      }
+
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me", userId] });
+      }
+    }, 400); // 400ms polling for maximum responsiveness
+    return () => clearInterval(interval);
   }, [latestRound?.id, queryClient, userId]);
 
   const { data: userTransactions } = useQuery<Transaction[]>({

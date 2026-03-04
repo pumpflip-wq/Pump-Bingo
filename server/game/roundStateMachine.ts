@@ -32,20 +32,21 @@ export async function handleStateTransitions(round: Round, participantCount: num
       }
     } else if (round.status === ROUND_STATUS.IN_GAME) {
     // Only allow the round to finish if a winner has been declared.
-    // We remove the condition that automatically ends the game when 75 numbers are drawn.
     const isOver = !!round.winnerId;
     if (isOver) {
       if (!round.completedAt) {
         // Mark completion time if not already set
         const completedAt = new Date();
         await storage.updateRound(round.id, { completedAt });
+        console.log(`[Round ${round.id}] Winner declared: ${round.winnerId}. Setting completedAt: ${completedAt.toISOString()}`);
         return;
       }
       const completedTime = new Date(round.completedAt).getTime();
-      const postWinDelay = PROTOCOL_CONFIG.POST_WIN_DELAY_MS || 10000;
+      const postWinDelay = 10000; // 10s delay to show winner
       if (now.getTime() - completedTime >= postWinDelay) {
         // Transition to FINISHED
         await storage.updateRound(round.id, { status: ROUND_STATUS.FINISHED });
+        console.log(`[Round ${round.id}] Post-win delay over. Transitioning to FINISHED.`);
       }
     }
   }
