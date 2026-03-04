@@ -63,10 +63,13 @@ export function useGameState() {
     }
   }, [connected, walletAddress, user?.username, login]);
 
-  const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds();
+  const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds({
+    refetchInterval: 1000,
+    staleTime: 0
+  });
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
   const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number, {
-    refetchInterval: 300, // Faster polling for high-priority round data
+    refetchInterval: 1000, // Sync with rounds list polling
     staleTime: 0, 
     refetchOnWindowFocus: true,
     refetchOnMount: true
@@ -81,14 +84,13 @@ export function useGameState() {
       });
       
       if (latestRound?.id) {
+        // Also force refetch the specific round data
         queryClient.invalidateQueries({ 
-          queryKey: [api.rounds.get.path, latestRound.id], 
-          exact: true
+          queryKey: [api.rounds.get.path, latestRound.id]
         });
       }
 
-      // Check if we need to poll the next round if the current one just finished
-      // but latestRound hasn't updated yet in the list
+      // If we are waiting for a new round (status FINISHED), invalidate list more often
       if (latestRound?.status === "FINISHED") {
          queryClient.invalidateQueries({ 
            queryKey: [api.rounds.list.path]
@@ -98,7 +100,7 @@ export function useGameState() {
       if (userId) {
         queryClient.invalidateQueries({ queryKey: ["/api/auth/me", userId] });
       }
-    }, 400); // 400ms polling for maximum responsiveness
+    }, 1000); // Standardize to 1s to match server tick and avoid too many requests
     return () => clearInterval(interval);
   }, [latestRound?.id, latestRound?.status, queryClient, userId]);
 

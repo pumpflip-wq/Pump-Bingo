@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, buildUrl } from "@shared/routes";
 
 // GET /api/rounds
-export function useRounds() {
+export function useRounds(options?: { refetchInterval?: number; staleTime?: number }) {
   return useQuery({
     queryKey: [api.rounds.list.path],
     queryFn: async () => {
@@ -13,6 +13,7 @@ export function useRounds() {
       return Array.isArray(data) ? api.rounds.list.responses[200].parse(data) : [];
     },
     refetchInterval: 1000, // Faster polling for the list
+    ...options
   });
 }
 
