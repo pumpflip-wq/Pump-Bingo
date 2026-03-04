@@ -1,5 +1,5 @@
 export const PROTOCOL_CONFIG = {
-  MINT_ADDRESS: "CJbxcY3h4m2QgFtP8f3mMEa6MCnpDi3J4A4h6tMFpump",
+  MINT_ADDRESS: "soonpump",
   SYMBOL: "$PBINGO",
   DECIMALS: 6,
 
