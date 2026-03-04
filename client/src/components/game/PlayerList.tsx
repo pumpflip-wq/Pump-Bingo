@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, ShieldCheck, Globe } from "lucide-react";
-import { cn, formatAddress, formatCurrency } from "@/lib/utils";
+import { cn, formatAddress } from "@/lib/utils";
 import { PROTOCOL_CONFIG } from "@shared/config";
 
 interface PlayerListProps {
@@ -81,8 +81,6 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
         <AnimatePresence mode="popLayout">
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
-            const winnerKey = roundData?.round?.winnerUsername?.toLowerCase() || null;
-            const isWinner = Boolean(winnerKey && p._key === winnerKey);
             
             // SHOW probabilities and ranking numbers ONLY for players during active game
             const showStats = amIParticipating && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED');
@@ -130,15 +128,15 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                     )}
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
-                    {Number(roundData?.round?.price || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) > 0 ? (
-                      <span className="text-[12px] text-primary font-black font-mono tracking-normal">
-                        +{(Number(roundData?.round?.price || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) / 1e9).toFixed(2)} SOL
-                      </span>
-                    ) : (
-                      <span className="text-[12px] text-primary font-black font-mono tracking-normal">
-                        FREE PLAY
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2 mt-0.5">
+                       <span className="text-[12px] text-primary font-black font-mono tracking-normal">
+                         {Number(roundData?.round?.price || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) > 0 ? (
+                           `+${(Number(roundData?.round?.price || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) / 1e9).toFixed(2)} SOL`
+                         ) : (
+                           "FREE PLAY"
+                         )}
+                       </span>
+                    </div>
                     {showStats && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && (
                       <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
                         <motion.div 

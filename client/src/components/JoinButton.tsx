@@ -190,8 +190,21 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         {
           onSuccess: (data: any) => {
             setIsWalleting(false);
-            queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
-            queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
+            // Immediate invalidation with refetch for instant UI update
+            queryClient.invalidateQueries({ 
+              queryKey: [api.rounds.get.path, roundId],
+              refetchType: 'all'
+            });
+            queryClient.invalidateQueries({ 
+              queryKey: [api.rounds.list.path],
+              refetchType: 'all'
+            });
+            if (joinUserId) {
+              queryClient.invalidateQueries({ 
+                queryKey: ["/api/auth/me", joinUserId],
+                refetchType: 'all'
+              });
+            }
             
             const isActuallyStarted = roundData?.round?.status === "IN_GAME" || roundData?.round?.status === "FINISHED";
             const showQueued = data.queued && isActuallyStarted;

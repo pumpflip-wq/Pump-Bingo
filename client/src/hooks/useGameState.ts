@@ -66,8 +66,8 @@ export function useGameState() {
   const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
   const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number, {
-    refetchInterval: 1000, // Poll every 1 second for real-time updates
-    staleTime: 500,
+    refetchInterval: 500, // Reduced to 500ms for faster updates
+    staleTime: 0, // Ensure we always get fresh data
     refetchOnWindowFocus: true,
     refetchOnMount: true
   });
@@ -84,10 +84,14 @@ export function useGameState() {
         queryClient.invalidateQueries({ 
           queryKey: [api.rounds.list.path]
         });
-      }, 2000); 
+        // Also invalidate user to reflect join status immediately
+        if (userId) {
+          queryClient.invalidateQueries({ queryKey: ["/api/auth/me", userId] });
+        }
+      }, 1000); // Poll every 1s for the round list and user state
       return () => clearInterval(interval);
     }
-  }, [latestRound?.id, queryClient]);
+  }, [latestRound?.id, queryClient, userId]);
 
   const { data: userTransactions } = useQuery<Transaction[]>({
     queryKey: ["/api/auth/me/transactions", user?.id],

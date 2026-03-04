@@ -13,8 +13,8 @@ export async function handleStateTransitions(round: Round, participantCount: num
     if (round.status === ROUND_STATUS.OPEN) {
       if (!isWaitingForPlayers) {
         if (!round.startTime) {
-          // 3s countdown for ultra-fast testing
-          const startTime = new Date(now.getTime() + 3000);
+          // 1s countdown for ultra-fast joining
+          const startTime = new Date(now.getTime() + 1000);
           await storage.updateRound(round.id, { startTime });
           console.log(`[Round ${round.id}] Started countdown to ${startTime.toISOString()}`);
         } else {
