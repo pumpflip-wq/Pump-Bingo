@@ -67,16 +67,16 @@ export function useGameState() {
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
   const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number, {
     refetchInterval: 500, // Reduced to 500ms for faster updates
-    staleTime: 0, // Ensure we always get fresh data
+    staleTime: 0, 
     refetchOnWindowFocus: true,
     refetchOnMount: true
   });
 
-  // Poll round data based on server-driven status and timers
+  // Aggressive polling for round data and user state
   useEffect(() => {
     if (latestRound?.id) {
       const interval = setInterval(() => {
-        // Force invalidate with refetch to ensure no stale data remains in cache
+        // Force invalidate to ensure UI stays in sync
         queryClient.invalidateQueries({ 
           queryKey: [api.rounds.get.path, latestRound.id], 
           exact: true
@@ -84,11 +84,10 @@ export function useGameState() {
         queryClient.invalidateQueries({ 
           queryKey: [api.rounds.list.path]
         });
-        // Also invalidate user to reflect join status immediately
         if (userId) {
           queryClient.invalidateQueries({ queryKey: ["/api/auth/me", userId] });
         }
-      }, 1000); // Poll every 1s for the round list and user state
+      }, 500); // 500ms polling for list and user state
       return () => clearInterval(interval);
     }
   }, [latestRound?.id, queryClient, userId]);

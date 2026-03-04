@@ -7,16 +7,16 @@ const POST_WIN_DELAY_MS = 10000;
 export async function handleStateTransitions(round: Round, participantCount: number): Promise<void> {
   const now = new Date();
     const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
-    const minPlayers = 1; // MVP always 1
+    const minPlayers = 2; 
     const isWaitingForPlayers = participantCount < minPlayers;
 
     if (round.status === ROUND_STATUS.OPEN) {
       if (!isWaitingForPlayers) {
         if (!round.startTime) {
-          // 1s countdown for ultra-fast joining
-          const startTime = new Date(now.getTime() + 1000);
+          // 60s countdown as requested by user
+          const startTime = new Date(now.getTime() + 60000);
           await storage.updateRound(round.id, { startTime });
-          console.log(`[Round ${round.id}] Started countdown to ${startTime.toISOString()}`);
+          console.log(`[Round ${round.id}] Started 60s countdown to ${startTime.toISOString()}`);
         } else {
           const startTimeMs = new Date(round.startTime).getTime();
           if (now.getTime() >= startTimeMs) {

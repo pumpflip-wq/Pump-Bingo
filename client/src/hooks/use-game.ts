@@ -12,7 +12,7 @@ export function useRounds() {
       // Ensure we always have an array even if server returns something else
       return Array.isArray(data) ? api.rounds.list.responses[200].parse(data) : [];
     },
-    refetchInterval: 5000, // Reduced polling for the list
+    refetchInterval: 1000, // Faster polling for the list
   });
 }
 
