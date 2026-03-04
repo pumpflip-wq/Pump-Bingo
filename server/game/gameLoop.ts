@@ -118,6 +118,7 @@ export class GameManager {
 
         await storage.markPaymentProcessed(payment.id);
         console.log(`[GameManager] Auto-joined queued player ${payment.userId} to round #${roundId}`);
+        await this.handlePlayerJoined(roundId);
       } catch (err) {
         console.error("Error processing queued payment:", err);
       }
@@ -175,6 +176,13 @@ export class GameManager {
     });
 
     return !!(updated && updated.winnerId === userId);
+  }
+
+  async handlePlayerJoined(roundId: number) {
+    const round = await storage.getRound(roundId);
+    if (!round || round.status !== ROUND_STATUS.OPEN) return;
+    const count = await storage.getRoundParticipantsCount(roundId);
+    await handleStateTransitions(round, count);
   }
 
   generateCard() { return generateBingoCard(); }

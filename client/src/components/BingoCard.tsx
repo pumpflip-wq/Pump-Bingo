@@ -43,6 +43,7 @@ export function BingoCard({ card, drawnNumbers, className }: BingoCardProps) {
     return minMissing === 1;
   }, [card, drawnNumbers]);
 
+  // No changes needed here, just verifying the file content.
   return (
     <div className={cn(
       "grid grid-cols-5 gap-1 lg:gap-3 p-1.5 lg:p-6 bg-black/60 backdrop-blur-2xl rounded-xl lg:rounded-2xl border-2 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group transition-all duration-500",

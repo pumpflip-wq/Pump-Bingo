@@ -6,47 +6,31 @@ const POST_WIN_DELAY_MS = 10000;
 
 export async function handleStateTransitions(round: Round, participantCount: number): Promise<void> {
   const now = new Date();
-  const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
-  const minPlayers = isFreeMode ? 1 : 2;
-  const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && participantCount < minPlayers;
+    const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
+    const minPlayers = 1; // MVP always 1
+    const isWaitingForPlayers = participantCount < minPlayers;
 
-  if (round.status === ROUND_STATUS.OPEN) {
-    if (!isWaitingForPlayers) {
-      if (!round.startTime) {
-        // Initialize countdown: 60 seconds from now
-        const startTime = new Date(now.getTime() + 60000);
-        await storage.updateRound(round.id, { startTime });
-        console.log(`[Round ${round.id}] Started countdown to ${startTime.toISOString()}`);
-      } else {
-        const startTimeMs = new Date(round.startTime).getTime();
-        const remaining = Math.ceil((startTimeMs - now.getTime()) / 1000);
-        
-        if (remaining <= 0) {
-          // Move to STARTING state: 5 second delay
-          const startingEndTime = new Date(now.getTime() + 5000);
-          await storage.updateRound(round.id, {
-            status: ROUND_STATUS.STARTING,
-            startTime: startingEndTime
-          });
-          console.log(`[Round ${round.id}] Transitioning to STARTING. Verifying until ${startingEndTime.toISOString()}`);
+    if (round.status === ROUND_STATUS.OPEN) {
+      if (!isWaitingForPlayers) {
+        if (!round.startTime) {
+          // 3s countdown for ultra-fast testing
+          const startTime = new Date(now.getTime() + 3000);
+          await storage.updateRound(round.id, { startTime });
+          console.log(`[Round ${round.id}] Started countdown to ${startTime.toISOString()}`);
+        } else {
+          const startTimeMs = new Date(round.startTime).getTime();
+          if (now.getTime() >= startTimeMs) {
+            await storage.updateRound(round.id, {
+              status: ROUND_STATUS.IN_GAME,
+              startTime: new Date()
+            });
+            console.log(`[Round ${round.id}] Transitioning to IN_GAME.`);
+          }
         }
-      }
-    } else {
-      // Less than 2 players: Ensure startTime is null to signify "Waiting for players"
-      if (round.startTime !== null) {
+      } else if (round.startTime) {
         await storage.updateRound(round.id, { startTime: null });
-        console.log(`[Round ${round.id}] Resetting startTime (waiting for players)`);
       }
-    }
-  } else if (round.status === ROUND_STATUS.STARTING) {
-    if (isWaitingForPlayers) {
-      // Fallback to OPEN if players leave during starting delay
-      await storage.updateRound(round.id, { status: ROUND_STATUS.OPEN, startTime: null });
-    } else if (round.startTime && now.getTime() >= new Date(round.startTime).getTime()) {
-      // Move to IN_GAME
-      await storage.updateRound(round.id, { status: ROUND_STATUS.IN_GAME, startTime: new Date() });
-    }
-  } else if (round.status === ROUND_STATUS.IN_GAME) {
+    } else if (round.status === ROUND_STATUS.IN_GAME) {
     // Only allow the round to finish if a winner has been declared.
     // We remove the condition that automatically ends the game when 75 numbers are drawn.
     const isOver = !!round.winnerId;

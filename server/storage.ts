@@ -173,6 +173,12 @@ export class DatabaseStorage implements IStorage {
       RETURNING id, round_id, user_id, card, has_bingo, joined_at, tx_signature, final_win_prob
     `);
     const row = res.rows?.[0] as any;
+
+    // Trigger Game Manager to check if round should start
+    import("./game").then(m => {
+      m.gameManager.handlePlayerJoined(roundId).catch(console.error);
+    });
+
     return {
       id: row.id,
       roundId: row.round_id,

@@ -65,7 +65,12 @@ export function useGameState() {
 
   const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds();
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
-  const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number);
+  const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number, {
+    refetchInterval: 1000, // Poll every 1 second for real-time updates
+    staleTime: 500,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
+  });
 
   // Poll round data based on server-driven status and timers
   useEffect(() => {
