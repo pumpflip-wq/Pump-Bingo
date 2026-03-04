@@ -47,7 +47,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       return;
     }
 
-    if (!userId) {
+    if (!effectiveUserId) {
       toast({
         title: "Authentication Failed",
         description: "Please refresh and try again.",

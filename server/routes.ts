@@ -296,7 +296,7 @@ export async function registerRoutes(
       });
 
       const user = await storage.getUser(Number(userId));
-      return res.json({ participant, balance: Number(user?.balance || 0) });
+      const responseData = { participant, balance: Number(user?.balance || 0) };
 
       // Create transaction & update balance in background
       if (entryPrice > 0) {
@@ -321,6 +321,8 @@ export async function registerRoutes(
             .catch(console.error);
         }
       }
+      
+      return res.json(responseData);
     } catch (err) {
       console.error("Join round error:", err);
       res.status(500).json({ message: "Failed to join round" });

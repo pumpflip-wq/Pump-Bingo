@@ -46,6 +46,11 @@ export class SolanaManager {
   }
 
   async sendReward(toAddress: string, amount: number): Promise<string | null> {
+    if (amount <= 0) {
+      console.log(`[SolanaManager] Skipping zero amount reward for ${toAddress}`);
+      return "FREE_MODE_NO_PAYOUT";
+    }
+
     if (!this.masterKeypair) {
       console.log(`[SolanaManager] No master wallet - returning mock signature for ${amount} to ${toAddress}`);
       return "MOCK_SIG_" + Math.random().toString(36).substring(7);
