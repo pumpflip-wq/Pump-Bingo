@@ -11,7 +11,7 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row items-center gap-4 lg:gap-6">
             <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
               <img 
-                src="https://i.ibb.co/JjHKRQhZ/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png" 
+                src="https://i.ibb.co/mVmrS6b2/Chat-GPT-Image-Jan-20-2026-11-15-29-PM.png" 
                 alt="PUMP BINGO" 
                 className="w-10 h-10 lg:w-14 lg:h-14 object-cover"
               />
