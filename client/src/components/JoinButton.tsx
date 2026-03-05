@@ -222,6 +222,12 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
                 ? "You've been added to the queue for the next game!" 
                 : "You've successfully entered the round!",
             });
+
+            // Force a small delay then another invalidation to be absolutely sure
+            setTimeout(() => {
+              queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
+              queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
+            }, 500);
           },
           onError: (error: any) => {
             setIsWalleting(false);
