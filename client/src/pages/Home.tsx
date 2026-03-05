@@ -167,12 +167,15 @@ export default function Home() {
       const winnerId = roundData?.round.winnerId || (roundData?.round.status === ROUND_STATUS.FINISHED ? roundData?.round.winnerUserId : null);
       const winner = roundData?.participants?.find((p: any) => Number(p.userId || p.id) === Number(winnerId));
       
+      const isMe = Number(winnerId) === Number(user?.id);
+      const amIParticipant = isParticipant;
+
       return {
         show: true,
-        username: winner?.username || (winnerId === user?.id ? walletAddress : winnerId?.toString() || "Unknown"),
+        username: winner?.username || (isMe ? walletAddress : winnerId?.toString() || "Unknown"),
         prize: roundData?.round.prizePool || 0,
-        isWinner: Number(winnerId) === Number(user?.id),
-        isParticipant: isParticipant,
+        isWinner: isMe,
+        isParticipant: amIParticipant,
         txHash: roundData?.round.payoutSignature || undefined,
         timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
         currentRoundId: completionTimeRef.current?.roundId,
