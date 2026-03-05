@@ -18,7 +18,7 @@ export function useRounds(options?: { refetchInterval?: number; staleTime?: numb
 }
 
 // GET /api/rounds/:id
-export function useRound(id: number) {
+export function useRound(id: number, options?: any) {
   const queryClient = useQueryClient();
   
   return useQuery({
@@ -33,18 +33,19 @@ export function useRound(id: number) {
     enabled: !!id,
     refetchInterval: (query) => {
       const data = query.state.data as any;
-      if (!data) return 500;
+      if (!data) return 1000;
       
       // Aggressive polling for Replit environment to ensure real-time feel
-      if (data.round.status === 'OPEN') return 500;
-      if (data.round.status === 'STARTING') return 300;
-      if (data.round.status === 'IN_GAME') return 500;
+      if (data.round.status === 'OPEN') return 1000;
+      if (data.round.status === 'STARTING') return 500;
+      if (data.round.status === 'IN_GAME') return 1000;
       if (data.round.status === 'FINISHED') return 2000;
       return 1000;
     },
     staleTime: 0, 
     gcTime: 0,
     refetchOnWindowFocus: true,
+    ...options
   });
 }
 

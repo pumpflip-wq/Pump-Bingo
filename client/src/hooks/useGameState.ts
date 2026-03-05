@@ -81,35 +81,24 @@ export function useGameState() {
     const interval = setInterval(() => {
       // Force invalidate list to detect new rounds or status changes
       queryClient.invalidateQueries({ 
-        queryKey: [api.rounds.list.path],
-        refetchType: 'all'
+        queryKey: [api.rounds.list.path]
       });
       
       if (latestRound?.id) {
         // Also force refetch the specific round data
         queryClient.invalidateQueries({ 
-          queryKey: [api.rounds.get.path, latestRound.id],
-          refetchType: 'all'
+          queryKey: [api.rounds.get.path, latestRound.id]
         });
-      }
-
-      // If we are waiting for a new round (status FINISHED), invalidate list more often
-      if (latestRound?.status === "FINISHED") {
-         queryClient.invalidateQueries({ 
-           queryKey: [api.rounds.list.path],
-           refetchType: 'all'
-         });
       }
 
       if (userId) {
         queryClient.invalidateQueries({ 
-          queryKey: ["/api/auth/me", userId],
-          refetchType: 'all'
+          queryKey: ["/api/auth/me", userId]
         });
       }
     }, 1000); 
     return () => clearInterval(interval);
-  }, [latestRound?.id, latestRound?.status, queryClient, userId]);
+  }, [latestRound?.id, queryClient, userId]);
 
   const { data: userTransactions } = useQuery<Transaction[]>({
     queryKey: ["/api/auth/me/transactions", user?.id],
