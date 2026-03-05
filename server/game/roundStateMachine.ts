@@ -28,7 +28,9 @@ export async function handleStateTransitions(round: Round, participantCount: num
           }
         }
       } else if (round.startTime) {
+        // Reset countdown if players leave
         await storage.updateRound(round.id, { startTime: null });
+        console.log(`[Round ${round.id}] Players left. Resetting countdown.`);
       }
     } else if (round.status === ROUND_STATUS.IN_GAME) {
     // Only allow the round to finish if a winner has been declared.
@@ -40,16 +42,6 @@ export async function handleStateTransitions(round: Round, participantCount: num
         await storage.updateRound(round.id, { completedAt });
         console.log(`[Round ${round.id}] Winner declared: ${round.winnerId}. Setting completedAt: ${completedAt.toISOString()}`);
         return;
-      }
-      const completedTime = new Date(round.completedAt).getTime();
-      const postWinDelay = 10000; // 10s delay to show winner
-      if (now.getTime() - completedTime >= postWinDelay) {
-        // Transition to FINISHED
-        await storage.updateRound(round.id, { 
-          status: ROUND_STATUS.FINISHED,
-          completedAt: new Date() // Ensure it's strictly set for the next round logic
-        });
-        console.log(`[Round ${round.id}] Post-win delay over. Transitioning to FINISHED.`);
       }
     }
   }

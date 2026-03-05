@@ -166,16 +166,22 @@ export class GameManager {
     await db.transaction(async (tx) => {
       for (const p of allParticipants) {
         const prob = calculateWinProb(p.card as number[][], round.drawnNumbers || []);
-        await tx.update(participants).set({ finalWinProb: prob }).where(eq(participants.id, p.id));
+        // Only update if the probability has changed to avoid unnecessary DB writes
+        if (p.finalWinProb !== prob) {
+          await tx.update(participants).set({ finalWinProb: prob }).where(eq(participants.id, p.id));
+        }
       }
     });
 
     // Fetch the updated round to ensure we have the latest state before finishing
     const currentRound = await storage.getRound(roundId);
+    if (!currentRound) return false;
+
     const updated = await storage.updateRound(roundId, {
       winnerId: userId,
+      status: ROUND_STATUS.FINISHED,
       completedAt: new Date(),
-      drawnNumbers: currentRound?.drawnNumbers || round.drawnNumbers, // Use latest drawn numbers
+      drawnNumbers: currentRound.drawnNumbers || round.drawnNumbers,
     });
 
     return !!(updated && updated.winnerId === userId);
