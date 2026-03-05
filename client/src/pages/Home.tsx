@@ -164,23 +164,20 @@ export default function Home() {
       const elapsed = currentTime - winnerDeclaredAt;
       const totalDisplayTime = 10000; // 10 seconds
       
-      // We keep showing the overlay even if roundData changes to a new round, 
-      // as long as the 10s haven't passed and the user hasn't closed it.
-      if (elapsed < totalDisplayTime && !hasManuallyClosed) {
-        const winnerId = roundData?.round.winnerId || (roundData?.round.status === ROUND_STATUS.FINISHED ? roundData?.round.winnerUserId : null);
-        const winner = roundData?.participants?.find((p: any) => Number(p.userId || p.id) === Number(winnerId));
-        
-        return {
-          show: true,
-          username: winner?.username || (winnerId === user?.id ? walletAddress : winnerId?.toString() || "Unknown"),
-          prize: roundData?.round.prizePool || 0,
-          isWinner: Number(winnerId) === Number(user?.id),
-          isParticipant: isParticipant,
-          txHash: roundData?.round.payoutSignature || undefined,
-          timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
-          currentRoundId: completionTimeRef.current?.roundId,
-        };
-      }
+      const winnerId = roundData?.round.winnerId || (roundData?.round.status === ROUND_STATUS.FINISHED ? roundData?.round.winnerUserId : null);
+      const winner = roundData?.participants?.find((p: any) => Number(p.userId || p.id) === Number(winnerId));
+      
+      return {
+        show: true,
+        username: winner?.username || (winnerId === user?.id ? walletAddress : winnerId?.toString() || "Unknown"),
+        prize: roundData?.round.prizePool || 0,
+        isWinner: Number(winnerId) === Number(user?.id),
+        isParticipant: isParticipant,
+        txHash: roundData?.round.payoutSignature || undefined,
+        timeLeft: Math.max(0, Math.floor((totalDisplayTime - elapsed) / 1000)),
+        currentRoundId: completionTimeRef.current?.roundId,
+        isExpired: elapsed >= totalDisplayTime || hasManuallyClosed
+      };
     }
     return null;
   }, [roundData, user?.id, walletAddress, hasManuallyClosed, currentTime, isParticipant]);
@@ -215,7 +212,37 @@ export default function Home() {
       </aside>
       <main className="lg:col-span-6 space-y-4 h-[750px] flex flex-col overflow-hidden relative" style={{ perspective: "1000px" }}>
         <AnimatePresence mode="wait">
-          {roundData.round.status === "OPEN" || roundData.round.status === "STARTING" ? (
+          {overlayState?.show && !overlayState.isExpired ? (
+            <motion.div 
+              key="winner-post-game"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.1 }}
+              className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-center h-full relative overflow-hidden bg-black/80 backdrop-blur-3xl"
+            >
+              <div className="space-y-8 z-10">
+                <Trophy className="w-24 h-24 text-primary mx-auto animate-bounce" />
+                <h2 className="text-5xl font-black text-white italic tracking-tighter uppercase">
+                  {overlayState.isWinner ? "YOU WON!" : "ROUND OVER!"}
+                </h2>
+                <div className="space-y-2">
+                  <p className="text-primary text-xl font-black uppercase tracking-widest">Winner</p>
+                  <p className="text-4xl font-mono text-white">{formatAddress(overlayState.username)}</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-primary text-xl font-black uppercase tracking-widest">Prize Pool</p>
+                  <p className="text-6xl font-black text-white font-display italic">
+                    {formatCurrency(overlayState.prize)} <span className="text-primary">{PROTOCOL_CONFIG.SYMBOL}</span>
+                  </p>
+                </div>
+                <div className="pt-8">
+                  <p className="text-white/60 text-sm uppercase font-black tracking-[0.3em]">Next Round in {overlayState.timeLeft}s</p>
+                </div>
+              </div>
+              {/* Background Glow */}
+              <div className="absolute inset-0 bg-primary/5 animate-pulse pointer-events-none" />
+            </motion.div>
+          ) : roundData.round.status === "OPEN" || roundData.round.status === "STARTING" ? (
             <motion.div key="waiting" initial={{ opacity: 0, rotateY: -90 }} animate={{ opacity: 1, rotateY: 0 }} exit={{ opacity: 0, rotateY: 90 }} transition={{ duration: 0.8 }} className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-between h-full relative overflow-hidden">
                <div className="flex-1 flex flex-col items-center justify-between py-4 w-full h-full">
                   <div className="w-full space-y-8">
