@@ -6,8 +6,8 @@ import { sql } from "drizzle-orm";
 
 const { Pool } = pg;
 
-// Use DATABASE_URL_EXTERNAL if provided (for manual sync), otherwise fall back to DATABASE_URL
-const connectionString = process.env.DATABASE_URL_EXTERNAL || process.env.DATABASE_URL;
+// Use Replit's built-in DATABASE_URL; DATABASE_URL_EXTERNAL is for manual migration only
+const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
   console.error("ERROR: DATABASE_URL must be set. Did you forget to provision a database?");
