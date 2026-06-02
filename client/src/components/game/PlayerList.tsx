@@ -50,20 +50,12 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
       _key: (p.username || "").toLowerCase()
     }));
 
-    if (amIParticipating && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED')) {
+    // Always sort by win probability during and after game (for everyone incl. spectators)
+    if (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') {
       return normalized.sort((a, b) => {
         if (winnerKey && a._key === winnerKey) return -1;
         if (winnerKey && b._key === winnerKey) return 1;
         return (b.prob || 0) - (a.prob || 0);
-      });
-    }
-    
-    // Default/Spectator: Joined order but still prioritize winner if game finished
-    if (roundStatus === 'FINISHED') {
-       return normalized.sort((a, b) => {
-        if (winnerKey && a._key === winnerKey) return -1;
-        if (winnerKey && b._key === winnerKey) return 1;
-        return 0; 
       });
     }
 
@@ -82,8 +74,8 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
             
-            // SHOW probabilities and ranking numbers ONLY for players during active game
-            const showStats = amIParticipating && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED');
+            // Show probabilities and ranking numbers for ALL viewers during active game
+            const showStats = roundStatus === 'IN_GAME' || roundStatus === 'FINISHED';
             
             // Filter out system account or invalid players
             if (!p.username || p.username === "Unknown") return null;

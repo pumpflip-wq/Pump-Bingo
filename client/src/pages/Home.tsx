@@ -312,9 +312,57 @@ export default function Home() {
                     <BingoClaimButton roundId={roundData.round.id} userId={user?.id || 0} card={currentCard} drawnNumbers={roundData.round.drawnNumbers || []} status={roundData.round.status} isBingoed={(myParticipant as any)?.hasBingo} className="w-full h-16 text-3xl font-black" />
                   </div>
                 ) : (
-                  <div className="flex-1 flex flex-col items-center justify-center space-y-6">
-                    <Loader2 className="w-16 h-16 text-primary animate-spin" />
-                    <p className="text-xl text-white font-black italic uppercase animate-pulse">SPECTATING GAME...</p>
+                  <div className="flex-1 flex flex-col items-center justify-center space-y-5 px-2">
+                    {/* Spectator badge */}
+                    <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/40 bg-primary/10">
+                      <Globe2 className="w-4 h-4 text-primary" />
+                      <span className="text-xs font-black text-primary uppercase tracking-[0.25em]">Spectating Live</span>
+                    </div>
+
+                    {/* Drawn number + progress */}
+                    <div className="flex flex-col items-center gap-1">
+                      <p className="text-xs text-white/50 uppercase font-black tracking-widest">Last Called</p>
+                      {(roundData.round.drawnNumbers || []).length > 0 ? (
+                        <div className="w-20 h-20 rounded-full border-2 border-primary/60 bg-primary/10 flex items-center justify-center shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+                          <span className="text-4xl font-black text-primary italic">{roundData.round.drawnNumbers[roundData.round.drawnNumbers.length - 1]}</span>
+                        </div>
+                      ) : (
+                        <div className="w-20 h-20 rounded-full border-2 border-white/10 bg-white/5 flex items-center justify-center">
+                          <Loader2 className="w-8 h-8 text-primary/50 animate-spin" />
+                        </div>
+                      )}
+                      <p className="text-xs text-white/40 font-mono mt-1">{(roundData.round.drawnNumbers || []).length} / 75 balls drawn</p>
+                    </div>
+
+                    {/* Recent numbers */}
+                    {(roundData.round.drawnNumbers || []).length > 1 && (
+                      <div className="flex gap-1.5 flex-wrap justify-center max-w-[260px]">
+                        {[...(roundData.round.drawnNumbers || [])].reverse().slice(1, 9).map((n: number, i: number) => (
+                          <div key={i} className="w-8 h-8 rounded-full bg-black/40 border border-white/10 flex items-center justify-center text-[11px] font-black text-white/60">
+                            {n}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Live leaderboard */}
+                    {sortedParticipants.length > 0 && (
+                      <div className="w-full max-w-[300px] space-y-1.5">
+                        <p className="text-xs text-white/40 uppercase font-black tracking-widest text-center mb-2">Live Standings</p>
+                        {sortedParticipants.slice(0, 5).map((p: any, i: number) => (
+                          <div key={p.userId || i} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/5">
+                            <span className="text-xs font-black text-primary w-4 shrink-0">#{i + 1}</span>
+                            <span className="flex-1 text-xs font-black text-white truncate">{formatAddress(p.username)}</span>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <div className="w-16 h-1 bg-white/10 rounded-full overflow-hidden">
+                                <div className="h-full bg-primary rounded-full" style={{ width: `${p.prob || 0}%` }} />
+                              </div>
+                              <span className="text-xs font-black text-primary w-8 text-right">{Math.round(p.prob || 0)}%</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -405,9 +453,32 @@ export default function Home() {
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center space-y-4">
-                        <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto" />
-                        <p className="text-sm font-black text-white uppercase italic animate-pulse">SPECTATING...</p>
+                      <div className="flex flex-col items-center justify-center h-full space-y-3 px-2 pt-14">
+                        <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-primary/40 bg-primary/10">
+                          <Globe2 className="w-3 h-3 text-primary" />
+                          <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Spectating Live</span>
+                        </div>
+                        {/* Last number */}
+                        {(roundData.round.drawnNumbers || []).length > 0 ? (
+                          <div className="w-14 h-14 rounded-full border-2 border-primary/60 bg-primary/10 flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+                            <span className="text-2xl font-black text-primary italic">{roundData.round.drawnNumbers[roundData.round.drawnNumbers.length - 1]}</span>
+                          </div>
+                        ) : (
+                          <Loader2 className="w-8 h-8 text-primary/50 animate-spin" />
+                        )}
+                        <p className="text-[10px] text-white/40 font-mono">{(roundData.round.drawnNumbers || []).length} / 75 balls</p>
+                        {/* Mini leaderboard */}
+                        {sortedParticipants.length > 0 && (
+                          <div className="w-full space-y-1">
+                            {sortedParticipants.slice(0, 4).map((p: any, i: number) => (
+                              <div key={p.userId || i} className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-white/5 border border-white/5">
+                                <span className="text-[10px] font-black text-primary w-4 shrink-0">#{i+1}</span>
+                                <span className="flex-1 text-[10px] font-black text-white truncate">{formatAddress(p.username)}</span>
+                                <span className="text-[10px] font-black text-primary shrink-0">{Math.round(p.prob || 0)}%</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

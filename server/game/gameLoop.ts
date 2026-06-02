@@ -57,8 +57,8 @@ export class GameManager {
       // If no round exists, or the latest round is finished, create a new one
       if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
         const completedAt = latestRound?.completedAt ? new Date(latestRound.completedAt).getTime() : 0;
-        // Faster new round creation (1s instead of 2s)
-        const canCreate = !latestRound || (Date.now() - completedAt > 1000);
+        // Wait POST_WIN_DELAY_MS (10s) so players can see the winner screen
+        const canCreate = !latestRound || (Date.now() - completedAt > PROTOCOL_CONFIG.POST_WIN_DELAY_MS);
         
         if (canCreate) {
           await this.createNewRound();
