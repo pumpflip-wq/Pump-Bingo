@@ -15,7 +15,8 @@ export const PROTOCOL_CONFIG = {
   // Mainnet Configuration
   NETWORK: "mainnet-beta",
   RPC_URL:
-    "https://mainnet.helius-rpc.com/?api-key=dd4d0f55-719e-4f2e-b8b8-2f686bc7d2bf",
+    (typeof process !== "undefined" && process.env?.SOLANA_RPC_URL) ||
+    "https://api.mainnet-beta.solana.com",
   BACKUP_RPC_URL: "https://api.mainnet-beta.solana.com",
 
   // Admin wallet address
