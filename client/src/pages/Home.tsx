@@ -36,29 +36,27 @@ import { useGameState } from "@/hooks/useGameState";
 
 function ModeSelector({ selected, onChange }: { selected: 'FREE' | 'PAID'; onChange: (m: 'FREE' | 'PAID') => void }) {
   return (
-    <div className="flex items-stretch gap-0.5 p-0.5 bg-black/70 border border-white/8 rounded-xl backdrop-blur-sm" data-testid="mode-selector">
+    <div className="flex items-stretch p-[3px] bg-black/60 border border-white/10 rounded-xl backdrop-blur-sm" data-testid="mode-selector">
       <button
         onClick={() => onChange('FREE')}
         data-testid="button-mode-free"
-        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-5 rounded-[10px] font-black uppercase text-sm tracking-widest transition-all duration-200 ${
+        className={`flex-1 py-2.5 px-6 rounded-[9px] font-black uppercase text-xs tracking-[0.15em] transition-all duration-200 ${
           selected === 'FREE'
-            ? 'bg-primary text-black shadow-[0_0_18px_rgba(34,197,94,0.3)]'
-            : 'text-white/35 hover:text-white/65 hover:bg-white/5'
+            ? 'bg-primary text-black shadow-[0_0_16px_rgba(34,197,94,0.25)]'
+            : 'text-white/40 hover:text-white/70'
         }`}
       >
-        <Zap className={`w-3.5 h-3.5 ${selected === 'FREE' ? 'text-black' : 'text-primary/60'}`} />
-        FREE
+        Free Play
       </button>
       <button
         onClick={() => onChange('PAID')}
         data-testid="button-mode-paid"
-        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-5 rounded-[10px] font-black uppercase text-sm tracking-widest transition-all duration-200 ${
+        className={`flex-1 py-2.5 px-6 rounded-[9px] font-black uppercase text-xs tracking-[0.15em] transition-all duration-200 ${
           selected === 'PAID'
-            ? 'bg-amber-500 text-black shadow-[0_0_18px_rgba(245,158,11,0.3)]'
-            : 'text-white/35 hover:text-white/65 hover:bg-white/5'
+            ? 'bg-amber-500 text-black shadow-[0_0_16px_rgba(245,158,11,0.25)]'
+            : 'text-white/40 hover:text-white/70'
         }`}
       >
-        <Coins className={`w-3.5 h-3.5 ${selected === 'PAID' ? 'text-black' : 'text-amber-500/60'}`} />
         100 {PROTOCOL_CONFIG.SYMBOL}
       </button>
     </div>
@@ -66,7 +64,7 @@ function ModeSelector({ selected, onChange }: { selected: 'FREE' | 'PAID'; onCha
 }
 
 export default function Home() {
-  const [selectedMode, setSelectedMode] = useState<'FREE' | 'PAID'>('FREE');
+  const [selectedMode, setSelectedMode] = useState<'FREE' | 'PAID'>('PAID');
 
   const {
     user,
@@ -265,7 +263,7 @@ export default function Home() {
                 </h2>
                 <div className="space-y-2">
                   <p className="text-primary text-xl font-black uppercase tracking-widest">Winner</p>
-                  <p className="text-4xl font-mono text-white">{formatAddress(overlayState.username)}</p>
+                  <p className="text-4xl font-mono text-white">{formatAddress(overlayState.username ?? '')}</p>
                 </div>
                 <div className="space-y-2">
                   <p className="text-primary text-xl font-black uppercase tracking-widest">Prize Pool</p>
@@ -384,7 +382,7 @@ export default function Home() {
                       <p className="text-xs text-white/50 uppercase font-black tracking-widest">Last Called</p>
                       {(roundData.round.drawnNumbers || []).length > 0 ? (
                         <div className="w-20 h-20 rounded-full border-2 border-primary/60 bg-primary/10 flex items-center justify-center shadow-[0_0_20px_rgba(34,197,94,0.3)]">
-                          <span className="text-4xl font-black text-primary italic">{roundData.round.drawnNumbers[roundData.round.drawnNumbers.length - 1]}</span>
+                          <span className="text-4xl font-black text-primary italic">{(roundData.round.drawnNumbers ?? [])[(roundData.round.drawnNumbers ?? []).length - 1]}</span>
                         </div>
                       ) : (
                         <div className="w-20 h-20 rounded-full border-2 border-white/10 bg-white/5 flex items-center justify-center">
@@ -535,7 +533,7 @@ export default function Home() {
                         {/* Last number */}
                         {(roundData.round.drawnNumbers || []).length > 0 ? (
                           <div className="w-14 h-14 rounded-full border-2 border-primary/60 bg-primary/10 flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.3)]">
-                            <span className="text-2xl font-black text-primary italic">{roundData.round.drawnNumbers[roundData.round.drawnNumbers.length - 1]}</span>
+                            <span className="text-2xl font-black text-primary italic">{(roundData.round.drawnNumbers ?? [])[(roundData.round.drawnNumbers ?? []).length - 1]}</span>
                           </div>
                         ) : (
                           <Loader2 className="w-8 h-8 text-primary/50 animate-spin" />
@@ -611,7 +609,7 @@ export default function Home() {
             prize={overlayState.prize}
             isWinner={overlayState.isWinner}
             isParticipant={overlayState.isParticipant}
-            txHash={overlayState.txHash || ""}
+            txHash={overlayState.txHash ?? ""}
             onClose={() => setHasManuallyClosed(true)}
             timeLeft={overlayState.timeLeft}
           />

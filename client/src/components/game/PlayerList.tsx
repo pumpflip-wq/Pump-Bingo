@@ -24,7 +24,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
     );
     list.forEach(p => {
       const key = p.userId != null ? String(p.userId) : p.username;
-      if (!key || p.username === "Unknown" || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
+      if (!key || p.username === "Unknown") return;
       if (!map.has(key) || (!map.get(key).txSignature && p.txSignature)) {
         map.set(key, p);
       }
@@ -66,7 +66,6 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
             if (!p.username || p.username === "Unknown") return null;
-            if (p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return null;
             const showStats = roundStatus === 'IN_GAME' || roundStatus === 'FINISHED';
 
             return (

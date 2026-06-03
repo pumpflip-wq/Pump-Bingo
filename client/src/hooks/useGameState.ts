@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useRounds, useRound } from './use-game';
+import { useRounds, useRound, type RoundData } from './use-game';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { type User, type Round, type Transaction } from '@shared/schema';
 import { api } from "@shared/routes";

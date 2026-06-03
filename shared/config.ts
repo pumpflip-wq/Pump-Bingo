@@ -4,9 +4,9 @@ export const PROTOCOL_CONFIG = {
   DECIMALS: 6,
 
   // Game Settings
-  DEFAULT_ENTRY_PRICE: 0 * 1e6, // FREE lobby entry price (always 0)
-  PAID_ENTRY_PRICE: 100 * 1e6,  // PAID lobby entry price (100 $PBINGO)
-  FEE_PERCENTAGE: 0,
+  DEFAULT_ENTRY_PRICE: 0 * 1e6,       // FREE lobby entry price (always 0)
+  PAID_ENTRY_PRICE: 100 * 1e6,        // PAID lobby entry price (100 $PBINGO)
+  FEE_PERCENTAGE: 10,                  // 10% protocol fee on prize pools
 
   // Links
   PUMP_FUN_URL: "https://pump.fun/coin/",
@@ -20,7 +20,7 @@ export const PROTOCOL_CONFIG = {
     "https://api.mainnet-beta.solana.com",
   BACKUP_RPC_URL: "https://api.mainnet-beta.solana.com",
 
-  // Admin wallet address
+  // Admin wallet address (treasury — receives entry fees and sends prizes)
   ADMIN_WALLET: "23caHs1DUE8Qh5G2fLtKGUtEicahB4roGhiedp7zWg4Z",
   POST_WIN_DELAY_MS: 10000,
 };

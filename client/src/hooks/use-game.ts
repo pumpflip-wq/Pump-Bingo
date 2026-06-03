@@ -1,5 +1,37 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, buildUrl } from "@shared/routes";
+import type { Round } from "@shared/schema";
+
+// ─── Shared Types ────────────────────────────────────────────────────────────
+
+export type RoundParticipant = {
+  id: number;
+  userId: number;
+  username: string;
+  joinedAt: string;
+  card: number[][];
+  txSignature?: string | null;
+  winRate?: number;
+  finalWinProb?: number;
+  prob?: number;
+  hasBingo?: boolean;
+};
+
+export type RoundData = {
+  round: Round & {
+    winnerUserId: number | null;
+    winnerUsername: string | null;
+    mode: string;
+  };
+  participantsCount: number;
+  secondsRemaining: number;
+  nextRoundSecondsRemaining: number;
+  isWaitingForPlayers: boolean;
+  participants: RoundParticipant[];
+  status: string;
+};
+
+// ─── Hooks ───────────────────────────────────────────────────────────────────
 
 // GET /api/rounds (optionally filtered by mode: 'FREE' | 'PAID')
 export function useRounds(mode?: string, options?: { refetchInterval?: number; staleTime?: number }) {
@@ -23,18 +55,18 @@ export function useRounds(mode?: string, options?: { refetchInterval?: number; s
 export function useRound(id: number, options?: any) {
   const queryClient = useQueryClient();
   
-  return useQuery({
+  return useQuery<RoundData | null>({
     queryKey: [api.rounds.get.path, id],
-    queryFn: async () => {
+    queryFn: async (): Promise<RoundData | null> => {
       if (!id) return null;
       const url = buildUrl(api.rounds.get.path, { id });
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch round");
-      return api.rounds.get.responses[200].parse(await res.json());
+      return res.json() as Promise<RoundData>;
     },
     enabled: !!id,
     refetchInterval: (query) => {
-      const data = query.state.data as any;
+      const data = query.state.data as RoundData | null;
       if (!data) return 1000;
       if (data.round.status === 'OPEN') return 1000;
       if (data.round.status === 'STARTING') return 500;
