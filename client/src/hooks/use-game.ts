@@ -1,18 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, buildUrl } from "@shared/routes";
 
-// GET /api/rounds
-export function useRounds(options?: { refetchInterval?: number; staleTime?: number }) {
+// GET /api/rounds (optionally filtered by mode: 'FREE' | 'PAID')
+export function useRounds(mode?: string, options?: { refetchInterval?: number; staleTime?: number }) {
   return useQuery({
-    queryKey: [api.rounds.list.path],
+    queryKey: [api.rounds.list.path, mode],
     queryFn: async () => {
-      const res = await fetch(api.rounds.list.path);
+      const url = mode
+        ? `${api.rounds.list.path}?mode=${mode}`
+        : api.rounds.list.path;
+      const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch rounds");
       const data = await res.json();
-      // Ensure we always have an array even if server returns something else
       return Array.isArray(data) ? api.rounds.list.responses[200].parse(data) : [];
     },
-    refetchInterval: 1000, // Faster polling for the list
+    refetchInterval: 1000,
     ...options
   });
 }
@@ -34,8 +36,6 @@ export function useRound(id: number, options?: any) {
     refetchInterval: (query) => {
       const data = query.state.data as any;
       if (!data) return 1000;
-      
-      // Aggressive polling for Replit environment to ensure real-time feel
       if (data.round.status === 'OPEN') return 1000;
       if (data.round.status === 'STARTING') return 500;
       if (data.round.status === 'IN_GAME') return 1000;
@@ -85,7 +85,7 @@ export function useParticipant(roundId: number, userId: number | undefined) {
       if (!userId || !roundId) return null;
       const url = buildUrl(api.participants.get.path, { roundId, userId });
       const res = await fetch(url);
-      if (res.status === 404) return null; // Not joined yet
+      if (res.status === 404) return null;
       if (!res.ok) throw new Error("Failed to fetch participant");
       return api.participants.get.responses[200].parse(await res.json());
     },

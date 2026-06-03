@@ -139,8 +139,12 @@ export async function registerRoutes(
 
   // ===== ROUNDS =====
   app.get(api.rounds.list.path, async (req, res) => {
-    const rounds = await storage.getOpenRounds();
-    const safeRounds = rounds.map((round) => ({
+    const mode = req.query.mode as string | undefined;
+    let allRounds = await storage.getOpenRounds();
+    if (mode) {
+      allRounds = allRounds.filter(r => (r as any).mode === mode);
+    }
+    const safeRounds = allRounds.map((round) => ({
       ...round,
       serverSeed:
         round.status === ROUND_STATUS.FINISHED ? round.serverSeed : null,
@@ -186,9 +190,8 @@ export async function registerRoutes(
     let nextRoundSecondsRemaining = 0;
     const now = Date.now();
     
-      // Logic for WAITING_FOR_PLAYERS state
-    const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
-    const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && count < (isFreeMode ? 1 : 2); // In free mode, we need at least 1 player to start the countdown
+      // Logic for WAITING_FOR_PLAYERS state (always require 2 players for both modes)
+    const isWaitingForPlayers = round.status === ROUND_STATUS.OPEN && count < 2;
 
     if (round.startTime && !isWaitingForPlayers) {
       const startMs = new Date(round.startTime).getTime();
@@ -256,9 +259,8 @@ export async function registerRoutes(
       const round = await storage.getRound(roundId);
       if (!round) return res.status(404).json({ message: "Round not found" });
 
-      const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
+      const isFreeMode = Number(round.price) === 0;
 
-      const minPlayers = isFreeMode ? 1 : 2;
       if (round.status !== ROUND_STATUS.OPEN) {
         if (txSignature && !isFreeMode) {
           await storage.createPaymentQueue({

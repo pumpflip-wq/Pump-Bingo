@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { SolanaProvider } from "./components/SolanaProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion, AnimatePresence } from "framer-motion";
-import { History, ShieldCheck, Twitter, Settings, Menu, Users, X, Zap } from "lucide-react";
+import { History, ShieldCheck, Settings, Menu, X } from "lucide-react";
 import { SiX } from "react-icons/si";
 import { PROTOCOL_CONFIG } from "@shared/config";
 import { useAuth } from "./hooks/use-auth";
@@ -23,68 +23,6 @@ import { TermsModal } from "./components/TermsModal";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-const IS_FREE_MODE = PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE === 0;
-
-function FreeModeBanner() {
-  const [dismissed, setDismissed] = useState(false);
-
-  if (!IS_FREE_MODE || dismissed) return null;
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ y: 80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 80, opacity: 0 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="fixed bottom-0 left-0 right-0 z-[200]"
-        data-testid="banner-free-mode"
-      >
-        <div className="relative bg-black/90 backdrop-blur-xl border-t border-primary/30 shadow-[0_-4px_40px_rgba(34,197,94,0.15)]">
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5" />
-            <motion.div
-              animate={{ x: ["0%", "100%"] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              className="absolute top-0 left-[-100%] w-1/2 h-[1px] bg-gradient-to-r from-transparent via-primary/60 to-transparent"
-            />
-          </div>
-          <div className="max-w-[1450px] mx-auto px-4 py-3 flex items-center gap-3">
-            <button
-              onClick={() => setDismissed(true)}
-              className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all text-white/40 hover:text-white/80 opacity-0 pointer-events-none"
-              aria-hidden="true"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-            <div className="flex-1 flex items-center justify-center gap-2.5">
-              <div className="flex items-center justify-center w-6 h-6 lg:w-7 lg:h-7 rounded-full bg-primary/20 border border-primary/40 shrink-0">
-                <Zap className="w-3 h-3 lg:w-4 lg:h-4 text-primary" />
-              </div>
-              <p className="text-xs lg:text-sm font-bold tracking-wide text-white/90 text-center">
-                <span className="text-primary font-black">FREE MODE</span>
-                <span className="text-white/50 mx-2">—</span>
-                <span className="text-white/80">Play for free during our launch phase.</span>
-                <span className="text-white/40 mx-2 hidden sm:inline">·</span>
-                <span className="hidden sm:inline text-white/60">Real money games with </span>
-                <span className="hidden sm:inline text-primary font-black">{PROTOCOL_CONFIG.SYMBOL}</span>
-                <span className="hidden sm:inline text-white/60"> tokens coming soon.</span>
-              </p>
-            </div>
-            <button
-              onClick={() => setDismissed(true)}
-              className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all text-white/40 hover:text-white/80"
-              data-testid="button-dismiss-free-banner"
-              aria-label="Dismiss banner"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </motion.div>
-    </AnimatePresence>
-  );
-}
 
 const logoPng = "/logo.png";
 
@@ -155,9 +93,8 @@ function AppContent() {
 
   return (
     <TooltipProvider>
-      <div className={`flex flex-col min-h-screen w-full bg-background text-foreground${IS_FREE_MODE ? " pb-12" : ""}`}>
+      <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
         <TermsModal show={connected && !termsAccepted} onAccept={handleAcceptTerms} />
-        <FreeModeBanner />
           <header className="sticky top-0 z-[100] w-full bg-background/80 backdrop-blur-xl border-b border-white/5">
             <div className="max-w-[1450px] mx-auto px-4 lg:px-8 flex flex-row items-center justify-between py-2 lg:py-4 gap-2 lg:gap-6">
               <Link href="/" className="flex items-center gap-2 lg:gap-4 group cursor-pointer hover:opacity-90 transition-opacity shrink-0">

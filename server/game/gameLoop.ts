@@ -16,7 +16,6 @@ export class GameManager {
 
   start() {
     if (this.loopInterval) return;
-    // Standard 1s tick for high-resolution state management
     this.loopInterval = setInterval(() => this.tick(), 1000);
   }
 
@@ -29,8 +28,7 @@ export class GameManager {
 
   private async tick() {
     if (this.isProcessing) return;
-    
-    // Safety check: Don't start rounds if MINT_ADDRESS is missing for Mainnet
+
     if (PROTOCOL_CONFIG.NETWORK === "mainnet-beta" && !PROTOCOL_CONFIG.MINT_ADDRESS) {
       console.log("[GameManager] Mainnet active but MINT_ADDRESS is missing. Waiting for configuration...");
       return;
@@ -38,35 +36,9 @@ export class GameManager {
 
     this.isProcessing = true;
     try {
-      // Use a database advisory lock to ensure only one server processes the game loop at a time
-      // This is critical when running multiple server instances (e.g., Replit and Railway)
-      // connected to the same database.
-      await db.execute(sql`SELECT pg_advisory_xact_lock(12345)`);
-      
-      let latestRound = await storage.getLatestRound();
-
-      // Check if current round price needs updating (e.g. admin changed config from 0 to >0 or vice-versa)
-      if (latestRound && latestRound.status === ROUND_STATUS.OPEN && Number(latestRound.price) !== Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE)) {
-        console.log(`[GameManager] Updating round ${latestRound.id} price from ${latestRound.price} to ${PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE}`);
-        await storage.updateRound(latestRound.id, {
-          price: PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE
-        });
-        latestRound.price = PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE;
-      }
-      
-      // If no round exists, or the latest round is finished, create a new one
-      if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
-        const completedAt = latestRound?.completedAt ? new Date(latestRound.completedAt).getTime() : 0;
-        // Wait POST_WIN_DELAY_MS (10s) so players can see the winner screen
-        const canCreate = !latestRound || (Date.now() - completedAt > PROTOCOL_CONFIG.POST_WIN_DELAY_MS);
-        
-        if (canCreate) {
-          await this.createNewRound();
-        }
-        return;
-      }
-      
-      await this.processRound(latestRound);
+      // Process both modes sequentially to avoid advisory lock conflicts
+      await this.processModeGame("FREE");
+      await this.processModeGame("PAID");
     } catch (err) {
       console.error("Game Loop Error:", err);
     } finally {
@@ -74,26 +46,61 @@ export class GameManager {
     }
   }
 
-  private async createNewRound() {
-    const latestRound = await storage.getLatestRound();
-    const nextId = (latestRound?.id ?? 0) + 1;
+  private async processModeGame(mode: string) {
+    // Different lock IDs per mode so they don't block each other
+    const lockId = mode === "FREE" ? 12345 : 12346;
+    const entryPrice = mode === "FREE" ? 0 : PROTOCOL_CONFIG.PAID_ENTRY_PRICE;
+
+    try {
+      await db.execute(sql`SELECT pg_advisory_xact_lock(${lockId})`);
+
+      let latestRound = await storage.getLatestRoundByMode(mode);
+
+      if (!latestRound || latestRound.status === ROUND_STATUS.FINISHED) {
+        const completedAt = latestRound?.completedAt
+          ? new Date(latestRound.completedAt).getTime()
+          : 0;
+        const canCreate =
+          !latestRound ||
+          Date.now() - completedAt > PROTOCOL_CONFIG.POST_WIN_DELAY_MS;
+
+        if (canCreate) {
+          await this.createNewRound(mode, entryPrice);
+        }
+        return;
+      }
+
+      await this.processRound(latestRound);
+    } catch (err) {
+      console.error(`[GameManager][${mode}] Error:`, err);
+    }
+  }
+
+  private async createNewRound(mode: string, entryPrice: number) {
     const seed = crypto.randomBytes(32).toString("hex").toLowerCase();
-    const hash = crypto.createHash("sha256").update(seed).digest("hex").toLowerCase();
-    
-    await storage.createRound({
-      id: nextId,
+    const hash = crypto
+      .createHash("sha256")
+      .update(seed)
+      .digest("hex")
+      .toLowerCase();
+
+    const newRound = await storage.createRound({
       status: ROUND_STATUS.OPEN,
+      mode,
       serverSeed: seed,
       publicHash: hash,
       startTime: null,
-      price: PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE,
+      price: entryPrice,
       prizePool: 0,
       drawnNumbers: [],
       completedAt: null,
       winnerId: null,
     });
 
-    await this.processPaymentQueue(nextId);
+    // Only PAID rounds use the payment queue
+    if (mode === "PAID") {
+      await this.processPaymentQueue(newRound.id);
+    }
   }
 
   private async processPaymentQueue(roundId: number) {
@@ -112,7 +119,7 @@ export class GameManager {
         const card = generateBingoCard();
         await storage.joinRound(roundId, payment.userId, card, payment.txSignature);
 
-        const paymentAmount = Number(payment.amount || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE);
+        const paymentAmount = Number(payment.amount || PROTOCOL_CONFIG.PAID_ENTRY_PRICE);
         await storage.updateRound(roundId, {
           prizePool: Number(round.prizePool || 0) + paymentAmount,
         });
@@ -149,7 +156,8 @@ export class GameManager {
       }
     }
 
-    if (round.status === ROUND_STATUS.OPEN) {
+    // Process payment queue only for PAID rounds
+    if (round.status === ROUND_STATUS.OPEN && (round as any).mode === "PAID") {
       await this.processPaymentQueue(round.id);
     }
   }
@@ -161,19 +169,16 @@ export class GameManager {
 
     const allParticipants = await db.select().from(participants).where(eq(participants.roundId, roundId));
     console.log(`[GameManager] Calculating win probs for ${allParticipants.length} players in round #${roundId}`);
-    
-    // Efficiently update probabilities using a transaction or batch
+
     await db.transaction(async (tx) => {
       for (const p of allParticipants) {
         const prob = calculateWinProb(p.card as number[][], round.drawnNumbers || []);
-        // Only update if the probability has changed to avoid unnecessary DB writes
         if (p.finalWinProb !== prob) {
           await tx.update(participants).set({ finalWinProb: prob }).where(eq(participants.id, p.id));
         }
       }
     });
 
-    // Fetch the updated round to ensure we have the latest state before finishing
     const currentRound = await storage.getRound(roundId);
     if (!currentRound) return false;
 

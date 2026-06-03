@@ -27,6 +27,7 @@ export interface IStorage {
   // Round
   getRound(id: number): Promise<Round | undefined>;
   getLatestRound(): Promise<Round | undefined>;
+  getLatestRoundByMode(mode: string): Promise<Round | undefined>;
   getOpenRounds(): Promise<Round[]>;
   createRound(round: Partial<Round>): Promise<Round>;
   updateRound(id: number, updates: Partial<Round>): Promise<Round>;
@@ -124,9 +125,23 @@ export class DatabaseStorage implements IStorage {
     return round;
   }
 
+  async getLatestRoundByMode(mode: string): Promise<Round | undefined> {
+    const [round] = await db
+      .select()
+      .from(rounds)
+      .where(sql`${rounds.mode} = ${mode}`)
+      .orderBy(sql`${rounds.id} DESC`)
+      .limit(1);
+    return round;
+  }
+
   async getOpenRounds(): Promise<Round[]> {
-    const latest = await this.getLatestRound();
-    return latest ? [latest] : [];
+    const freeRound = await this.getLatestRoundByMode('FREE');
+    const paidRound = await this.getLatestRoundByMode('PAID');
+    const result: Round[] = [];
+    if (freeRound) result.push(freeRound);
+    if (paidRound) result.push(paidRound);
+    return result;
   }
 
   async createRound(round: Partial<Round>): Promise<Round> {

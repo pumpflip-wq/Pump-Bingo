@@ -16,6 +16,8 @@ import {
   ShieldCheck,
   Menu,
   X,
+  Zap,
+  Coins,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo, useRef } from "react";
@@ -32,7 +34,38 @@ import { BingoClaimButton } from "@/components/BingoClaimButton";
 import { BingoCard } from "@/components/BingoCard";
 import { useGameState } from "@/hooks/useGameState";
 
+function ModeSelector({ selected, onChange }: { selected: 'FREE' | 'PAID'; onChange: (m: 'FREE' | 'PAID') => void }) {
+  return (
+    <div className="flex items-center gap-1.5 p-1 bg-black/50 border border-white/10 rounded-2xl" data-testid="mode-selector">
+      <button
+        onClick={() => onChange('FREE')}
+        data-testid="button-mode-free"
+        className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl font-black uppercase text-sm tracking-widest transition-all ${
+          selected === 'FREE'
+            ? 'bg-primary text-black shadow-[0_0_15px_rgba(34,197,94,0.4)]'
+            : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+        }`}
+      >
+        <Zap className="w-4 h-4" /> FREE
+      </button>
+      <button
+        onClick={() => onChange('PAID')}
+        data-testid="button-mode-paid"
+        className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl font-black uppercase text-sm tracking-widest transition-all ${
+          selected === 'PAID'
+            ? 'bg-secondary text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]'
+            : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+        }`}
+      >
+        <Coins className="w-4 h-4" /> 100 {PROTOCOL_CONFIG.SYMBOL}
+      </button>
+    </div>
+  );
+}
+
 export default function Home() {
+  const [selectedMode, setSelectedMode] = useState<'FREE' | 'PAID'>('FREE');
+
   const {
     user,
     walletAddress,
@@ -43,7 +76,7 @@ export default function Home() {
     error,
     historyRounds,
     historyLoading,
-  } = useGameState();
+  } = useGameState(selectedMode);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"game" | "players" | "history">("game");
@@ -284,7 +317,7 @@ export default function Home() {
                       <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-[2rem] w-full text-center">
                         <p className="text-primary font-black text-3xl italic tracking-tighter mb-3 uppercase">YOU'RE IN THE GAME!</p>
                       </div>
-                    ) : <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />}
+                    ) : <JoinButton roundId={roundData.round.id} price={Number(roundData.round.price)} userId={user?.id || 0} />}
                   </div>
                </div>
             </motion.div>
@@ -431,7 +464,7 @@ export default function Home() {
                       </div>
                     ) : (
                       <div className="flex justify-center w-full">
-                        <JoinButton roundId={roundData.round.id} price={PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE} userId={user?.id || 0} />
+                        <JoinButton roundId={roundData.round.id} price={Number(roundData.round.price)} userId={user?.id || 0} />
                       </div>
                     )}
                   </div>
@@ -525,7 +558,8 @@ export default function Home() {
   );
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden">
+    <div className="flex flex-col flex-1 h-full overflow-hidden gap-4">
+      <ModeSelector selected={selectedMode} onChange={setSelectedMode} />
       {desktopView}
       {mobileView}
       <AnimatePresence>

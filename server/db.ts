@@ -89,6 +89,13 @@ async function runMigrations() {
   } catch (e) {
     console.log("Column final_win_prob migration:", e);
   }
+
+  // Add mode column to rounds (dual game modes: FREE | PAID)
+  await db.execute(sql`ALTER TABLE rounds ADD COLUMN IF NOT EXISTS mode TEXT DEFAULT 'FREE'`);
+  await db.execute(sql`UPDATE rounds SET mode = 'FREE' WHERE mode IS NULL`);
+
+  // Sync the rounds_id_seq sequence to the actual max ID to prevent duplicate key errors
+  await db.execute(sql`SELECT setval('rounds_id_seq', COALESCE((SELECT MAX(id) FROM rounds), 0))`);
   
   console.log("Migrations complete.");
 }
@@ -116,6 +123,7 @@ async function createTables() {
     CREATE TABLE IF NOT EXISTS rounds (
       id SERIAL PRIMARY KEY,
       status TEXT NOT NULL DEFAULT 'OPEN',
+      mode TEXT NOT NULL DEFAULT 'FREE',
       start_time TIMESTAMP,
       price BIGINT NOT NULL DEFAULT 100,
       prize_pool BIGINT NOT NULL DEFAULT 0,

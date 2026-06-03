@@ -4,7 +4,8 @@ export const PROTOCOL_CONFIG = {
   DECIMALS: 6,
 
   // Game Settings
-  DEFAULT_ENTRY_PRICE: 0 * 1e6, // Set entry price to 100 tokens
+  DEFAULT_ENTRY_PRICE: 0 * 1e6, // FREE lobby entry price (always 0)
+  PAID_ENTRY_PRICE: 100 * 1e6,  // PAID lobby entry price (100 $PBINGO)
   FEE_PERCENTAGE: 0,
 
   // Links

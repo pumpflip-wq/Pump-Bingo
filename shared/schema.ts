@@ -15,6 +15,7 @@ export const users = pgTable("users", {
 export const rounds = pgTable("rounds", {
   id: serial("id").primaryKey(),
   status: text("status").notNull().default("OPEN"), // OPEN, STARTING, IN_GAME, FINISHED
+  mode: text("mode").notNull().default("FREE"), // FREE | PAID
   startTime: timestamp("start_time"),
   price: bigint("price", { mode: "number" }).notNull().default(100), // Buy-in price
   prizePool: bigint("prize_pool", { mode: "number" }).notNull().default(0),
@@ -88,4 +89,10 @@ export const ROUND_STATUS = {
   FINISHED: "FINISHED",
 } as const;
 
+export const GAME_MODE = {
+  FREE: "FREE",
+  PAID: "PAID",
+} as const;
+
 export type RoundStatus = keyof typeof ROUND_STATUS;
+export type GameMode = keyof typeof GAME_MODE;

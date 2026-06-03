@@ -1,0 +1,1 @@
+- [PostgreSQL sequence desync fix](pg-sequence-fix.md) — when rounds are inserted with explicit IDs, the serial sequence stays at 1; must call setval after migration.

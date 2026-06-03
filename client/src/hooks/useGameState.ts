@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useRounds, useRound, useParticipant } from './use-game';
+import { useRounds, useRound } from './use-game';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { type User, type Round, type Transaction } from '@shared/schema';
 import { api } from "@shared/routes";
 
-export function useGameState() {
+export function useGameState(mode: 'FREE' | 'PAID' = 'FREE') {
   const { publicKey, connected } = useWallet();
   const walletAddress = publicKey?.toBase58();
 
@@ -21,7 +21,7 @@ export function useGameState() {
       return res.json();
     },
     enabled: !!userId,
-    staleTime: 0 // Always fetch fresh user data on mount
+    staleTime: 0
   });
 
   const { mutate: login } = useMutation({
@@ -42,7 +42,6 @@ export function useGameState() {
       if (updated) setUserId(Number(updated));
     };
     window.addEventListener('storage', handleStorageChange);
-    // Also listen for local changes in the same tab
     const interval = setInterval(() => {
       const current = localStorage.getItem("pb_user_id");
       if (current && Number(current) !== userId) {
@@ -58,34 +57,32 @@ export function useGameState() {
 
   useEffect(() => {
     if (connected && walletAddress && (!user || user.username !== walletAddress)) {
-      console.log("[useGameState] Triggering login for:", walletAddress);
       login(walletAddress);
     }
   }, [connected, walletAddress, user?.username, login]);
 
-  const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds({
+  // Fetch rounds filtered by the selected mode
+  const { data: rounds, isLoading: roundsLoading, error: roundsError } = useRounds(mode, {
     refetchInterval: 1000,
     staleTime: 0
   });
   const latestRound = rounds && rounds.length > 0 ? rounds[0] : null;
+
   const { data: roundData, isLoading: roundLoading, error: roundError, refetch: refetchRound } = useRound(latestRound?.id as number, {
     refetchInterval: 1000,
     staleTime: 0, 
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    notifyOnChangeProps: 'all', // Ensure any change triggers a re-render
+    notifyOnChangeProps: 'all',
   });
 
-  // Aggressive polling for round list and user state
   useEffect(() => {
     const interval = setInterval(() => {
-      // Force invalidate list to detect new rounds or status changes
       queryClient.invalidateQueries({ 
-        queryKey: [api.rounds.list.path]
+        queryKey: [api.rounds.list.path, mode]
       });
       
       if (latestRound?.id) {
-        // Also force refetch the specific round data
         queryClient.invalidateQueries({ 
           queryKey: [api.rounds.get.path, latestRound.id]
         });
@@ -98,7 +95,7 @@ export function useGameState() {
       }
     }, 1000); 
     return () => clearInterval(interval);
-  }, [latestRound?.id, queryClient, userId]);
+  }, [latestRound?.id, mode, userId]);
 
   const { data: userTransactions } = useQuery<Transaction[]>({
     queryKey: ["/api/auth/me/transactions", user?.id],
