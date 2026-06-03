@@ -1,5 +1,5 @@
 export const PROTOCOL_CONFIG = {
-  MINT_ADDRESS: "soonpump",
+  MINT_ADDRESS: "A3yCeYbaCWNVbdCceA1zkMKtQ3T2831X8esHj4shpump",
   SYMBOL: "$PBINGO",
   DECIMALS: 6,
 
@@ -8,7 +8,7 @@ export const PROTOCOL_CONFIG = {
   FEE_PERCENTAGE: 0,
 
   // Links
-  PUMP_FUN_URL: "https://pump.fun/",
+  PUMP_FUN_URL: "https://pump.fun/coin/",
   DEXSCANNER_URL: "https://dexscreener.com/solana/",
   TWITTER_URL: "https://x.com/Pump_Bingo",
 
