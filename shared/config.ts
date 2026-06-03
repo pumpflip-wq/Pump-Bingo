@@ -10,7 +10,7 @@ export const PROTOCOL_CONFIG = {
   // Links
   PUMP_FUN_URL: "https://pump.fun/coin/",
   DEXSCANNER_URL: "https://dexscreener.com/solana/",
-  TWITTER_URL: "https://x.com/Pump_Bingo",
+  TWITTER_URL: "https://x.com/PumpBingo_fun",
 
   // Mainnet Configuration
   NETWORK: "mainnet-beta",
