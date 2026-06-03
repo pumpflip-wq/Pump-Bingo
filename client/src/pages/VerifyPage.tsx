@@ -156,6 +156,7 @@ export default function VerifyPage() {
                 <thead>
                   <tr className="border-b border-white/10">
                     <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white whitespace-nowrap">Round ID</th>
+                    <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white whitespace-nowrap">Mode</th>
                     <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white whitespace-nowrap">Status</th>
                     <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white whitespace-nowrap">Drawn Numbers</th>
                     <th className="py-4 px-6 text-sm font-black uppercase tracking-widest text-white whitespace-nowrap">Verification Info</th>
@@ -165,6 +166,13 @@ export default function VerifyPage() {
                   {rounds?.slice(0, 10).map((round) => (
                     <tr key={round.id} className="group hover:bg-white/[0.02] transition-colors">
                       <td className="py-6 px-6 font-mono text-lg text-white font-black whitespace-nowrap">#{round.id}</td>
+                      <td className="py-6 px-6">
+                        {(round as any).mode === 'PAID' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] font-black uppercase tracking-widest">💰 PAID</span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/15 border border-primary/30 text-primary text-[10px] font-black uppercase tracking-widest">⚡ FREE</span>
+                        )}
+                      </td>
                       <td className="py-6 px-6">
                         <div className="flex flex-col gap-2">
                           <span className={`text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-lg w-fit shadow-lg ${

@@ -32,6 +32,9 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
 
   const [isWalleting, setIsWalleting] = useState(false);
 
+  // Determine mode from the round price prop
+  const isFreeMode = price === 0;
+
   const handleJoin = async () => {
     if (isWinnerDeclared || isWalleting) return;
     
@@ -48,39 +51,27 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
     }
 
     if (!effectiveUserId) {
-      // If we don't have a userId yet, try to login/get user first
       if (connected && publicKey) {
         const username = publicKey.toString();
-        console.log("[DEBUG] Attempting auto-login for:", username);
         try {
           const res = await fetch("/api/auth/login", {
             method: "POST",
-            headers: { 
-              "Content-Type": "application/json",
-              "Accept": "application/json"
-            },
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
             body: JSON.stringify({ username })
           });
           
           if (res.ok) {
             const newUser = await res.json();
-            console.log("[DEBUG] Auto-login success:", newUser);
             if (newUser && newUser.id) {
-              // Sync both Query Cache and Local Storage
               queryClient.setQueryData(["/api/auth/me", newUser.id], newUser);
               queryClient.setQueryData(["/api/auth/me"], newUser);
               localStorage.setItem("pb_user_id", newUser.id.toString());
-              
-              // Proceed immediately with the ID we just got
               handleJoinWithId(newUser.id);
               return;
             }
-          } else {
-            const errorText = await res.text();
-            console.error("[DEBUG] Auto-login failed status:", res.status, "Body:", errorText);
           }
         } catch (e) {
-          console.error("[DEBUG] Auto-login fetch error:", e);
+          console.error("[JoinButton] Auto-login error:", e);
         }
       }
 
@@ -98,11 +89,10 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
 
   const handleJoinWithId = async (joinUserId: number) => {
     try {
-      const isFreeMode = Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0;
       let signature = "";
 
       if (!isFreeMode) {
-        signature = "TX_SIG_" + Date.now();
+        // Check for existing pending payment
         const pendingRes = await fetch(`/api/payments/pending/${joinUserId}`);
         if (pendingRes.ok) {
           const pendingData = await pendingRes.json();
@@ -129,13 +119,13 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             try {
               const account = await getAccount(connection, userATA);
               if (Number(account.amount) < price) {
-                throw new Error(`Insufficient ${PROTOCOL_CONFIG.SYMBOL} balance.`);
+                throw new Error(`Insufficient ${PROTOCOL_CONFIG.SYMBOL} balance. You need ${price / 1e6} ${PROTOCOL_CONFIG.SYMBOL}.`);
               }
             } catch (e: any) {
               if (e.name === 'TokenAccountNotFoundError') {
-                throw new Error(`You don't have a ${PROTOCOL_CONFIG.SYMBOL} token account. Please make sure you have the tokens.`);
+                throw new Error(`You don't have a ${PROTOCOL_CONFIG.SYMBOL} token account. Buy tokens first.`);
               }
-              throw new Error(e.message || `Could not verify ${PROTOCOL_CONFIG.SYMBOL} balance. Make sure you have the tokens.`);
+              throw new Error(e.message || `Could not verify ${PROTOCOL_CONFIG.SYMBOL} balance.`);
             }
 
             const { blockhash } = await connection.getLatestBlockhash('confirmed');
@@ -149,17 +139,12 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
                 PROTOCOL_CONFIG.DECIMALS
               )
             );
-
             transaction.recentBlockhash = blockhash;
             transaction.feePayer = publicKey!;
 
-            signature = await sendTransaction(transaction, connection, { 
-              preflightCommitment: 'confirmed',
-            });
-            
+            signature = await sendTransaction(transaction, connection, { preflightCommitment: 'confirmed' });
             await connection.confirmTransaction(signature, "confirmed");
           } else {
-            // Fallback to SOL if no MINT_ADDRESS provided (safety)
             const treasury = new PublicKey(PROTOCOL_CONFIG.ADMIN_WALLET);
             const { blockhash } = await connection.getLatestBlockhash('confirmed');
             const transaction = new Transaction().add(
@@ -174,6 +159,9 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             signature = await sendTransaction(transaction, connection);
             await connection.confirmTransaction(signature, "confirmed");
           }
+        } else {
+          // Devnet / staging — simulate payment
+          signature = "TX_SIM_" + Date.now();
         }
 
         await apiRequest("POST", "/api/payments/queue", {
@@ -190,40 +178,26 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
         {
           onSuccess: async (data: any) => {
             setIsWalleting(false);
-            // Immediate invalidation with refetch for instant UI update
             await Promise.all([
-              queryClient.invalidateQueries({ 
-                queryKey: [api.rounds.get.path, roundId],
-                refetchType: 'all'
-              }),
-              queryClient.invalidateQueries({ 
-                queryKey: [api.rounds.list.path],
-                refetchType: 'all'
-              }),
-              queryClient.invalidateQueries({ 
-                queryKey: ["/api/auth/me"],
-                refetchType: 'all'
-              })
+              queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId], refetchType: 'all' }),
+              queryClient.invalidateQueries({ queryKey: [api.rounds.list.path], refetchType: 'all' }),
+              queryClient.invalidateQueries({ queryKey: ["/api/auth/me"], refetchType: 'all' })
             ]);
 
             if (joinUserId) {
-              await queryClient.invalidateQueries({ 
-                queryKey: ["/api/auth/me", joinUserId],
-                refetchType: 'all'
-              });
+              queryClient.invalidateQueries({ queryKey: ["/api/auth/me", joinUserId], refetchType: 'all' });
             }
             
             const isActuallyStarted = roundData?.round?.status === "IN_GAME" || roundData?.round?.status === "FINISHED";
             const showQueued = data.queued && isActuallyStarted;
 
             toast({
-              title: showQueued ? "Queued for Next Round" : "Successfully Joined",
+              title: showQueued ? "Queued for Next Round" : "Successfully Joined!",
               description: showQueued 
                 ? "You've been added to the queue for the next game!" 
-                : "You've successfully entered the round!",
+                : isFreeMode ? "You're in the game — good luck!" : `Entry of ${price / 1e6} ${PROTOCOL_CONFIG.SYMBOL} confirmed!`,
             });
 
-            // Force a small delay then another invalidation to be absolutely sure
             setTimeout(() => {
               queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
               queryClient.invalidateQueries({ queryKey: [api.rounds.list.path] });
@@ -232,7 +206,6 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
           onError: (error: any) => {
             setIsWalleting(false);
             queryClient.invalidateQueries({ queryKey: [api.rounds.get.path, roundId] });
-            
             toast({
               title: "Join Error",
               description: error.message || "Failed to join the round. Please try again.",
@@ -275,15 +248,17 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
       {isPending || isWalleting ? (
         <div className="flex items-center justify-center gap-2">
           <Loader2 className="w-6 h-6 animate-spin" />
-          <span>{isWalleting ? (Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0 ? 'JOINING...' : 'WAITING FOR WALLET...') : 'JOINING...'}</span>
+          <span>{isFreeMode ? 'JOINING...' : 'CONFIRM WALLET...'}</span>
         </div>
       ) : (
-        <div className="flex items-center justify-center gap-4">
-          <span>{Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) === 0 ? 'PLAY FOR FREE' : 'JOIN GAME -'}</span>
-          {Number(PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) > 0 && (
-            <span className="text-3xl text-black font-black">
-              {formatCurrency(price, false)} {PROTOCOL_CONFIG.SYMBOL}
-            </span>
+        <div className="flex items-center justify-center gap-3">
+          {isFreeMode ? (
+            <span>PLAY FOR FREE</span>
+          ) : (
+            <>
+              <span>JOIN GAME</span>
+              <span className="text-2xl text-black/80 font-black">— {formatCurrency(price, false)} {PROTOCOL_CONFIG.SYMBOL}</span>
+            </>
           )}
         </div>
       )}

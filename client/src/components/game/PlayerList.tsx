@@ -13,44 +13,29 @@ interface PlayerListProps {
 }
 
 export function PlayerList({ participants, walletAddress, formatAddress, roundStatus, roundData }: PlayerListProps) {
-  const amIParticipating = useMemo(() => participants.some(participant => participant.username === walletAddress), [participants, walletAddress]);
+  const amIParticipating = useMemo(() => participants.some(p => p.username === walletAddress), [participants, walletAddress]);
 
   const activeParticipants = useMemo(() => {
-    if (!participants) return [];
-    
+    if (!participants || participants.length === 0) return [];
     const map = new Map();
-    // Sort to prioritize confirmed players over optimistic ones
-    const list = [...participants].sort((a: any, b: any) => {
-      const aScore = a.txSignature ? 2 : 1;
-      const bScore = b.txSignature ? 2 : 1;
-      return aScore - bScore;
-    });
-
+    // Prefer confirmed (with txSignature) over optimistic entries
+    const list = [...participants].sort((a: any, b: any) =>
+      (b.txSignature ? 1 : 0) - (a.txSignature ? 1 : 0)
+    );
     list.forEach(p => {
-      // Use userId if available, fallback to username
-      const key = p.userId ? String(p.userId) : p.username;
+      const key = p.userId != null ? String(p.userId) : p.username;
       if (!key || p.username === "Unknown" || p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return;
-      
-      // Update map if key doesn't exist or we found a confirmed version
       if (!map.has(key) || (!map.get(key).txSignature && p.txSignature)) {
         map.set(key, p);
       }
     });
-
     return Array.from(map.values());
   }, [participants]);
 
   const sortedParticipants = useMemo(() => {
-    if (!activeParticipants || activeParticipants.length === 0) return [];
-    
+    if (activeParticipants.length === 0) return [];
     const winnerKey = roundData?.round?.winnerUsername?.toLowerCase() || null;
-
-    const normalized = activeParticipants.map(p => ({
-      ...p,
-      _key: (p.username || "").toLowerCase()
-    }));
-
-    // Always sort by win probability during and after game (for everyone incl. spectators)
+    const normalized = activeParticipants.map(p => ({ ...p, _key: (p.username || "").toLowerCase() }));
     if (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') {
       return normalized.sort((a, b) => {
         if (winnerKey && a._key === winnerKey) return -1;
@@ -58,9 +43,13 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
         return (b.prob || 0) - (a.prob || 0);
       });
     }
-
     return normalized;
-  }, [activeParticipants, roundStatus, amIParticipating, roundData?.round?.winnerUsername]);
+  }, [activeParticipants, roundStatus, roundData?.round?.winnerUsername]);
+
+  const isPaidRound = Number(roundData?.round?.price || 0) > 0;
+  const entryLabel = isPaidRound
+    ? `+${(Number(roundData?.round?.price) / 1e6).toFixed(0)} ${PROTOCOL_CONFIG.SYMBOL}`
+    : "FREE PLAY";
 
   return (
     <div className="glass-card neon-border rounded-2xl p-4 lg:p-6 flex flex-col h-full lg:h-[750px] overflow-hidden bg-black/20">
@@ -68,39 +57,32 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
         <h3 className="text-lg lg:text-[22px] text-white uppercase font-black tracking-widest flex items-center gap-2 font-display">
           <Users className="w-5 h-5 lg:w-6 lg:h-6 text-primary" /> Active Players
         </h3>
+        {sortedParticipants.length > 0 && (
+          <span className="text-xs font-black text-primary/60 uppercase tracking-widest">{sortedParticipants.length}</span>
+        )}
       </div>
       <div className="flex-1 overflow-y-auto space-y-2 pr-1 lg:pr-2 custom-scrollbar">
         <AnimatePresence mode="popLayout">
           {sortedParticipants.map((p: any, idx) => {
             const isMe = p.username === walletAddress;
-            
-            // Show probabilities and ranking numbers for ALL viewers during active game
-            const showStats = roundStatus === 'IN_GAME' || roundStatus === 'FINISHED';
-            
-            // Filter out system account or invalid players
             if (!p.username || p.username === "Unknown") return null;
-            // Never show the system/master wallet in the player list
             if (p.username === PROTOCOL_CONFIG.ADMIN_WALLET) return null;
+            const showStats = roundStatus === 'IN_GAME' || roundStatus === 'FINISHED';
 
             return (
-              <motion.div 
+              <motion.div
                 layout
-                key={p.userId || p.id}
+                key={p.userId || p.username}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
-                transition={{ 
-                  type: "spring",
-                  stiffness: 500,
-                  damping: 30,
-                  mass: 1
-                }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 className={cn(
                   "flex items-center justify-between p-3 bg-white/5 rounded-xl border transition-all hover:border-primary/50 hover:bg-white/10 group",
                   isMe ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(34,197,94,0.1)]" : "border-white/5"
                 )}
               >
-                <div className="flex flex-col flex-1">
+                <div className="flex flex-col flex-1 overflow-hidden">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2 overflow-hidden">
                       {showStats && (
@@ -108,37 +90,34 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
                           {idx + 1}
                         </span>
                       )}
-                      <span className="text-sm font-black text-white italic tracking-tight flex items-center gap-1 truncate">
+                      <span className="text-sm font-black text-white italic tracking-tight truncate">
                         {formatAddress(p.username)}
                         {isMe && <span className="text-[10px] text-primary font-black ml-1">(YOU)</span>}
                       </span>
                     </div>
                     {showStats && (
-                      <span className="text-sm font-black text-primary min-w-[3ch] text-right">
+                      <span className="text-sm font-black text-primary min-w-[3ch] text-right shrink-0">
                         {Math.round(p.prob || 0)}%
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-col gap-1 mt-1">
-                    <div className="flex items-center gap-2 mt-0.5">
-                       <span className="text-[12px] text-primary font-black font-mono tracking-normal">
-                         {Number(roundData?.round?.price || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) > 0 ? (
-                           `+${(Number(roundData?.round?.price || PROTOCOL_CONFIG.DEFAULT_ENTRY_PRICE) / 1e9).toFixed(2)} SOL`
-                         ) : (
-                           "FREE PLAY"
-                         )}
-                       </span>
-                    </div>
-                    {showStats && (roundStatus === 'IN_GAME' || roundStatus === 'FINISHED') && (
-                      <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${p.prob || 0}%` }}
-                          className="h-full bg-primary"
-                        />
-                      </div>
-                    )}
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={cn(
+                      "text-[11px] font-black font-mono tracking-normal",
+                      isPaidRound ? "text-amber-400" : "text-primary/60"
+                    )}>
+                      {entryLabel}
+                    </span>
                   </div>
+                  {showStats && (
+                    <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mt-1">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${p.prob || 0}%` }}
+                        className="h-full bg-primary"
+                      />
+                    </div>
+                  )}
                 </div>
                 <ShieldCheck className={cn(
                   "w-4 h-4 transition-colors shrink-0 ml-2",

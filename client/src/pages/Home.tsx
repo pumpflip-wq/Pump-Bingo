@@ -36,28 +36,30 @@ import { useGameState } from "@/hooks/useGameState";
 
 function ModeSelector({ selected, onChange }: { selected: 'FREE' | 'PAID'; onChange: (m: 'FREE' | 'PAID') => void }) {
   return (
-    <div className="flex items-center gap-1.5 p-1 bg-black/50 border border-white/10 rounded-2xl" data-testid="mode-selector">
+    <div className="flex items-stretch gap-0.5 p-0.5 bg-black/70 border border-white/8 rounded-xl backdrop-blur-sm" data-testid="mode-selector">
       <button
         onClick={() => onChange('FREE')}
         data-testid="button-mode-free"
-        className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl font-black uppercase text-sm tracking-widest transition-all ${
+        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-5 rounded-[10px] font-black uppercase text-sm tracking-widest transition-all duration-200 ${
           selected === 'FREE'
-            ? 'bg-primary text-black shadow-[0_0_15px_rgba(34,197,94,0.4)]'
-            : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+            ? 'bg-primary text-black shadow-[0_0_18px_rgba(34,197,94,0.3)]'
+            : 'text-white/35 hover:text-white/65 hover:bg-white/5'
         }`}
       >
-        <Zap className="w-4 h-4" /> FREE
+        <Zap className={`w-3.5 h-3.5 ${selected === 'FREE' ? 'text-black' : 'text-primary/60'}`} />
+        FREE
       </button>
       <button
         onClick={() => onChange('PAID')}
         data-testid="button-mode-paid"
-        className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl font-black uppercase text-sm tracking-widest transition-all ${
+        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-5 rounded-[10px] font-black uppercase text-sm tracking-widest transition-all duration-200 ${
           selected === 'PAID'
-            ? 'bg-secondary text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]'
-            : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+            ? 'bg-amber-500 text-black shadow-[0_0_18px_rgba(245,158,11,0.3)]'
+            : 'text-white/35 hover:text-white/65 hover:bg-white/5'
         }`}
       >
-        <Coins className="w-4 h-4" /> 100 {PROTOCOL_CONFIG.SYMBOL}
+        <Coins className={`w-3.5 h-3.5 ${selected === 'PAID' ? 'text-black' : 'text-amber-500/60'}`} />
+        100 {PROTOCOL_CONFIG.SYMBOL}
       </button>
     </div>
   );
@@ -282,22 +284,36 @@ export default function Home() {
             <motion.div key="waiting" initial={{ opacity: 0, rotateY: -90 }} animate={{ opacity: 1, rotateY: 0 }} exit={{ opacity: 0, rotateY: 90 }} transition={{ duration: 0.8 }} className="glass-card neon-border rounded-[3rem] p-8 text-center flex flex-col items-center justify-between h-full relative overflow-hidden">
                <div className="flex-1 flex flex-col items-center justify-between py-4 w-full h-full">
                   <div className="w-full space-y-8">
-                    <div className="glass-card neon-border rounded-2xl p-8 bg-black/60 border-primary/30 flex flex-row items-center justify-center gap-24 w-full">
-                      <div className="flex flex-col text-center">
-                        <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Room</p>
-                        <p className="text-5xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
-                      </div>
-                      <div className="flex flex-col text-center scale-110">
-                        <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
+                    <div className="glass-card neon-border rounded-2xl p-8 bg-black/60 border-primary/30 flex flex-col items-center gap-6 w-full">
+                      <div className="flex flex-row items-center justify-center gap-24 w-full">
+                        <div className="flex flex-col text-center">
+                          <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Room</p>
+                          <p className="text-5xl font-black text-white font-display italic leading-none">#{roundData.round.id}</p>
+                        </div>
+                        <div className="flex flex-col text-center scale-110">
+                          <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Prize Pool</p>
+                          <div className="flex flex-col items-center">
+                            <span className="text-7xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{formatCurrency(roundData.round.prizePool || 0)}</span>
+                            <span className="text-3xl text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
+                          </div>
+                        </div>
                         <div className="flex flex-col items-center">
-                          <span className="text-7xl font-black text-primary font-display italic leading-none drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">{formatCurrency(roundData.round.prizePool || 0)}</span>
-                          <span className="text-3xl text-primary font-black uppercase tracking-widest mt-1">{PROTOCOL_CONFIG.SYMBOL}</span>
+                          <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Players</p>
+                          <p className="text-5xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                         </div>
                       </div>
-                      <div className="flex flex-col items-center">
-                        <p className="text-xl text-white uppercase font-black tracking-widest font-mono mb-2">Players</p>
-                        <p className="text-5xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
-                      </div>
+                      {/* Mode badge */}
+                      {(roundData.round as any).mode === 'PAID' ? (
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25">
+                          <Coins className="w-3.5 h-3.5 text-amber-400" />
+                          <span className="text-[11px] font-black uppercase tracking-widest text-amber-400">100 {PROTOCOL_CONFIG.SYMBOL} Entry</span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/25">
+                          <Zap className="w-3.5 h-3.5 text-primary" />
+                          <span className="text-[11px] font-black uppercase tracking-widest text-primary">Free Play</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   {isWaitingForCA ? (
@@ -332,7 +348,18 @@ export default function Home() {
                         <p className="text-3xl font-black text-primary italic font-display">{formatCurrency(roundData.round.prizePool)} {PROTOCOL_CONFIG.SYMBOL}</p>
                       </div>
                    </div>
-                   <div className="flex gap-4">
+                   <div className="flex gap-3 items-center">
+                      {(roundData.round as any).mode === 'PAID' ? (
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25">
+                          <Coins className="w-3 h-3 text-amber-400" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">100 {PROTOCOL_CONFIG.SYMBOL}</span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 border border-primary/25">
+                          <Zap className="w-3 h-3 text-primary" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-primary">Free</span>
+                        </div>
+                      )}
                       <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-center">
                         <p className="text-white uppercase font-black text-xs tracking-widest">Room</p>
                         <p className="text-2xl font-black text-white">#{roundData.round.id}</p>
@@ -429,18 +456,32 @@ export default function Home() {
             <motion.div key="game" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="h-full flex flex-col space-y-3">
               {roundData.round.status === "OPEN" || roundData.round.status === "STARTING" ? (
                 <div className="glass-card neon-border rounded-[2rem] p-4 flex-1 flex flex-col items-center justify-between bg-black/60 overflow-hidden relative">
-                  <div className="w-full flex justify-between items-center px-4 py-2 bg-white/5 rounded-2xl border border-white/10 z-20 relative">
-                    <div className="text-center">
-                      <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Room</p>
-                      <p className="text-xl font-black text-white italic">#{roundData.round.id}</p>
+                  <div className="w-full flex flex-col gap-1.5 z-20 relative">
+                    <div className="flex justify-between items-center px-4 py-2 bg-white/5 rounded-2xl border border-white/10">
+                      <div className="text-center">
+                        <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Room</p>
+                        <p className="text-xl font-black text-white italic">#{roundData.round.id}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Prize</p>
+                        <p className="text-xl font-black text-primary italic drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">{formatCurrency(roundData.round.prizePool || 0)}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Players</p>
+                        <p className="text-xl font-black text-white italic">{roundData.participantsCount}</p>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Prize</p>
-                      <p className="text-xl font-black text-primary italic drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">{formatCurrency(roundData.round.prizePool || 0)}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Players</p>
-                      <p className="text-xl font-black text-white italic">{roundData.participantsCount}</p>
+                    {/* Mode badge */}
+                    <div className="flex justify-center">
+                      {(roundData.round as any).mode === 'PAID' ? (
+                        <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-widest">
+                          <Coins className="w-2.5 h-2.5" /> 100 {PROTOCOL_CONFIG.SYMBOL} Entry
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[9px] font-black uppercase tracking-widest">
+                          <Zap className="w-2.5 h-2.5" /> Free Play
+                        </span>
+                      )}
                     </div>
                   </div>
 

@@ -173,6 +173,7 @@ export default function GameHistory() {
                       <TableHeader className="bg-white/5">
                         <TableRow>
                           <TableHead className="font-black uppercase tracking-widest text-white text-sm">Round</TableHead>
+                          <TableHead className="font-black uppercase tracking-widest text-white text-sm">Mode</TableHead>
                           <TableHead className="font-black uppercase tracking-widest text-white text-sm">Winner</TableHead>
                           <TableHead className="font-black uppercase tracking-widest text-white text-sm">Prize Pool</TableHead>
                           <TableHead className="font-black uppercase tracking-widest text-white text-sm">Verification Info</TableHead>
@@ -184,6 +185,13 @@ export default function GameHistory() {
                         {data?.rounds.map((round) => (
                           <TableRow key={round.id} className="hover:bg-white/5 transition-colors border-white/5">
                             <TableCell className="font-mono font-bold text-primary text-base">#{round.id}</TableCell>
+                            <TableCell>
+                              {round.mode === 'PAID' ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] font-black uppercase tracking-widest">💰 PAID</span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/15 border border-primary/30 text-primary text-[10px] font-black uppercase tracking-widest">⚡ FREE</span>
+                              )}
+                            </TableCell>
                             <TableCell className="font-bold italic text-base">
                               {round.winnerUsername ? (
                                 <span className="flex items-center gap-2">
@@ -265,7 +273,14 @@ export default function GameHistory() {
                     {data?.rounds.map((round) => (
                       <div key={round.id} className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-4">
                         <div className="flex items-center justify-between">
-                          <span className="font-mono font-bold text-primary text-xl">#{round.id}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-primary text-xl">#{round.id}</span>
+                            {round.mode === 'PAID' ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] font-black uppercase tracking-widest">💰 PAID</span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/15 border border-primary/30 text-primary text-[10px] font-black uppercase tracking-widest">⚡ FREE</span>
+                            )}
+                          </div>
                           <span className="text-sm text-white font-bold opacity-80">
                             {round.completedAt ? format(new Date(round.completedAt), "MMM d, HH:mm") : "-"}
                           </span>
