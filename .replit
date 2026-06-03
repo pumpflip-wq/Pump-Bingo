@@ -46,3 +46,4 @@ DATABASE_URL_EXTERNAL = "postgresql://postgres:qqbqXhxCSYCoTEDXSuSelDuGNeQEjNGG@
 
 [agent]
 stack = "FULLSTACK_JS"
+expertMode = true
