@@ -61,9 +61,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Ensure database is ready before registering routes
-  await initializeDatabase();
-  
+  // Register routes (before DB is ready — routes will handle DB errors gracefully)
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
@@ -89,10 +87,7 @@ app.use((req, res, next) => {
     await setupVite(httpServer, app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
+  // Start listening FIRST so Railway health checks pass immediately
   const port = parseInt(process.env.PORT || "5000", 10);
   httpServer.listen(
     {
@@ -102,11 +97,21 @@ app.use((req, res, next) => {
     },
     () => {
       log(`serving on port ${port}`);
-      // Start the game manager loop
-      import("./game").then(({ gameManager }) => {
-        gameManager.start();
-        log("Game Manager started");
-      });
+
+      // Initialize DB and start game loop AFTER server is listening
+      initializeDatabase()
+        .then(() => {
+          log("Database initialized successfully");
+          return import("./game");
+        })
+        .then(({ gameManager }) => {
+          gameManager.start();
+          log("Game Manager started");
+        })
+        .catch((err) => {
+          console.error("Startup error (DB/Game):", err.message);
+          log("Server running — waiting for DATABASE_URL to become available");
+        });
     },
   );
 })();

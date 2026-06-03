@@ -1,7 +1,8 @@
 import { Connection, Keypair, PublicKey, Transaction, sendAndConfirmTransaction, SystemProgram } from "@solana/web3.js";
 import { getOrCreateAssociatedTokenAccount, createTransferInstruction } from "@solana/spl-token";
 import { PROTOCOL_CONFIG } from "../shared/config";
-import bs58 from "bs58";
+import * as bs58Module from "bs58";
+const bs58 = (bs58Module as any).default ?? bs58Module;
 
 // This class manages the system's Solana wallet and token transactions
 export class SolanaManager {
