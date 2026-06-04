@@ -257,13 +257,14 @@ export async function registerRoutes(
       if (!round) return res.status(404).json({ message: "Round not found" });
 
       const isFreeMode = Number(round.price) === 0;
+      const entryAmount = isFreeMode ? 0 : PROTOCOL_CONFIG.PAID_ENTRY_PRICE;
 
       if (round.status !== ROUND_STATUS.OPEN) {
         if (txSignature && !isFreeMode) {
           await storage.createPaymentQueue({
             userId: Number(userId),
             txSignature,
-            amount: Number(round.price),
+            amount: entryAmount,
             status: "PENDING",
           });
           return res.json({
@@ -311,31 +312,30 @@ export async function registerRoutes(
       );
 
       const currentPrize = Number(round.prizePool || 0);
-      const entryPrice = Number(round.price || 0);
       await storage.updateRound(roundId, {
-        prizePool: currentPrize + entryPrice,
+        prizePool: currentPrize + entryAmount,
       });
 
       const user = await storage.getUser(Number(userId));
       const responseData = { participant, balance: Number(user?.balance || 0) };
 
       // Create transaction & update balance in background
-      if (entryPrice > 0) {
+      if (entryAmount > 0) {
         storage
           .createTransaction({
             userId,
-            amount: -entryPrice,
+            amount: -entryAmount,
             type: "BUY_IN",
             roundId,
           })
           .catch(console.error);
-        storage.updateUserBalance(userId, entryPrice * -1).catch(console.error);
+        storage.updateUserBalance(userId, entryAmount * -1).catch(console.error);
 
         // Verify on Solana in background
         const masterPubKey = solanaManager.getMasterPublicKey();
         if (txSignature && masterPubKey) {
           solanaManager
-            .verifyTransaction(txSignature, entryPrice, masterPubKey)
+            .verifyTransaction(txSignature, entryAmount, masterPubKey)
             .then((valid) => {
               if (!valid) console.error(`Transaction invalid: ${txSignature}`);
             })

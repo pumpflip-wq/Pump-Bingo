@@ -317,7 +317,7 @@ export default function Home() {
                       <div className="p-6 bg-primary/10 border-2 border-primary/30 rounded-[2rem] w-full text-center">
                         <p className="text-primary font-black text-3xl italic tracking-tighter mb-3 uppercase">YOU'RE IN THE GAME!</p>
                       </div>
-                    ) : <JoinButton roundId={roundData.round.id} price={Number(roundData.round.price)} userId={user?.id || 0} />}
+                    ) : <JoinButton roundId={roundData.round.id} price={Number(roundData.round.price) === 0 ? 0 : PROTOCOL_CONFIG.PAID_ENTRY_PRICE} userId={user?.id || 0} />}
                   </div>
                </div>
             </motion.div>
@@ -466,7 +466,7 @@ export default function Home() {
                       </div>
                     ) : (
                       <div className="flex justify-center w-full">
-                        <JoinButton roundId={roundData.round.id} price={Number(roundData.round.price)} userId={user?.id || 0} />
+                        <JoinButton roundId={roundData.round.id} price={Number(roundData.round.price) === 0 ? 0 : PROTOCOL_CONFIG.PAID_ENTRY_PRICE} userId={user?.id || 0} />
                       </div>
                     )}
                   </div>
