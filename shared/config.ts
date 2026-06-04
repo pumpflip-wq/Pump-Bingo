@@ -21,6 +21,6 @@ export const PROTOCOL_CONFIG = {
   BACKUP_RPC_URL: "https://api.mainnet-beta.solana.com",
 
   // Admin wallet address (treasury — receives entry fees and sends prizes)
-  ADMIN_WALLET: "23caHs1DUE8Qh5G2fLtKGUtEicahB4roGhiedp7zWg4Z",
+  ADMIN_WALLET: "HNWFkL5prLZ3hfLQZKWpNRYW8WrHgEca1rbZy7YCcsB2",
   POST_WIN_DELAY_MS: 10000,
 };
