@@ -5,7 +5,7 @@ export const PROTOCOL_CONFIG = {
 
   // Game Settings
   DEFAULT_ENTRY_PRICE: 0 * 1e6,       // FREE lobby entry price (always 0)
-  PAID_ENTRY_PRICE: 100 * 1e6,        // PAID lobby entry price (100 $PBINGO)
+  PAID_ENTRY_PRICE: 10000 * 1e6,      // PAID lobby entry price (10,000 $PBINGO)
   FEE_PERCENTAGE: 10,                  // 10% protocol fee on prize pools
 
   // Links

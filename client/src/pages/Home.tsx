@@ -16,8 +16,6 @@ import {
   ShieldCheck,
   Menu,
   X,
-  Zap,
-  Coins,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo, useRef } from "react";
@@ -57,7 +55,7 @@ function ModeSelector({ selected, onChange }: { selected: 'FREE' | 'PAID'; onCha
             : 'text-white/40 hover:text-white/70'
         }`}
       >
-        100 {PROTOCOL_CONFIG.SYMBOL}
+        {(PROTOCOL_CONFIG.PAID_ENTRY_PRICE / 1e6).toLocaleString()} {PROTOCOL_CONFIG.SYMBOL}
       </button>
     </div>
   );
@@ -300,18 +298,6 @@ export default function Home() {
                           <p className="text-5xl font-black text-white font-display italic leading-none">{roundData.participantsCount}</p>
                         </div>
                       </div>
-                      {/* Mode badge */}
-                      {(roundData.round as any).mode === 'PAID' ? (
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25">
-                          <Coins className="w-3.5 h-3.5 text-amber-400" />
-                          <span className="text-[11px] font-black uppercase tracking-widest text-amber-400">100 {PROTOCOL_CONFIG.SYMBOL} Entry</span>
-                        </div>
-                      ) : (
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/25">
-                          <Zap className="w-3.5 h-3.5 text-primary" />
-                          <span className="text-[11px] font-black uppercase tracking-widest text-primary">Free Play</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                   {isWaitingForCA ? (
@@ -347,17 +333,6 @@ export default function Home() {
                       </div>
                    </div>
                    <div className="flex gap-3 items-center">
-                      {(roundData.round as any).mode === 'PAID' ? (
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25">
-                          <Coins className="w-3 h-3 text-amber-400" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">100 {PROTOCOL_CONFIG.SYMBOL}</span>
-                        </div>
-                      ) : (
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 border border-primary/25">
-                          <Zap className="w-3 h-3 text-primary" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-primary">Free</span>
-                        </div>
-                      )}
                       <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-center">
                         <p className="text-white uppercase font-black text-xs tracking-widest">Room</p>
                         <p className="text-2xl font-black text-white">#{roundData.round.id}</p>
@@ -468,18 +443,6 @@ export default function Home() {
                         <p className="text-[10px] uppercase font-black text-white/80 tracking-widest">Players</p>
                         <p className="text-xl font-black text-white italic">{roundData.participantsCount}</p>
                       </div>
-                    </div>
-                    {/* Mode badge */}
-                    <div className="flex justify-center">
-                      {(roundData.round as any).mode === 'PAID' ? (
-                        <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-widest">
-                          <Coins className="w-2.5 h-2.5" /> 100 {PROTOCOL_CONFIG.SYMBOL} Entry
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[9px] font-black uppercase tracking-widest">
-                          <Zap className="w-2.5 h-2.5" /> Free Play
-                        </span>
-                      )}
                     </div>
                   </div>
 
