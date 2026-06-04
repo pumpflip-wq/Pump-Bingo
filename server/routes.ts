@@ -18,9 +18,6 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express,
 ): Promise<Server> {
-  // Start game loop
-  gameManager.start();
-
   // ===== ADMIN STATS =====
   app.get("/api/admin/stats", async (req, res) => {
     try {
@@ -287,6 +284,11 @@ export async function registerRoutes(
           participant: existing,
           balance: Number(user?.balance || 0),
         });
+      }
+
+      // For paid rounds, txSignature is required — reject if missing
+      if (!isFreeMode && !txSignature) {
+        return res.status(400).json({ message: "Transaction signature required for paid rounds." });
       }
 
       // Check for pending payment to prevent duplicates (only if not free)
