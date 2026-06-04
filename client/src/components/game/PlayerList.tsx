@@ -48,7 +48,7 @@ export function PlayerList({ participants, walletAddress, formatAddress, roundSt
 
   const isPaidRound = Number(roundData?.round?.price || 0) > 0;
   const entryLabel = isPaidRound
-    ? `+${(Number(roundData?.round?.price) / 1e6).toFixed(0)} ${PROTOCOL_CONFIG.SYMBOL}`
+    ? `+${(Number(roundData?.round?.price) / 1e6).toLocaleString("en-US")} ${PROTOCOL_CONFIG.SYMBOL}`
     : "FREE PLAY";
 
   return (

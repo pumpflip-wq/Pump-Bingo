@@ -119,7 +119,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
             try {
               const account = await getAccount(connection, userATA);
               if (Number(account.amount) < price) {
-                throw new Error(`Insufficient ${PROTOCOL_CONFIG.SYMBOL} balance. You need ${price / 1e6} ${PROTOCOL_CONFIG.SYMBOL}.`);
+                throw new Error(`Insufficient ${PROTOCOL_CONFIG.SYMBOL} balance. You need ${(price / 1e6).toLocaleString("en-US")} ${PROTOCOL_CONFIG.SYMBOL}.`);
               }
             } catch (e: any) {
               if (e.name === 'TokenAccountNotFoundError') {
@@ -195,7 +195,7 @@ export function JoinButton({ roundId, price, userId, className }: JoinButtonProp
               title: showQueued ? "Queued for Next Round" : "Successfully Joined!",
               description: showQueued 
                 ? "You've been added to the queue for the next game!" 
-                : isFreeMode ? "You're in the game — good luck!" : `Entry of ${price / 1e6} ${PROTOCOL_CONFIG.SYMBOL} confirmed!`,
+                : isFreeMode ? "You're in the game — good luck!" : `Entry of ${(price / 1e6).toLocaleString("en-US")} ${PROTOCOL_CONFIG.SYMBOL} confirmed!`,
             });
 
             setTimeout(() => {
