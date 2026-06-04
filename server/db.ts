@@ -95,7 +95,8 @@ async function runMigrations() {
   await db.execute(sql`UPDATE rounds SET mode = 'FREE' WHERE mode IS NULL`);
 
   // Sync the rounds_id_seq sequence to the actual max ID to prevent duplicate key errors
-  await db.execute(sql`SELECT setval('rounds_id_seq', COALESCE((SELECT MAX(id) FROM rounds), 0))`);
+  // Use GREATEST to ensure we never pass 0 (PostgreSQL sequences start at 1)
+  await db.execute(sql`SELECT setval('rounds_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM rounds), 1), 1))`);
   
   console.log("Migrations complete.");
 }
